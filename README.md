@@ -62,7 +62,7 @@ pip3 install -r dqn_example/dqn_requirements.txt
 ```
 and run the training file
 ```bash
-python3 dqn_train.py dqn_example/ppo_config.yaml --name dqn
+python3 ppo_train.py dqn_example/ppo_config.yaml --name dqn
 ```
 
 **Note:** The default configuration uses 1 GPU and 12 CPUs, so if your current instance doesn't have that amount of capacity, lower the numbers at the `dqn_example/dqn_config.yaml`. Additionally, if you are having out of memory problems, consider reducing the `buffer_size` parameter.
@@ -143,7 +143,7 @@ ray rsync-up dqn_example/ppo_autoscaler.yaml dqn_example .
 ray rsync-up dqn_example/ppo_autoscaler.yaml rllib_integration .
 
 # Run the training
-ray submit dqn_example/ppo_autoscaler.yaml dqn_train.py -- dqn_example/ppo_config.yaml --auto
+ray submit dqn_example/ppo_autoscaler.yaml ppo_train.py -- dqn_example/ppo_config.yaml --auto
 
 # (Optional) Monitor the cluster status 
 ray attach dqn_example/ppo_autoscaler.yaml

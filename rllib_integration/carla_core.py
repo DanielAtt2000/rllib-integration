@@ -58,8 +58,9 @@ class CarlaCore:
         self.hero = None
         self.config = join_dicts(BASE_CORE_CONFIG, config)
         self.sensor_interface = SensorInterface()
+        self.server_port = 2000
 
-        self.init_server()
+        # self.init_server()
         self.connect_client()
 
     def init_server(self):

@@ -3,12 +3,12 @@
 framework: "torch"
 num_workers: 1
 num_gpus_per_worker: 1
-num_cpus_per_worker: 11
+num_cpus_per_worker: 1
 rollout_fragment_length: 16
 timesteps_per_iteration: 20000
-train_batch_size: 64
+train_batch_size: 32
 learning_starts: 20000
-buffer_size: 5000
+buffer_size: 1
 # "batch_mode": "complete_episodes"
 lr: 0.0025
 # "exploration_config": {
@@ -38,7 +38,7 @@ model: {
 
 env_config:
   carla:
-    host: "localhost"
+    host: "127.0.0.1"
     timeout: 30.0
     timestep: 0.05
     retries_on_error: 25

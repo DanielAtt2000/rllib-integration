@@ -22,9 +22,9 @@ from rllib_integration.carla_core import kill_all_servers
 
 from rllib_integration.helper import get_checkpoint, launch_tensorboard
 
-from dqn_example.dqn_experiment import DQNExperiment
-from dqn_example.dqn_callbacks import DQNCallbacks
-from dqn_example.dqn_trainer import CustomDQNTrainer
+from ppo_example.ppo_experiment import DQNExperiment
+from ppo_example.ppo_callbacks import DQNCallbacks
+from ppo_example.ppo_trainer import CustomDQNTrainer
 
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
 EXPERIMENT_CLASS = DQNExperiment
