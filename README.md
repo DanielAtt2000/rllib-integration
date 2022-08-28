@@ -62,7 +62,7 @@ pip3 install -r dqn_example/dqn_requirements.txt
 ```
 and run the training file
 ```bash
-python3 dqn_train.py dqn_example/dqn_config.yaml --name dqn
+python3 dqn_train.py dqn_example/ppo_config.yaml --name dqn
 ```
 
 **Note:** The default configuration uses 1 GPU and 12 CPUs, so if your current instance doesn't have that amount of capacity, lower the numbers at the `dqn_example/dqn_config.yaml`. Additionally, if you are having out of memory problems, consider reducing the `buffer_size` parameter.
@@ -136,20 +136,20 @@ python3 aws_helper.py create-image --name <AMI-name> --installation-scripts inst
 
 ```bash
 # Initialize the cluster
-ray up dqn_example/dqn_autoscaler.yaml
+ray up dqn_example/ppo_autoscaler.yaml
 
 # (Optional) Update remote files with local changes
-ray rsync-up dqn_example/dqn_autoscaler.yaml dqn_example .
-ray rsync-up dqn_example/dqn_autoscaler.yaml rllib_integration .
+ray rsync-up dqn_example/ppo_autoscaler.yaml dqn_example .
+ray rsync-up dqn_example/ppo_autoscaler.yaml rllib_integration .
 
 # Run the training
-ray submit dqn_example/dqn_autoscaler.yaml dqn_train.py -- dqn_example/dqn_config.yaml --auto
+ray submit dqn_example/ppo_autoscaler.yaml dqn_train.py -- dqn_example/ppo_config.yaml --auto
 
 # (Optional) Monitor the cluster status 
-ray attach dqn_example/dqn_autoscaler.yaml
+ray attach dqn_example/ppo_autoscaler.yaml
 watch -n 1 ray status
 
 # Shutdown the cluster
-ray down dqn_example/dqn_autoscaler.yaml
+ray down dqn_example/ppo_autoscaler.yaml
 ```
 
