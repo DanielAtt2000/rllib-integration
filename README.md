@@ -62,7 +62,7 @@ pip3 install -r dqn_example/dqn_requirements.txt
 ```
 and run the training file
 ```bash
-python3 ppo_train.py dqn_example/ppo_config.yaml --name dqn
+python ppo_train.py ppo_example/ppo_config.yaml --name ppo
 ```
 
 **Note:** The default configuration uses 1 GPU and 12 CPUs, so if your current instance doesn't have that amount of capacity, lower the numbers at the `dqn_example/dqn_config.yaml`. Additionally, if you are having out of memory problems, consider reducing the `buffer_size` parameter.

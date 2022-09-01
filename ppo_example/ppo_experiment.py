@@ -16,7 +16,7 @@ from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
 
 
-class DQNExperiment(BaseExperiment):
+class PPOExperiment(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
 
@@ -52,19 +52,27 @@ class DQNExperiment(BaseExperiment):
         """Returns the action space, in this case, a discrete space"""
         return Discrete(len(self.get_actions()))
 
+    # def get_observation_space(self):
+    #     num_of_channels = 3
+    #     image_space = Box(
+    #         low=0.0,
+    #         high=255.0,
+    #         shape=(
+    #             self.config["hero"]["sensors"]["birdview"]["size"],
+    #             self.config["hero"]["sensors"]["birdview"]["size"],
+    #             num_of_channels * self.frame_stack,
+    #         ),
+    #         dtype=np.uint8,
+    #     )
+    #     return image_space
+
     def get_observation_space(self):
-        num_of_channels = 3
-        image_space = Box(
-            low=0.0,
-            high=255.0,
-            shape=(
-                self.config["hero"]["sensors"]["birdview"]["size"],
-                self.config["hero"]["sensors"]["birdview"]["size"],
-                num_of_channels * self.frame_stack,
-            ),
-            dtype=np.uint8,
-        )
-        return image_space
+        """
+        Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
+        :return:
+        """
+        return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
+
 
     def get_actions(self):
         return {
@@ -114,7 +122,7 @@ class DQNExperiment(BaseExperiment):
 
         return action
 
-    def get_observation(self, sensor_data):
+    def get_observation(self, sensor_data, core):
         """Function to do all the post processing of observations (sensor data).
 
         :param sensor_data: dictionary {sensor_name: sensor_data}
@@ -123,27 +131,69 @@ class DQNExperiment(BaseExperiment):
         as well as a variable with additional information about such observation.
         The information variable can be empty
         """
-        image = post_process_image(sensor_data['birdview'][1], normalized = False, grayscale = False)
 
-        if self.prev_image_0 is None:
-            self.prev_image_0 = image
-            self.prev_image_1 = self.prev_image_0
-            self.prev_image_2 = self.prev_image_1
+        # Current position and heading of the vehicle
+        # velocity
+        # Final position and heading
 
-        images = image
+        # collision
+        # laneInvasion
+        # Time
 
-        if self.frame_stack >= 2:
-            images = np.concatenate([self.prev_image_0, images], axis=2)
-        if self.frame_stack >= 3 and images is not None:
-            images = np.concatenate([self.prev_image_1, images], axis=2)
-        if self.frame_stack >= 4 and images is not None:
-            images = np.concatenate([self.prev_image_2, images], axis=2)
+        # changing location to value between 0 and 1
+        # NORMALIZE
+        # x_pos, y_pos = core.normalize_coordinates(observation["location"].location.x,
+        #                                           observation["location"].location.y)
 
-        self.prev_image_2 = self.prev_image_1
-        self.prev_image_1 = self.prev_image_0
-        self.prev_image_0 = image
+        transform = core.hero.get_transform()
+        x_pos = transform.location.x
+        y_pos = transform.location.y
 
-        return images, {}
+        distToFinish = np.sqrt(np.square(np.float32(self.config["hero"]["final_location_x"]) - x_pos) + np.square(np.float32(self.config["hero"]["final_location_y"]) - y_pos))
+
+
+        forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
+        forward_velocity = np.clip(forward_velocity, 0, 50.0) / 50
+        heading = np.sin(transform.rotation.yaw * np.pi / 180)
+
+        collisionCounter = 0
+        laneInvasionCounter = 0
+        for sensor in sensor_data:
+            if sensor == 'collision':
+                collisionCounter +=1
+                print('Collision Event')
+                print(sensor_data[sensor][1][0].semantic_tags)
+                print(sensor_data[sensor][1][0].type_id)
+
+            # if sensor == 'obstacle':
+            #     obstacle = sensor_data[sensor][1][0].type_id
+            #     if 'static.road' != obstacle and 'static.terrain' != obstacle:
+            #         print('Obstacle Event')
+            #         print(obstacle)
+
+            if sensor == 'laneInvasion':
+                print('Lane Invasion Event')
+
+                laneInvasions = sensor_data[sensor][1][1]
+                print(laneInvasions)
+                for laneInvasion in laneInvasions:
+                    laneInvasionCounter +=1
+                    print(laneInvasion.type)
+
+        print(f"X Location {x_pos}")
+        print(f"Y Location {y_pos}")
+        print(f"Heading {heading}")
+        print(f"Forward Velocity {forward_velocity}")
+        print(f"Distance to finish {distToFinish}")
+        print(f"Collision Counter {collisionCounter}")
+        print(f"Lane Invasion Counter {laneInvasionCounter}")
+
+
+
+        return np.r_[
+                   np.float32(x_pos), np.float32(y_pos), np.float32(heading), np.float32(forward_velocity),
+                   np.float32(distToFinish), np.float32(collisionCounter), np.float32(laneInvasionCounter)
+               ], {}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -180,62 +230,78 @@ class DQNExperiment(BaseExperiment):
         hero = core.hero
         map_ = core.map
 
-        # Hero-related variables
-        hero_location = hero.get_location()
-        hero_velocity = self.get_speed(hero)
-        hero_heading = hero.get_transform().get_forward_vector()
-        hero_heading = [hero_heading.x, hero_heading.y]
 
-        # Initialize last location
-        if self.last_location == None:
-            self.last_location = hero_location
+        hero_velocity = observation[3]
+        hero_dist_to_finish = observation[4]
+        hero_collision_counter = observation[5]
+        hero_laneinvasion_counter = observation[6]
 
-        # Compute deltas
-        delta_distance = float(np.sqrt(np.square(hero_location.x - self.last_location.x) + \
-                            np.square(hero_location.y - self.last_location.y)))
-        delta_velocity = hero_velocity - self.last_velocity
 
-        # Update variables
-        self.last_location = hero_location
-        self.last_velocity = hero_velocity
+        # Current position and heading of the vehicle
+        # velocity
+        # Final position and heading
 
-        # Reward if going forward
-        reward = delta_distance
+        # collision
+        # laneInvasion
+        # Time
 
-        # Reward if going faster than last step
-        if hero_velocity < 20.0:
-            reward += 0.05 * delta_velocity
 
-        # La duracion de estas infracciones deberia ser 2 segundos?
-        # Penalize if not inside the lane
-        closest_waypoint = map_.get_waypoint(
-            hero_location,
-            project_to_road=False,
-            lane_type=carla.LaneType.Any
-        )
-        if closest_waypoint is None or closest_waypoint.lane_type not in self.allowed_types:
-            reward += -0.5
-            self.last_heading_deviation = math.pi
-        else:
-            if not closest_waypoint.is_junction:
-                wp_heading = closest_waypoint.transform.get_forward_vector()
-                wp_heading = [wp_heading.x, wp_heading.y]
-                angle = compute_angle(hero_heading, wp_heading)
-                self.last_heading_deviation = abs(angle)
-
-                if np.dot(hero_heading, wp_heading) < 0:
-                    # We are going in the wrong direction
-                    reward += -0.5
-
-                else:
-                    if abs(math.sin(angle)) > 0.4:
-                        if self.last_action == None:
-                            self.last_action = carla.VehicleControl()
-
-                        if self.last_action.steer * math.sin(angle) >= 0:
-                            reward -= 0.05
-            else:
-                self.last_heading_deviation = 0
+        # # Hero-related variables
+        # hero_location = hero.get_location()
+        # hero_velocity = self.get_speed(hero)
+        # hero_heading = hero.get_transform().get_forward_vector()
+        # hero_heading = [hero_heading.x, hero_heading.y]
+        #
+        # # Initialize last location
+        # if self.last_location == None:
+        #     self.last_location = hero_location
+        #
+        # # Compute deltas
+        # delta_distance = float(np.sqrt(np.square(hero_location.x - self.last_location.x) + \
+        #                     np.square(hero_location.y - self.last_location.y)))
+        # delta_velocity = hero_velocity - self.last_velocity
+        #
+        # # Update variables
+        # self.last_location = hero_location
+        # self.last_velocity = hero_velocity
+        #
+        # # Reward if going forward
+        # reward = delta_distance
+        #
+        # # Reward if going faster than last step
+        # if hero_velocity < 20.0:
+        #     reward += 0.05 * delta_velocity
+        #
+        # # La duracion de estas infracciones deberia ser 2 segundos?
+        # # Penalize if not inside the lane
+        # closest_waypoint = map_.get_waypoint(
+        #     hero_location,
+        #     project_to_road=False,
+        #     lane_type=carla.LaneType.Any
+        # )
+        # if closest_waypoint is None or closest_waypoint.lane_type not in self.allowed_types:
+        #     reward += -0.5
+        #     self.last_heading_deviation = math.pi
+        # else:
+        #     if not closest_waypoint.is_junction:
+        #         wp_heading = closest_waypoint.transform.get_forward_vector()
+        #         wp_heading = [wp_heading.x, wp_heading.y]
+        #         angle = compute_angle(hero_heading, wp_heading)
+        #         self.last_heading_deviation = abs(angle)
+        #
+        #         if np.dot(hero_heading, wp_heading) < 0:
+        #             # We are going in the wrong direction
+        #             reward += -0.5
+        #
+        #         else:
+        #             if abs(math.sin(angle)) > 0.4:
+        #                 if self.last_action == None:
+        #                     self.last_action = carla.VehicleControl()
+        #
+        #                 if self.last_action.steer * math.sin(angle) >= 0:
+        #                     reward -= 0.05
+        #     else:
+        #         self.last_heading_deviation = 0
 
         if self.done_falling:
             reward += -40

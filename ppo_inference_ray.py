@@ -17,10 +17,10 @@ from ray.rllib.agents.dqn import DQNTrainer
 from rllib_integration.carla_env import CarlaEnv
 from rllib_integration.carla_core import kill_all_servers
 
-from ppo_example.ppo_experiment import DQNExperiment
+from ppo_example.ppo_experiment import PPOExperiment
 
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
-EXPERIMENT_CLASS = DQNExperiment
+EXPERIMENT_CLASS = PPOExperiment
 
 def parse_config(args):
     """

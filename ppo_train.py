@@ -22,32 +22,39 @@ from rllib_integration.carla_core import kill_all_servers
 
 from rllib_integration.helper import get_checkpoint, launch_tensorboard
 
-from ppo_example.ppo_experiment import DQNExperiment
-from ppo_example.ppo_callbacks import DQNCallbacks
-from ppo_example.ppo_trainer import CustomDQNTrainer
+from ppo_example.ppo_experiment import PPOExperiment
+from ppo_example.ppo_callbacks import PPOCallbacks
+from ppo_example.ppo_trainer import CustomPPOTrainer
 
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
-EXPERIMENT_CLASS = DQNExperiment
+EXPERIMENT_CLASS = PPOExperiment
 
 
 def run(args):
     try:
-        ray.init(address= "auto" if args.auto else None)
-        tune.run(CustomDQNTrainer,
+        ray.init( num_gpus=1)
+        tune.run('SAC',
+                 stop={"timesteps_total": 1000000},
                  name=args.name,
                  local_dir=args.directory,
-                 stop={"perf/ram_util_percent": 85.0},
+                 # stop={"perf/ram_util_percent": 85.0},
                  checkpoint_freq=1,
-                 checkpoint_at_end=True,
-                 restore=get_checkpoint(args.name, args.directory,
-                                        args.restore, args.overwrite),
+                 # checkpoint_at_end=True,
+                 # restore=get_checkpoint(args.name, args.directory,
+                 #                        args.restore, args.overwrite),
                  config=args.config,
-                 queue_trials=True)
+                 # queue_trials=True
+                 resume=False,
+                 reuse_actors=True
+        )
 
     finally:
         kill_all_servers()
         ray.shutdown()
 
+# Memory usage on this node: 15.5/15.8 GiB: ***LOW MEMORY***
+# less than 10% of the memory on this node is available for use. This can cause unexpected crashes.
+# Consider reducing the memory used by your application or reducing the Ray object store size by setting `object_store_memory` when calling `ray.init`.
 
 def parse_config(args):
     """
@@ -57,7 +64,7 @@ def parse_config(args):
         config = yaml.load(f, Loader=yaml.FullLoader)
         config["env"] = CarlaEnv
         config["env_config"]["experiment"]["type"] = EXPERIMENT_CLASS
-        config["callbacks"] = DQNCallbacks
+        config["callbacks"] = PPOCallbacks
 
     return config
 
@@ -72,8 +79,8 @@ def main():
                            help="Specified directory to save results (default: ~/ray_results/carla_rllib")
     argparser.add_argument("-n", "--name",
                            metavar="N",
-                           default="dqn_example",
-                           help="Name of the experiment (default: dqn_example)")
+                           default="ppo_example",
+                           help="Name of the experiment (default: ppo_example)")
     argparser.add_argument("--restore",
                            action="store_true",
                            default=False,

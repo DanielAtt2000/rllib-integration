@@ -65,7 +65,7 @@ class BaseExperiment(object):
         """
         raise NotImplementedError
 
-    def get_observation(self, sensor_data):
+    def get_observation(self, sensor_data, core):
         """Function to do all the post processing of observations (sensor data).
 
         :param sensor_data: dictionary {sensor_name: sensor_data}

@@ -11,7 +11,7 @@ import numpy as np
 from ray.rllib.agents.callbacks import DefaultCallbacks
 
 
-class DQNCallbacks(DefaultCallbacks):
+class PPOCallbacks(DefaultCallbacks):
     def on_episode_start(self, worker, base_env, policies, episode, **kwargs):
         episode.user_data["heading_deviation"] = []
 

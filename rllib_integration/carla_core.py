@@ -21,7 +21,7 @@ from rllib_integration.sensors.factory import SensorFactory
 from rllib_integration.helper import join_dicts
 
 BASE_CORE_CONFIG = {
-    "host": "localhost",  # Client host
+    "host": '192.168.1.113',  # Client host
     "timeout": 10.0,  # Timeout of the client
     "timestep": 0.05,  # Time step of the simulation
     "retries_on_error": 10,  # Number of tries to connect to the client
@@ -63,51 +63,51 @@ class CarlaCore:
         # self.init_server()
         self.connect_client()
 
-    def init_server(self):
-        """Start a server on a random port"""
-        self.server_port = random.randint(15000, 32000)
-
-        # Ray tends to start all processes simultaneously. Use random delays to avoid problems
-        time.sleep(random.uniform(0, 1))
-
-        uses_server_port = is_used(self.server_port)
-        uses_stream_port = is_used(self.server_port + 1)
-        while uses_server_port and uses_stream_port:
-            if uses_server_port:
-                print("Is using the server port: " + self.server_port)
-            if uses_stream_port:
-                print("Is using the streaming port: " + str(self.server_port+1))
-            self.server_port += 2
-            uses_server_port = is_used(self.server_port)
-            uses_stream_port = is_used(self.server_port+1)
-
-        if self.config["show_display"]:
-            server_command = [
-                "{}/CarlaUE4.sh".format(os.environ["CARLA_ROOT"]),
-                "-windowed",
-                "-ResX={}".format(self.config["resolution_x"]),
-                "-ResY={}".format(self.config["resolution_y"]),
-            ]
-        else:
-            server_command = [
-                "DISPLAY= ",
-                "{}/CarlaUE4.sh".format(os.environ["CARLA_ROOT"]),
-                "-opengl"  # no-display isn't supported for Unreal 4.24 with vulkan
-            ]
-
-        server_command += [
-            "--carla-rpc-port={}".format(self.server_port),
-            "-quality-level={}".format(self.config["quality_level"])
-        ]
-
-        server_command_text = " ".join(map(str, server_command))
-        print(server_command_text)
-        server_process = subprocess.Popen(
-            server_command_text,
-            shell=True,
-            preexec_fn=os.setsid,
-            stdout=open(os.devnull, "w"),
-        )
+    # def init_server(self):
+    #     """Start a server on a random port"""
+    #     self.server_port = random.randint(15000, 32000)
+    #
+    #     # Ray tends to start all processes simultaneously. Use random delays to avoid problems
+    #     time.sleep(random.uniform(0, 1))
+    #
+    #     uses_server_port = is_used(self.server_port)
+    #     uses_stream_port = is_used(self.server_port + 1)
+    #     while uses_server_port and uses_stream_port:
+    #         if uses_server_port:
+    #             print("Is using the server port: " + self.server_port)
+    #         if uses_stream_port:
+    #             print("Is using the streaming port: " + str(self.server_port+1))
+    #         self.server_port += 2
+    #         uses_server_port = is_used(self.server_port)
+    #         uses_stream_port = is_used(self.server_port+1)
+    #
+    #     if self.config["show_display"]:
+    #         server_command = [
+    #             "{}/CarlaUE4.sh".format(os.environ["CARLA_ROOT"]),
+    #             "-windowed",
+    #             "-ResX={}".format(self.config["resolution_x"]),
+    #             "-ResY={}".format(self.config["resolution_y"]),
+    #         ]
+    #     else:
+    #         server_command = [
+    #             "DISPLAY= ",
+    #             "{}/CarlaUE4.sh".format(os.environ["CARLA_ROOT"]),
+    #             "-opengl"  # no-display isn't supported for Unreal 4.24 with vulkan
+    #         ]
+    #
+    #     server_command += [
+    #         "--carla-rpc-port={}".format(self.server_port),
+    #         "-quality-level={}".format(self.config["quality_level"])
+    #     ]
+    #
+    #     server_command_text = " ".join(map(str, server_command))
+    #     print(server_command_text)
+    #     server_process = subprocess.Popen(
+    #         server_command_text,
+    #         shell=True,
+    #         preexec_fn=os.setsid,
+    #         stdout=open(os.devnull, "w"),
+    #     )
 
     def connect_client(self):
         """Connect to the client"""
@@ -139,7 +139,9 @@ class CarlaCore:
         self.world = self.client.load_world(
             map_name = experiment_config["town"],
             reset_settings = False,
-            map_layers = carla.MapLayer.All if self.config["enable_map_assets"] else carla.MapLayer.NONE)
+            # map_layers = carla.MapLayer.All if self.config["enable_map_assets"] else carla.MapLayer.NONE
+            map_layers = carla.MapLayer.NONE
+            )
 
         self.map = self.world.get_map()
 
