@@ -26,14 +26,15 @@ from ppo_example.ppo_experiment import PPOExperiment
 from ppo_example.ppo_callbacks import PPOCallbacks
 from ppo_example.ppo_trainer import CustomPPOTrainer
 
+
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
 EXPERIMENT_CLASS = PPOExperiment
 
 
 def run(args):
     try:
-        ray.init( num_gpus=1)
-        tune.run('SAC',
+        ray.init( num_gpus=1,include_dashboard=True)
+        tune.run(CustomPPOTrainer,
                  stop={"timesteps_total": 1000000},
                  name=args.name,
                  local_dir=args.directory,
@@ -45,7 +46,8 @@ def run(args):
                  config=args.config,
                  # queue_trials=True
                  resume=False,
-                 reuse_actors=True
+                 reuse_actors=True,
+
         )
 
     finally:
