@@ -160,9 +160,9 @@ class PPOExperiment(BaseExperiment):
         for sensor in sensor_data:
             if sensor == 'collision':
                 collisionCounter +=1
-                print('Collision Event')
-                print(sensor_data[sensor][1][0].semantic_tags)
-                print(sensor_data[sensor][1][0].type_id)
+                # print('Collision Event')
+                # print(sensor_data[sensor][1][0].semantic_tags)
+                # print(sensor_data[sensor][1][0].type_id)
 
             # if sensor == 'obstacle':
             #     obstacle = sensor_data[sensor][1][0].type_id
@@ -171,13 +171,13 @@ class PPOExperiment(BaseExperiment):
             #         print(obstacle)
 
             if sensor == 'laneInvasion':
-                print('Lane Invasion Event')
+                # print('Lane Invasion Event')
 
                 laneInvasions = sensor_data[sensor][1][1]
-                print(laneInvasions)
+                # print(laneInvasions)
                 for laneInvasion in laneInvasions:
                     laneInvasionCounter +=1
-                    print(laneInvasion.type)
+                    # print(laneInvasion.type)
 
         # print(f"X Location {x_pos}")
         # print(f"Y Location {y_pos}")
@@ -220,7 +220,9 @@ class PPOExperiment(BaseExperiment):
         self.done_falling = hero.get_location().z < -0.5
         self.done_collision = observation[5] > 0
         self.done_arrived = self.is_hero_near_finish_location(observation)
-        return self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision or self.done_arrived
+
+        output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision or self.done_arrived
+        return bool(output)
 
     def compute_reward(self, observation, core):
         """Computes the reward"""
@@ -277,7 +279,7 @@ class PPOExperiment(BaseExperiment):
         # print('Distance to finish: ' + str(hero_dist_to_finish))
         reward += 100 * (self.last_dist_to_finish - hero_dist_to_finish)
 
-        print('Delta distance ' + str(100 * (self.last_dist_to_finish - hero_dist_to_finish)))
+        # print('Delta distance ' + str(100 * (self.last_dist_to_finish - hero_dist_to_finish)))
 
         # Update variables
         self.last_location = hero_location
@@ -329,16 +331,16 @@ class PPOExperiment(BaseExperiment):
         if self.done_falling:
             reward += -100
         if self.done_collision:
-            print("Done collision")
+            # print("Done collision")
             reward += -100
         if self.done_time_idle:
-            print("Done idle")
+            # print("Done idle")
             reward += -100
         if self.done_time_episode:
-            print("Done max time")
+            # print("Done max time")
             reward += 100
         if self.done_arrived:
-            print("Done arrived")
+            # print("Done arrived")
             reward += 100
-        print('Reward: ' + str(reward))
+        # print('Reward: ' + str(reward))
         return reward

@@ -9,10 +9,10 @@
 import torch
 import os
 
-from ray.rllib.agents.sac import SACTrainer
+from ray.rllib.algorithms.ppo import PPO
 
 
-class CustomPPOTrainer(SACTrainer):
+class CustomPPOTrainer(PPO):
     """
     Modified version of DQNTrainer with the added functionality of saving the torch model for later inference
     """

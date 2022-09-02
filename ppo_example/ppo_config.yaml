@@ -3,7 +3,7 @@
 framework: "torch"
 num_workers: 1
 num_gpus_per_worker: 1
-num_cpus_per_worker: 6
+num_cpus_per_worker: 9
 #rollout_fragment_length: 16
 #timesteps_per_iteration: 20000
 #train_batch_size: 128

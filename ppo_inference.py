@@ -71,7 +71,9 @@ def main():
     try:
         # Initialize the model and load the state dictionary
         model = CustomDQNModel(gpu_n=args.gpu_n)
-        model.load_state_dict(torch.load(args.checkpoint))
+        from ray.rllib.algorithms.ppo import PPO
+        model = PPO(config=args.config)
+        model.restore(torch.load(os.path.expanduser("~") + "/ray_results/carla_rllib/" + args.checkpoint))
         model.eval()
         if args.gpu_n >= 0:
             model.cuda()
