@@ -117,6 +117,9 @@ class PPOExperiment(BaseExperiment):
         action.reverse = action_control[3]
         action.hand_brake = action_control[4]
 
+        print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
+
+
         self.last_action = action
 
         return action
@@ -158,6 +161,10 @@ class PPOExperiment(BaseExperiment):
         collisionCounter = 0
         laneInvasionCounter = 0
         for sensor in sensor_data:
+            print('-----START1')
+
+            print(sensor)
+            print('-----END1')
             if sensor == 'collision':
                 collisionCounter +=1
                 # print('Collision Event')

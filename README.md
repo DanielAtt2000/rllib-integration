@@ -62,6 +62,7 @@ pip3 install -r dqn_example/dqn_requirements.txt
 ```
 and run the training file
 ```bash
+USE ANACONDA Carla3Copy
 python ppo_train.py ppo_example/ppo_config.yaml --name ppo
 ```
 

@@ -3,7 +3,7 @@
 framework: "torch"
 num_workers: 1
 num_gpus_per_worker: 1
-num_cpus_per_worker: 9
+num_cpus_per_worker: 10
 #rollout_fragment_length: 16
 #timesteps_per_iteration: 20000
 #train_batch_size: 128
@@ -39,11 +39,12 @@ lr: 0.01
 env_config:
   carla:
     host: "192.168.1.113"
+    # host: "localhost"
     timeout: 30.0
     timestep: 0.05
     retries_on_error: 25
-    resolution_x: 600
-    resolution_y: 600
+    resolution_x: 300
+    resolution_y: 300
     quality_level: "Low"
     enable_map_assets: True
     enable_rendering: True
@@ -51,16 +52,24 @@ env_config:
 
   experiment:
     hero:
-      blueprint: "vehicle.lincoln.mkz_2017"
+      blueprintTruck: "DAFxf"
+      blueprintTrailer: "trailer"
       sensors:
-        obstacle:
-          type: "sensor.other.obstacle"
+#        obstacle:
+#          type: "sensor.other.obstacle"
         collision:
           type: "sensor.other.collision"
-        laneInvasion:
-          type: "sensor.other.lane_invasion"
+#        laneInvasion:
+#          type: "sensor.other.lane_invasion"
       spawn_points: [
          "5.1,54.2,1",  # x,y,z[,roll,pitch,yaw]
+        "5.7,117.7,1",
+        "2.0,97.2,1",
+        "1.8,87.6,1",
+        "4.5,47.0,1",
+        "8.3,25.0,1",
+         "20.0,11.5,1",
+         "36.9,7.1,1",
         ]
       final_location_x: 56.4
       final_location_y: 7.5

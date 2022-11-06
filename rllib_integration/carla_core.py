@@ -19,18 +19,20 @@ import carla
 from rllib_integration.sensors.sensor_interface import SensorInterface
 from rllib_integration.sensors.factory import SensorFactory
 from rllib_integration.helper import join_dicts
+import subprocess
+import sys
 
 BASE_CORE_CONFIG = {
-    "host": '192.168.1.113',  # Client host
-    "timeout": 10.0,  # Timeout of the client
-    "timestep": 0.05,  # Time step of the simulation
-    "retries_on_error": 10,  # Number of tries to connect to the client
-    "resolution_x": 600,  # Width of the server spectator camera
-    "resolution_y": 600,  # Height of the server spectator camera
-    "quality_level": "Low",  # Quality level of the simulation. Can be 'Low', 'High', 'Epic'
-    "enable_map_assets": False,  # enable / disable all town assets except for the road
-    "enable_rendering": True,  # enable / disable camera images
-    "show_display": False  # Whether or not the server will be displayed
+    # "host": 'localhost',  # Client host
+    # "timeout": 10.0,  # Timeout of the client
+    # "timestep": 0.05,  # Time step of the simulation
+    # "retries_on_error": 10,  # Number of tries to connect to the client
+    # "resolution_x": 600,  # Width of the server spectator camera
+    # "resolution_y": 600,  # Height of the server spectator camera
+    # "quality_level": "Low",  # Quality level of the simulation. Can be 'Low', 'High', 'Epic'
+    # "enable_map_assets": False,  # enable / disable all town assets except for the road
+    # "enable_rendering": False,  # enable / disable camera images
+    # "show_display": False  # Whether or not the server will be displayed
 }
 
 
@@ -43,6 +45,31 @@ def kill_all_servers():
     processes = [p for p in psutil.process_iter() if "carla" in p.name().lower()]
     for process in processes:
         os.kill(process.pid, signal.SIGKILL)
+        
+def get_actor_blueprints(world, filter, generation):
+    bps = world.get_blueprint_library().filter(filter)
+
+    if generation.lower() == "all":
+        return bps
+
+    # If the filter returns only one bp, we assume that this one needed
+    # and therefore, we ignore the generation
+    if len(bps) == 1:
+        return bps
+
+    try:
+        int_generation = int(generation)
+        # Check if generation is in available generations
+        if int_generation in [1, 2]:
+            bps = [x for x in bps if int(x.get_attribute('generation')) == int_generation]
+            return bps
+        else:
+            print("   Warning! Actor Generation is not valid. No actor will be spawned.")
+            return []
+    except:
+        print("   Warning! Actor Generation is not valid. No actor will be spawned.")
+        return []
+
 
 
 class CarlaCore:
@@ -56,12 +83,28 @@ class CarlaCore:
         self.world = None
         self.map = None
         self.hero = None
+        self.hero_trailer = None
         self.config = join_dicts(BASE_CORE_CONFIG, config)
-        self.sensor_interface = SensorInterface()
+        self.sensor_interface_truck = SensorInterface()
+        self.sensor_interface_trailer = SensorInterface()
         self.server_port = 2000
+        self.server_port_lines = ''
 
         # self.init_server()
         self.connect_client()
+
+    # def init_server(self):
+    #     with open('../ppo_example/server_ports.txt','r') as portsFileRead:
+    #         self.server_port_lines = portsFileRead.readlines()
+
+    #     self.server_port = int(self.server_port_lines[0])
+
+    #     with open('../ppo_example/server_ports.txt', 'w') as portsFileWrite:
+    #         for line in self.server_port_lines:
+    #             if str(self.server_port) not in line:
+    #                 portsFileWrite.write(line)
+
+
 
     # def init_server(self):
     #     """Start a server on a random port"""
@@ -148,87 +191,112 @@ class CarlaCore:
         # Choose the weather of the simulation
         weather = getattr(carla.WeatherParameters, experiment_config["weather"])
         self.world.set_weather(weather)
-
-        self.tm_port = self.server_port // 10 + self.server_port % 10
-        while is_used(self.tm_port):
-            print("Traffic manager's port " + str(self.tm_port) + " is already being used. Checking the next one")
-            tm_port += 1
-        print("Traffic manager connected to port " + str(self.tm_port))
-
-        self.traffic_manager = self.client.get_trafficmanager(self.tm_port)
-        self.traffic_manager.set_hybrid_physics_mode(experiment_config["background_activity"]["tm_hybrid_mode"])
-        seed = experiment_config["background_activity"]["seed"]
-        if seed is not None:
-            self.traffic_manager.set_random_device_seed(seed)
-
-        # Spawn the background activity
-        self.spawn_npcs(
-            experiment_config["background_activity"]["n_vehicles"],
-            experiment_config["background_activity"]["n_walkers"],
-        )
+        #
+        # self.tm_port = self.server_port // 10 + self.server_port % 10
+        # while is_used(self.tm_port):
+        #     print("Traffic manager's port " + str(self.tm_port) + " is already being used. Checking the next one")
+        #     self.tm_port += 1
+        # print("Traffic manager connected to port " + str(self.tm_port))
+        #
+        # self.traffic_manager = self.client.get_trafficmanager(self.tm_port)
+        # self.traffic_manager.set_hybrid_physics_mode(experiment_config["background_activity"]["tm_hybrid_mode"])
+        # seed = experiment_config["background_activity"]["seed"]
+        # if seed is not None:
+        #     self.traffic_manager.set_random_device_seed(seed)
+        #
+        # # Spawn the background activity
+        # self.spawn_npcs(
+        #     experiment_config["background_activity"]["n_vehicles"],
+        #     experiment_config["background_activity"]["n_walkers"],
+        # )
 
 
     def reset_hero(self, hero_config):
         """This function resets / spawns the hero vehicle and its sensors"""
 
         # Part 1: destroy all sensors (if necessary)
-        self.sensor_interface.destroy()
+        self.sensor_interface_truck.destroy()
+        self.sensor_interface_trailer.destroy()
 
         self.world.tick()
 
         # Part 2: Spawn the ego vehicle
-        user_spawn_points = hero_config["spawn_points"]
-        if user_spawn_points:
-            spawn_points = []
-            for transform in user_spawn_points:
+        # user_spawn_points = hero_config["spawn_points"]
+        # if user_spawn_points:
+        #     spawn_points = []
+        #     for transform in user_spawn_points:
+        #
+        #         transform = [float(x) for x in transform.split(",")]
+        #         if len(transform) == 3:
+        #             location = carla.Location(
+        #                 transform[0], transform[1], transform[2]
+        #             )
+        #             waypoint = self.map.get_waypoint(location)
+        #             waypoint = waypoint.previous(random.uniform(0, 5))[0]
+        #             transform = carla.Transform(
+        #                 location, waypoint.transform.rotation
+        #             )
+        #         else:
+        #             assert len(transform) == 6
+        #             transform = carla.Transform(
+        #                 carla.Location(transform[0], transform[1], transform[2]),
+        #                 carla.Rotation(transform[4], transform[5], transform[3])
+        #             )
+        #         spawn_points.append(transform)
+        # else:
 
-                transform = [float(x) for x in transform.split(",")]
-                if len(transform) == 3:
-                    location = carla.Location(
-                        transform[0], transform[1], transform[2]
-                    )
-                    waypoint = self.map.get_waypoint(location)
-                    waypoint = waypoint.previous(random.uniform(0, 5))[0]
-                    transform = carla.Transform(
-                        location, waypoint.transform.rotation
-                    )
-                else:
-                    assert len(transform) == 6
-                    transform = carla.Transform(
-                        carla.Location(transform[0], transform[1], transform[2]),
-                        carla.Rotation(transform[4], transform[5], transform[3])
-                    )
-                spawn_points.append(transform)
-        else:
-            spawn_points = self.map.get_spawn_points()
+        # Specify more than one starting point so the RL doesn't always start from the same position
+        spawn_points = [self.map.get_spawn_points()[61]]
 
-        self.hero_blueprints = self.world.get_blueprint_library().find(hero_config['blueprint'])
+        # Where we generate the truck
+        self.hero_blueprints = random.choice(get_actor_blueprints(self.world, "DAFxf", "2"))
         self.hero_blueprints.set_attribute("role_name", "hero")
+
+        self.trailer_blueprints = random.choice(get_actor_blueprints(self.world, "trailer", "2"))
+        self.trailer_blueprints.set_attribute("role_name", "hero-trailer")
 
         # If already spawned, destroy it
         if self.hero is not None:
             self.hero.destroy()
             self.hero = None
 
+        if self.hero_trailer is not None:
+            self.hero_trailer.destroy()
+            self.hero_trailer = None
+
         random.shuffle(spawn_points, random.random)
         for i in range(0,len(spawn_points)):
             next_spawn_point = spawn_points[i % len(spawn_points)]
+
+            # Spawning the trailer first and than spawning the truck in a location a bit forward up to connect with it
+            next_spawn_point.location.z = 0.5
+            self.hero_trailer = self.world.try_spawn_actor(self.trailer_blueprints, next_spawn_point)
+
+            # Moving the spawn point a bit further up
+            next_spawn_point.location.z = 0.5
+            forwardVector = next_spawn_point.get_forward_vector() * 5.2
+            next_spawn_point.location += forwardVector
+
+            # Spawning the truck
             self.hero = self.world.try_spawn_actor(self.hero_blueprints, next_spawn_point)
-            if self.hero is not None:
-                print("Hero spawned!")
+
+            if self.hero is not None and self.hero_trailer is not None:
+                print("Truck and Trailer spawned!")
                 break
             else:
                 print("Could not spawn hero, changing spawn point")
 
-        if self.hero is None:
+        if self.hero is None or self.hero_trailer is None:
             print("We ran out of spawn points")
             return
 
         self.world.tick()
 
         # Part 3: Spawn the new sensors
+        # Where we set the sensors
         for name, attributes in hero_config["sensors"].items():
-            sensor = SensorFactory.spawn(name, attributes, self.sensor_interface, self.hero)
+            sensor_truck = SensorFactory.spawn(name, attributes, self.sensor_interface_truck, self.hero)
+            sensor_trailer = SensorFactory.spawn(name, attributes,self.sensor_interface_trailer, self.hero_trailer)
 
         # Not needed anymore. This tick will happen when calling CarlaCore.tick()
         # self.world.tick()
@@ -345,7 +413,7 @@ class CarlaCore:
         # Get the camera orientation
         server_view_roll = transform.rotation.roll
         server_view_yaw = transform.rotation.yaw
-        server_view_pitch = transform.rotation.pitch
+        server_view_pitch = transform.rotation.pitch 
 
         # Get the spectator and place it on the desired position
         self.spectator = self.world.get_spectator()
@@ -362,10 +430,12 @@ class CarlaCore:
 
     def get_sensor_data(self):
         """Returns the data sent by the different sensors at this tick"""
-        sensor_data = self.sensor_interface.get_data()
+        sensor_data_truck = self.sensor_interface_truck.get_data('truck')
+        sensor_data_trailer = self.sensor_interface_trailer.get_data('trailer')
         # print("---------")
         # world_frame = self.world.get_snapshot().frame
         # print("World frame: {}".format(world_frame))
         # for name, data in sensor_data.items():
         #     print("{}: {}".format(name, data[0]))
-        return sensor_data
+        merged_sensor_data = {**sensor_data_truck, **sensor_data_trailer}
+        return merged_sensor_data

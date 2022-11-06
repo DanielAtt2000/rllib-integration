@@ -40,13 +40,13 @@ class SensorInterface(object):
         else:
             self._sensors[name] = sensor
 
-    def get_data(self):
+    def get_data(self,blueprintName):
         """Returns the data of all the registered sensors as a dictionary {sensor_name: sensor_data}"""
         try:
             data_dict = {}
             while len(data_dict.keys()) < len(self._sensors.keys()):
                 sensor_data = self._data_buffers.get(True, self._queue_timeout)
-                data_dict[sensor_data[0]] = (sensor_data[1], sensor_data[2])
+                data_dict[sensor_data[0]+'_'+blueprintName] = (sensor_data[1], sensor_data[2])
 
         except queue.Empty:
             raise RuntimeError("A sensor took too long to send their data")
@@ -54,7 +54,7 @@ class SensorInterface(object):
         for event_sensor in self._event_sensors:
             try:
                 sensor_data = self._event_data_buffers.get_nowait()
-                data_dict[sensor_data[0]] = (sensor_data[1], sensor_data[2])
+                data_dict[sensor_data[0]+'_'+blueprintName] = (sensor_data[1], sensor_data[2])
             except queue.Empty:
                 pass
         # print("Data buffer: {}".format(len(self._data_buffers.queue)))
