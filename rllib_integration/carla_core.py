@@ -246,7 +246,8 @@ class CarlaCore:
         # else:
 
         # Specify more than one starting point so the RL doesn't always start from the same position
-        spawn_points = [self.map.get_spawn_points()[61]]
+        spawn_point_no = random.choice([33, 28, 27, 17, 14, 11, 10, 5])
+        spawn_points = [self.map.get_spawn_points()[spawn_point_no]]
 
         # Where we generate the truck
         self.hero_blueprints = random.choice(get_actor_blueprints(self.world, "DAFxf", "2"))
@@ -296,7 +297,8 @@ class CarlaCore:
         # Where we set the sensors
         for name, attributes in hero_config["sensors"].items():
             sensor_truck = SensorFactory.spawn(name, attributes, self.sensor_interface_truck, self.hero)
-            sensor_trailer = SensorFactory.spawn(name, attributes,self.sensor_interface_trailer, self.hero_trailer)
+            if name != 'lidar':
+                sensor_trailer = SensorFactory.spawn(name, attributes,self.sensor_interface_trailer, self.hero_trailer)
 
         # Not needed anymore. This tick will happen when calling CarlaCore.tick()
         # self.world.tick()

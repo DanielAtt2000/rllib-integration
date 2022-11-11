@@ -34,7 +34,7 @@ BASE_EXPERIMENT_CONFIG = {
         "tm_hybrid_mode": True,
         "seed": None
     },
-    "town": "Town05_Opt",
+    # "town": "Town05_Opt",
     "weather": 'ClearNoon'
 }
 

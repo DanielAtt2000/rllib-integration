@@ -7,6 +7,39 @@
 # For a copy, see <https://opensource.org/licenses/MIT>.
 
 import queue
+from datetime import datetime
+import open3d as o3d
+import numpy as np
+import time, sys, pickle
+from datetime import datetime
+import pandas as pd
+
+LABEL_COLORS = np.array([
+    (255, 255, 255),  # None
+    (70, 70, 70),  # Building
+    (100, 40, 40),  # Fences
+    (55, 90, 80),  # Other
+    (220, 20, 60),  # Pedestrian
+    (153, 153, 153),  # Pole
+    (157, 234, 50),  # RoadLines
+    (128, 64, 128),  # Road
+    (244, 35, 232),  # Sidewalk
+    (107, 142, 35),  # Vegetation
+    (0, 0, 142),  # Vehicle
+    (102, 102, 156),  # Wall
+    (220, 220, 0),  # TrafficSign
+    (70, 130, 180),  # Sky
+    (81, 0, 81),  # Ground
+    (150, 100, 100),  # Bridge
+    (230, 150, 140),  # RailTrack
+    (180, 165, 180),  # GuardRail
+    (250, 170, 30),  # TrafficLight
+    (110, 190, 160),  # Static
+    (170, 120, 50),  # Dynamic
+    (45, 60, 150),  # Water
+    (145, 170, 100),  # Terrain
+]) / 255.0  # normalize each channel [0-1] since is what Open3D uses
+
 
 class SensorInterface(object):
     """
@@ -20,6 +53,26 @@ class SensorInterface(object):
 
         self._event_sensors = {}
         self._event_data_buffers = queue.Queue()
+
+        self.visualiseLIDAR = True
+
+        self.counter = 0
+        self.point_list = o3d.geometry.PointCloud()
+
+        self.vis = o3d.visualization.Visualizer()
+
+        self.vis.create_window(
+            window_name='Carla Lidar',
+            width=960,
+            height=540,
+            left=480,
+            top=270)
+        self.vis.get_render_option().background_color = [0.05, 0.05, 0.05]
+        self.vis.get_render_option().point_size = 1
+        self.vis.get_render_option().show_coordinate_frame = True
+
+        self.frame = 0
+        self.dt0 = datetime.now()
 
     @property
     def sensors(self):
@@ -46,8 +99,47 @@ class SensorInterface(object):
             data_dict = {}
             while len(data_dict.keys()) < len(self._sensors.keys()):
                 sensor_data = self._data_buffers.get(True, self._queue_timeout)
-                data_dict[sensor_data[0]+'_'+blueprintName] = (sensor_data[1], sensor_data[2])
 
+                if self.counter > 20 and self.visualiseLIDAR:
+                    data = sensor_data[2]
+
+                    # We're negating the y to correclty visualize a world that matches
+                    # what we see in Unreal since Open3D uses a right-handed coordinate system
+                    points = np.array([data['x'], -data['y'], data['z']]).T
+
+                    # # An example of adding some noise to our data if needed:
+                    # points += np.random.uniform(-0.05, 0.05, size=points.shape)
+
+                    # Colorize the pointcloud based on the CityScapes color palette
+                    labels = np.array(data['ObjTag'])
+
+                    int_color = LABEL_COLORS[labels]
+
+                    # # In case you want to make the color intensity depending
+                    # # of the incident ray angle, you can use:
+                    # int_color *= np.array(data['CosAngle'])[:, None]
+
+                    self.point_list.points = o3d.utility.Vector3dVector(points)
+                    self.point_list.colors = o3d.utility.Vector3dVector(int_color)
+
+                    if self.frame == 2:
+                        self.vis.add_geometry(self.point_list)
+                    self.vis.update_geometry(self.point_list)
+
+                    self.vis.poll_events()
+                    self.vis.update_renderer()
+                    # # This can fix Open3D jittering issues:
+                    time.sleep(0.005)
+
+                    process_time = datetime.now() - self.dt0
+                    sys.stdout.write('\r' + 'FPS: ' + str(1.0 / process_time.total_seconds()))
+                    sys.stdout.flush()
+                    self.dt0 = datetime.now()
+                    self.frame += 1
+
+
+                data_dict[sensor_data[0]+'_'+blueprintName] = (sensor_data[1], sensor_data[2])
+                self.counter+=1
         except queue.Empty:
             raise RuntimeError("A sensor took too long to send their data")
 

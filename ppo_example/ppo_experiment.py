@@ -26,6 +26,10 @@ class PPOExperiment(BaseExperiment):
         self.allowed_types = [carla.LaneType.Driving, carla.LaneType.Parking]
         self.last_heading_deviation = 0
         self.last_action = None
+        self.min_x = None
+        self.max_x = None
+        self.min_y = None
+        self.max_y = None
 
     def reset(self):
         """Called at the beginning and each time the simulation is reset"""
@@ -46,6 +50,16 @@ class PPOExperiment(BaseExperiment):
 
 
         self.last_heading_deviation = 0
+
+    def min_max_normalization(self, value, axis):
+        if axis == 'x':
+            return (value - self.min_x) / (self.max_x - self.min_x)
+        elif axis == 'y':
+            return (value - self.min_y) / (self.max_y - self.min_y)
+        else:
+            raise Exception('Incorrect axis input')
+
+    [33,28, 27, 17,  14, 11, 10, 5]
 
     def get_action_space(self):
         """Returns the action space, in this case, a discrete space"""
@@ -117,7 +131,7 @@ class PPOExperiment(BaseExperiment):
         action.reverse = action_control[3]
         action.hand_brake = action_control[4]
 
-        print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
+        # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
 
 
         self.last_action = action
@@ -133,14 +147,34 @@ class PPOExperiment(BaseExperiment):
         as well as a variable with additional information about such observation.
         The information variable can be empty
         """
+        # State for Truck
+            # Current position
+            # Angle
+            # velocity
+            # acceleration
+            # collision
+            # last action
 
-        # Current position and heading of the vehicle
-        # velocity
-        # Final position and heading
+        # For Trailer
+            # Position
+            # angle
+            # collision
 
-        # collision
-        # laneInvasion
-        # Time
+
+        # How am i going to detect objects in the surronding area.
+        # Know the cetner of the roundabout,
+        # have a radius for the inner and outer circles
+        #
+
+
+        # Get minimuma and maximum points of the map
+        # Get roundbaout center
+        # estimate inner and outer radius
+
+
+
+
+
 
         # changing location to value between 0 and 1
         # NORMALIZE
@@ -160,13 +194,22 @@ class PPOExperiment(BaseExperiment):
 
         collisionCounter = 0
         laneInvasionCounter = 0
+
         for sensor in sensor_data:
             print('-----START1')
-
             print(sensor)
             print('-----END1')
-            if sensor == 'collision':
+            if sensor == 'collision_truck':
                 collisionCounter +=1
+            elif sensor == 'collision_trailer':
+                pass
+            if sensor == 'lidar_truck':
+                pass
+                # print('HEYYYY')
+                #
+                # print(sensor_data[sensor])
+                #
+                # print('HEYYYYEEE')
                 # print('Collision Event')
                 # print(sensor_data[sensor][1][0].semantic_tags)
                 # print(sensor_data[sensor][1][0].type_id)
