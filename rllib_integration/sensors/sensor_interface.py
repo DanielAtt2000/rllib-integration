@@ -54,25 +54,30 @@ class SensorInterface(object):
         self._event_sensors = {}
         self._event_data_buffers = queue.Queue()
 
-        self.visualiseLIDAR = True
-
+        self.visualiseLIDAR = False
         self.counter = 0
-        self.point_list = o3d.geometry.PointCloud()
+        self.lidar_window()
 
-        self.vis = o3d.visualization.Visualizer()
 
-        self.vis.create_window(
-            window_name='Carla Lidar',
-            width=960,
-            height=540,
-            left=480,
-            top=270)
-        self.vis.get_render_option().background_color = [0.05, 0.05, 0.05]
-        self.vis.get_render_option().point_size = 1
-        self.vis.get_render_option().show_coordinate_frame = True
 
-        self.frame = 0
-        self.dt0 = datetime.now()
+    def lidar_window(self):
+        if self.visualiseLIDAR:
+            self.point_list = o3d.geometry.PointCloud()
+
+            self.vis = o3d.visualization.Visualizer()
+
+            self.vis.create_window(
+                window_name='Carla Lidar',
+                width=960,
+                height=540,
+                left=480,
+                top=270)
+            self.vis.get_render_option().background_color = [0.05, 0.05, 0.05]
+            self.vis.get_render_option().point_size = 1
+            self.vis.get_render_option().show_coordinate_frame = True
+
+            self.frame = 0
+            self.dt0 = datetime.now()
 
     @property
     def sensors(self):

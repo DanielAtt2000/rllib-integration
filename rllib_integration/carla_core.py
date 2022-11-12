@@ -9,18 +9,17 @@
 import os
 import random
 import signal
-import subprocess
 import time
 import psutil
 import logging
 
 import carla
 
+from rllib_integration.RouteGeneration.global_route_planner import GlobalRoutePlanner
 from rllib_integration.sensors.sensor_interface import SensorInterface
 from rllib_integration.sensors.factory import SensorFactory
 from rllib_integration.helper import join_dicts
-import subprocess
-import sys
+from rllib_integration.GetStartStopLocation import get_entry_exit_spawn_point_indices
 
 BASE_CORE_CONFIG = {
     # "host": 'localhost',  # Client host
@@ -89,6 +88,7 @@ class CarlaCore:
         self.sensor_interface_trailer = SensorInterface()
         self.server_port = 2000
         self.server_port_lines = ''
+        self.current_route = None
 
         # self.init_server()
         self.connect_client()
@@ -245,10 +245,33 @@ class CarlaCore:
         #         spawn_points.append(transform)
         # else:
 
-        # Specify more than one starting point so the RL doesn't always start from the same position
-        spawn_point_no = random.choice([33, 28, 27, 17, 14, 11, 10, 5])
-        spawn_points = [self.map.get_spawn_points()[spawn_point_no]]
+        entry_spawn_point_index, exit_spawn_point_index= get_entry_exit_spawn_point_indices()
+        entry_spawn_point = self.map.get_spawn_points()[entry_spawn_point_index]
+        exit_spawn_point = self.map.get_spawn_points()[exit_spawn_point_index]
 
+        # # Specify more than one starting point so the RL doesn't always start from the same position
+        # spawn_point_no = random.choice([33, 28, 27, 17, 14, 11, 10, 5])
+        # spawn_points = [self.map.get_spawn_points()[spawn_point_no]]
+
+        # Obtaining the route information
+
+
+        start_waypoint = self.map.get_waypoint(entry_spawn_point.location)
+        end_waypoint = self.map.get_waypoint(exit_spawn_point.location)
+
+        start_location = start_waypoint.transform.location
+        end_location = end_waypoint.transform.location
+
+        sampling_resolution = 2
+        global_planner = GlobalRoutePlanner(self.map, sampling_resolution)
+
+        self.current_route = global_planner.trace_route(start_location, end_location)
+
+        print('ROUTE INFORMATION')
+        for route_waypoint in self.current_route:
+            print(route_waypoint[0].transform.location)
+
+        # Spawning the actors
         # Where we generate the truck
         self.hero_blueprints = random.choice(get_actor_blueprints(self.world, "DAFxf", "2"))
         self.hero_blueprints.set_attribute("role_name", "hero")
@@ -265,31 +288,35 @@ class CarlaCore:
             self.hero_trailer.destroy()
             self.hero_trailer = None
 
-        random.shuffle(spawn_points, random.random)
-        for i in range(0,len(spawn_points)):
-            next_spawn_point = spawn_points[i % len(spawn_points)]
+        # random.shuffle(spawn_points, random.random)
+        # # for i in range(0,len(spawn_points)):
+        # next_spawn_point = spawn_points[i % len(spawn_points)]
 
-            # Spawning the trailer first and than spawning the truck in a location a bit forward up to connect with it
-            next_spawn_point.location.z = 0.5
-            self.hero_trailer = self.world.try_spawn_actor(self.trailer_blueprints, next_spawn_point)
+        # Spawning the trailer first and than spawning the truck in a location a bit forward up to connect with it
+        entry_spawn_point.location.z = 0.5
+        self.hero_trailer = self.world.try_spawn_actor(self.trailer_blueprints, entry_spawn_point)
 
-            # Moving the spawn point a bit further up
-            next_spawn_point.location.z = 0.5
-            forwardVector = next_spawn_point.get_forward_vector() * 5.2
-            next_spawn_point.location += forwardVector
+        # Moving the spawn point a bit further up
+        entry_spawn_point.location.z = 0.5
+        forwardVector = entry_spawn_point.get_forward_vector() * 5.2
+        entry_spawn_point.location += forwardVector
 
-            # Spawning the truck
-            self.hero = self.world.try_spawn_actor(self.hero_blueprints, next_spawn_point)
+        # Spawning the truck
+        self.hero = self.world.try_spawn_actor(self.hero_blueprints, entry_spawn_point)
 
-            if self.hero is not None and self.hero_trailer is not None:
-                print("Truck and Trailer spawned!")
-                break
-            else:
-                print("Could not spawn hero, changing spawn point")
+        if self.hero is not None and self.hero_trailer is not None:
+            print("Truck and Trailer spawned!")
+
+            # break
+        else:
+            print("Could not spawn hero, changing spawn point")
+            print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points <====')
 
         if self.hero is None or self.hero_trailer is None:
             print("We ran out of spawn points")
+            print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points<====')
             return
+
 
         self.world.tick()
 

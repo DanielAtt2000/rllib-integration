@@ -203,8 +203,9 @@ class PPOExperiment(BaseExperiment):
                 collisionCounter +=1
             elif sensor == 'collision_trailer':
                 pass
-            if sensor == 'lidar_truck':
-                pass
+            elif sensor == 'lidar_truck':
+
+                print(f"Number of sensor points {sensor_data[sensor][1].shape}")
                 # print('HEYYYY')
                 #
                 # print(sensor_data[sensor])
