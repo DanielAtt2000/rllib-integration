@@ -51,6 +51,7 @@ env_config:
     enable_map_assets: True
     enable_rendering: True
     show_display: True
+    map_buffer : 1.2
 
   experiment:
     hero:

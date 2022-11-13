@@ -44,7 +44,7 @@ def kill_all_servers():
     processes = [p for p in psutil.process_iter() if "carla" in p.name().lower()]
     for process in processes:
         os.kill(process.pid, signal.SIGKILL)
-        
+
 def get_actor_blueprints(world, filter, generation):
     bps = world.get_blueprint_library().filter(filter)
 
@@ -70,7 +70,6 @@ def get_actor_blueprints(world, filter, generation):
         return []
 
 
-
 class CarlaCore:
     """
     Class responsible of handling all the different CARLA functionalities, such as server-client connecting,
@@ -88,10 +87,18 @@ class CarlaCore:
         self.sensor_interface_trailer = SensorInterface()
         self.server_port = 2000
         self.server_port_lines = ''
-        self.current_route = None
+
+        self.route = None
+        self.last_waypoint_index = -1
+
+        self.min_x = None
+        self.max_x = None
+        self.min_y = None
+        self.max_y = None
 
         # self.init_server()
         self.connect_client()
+        self.set_map_normalisation()
 
     # def init_server(self):
     #     with open('../ppo_example/server_ports.txt','r') as portsFileRead:
@@ -103,8 +110,6 @@ class CarlaCore:
     #         for line in self.server_port_lines:
     #             if str(self.server_port) not in line:
     #                 portsFileWrite.write(line)
-
-
 
     # def init_server(self):
     #     """Start a server on a random port"""
@@ -171,7 +176,7 @@ class CarlaCore:
                 return
 
             except Exception as e:
-                print(" Waiting for server to be ready: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
+                print(" Waiting for server to be ready: {}, attempt {} of {}".format(e, i + 1,                                                                                self.config["retries_on_error"]))
                 time.sleep(3)
 
         raise Exception("Cannot connect to server. Try increasing 'timeout' or 'retries_on_error' at the carla configuration")
@@ -180,11 +185,11 @@ class CarlaCore:
         """Initialize the hero and sensors"""
 
         self.world = self.client.load_world(
-            map_name = experiment_config["town"],
-            reset_settings = False,
+            map_name=experiment_config["town"],
+            reset_settings=False,
             # map_layers = carla.MapLayer.All if self.config["enable_map_assets"] else carla.MapLayer.NONE
-            map_layers = carla.MapLayer.NONE
-            )
+            map_layers=carla.MapLayer.NONE
+        )
 
         self.map = self.world.get_map()
 
@@ -210,6 +215,123 @@ class CarlaCore:
         #     experiment_config["background_activity"]["n_walkers"],
         # )
 
+    def set_map_normalisation(self):
+        map_buffer = self.config["map_buffer"]
+        spawn_points = list(self.map.get_spawn_points())
+
+        min_x = min_y = 1000000
+        max_x = max_y = -1000000
+
+        for spawn_point in spawn_points:
+            min_x = min(min_x, spawn_point.location.x)
+            max_x = max(max_x, spawn_point.location.x)
+
+            min_y = min(min_y, spawn_point.location.y)
+            max_y = max(max_y, spawn_point.location.y)
+
+        center_x = (max_x + min_x) / 2
+        center_y = (max_y + min_y) / 2
+
+        x_buffer = (max_x - center_x) * map_buffer
+        y_buffer = (max_y - center_y) * map_buffer
+
+        self.min_x = center_x - x_buffer
+        self.max_x = center_x + x_buffer
+
+        self.min_y = center_y - y_buffer
+        self.max_y = center_y + y_buffer
+
+    def normalise_map_location(self, value, axis):
+        assert self.min_x != None and self.min_y != None and self.max_x != None and self.max_y != None
+        if axis == 'x':
+            x_value_normalised = (value - self.min_x) / (self.max_x - self.min_x)
+            assert 0 <= x_value_normalised <= 1
+            return x_value_normalised
+        elif axis == 'y':
+            y_value_normalised = (value - self.min_y) / (self.max_y - self.min_y)
+            assert 0 <= y_value_normalised <= 1
+            return y_value_normalised
+        else:
+            raise Exception('Invalid axis given')
+
+    # def get_perpendicular_line_to_point_index(self, point_idx):
+    #     from numpy import ones, vstack
+    #     from numpy.linalg import lstsq
+    #     current_point = self.route[point_idx]
+    #     next_point = self.route[point_idx + 1]
+    #
+    #     points = [(current_point.x, current_point.y), (next_point.x, next_point.y)]
+    #     x_coords, y_coords = zip(*points)
+    #     A = vstack([x_coords, ones(len(x_coords))]).T
+    #     m, c = lstsq(A, y_coords)[0]
+    #
+    #     m_perpendicular = -1 / m
+    #
+    #     c_perpendicular = current_point.y - m_perpendicular * current_point.x
+
+    def is_in_front_of_waypoint(self, x_pos, y_pos):
+        last_x = self.route[self.last_waypoint_index].x
+        last_y = self.route[self.last_waypoint_index].y
+
+        next_x = self.route[self.last_waypoint_index + 1].x
+        next_y = self.route[self.last_waypoint_index + 1].y
+
+        last_to_next_vector = (next_x - last_x, next_y - last_y)
+
+        if last_x == next_x and last_y == next_y:
+            raise Exception('This should never be the case')
+
+        if last_to_next_vector[0] == 0:
+            # Vertical line between waypoints
+            if y_pos == last_y:
+                return 0
+            elif y_pos < last_y:
+                if next_y < last_y:
+                    return 1
+                elif next_y > last_y:
+                    return -1
+            elif y_pos > last_y:
+                if next_y < last_y:
+                    return -1
+                elif next_y > last_y:
+                    return 1
+
+        elif last_to_next_vector[1] == 0:
+            # Horizontal line between waypoints
+            if x_pos == last_x:
+                return 0
+            elif x_pos < last_x:
+                if next_x < last_x:
+                    return 1
+                elif next_x > last_x:
+                    return -1
+            elif x_pos > last_x:
+                if next_x < last_x:
+                    return -1
+                elif next_x > last_x:
+                    return 1
+
+        a = 1
+        t = 2
+        b = (-last_to_next_vector[0] / last_to_next_vector[1]) * a
+
+        # Equation of perpendicular line
+        # r = ( last_x, last_y) +  t * (a,b)
+        x_on_perpendicular = last_x + t * a
+        y_on_perpendicular = last_y + t * b
+
+        d_pos = (x_pos - last_x) * (y_on_perpendicular - last_y) - (y_pos - last_y) * (x_on_perpendicular - last_x)
+        d_infront = (next_x - last_x) * (y_on_perpendicular - last_y) - (next_y - last_y) * (
+                x_on_perpendicular - last_x)
+
+        if d_pos == 0:
+            # Vehicle is on the line
+            return 0
+        elif (d_pos > 0 and d_infront > 0) or (d_pos < 0 and d_infront < 0):
+            # Vehicle skipped line
+            return 1
+        else:
+            return -1
 
     def reset_hero(self, hero_config):
         """This function resets / spawns the hero vehicle and its sensors"""
@@ -245,7 +367,7 @@ class CarlaCore:
         #         spawn_points.append(transform)
         # else:
 
-        entry_spawn_point_index, exit_spawn_point_index= get_entry_exit_spawn_point_indices()
+        entry_spawn_point_index, exit_spawn_point_index = get_entry_exit_spawn_point_indices()
         entry_spawn_point = self.map.get_spawn_points()[entry_spawn_point_index]
         exit_spawn_point = self.map.get_spawn_points()[exit_spawn_point_index]
 
@@ -254,8 +376,6 @@ class CarlaCore:
         # spawn_points = [self.map.get_spawn_points()[spawn_point_no]]
 
         # Obtaining the route information
-
-
         start_waypoint = self.map.get_waypoint(entry_spawn_point.location)
         end_waypoint = self.map.get_waypoint(exit_spawn_point.location)
 
@@ -265,11 +385,19 @@ class CarlaCore:
         sampling_resolution = 2
         global_planner = GlobalRoutePlanner(self.map, sampling_resolution)
 
-        self.current_route = global_planner.trace_route(start_location, end_location)
+        route_waypoints = global_planner.trace_route(start_location, end_location)
+        self.last_waypoint_index = -1
+        self.route = [carla.Transform(
+            carla.Location(self.normalise_map_location(route_waypoint[0].transform.location.x, 'x'),
+                            self.normalise_map_location(route_waypoint[0].transform.location.y, 'y'),
+                           0),
+            carla.Rotation(0,0,0))
+
+            for route_waypoint in route_waypoints]
 
         print('ROUTE INFORMATION')
-        for route_waypoint in self.current_route:
-            print(route_waypoint[0].transform.location)
+        for route_waypoint in self.route:
+            print(route_waypoint)
 
         # Spawning the actors
         # Where we generate the truck
@@ -325,7 +453,7 @@ class CarlaCore:
         for name, attributes in hero_config["sensors"].items():
             sensor_truck = SensorFactory.spawn(name, attributes, self.sensor_interface_truck, self.hero)
             if name != 'lidar':
-                sensor_trailer = SensorFactory.spawn(name, attributes,self.sensor_interface_trailer, self.hero_trailer)
+                sensor_trailer = SensorFactory.spawn(name, attributes, self.sensor_interface_trailer, self.hero_trailer)
 
         # Not needed anymore. This tick will happen when calling CarlaCore.tick()
         # self.world.tick()
@@ -334,7 +462,6 @@ class CarlaCore:
 
     def spawn_npcs(self, n_vehicles, n_walkers):
         """Spawns vehicles and walkers, also setting up the Traffic Manager and its parameters"""
-
 
         SpawnActor = carla.command.SpawnActor
         SetAutopilot = carla.command.SetAutopilot
@@ -442,14 +569,14 @@ class CarlaCore:
         # Get the camera orientation
         server_view_roll = transform.rotation.roll
         server_view_yaw = transform.rotation.yaw
-        server_view_pitch = transform.rotation.pitch 
+        server_view_pitch = transform.rotation.pitch
 
         # Get the spectator and place it on the desired position
         self.spectator = self.world.get_spectator()
         self.spectator.set_transform(
             carla.Transform(
                 carla.Location(x=server_view_x, y=server_view_y, z=server_view_z),
-                carla.Rotation(pitch=server_view_pitch,yaw=server_view_yaw,roll=server_view_roll),
+                carla.Rotation(pitch=server_view_pitch, yaw=server_view_yaw, roll=server_view_roll),
             )
         )
 

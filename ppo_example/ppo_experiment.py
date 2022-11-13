@@ -12,6 +12,7 @@ from gym.spaces import Box, Discrete
 
 import carla
 
+from rllib_integration.GetAngle import calculate_angle_with_center_of_lane
 from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
 
@@ -26,10 +27,7 @@ class PPOExperiment(BaseExperiment):
         self.allowed_types = [carla.LaneType.Driving, carla.LaneType.Parking]
         self.last_heading_deviation = 0
         self.last_action = None
-        self.min_x = None
-        self.max_x = None
-        self.min_y = None
-        self.max_y = None
+
 
     def reset(self):
         """Called at the beginning and each time the simulation is reset"""
@@ -51,15 +49,11 @@ class PPOExperiment(BaseExperiment):
 
         self.last_heading_deviation = 0
 
-    def min_max_normalization(self, value, axis):
-        if axis == 'x':
-            return (value - self.min_x) / (self.max_x - self.min_x)
-        elif axis == 'y':
-            return (value - self.min_y) / (self.max_y - self.min_y)
-        else:
-            raise Exception('Incorrect axis input')
+        self.last_no_of_collisions = 0
 
-    [33,28, 27, 17,  14, 11, 10, 5]
+
+
+    # [33,28, 27, 17,  14, 11, 10, 5]
 
     def get_action_space(self):
         """Returns the action space, in this case, a discrete space"""
@@ -136,6 +130,7 @@ class PPOExperiment(BaseExperiment):
 
         self.last_action = action
 
+
         return action
 
     def get_observation(self, sensor_data, core):
@@ -161,100 +156,104 @@ class PPOExperiment(BaseExperiment):
             # collision
 
 
-        # How am i going to detect objects in the surronding area.
-        # Know the cetner of the roundabout,
-        # have a radius for the inner and outer circles
-        #
+        # Getting truck location
+        truck_transform = core.hero.get_transform()
 
+        truck_normalised_transform = carla.Transform(
+            carla.Location(self.normalise_map_location(truck_transform.location.x, 'x'),
+                           self.normalise_map_location(truck_transform.location.y, 'y'),
+                           0),
+            carla.Rotation(0, 0, 0))
 
-        # Get minimuma and maximum points of the map
-        # Get roundbaout center
-        # estimate inner and outer radius
+        # Getting trailer location
+        trailer_transform = core.hero_trailer.get_transform()
+        trailer_normalised_transform = carla.Transform(
+            carla.Location(self.normalise_map_location(trailer_transform.location.x, 'x'),
+                           self.normalise_map_location(trailer_transform.location.y, 'y'),
+                           0),
+            carla.Rotation(0, 0, 0))
 
+        # Checking if we have passed the last way point
+        in_front_of_waypoint = core.is_in_front_of_waypoint(truck_normalised_transform.location.x, truck_normalised_transform.location.y)
+        if in_front_of_waypoint == 0 or in_front_of_waypoint == 1:
+            core.last_waypoint_index += 1
+        else:
+            pass
 
+        # Distance to next waypoint
+        x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index+1].location.x - truck_normalised_transform.location.x, )
+        y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index+1].location.y - truck_normalised_transform.location.y )
 
-
-
-
-        # changing location to value between 0 and 1
-        # NORMALIZE
-        # x_pos, y_pos = core.normalize_coordinates(observation["location"].location.x,
-        #                                           observation["location"].location.y)
-
-        transform = core.hero.get_transform()
-        x_pos = transform.location.x
-        y_pos = transform.location.y
-
-        distToFinish = np.sqrt(np.square(np.float32(self.config["hero"]["final_location_x"]) - x_pos) + np.square(np.float32(self.config["hero"]["final_location_y"]) - y_pos))
-
-
+        # Forward Velocity
+        # Normalising it between 0 and 50
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
         forward_velocity = np.clip(forward_velocity, 0, 50.0) / 50
-        heading = np.sin(transform.rotation.yaw * np.pi / 180)
 
-        collisionCounter = 0
-        laneInvasionCounter = 0
+        # Acceleration
+        # TODO Normalise acceleration
+        acceleration = self.get_acceleration(core.hero)
 
+        # Angle to center of lane
+        angle_to_center_of_lane_degrees = calculate_angle_with_center_of_lane(
+            previous_position=core.route[core.last_waypoint_index].location,
+            current_position=truck_normalised_transform.location,
+            next_position=core.route[core.last_waypoint_index+1].location)
+
+
+        # heading = np.sin(transform.rotation.yaw * np.pi / 180)
+        #
+
+        collision_counter = 0
+        lidar_data = None
         for sensor in sensor_data:
-            print('-----START1')
-            print(sensor)
-            print('-----END1')
             if sensor == 'collision_truck':
-                collisionCounter +=1
-            elif sensor == 'collision_trailer':
-                pass
+                # TODO check this
+                self.last_no_of_collisions = sensor_data[sensor][2]
+                print(f'NUMBER OF COLLISIONS {sensor_data[sensor][2]}')
             elif sensor == 'lidar_truck':
-
-                print(f"Number of sensor points {sensor_data[sensor][1].shape}")
-                # print('HEYYYY')
-                #
-                # print(sensor_data[sensor])
-                #
-                # print('HEYYYYEEE')
-                # print('Collision Event')
-                # print(sensor_data[sensor][1][0].semantic_tags)
-                # print(sensor_data[sensor][1][0].type_id)
-
-            # if sensor == 'obstacle':
-            #     obstacle = sensor_data[sensor][1][0].type_id
-            #     if 'static.road' != obstacle and 'static.terrain' != obstacle:
-            #         print('Obstacle Event')
-            #         print(obstacle)
-
-            if sensor == 'laneInvasion':
-                # print('Lane Invasion Event')
-
-                laneInvasions = sensor_data[sensor][1][1]
-                # print(laneInvasions)
-                for laneInvasion in laneInvasions:
-                    laneInvasionCounter +=1
-                    # print(laneInvasion.type)
-
-        # print(f"X Location {x_pos}")
-        # print(f"Y Location {y_pos}")
-        # print(f"Heading {heading}")
-        # print(f"Forward Velocity {forward_velocity}")
-        # print(f"Distance to finish {distToFinish}")
-        # print(f"Collision Counter {collisionCounter}")
-        # print(f"Lane Invasion Counter {laneInvasionCounter}")
+                lidar_data = sensor_data[sensor][2]
+                print(f'LIDAR Data Shape {sensor_data[sensor][2].shape}')
 
 
+        print(f"truck_normalised_transform.location.x {truck_normalised_transform.location.x}")
+        print(f"truck_normalised_transform.location.y {truck_normalised_transform.location.y}")
+        print(f"forward_velocity {forward_velocity}")
+        print(f"acceleration {acceleration}")
+        print(f"x_dist_to_next_waypoint {x_dist_to_next_waypoint}")
+        print(f"y_dist_to_next_waypoint {y_dist_to_next_waypoint}")
+        print(f"angle_to_center_of_lane_degrees {angle_to_center_of_lane_degrees}")
 
         return np.r_[
-                   np.float32(x_pos), np.float32(y_pos), np.float32(heading), np.float32(forward_velocity),
-                   np.float32(distToFinish), np.float32(collisionCounter), np.float32(laneInvasionCounter)
-               ], {}
+                np.float32(truck_normalised_transform.location.x),
+                np.float32(truck_normalised_transform.location.y),
+                np.float32(forward_velocity),
+                np.float32(acceleration),
+                np.float32(x_dist_to_next_waypoint),
+                np.float32(y_dist_to_next_waypoint),
+                np.float32(angle_to_center_of_lane_degrees),
+                #LIDAR
+                # Last action here?
+            ], {}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
         vel = hero.get_velocity()
         return 3.6 * math.sqrt(vel.x ** 2 + vel.y ** 2 + vel.z ** 2)
 
+    def get_acceleration(self,hero):
+        acc = hero.get_acceleration()
+        return math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2)
+
     def is_hero_near_finish_location(self, observation):
+
         final_x = self.config["hero"]["final_location_x"]
         final_y = self.config["hero"]["final_location_y"]
 
         if abs(observation[0] - final_x) < 0.5 and abs(observation[1] - final_y) < 0.5:
+            return True
+
+    def completed_route(self, core):
+        if len(core.route) == core.last_waypoint_index - 1:
             return True
 
 
@@ -266,11 +265,12 @@ class PPOExperiment(BaseExperiment):
             self.time_idle = 0
         else:
             self.time_idle += 1
+
         self.time_episode += 1
         self.done_time_episode = self.max_time_episode < self.time_episode
         self.done_falling = hero.get_location().z < -0.5
-        self.done_collision = observation[5] > 0
-        self.done_arrived = self.is_hero_near_finish_location(observation)
+        self.done_collision = self.last_no_of_collisions > 0
+        self.done_arrived = self.completed_route(core)
 
         output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision or self.done_arrived
         return bool(output)
@@ -293,10 +293,41 @@ class PPOExperiment(BaseExperiment):
         map_ = core.map
 
         reward = 0
-        hero_velocity = observation[3]
-        hero_dist_to_finish = observation[4]
-        hero_collision_counter = observation[5]
-        hero_laneinvasion_counter = observation[6]
+
+        # Observations
+        # np.float32(truck_normalised_transform.location.x),
+        # np.float32(truck_normalised_transform.location.y),
+        # np.float32(forward_velocity),
+        # np.float32(acceleration),
+        # np.float32(x_dist_to_next_waypoint),
+        # np.float32(y_dist_to_next_waypoint),
+        # np.float32(angle_to_center_of_lane_degrees),
+
+
+        forward_velocity = observation[2]
+        angle_to_center_of_lane_degrees = observation[6]
+
+        # When the angle with the center line is 0 the highest reward is given
+        if angle_to_center_of_lane_degrees == 0:
+            reward += 1
+            print(f'Reward for angle to center line is 0, R+= 1')
+        else:
+            # Angle with the center line can deviate between 0 and 180 degrees
+            # TODO Check this reward
+            # Maybe this wil be too high?
+            # Since the RL can stay there and get the reward
+            reward += np.clip(1/angle_to_center_of_lane_degrees,0,1)
+            print(f'Reward for angle to center line { np.clip(1/angle_to_center_of_lane_degrees,0,1)}')
+
+
+        # Positive reward for higher velocity
+        # Already normalised in observations
+        reward += forward_velocity
+        print(f'Reward for forward_velocity {forward_velocity}')
+
+        # Negative reward each time step to push for completing the task.
+        reward += -0.01
+
 
 
 
@@ -309,89 +340,87 @@ class PPOExperiment(BaseExperiment):
         # Time
 
 
-        # Hero-related variables
-        hero_location = hero.get_location()
-        # hero_velocity = self.get_speed(hero)
-        hero_heading = hero.get_transform().get_forward_vector()
-        hero_heading = [hero_heading.x, hero_heading.y]
-
-        # Initialize last location
-        if self.last_location == None:
-            self.last_location = hero_location
+        # # Hero-related variables
+        # hero_location = hero.get_location()
+        # # hero_velocity = self.get_speed(hero)
+        # hero_heading = hero.get_transform().get_forward_vector()
+        # hero_heading = [hero_heading.x, hero_heading.y]
+        #
+        # # Initialize last location
+        # if self.last_location == None:
+        #     self.last_location = hero_location
 
         # Compute deltas
-        delta_distance = float(np.sqrt(np.square(hero_location.x - self.last_location.x) + np.square(hero_location.y - self.last_location.y)))
+        # delta_distance = float(np.sqrt(np.square(hero_location.x - self.last_location.x) + np.square(hero_location.y - self.last_location.y)))
 
         # Reward if going forward
-        reward = delta_distance
-        delta_velocity = hero_velocity - self.last_velocity
+        # reward = delta_distance
+        # delta_velocity = hero_velocity - self.last_velocity
 
 
         # print('Distance to finish: ' + str(hero_dist_to_finish))
-        reward += 100 * (self.last_dist_to_finish - hero_dist_to_finish)
+        # reward += 100 * (self.last_dist_to_finish - hero_dist_to_finish)
 
         # print('Delta distance ' + str(100 * (self.last_dist_to_finish - hero_dist_to_finish)))
 
         # Update variables
-        self.last_location = hero_location
-        self.last_velocity = hero_velocity
-        self.last_dist_to_finish = hero_dist_to_finish
-
+        # self.last_location = hero_location
+        # self.last_velocity = hero_velocity
+        # self.last_dist_to_finish = hero_dist_to_finish
+        #
 
 
 
 
         # Reward if going faster than last step
-        if hero_velocity < 20.0:
-            reward += 0.05 * delta_velocity
+        # if hero_velocity < 20.0:
+        #     reward += 0.05 * delta_velocity
 
         # La duracion de estas infracciones deberia ser 2 segundos?
         # Penalize if not inside the lane
-        closest_waypoint = map_.get_waypoint(
-            hero_location,
-            project_to_road=False,
-            lane_type=carla.LaneType.Any
-        )
-        if closest_waypoint is None or closest_waypoint.lane_type not in self.allowed_types:
-            reward += -0.5
-            self.last_heading_deviation = math.pi
-        else:
-            if not closest_waypoint.is_junction:
-                wp_heading = closest_waypoint.transform.get_forward_vector()
-                wp_heading = [wp_heading.x, wp_heading.y]
-                angle = compute_angle(hero_heading, wp_heading)
-                self.last_heading_deviation = abs(angle)
-
-                if np.dot(hero_heading, wp_heading) < 0:
-                    # We are going in the wrong direction
-                    reward += -0.5
-
-                else:
-                    if abs(math.sin(angle)) > 0.4:
-                        if self.last_action == None:
-                            self.last_action = carla.VehicleControl()
-
-                        if self.last_action.steer * math.sin(angle) >= 0:
-                            reward -= 0.05
-            else:
-                self.last_heading_deviation = 0
-
-        # Negative reward for changing lane
-        reward += 40 * -hero_laneinvasion_counter
+        # closest_waypoint = map_.get_waypoint(
+        #     hero_location,
+        #     project_to_road=False,
+        #     lane_type=carla.LaneType.Any
+        # )
+        # if closest_waypoint is None or closest_waypoint.lane_type not in self.allowed_types:
+        #     reward += -0.5
+        #     self.last_heading_deviation = math.pi
+        # else:
+        #     if not closest_waypoint.is_junction:
+        #         wp_heading = closest_waypoint.transform.get_forward_vector()
+        #         wp_heading = [wp_heading.x, wp_heading.y]
+        #         angle = compute_angle(hero_heading, wp_heading)
+        #         self.last_heading_deviation = abs(angle)
+        #
+        #         if np.dot(hero_heading, wp_heading) < 0:
+        #             # We are going in the wrong direction
+        #             reward += -0.5
+        #
+        #         else:
+        #             if abs(math.sin(angle)) > 0.4:
+        #                 if self.last_action == None:
+        #                     self.last_action = carla.VehicleControl()
+        #
+        #                 if self.last_action.steer * math.sin(angle) >= 0:
+        #                     reward -= 0.05
+        #     else:
+        #         self.last_heading_deviation = 0
 
         if self.done_falling:
-            reward += -100
+            reward += -1
+            print('Done falling')
         if self.done_collision:
-            # print("Done collision")
-            reward += -100
+            print("Done collision")
+            reward += -1
         if self.done_time_idle:
-            # print("Done idle")
-            reward += -100
+            print("Done idle")
+            reward += -1
         if self.done_time_episode:
-            # print("Done max time")
-            reward += 100
+            print("Done max time")
+            reward += -1
         if self.done_arrived:
-            # print("Done arrived")
-            reward += 100
+            print("Done arrived")
+            reward += 1
         # print('Reward: ' + str(reward))
         return reward

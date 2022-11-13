@@ -1,11 +1,11 @@
 import math
 
 def calculate_angle_with_center_of_lane(previous_position, current_position, next_position):
-    Vl_x = current_position[0] - previous_position[0]
-    Vl_y = current_position[1] - previous_position[1]
+    Vl_x = current_position.x - previous_position.x
+    Vl_y = current_position.y - previous_position.y
 
-    Vj_x = next_position[0] - previous_position[0]
-    Vj_y = next_position[1] - previous_position[1]
+    Vj_x = next_position.x - previous_position.x
+    Vj_y = next_position.y - previous_position.y
 
     enumerator = (Vl_x * Vj_x) + (Vl_y * Vj_y)
     denominator = math.sqrt(math.pow(Vl_x, 2) + math.pow(Vl_y, 2)) * math.sqrt(math.pow(Vj_x, 2) + math.pow(Vj_y, 2))

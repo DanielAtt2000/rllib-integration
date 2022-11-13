@@ -1,7 +1,7 @@
 import pandas as pd
 import random
 
-[33,28, 27, 17,  14, 11, 10, 5]
+# [33,28, 27, 17,  14, 11, 10, 5]
 spawn_points = pd.DataFrame(data={'N_IN':[11,33], 'N_OUT':[18,32],
                                'W_IN': [5,17], 'W_OUT': [15,34],
                                'S_IN':[27,28], 'S_OUT':[2,21],
