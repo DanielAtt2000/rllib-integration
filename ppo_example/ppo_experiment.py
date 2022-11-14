@@ -80,7 +80,7 @@ class PPOExperiment(BaseExperiment):
         """
         spaces = {
             'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
-            'lidar': Box(low=-5000, high=5000,shape=(5,6), dtype=np.float64),
+            'lidar': Box(low=-5000, high=5000,shape=(5,6), dtype=np.float32),
         }
         # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
         obs_space = Dict(spaces)
@@ -224,9 +224,10 @@ class PPOExperiment(BaseExperiment):
                 self.last_no_of_collisions = len(sensor_data[sensor][1])
                 print(f'COLLISIONS {sensor_data[sensor]}')
             elif sensor == 'lidar_truck':
-                lidar_data = sensor_data[sensor]
-                print(f"LIDAR ONE {sensor_data['lidar_truck'][1][0]}")
-                print(f'LIDAR Data Shape {sensor_data[sensor][1].shape}')
+                pass
+                # lidar_data = sensor_data[sensor]
+                # print(f"LIDAR ONE {sensor_data['lidar_truck'][1][0]}")
+                # print(f'LIDAR Data Shape {sensor_data[sensor][1].shape}')
                 # np.apply_along_axis(core.normalise_map_location(value=,axis='x'))
 
         # print("OBSERVATIONS START")
@@ -252,10 +253,10 @@ class PPOExperiment(BaseExperiment):
         #         # Last action here?
         #     ]
 
-        print("DTYPE")
-        print(sensor_data['lidar_truck'][1][0:5,:])
-        print(sensor_data['lidar_truck'][1][0:5,:].dtype)
-        print("DTYPE")
+        # print("DTYPE")
+        # print(sensor_data['lidar_truck'][1][0:5,:])
+        # print(sensor_data['lidar_truck'][1][0:5,:].dtype)
+        # print("DTYPE")
 
         return {'values': [
             np.float32(truck_normalised_transform.location.x),

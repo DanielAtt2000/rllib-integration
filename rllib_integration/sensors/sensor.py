@@ -173,11 +173,14 @@ class SemanticLidar(CarlaSensor):
 
         points = copy.deepcopy(points)
 
-        points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],points['ObjIdx'],points['ObjTag']]).T
+        ObjIdxFloat = points['ObjIdx'].astype('float32')
+        ObjTagFloat = points['ObjTag'].astype('float32')
+
+        points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],ObjIdxFloat, ObjTagFloat]).T
+        # points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],points['ObjIdx'], points['ObjTag']]).T
 
         # points = np.reshape(points, (int(points.shape[0] / 6), 6))
         return points
-
 
 # ==================================================================================================
 # -- Others -----------------------------------------------------------------------------------

@@ -8,7 +8,7 @@
 
 import numpy as np
 
-from ray.rllib.agents.callbacks import DefaultCallbacks
+from ray.rllib.algorithms.callbacks import DefaultCallbacks
 
 
 class PPOCallbacks(DefaultCallbacks):

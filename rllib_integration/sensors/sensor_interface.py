@@ -110,13 +110,15 @@ class SensorInterface(object):
 
                     # We're negating the y to correclty visualize a world that matches
                     # what we see in Unreal since Open3D uses a right-handed coordinate system
-                    points = np.array([data['x'], -data['y'], data['z']]).T
+                    points = np.array([data[:,0], -data[:,1], data[:,2]]).T
+                    # points = np.array([data['x'], -data['y'], data['z']]).T
 
                     # # An example of adding some noise to our data if needed:
                     # points += np.random.uniform(-0.05, 0.05, size=points.shape)
 
                     # Colorize the pointcloud based on the CityScapes color palette
-                    labels = np.array(data['ObjTag'])
+                    labels = data[:,5].astype('uint32')
+                    # labels = np.array(data['ObjTag'])
 
                     int_color = LABEL_COLORS[labels]
 
