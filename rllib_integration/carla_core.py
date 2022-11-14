@@ -88,8 +88,8 @@ class CarlaCore:
         self.server_port = 2000
         self.server_port_lines = ''
 
-        self.route = None
-        self.last_waypoint_index = -1
+        self.route = []
+        self.last_waypoint_index = None
 
         self.min_x = None
         self.max_x = None
@@ -98,7 +98,6 @@ class CarlaCore:
 
         # self.init_server()
         self.connect_client()
-        self.set_map_normalisation()
 
     # def init_server(self):
     #     with open('../ppo_example/server_ports.txt','r') as portsFileRead:
@@ -270,11 +269,11 @@ class CarlaCore:
     #     c_perpendicular = current_point.y - m_perpendicular * current_point.x
 
     def is_in_front_of_waypoint(self, x_pos, y_pos):
-        last_x = self.route[self.last_waypoint_index].x
-        last_y = self.route[self.last_waypoint_index].y
+        last_x = self.route[self.last_waypoint_index].location.x
+        last_y = self.route[self.last_waypoint_index].location.y
 
-        next_x = self.route[self.last_waypoint_index + 1].x
-        next_y = self.route[self.last_waypoint_index + 1].y
+        next_x = self.route[self.last_waypoint_index + 1].location.x
+        next_y = self.route[self.last_waypoint_index + 1].location.y
 
         last_to_next_vector = (next_x - last_x, next_y - last_y)
 
@@ -386,18 +385,30 @@ class CarlaCore:
         global_planner = GlobalRoutePlanner(self.map, sampling_resolution)
 
         route_waypoints = global_planner.trace_route(start_location, end_location)
-        self.last_waypoint_index = -1
-        self.route = [carla.Transform(
+        self.last_waypoint_index = 0
+        last_x = -1
+        last_y = -1
+
+        for route_waypoint in route_waypoints:
+
+            # Some waypoint may be duplicated
+            # Checking and ignoring duplicated points
+            if last_x == round(route_waypoint[0].transform.location.x,5) and last_y == round(route_waypoint[0].transform.location.y,5):
+                continue
+
+            last_x = round(route_waypoint[0].transform.location.x,5)
+            last_y = round(route_waypoint[0].transform.location.y,5)
+
+
+            self.route.append(carla.Transform(
             carla.Location(self.normalise_map_location(route_waypoint[0].transform.location.x, 'x'),
                             self.normalise_map_location(route_waypoint[0].transform.location.y, 'y'),
                            0),
-            carla.Rotation(0,0,0))
+            carla.Rotation(0,0,0)))
 
-            for route_waypoint in route_waypoints]
-
-        print('ROUTE INFORMATION')
-        for route_waypoint in self.route:
-            print(route_waypoint)
+        # print('ROUTE INFORMATION')
+        # for route_waypoint in self.route:
+        #     print(route_waypoint)
 
         # Spawning the actors
         # Where we generate the truck

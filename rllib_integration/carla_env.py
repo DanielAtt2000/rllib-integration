@@ -29,6 +29,7 @@ class CarlaEnv(gym.Env):
 
         self.core = CarlaCore(self.config['carla'])
         self.core.setup_experiment(self.experiment.config)
+        self.core.set_map_normalisation()
 
         self.reset()
 

@@ -31,6 +31,9 @@ def get_entry_exit_spawn_point_indices(debug=False):
         print(f"Stopping at {exit_name} with index {exit_spawn_point_index}")
         print('=====================')
 
+    # Only to test in straight line
+    entry_spawn_point_index = 33
+    exit_spawn_point_index = 11
     return entry_spawn_point_index, exit_spawn_point_index
 
 

@@ -8,7 +8,7 @@
 
 import math
 import numpy as np
-from gym.spaces import Box, Discrete
+from gym.spaces import Box, Discrete, Dict
 
 import carla
 
@@ -78,7 +78,16 @@ class PPOExperiment(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
-        return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
+        spaces = {
+            'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
+            'lidar': Box(low=-5000, high=5000,shape=(5,6), dtype=np.float64),
+        }
+        # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
+        obs_space = Dict(spaces)
+        print('SAMPLE')
+        print(obs_space.sample())
+        return obs_space
+
 
 
     def get_actions(self):
@@ -160,16 +169,16 @@ class PPOExperiment(BaseExperiment):
         truck_transform = core.hero.get_transform()
 
         truck_normalised_transform = carla.Transform(
-            carla.Location(self.normalise_map_location(truck_transform.location.x, 'x'),
-                           self.normalise_map_location(truck_transform.location.y, 'y'),
+            carla.Location(core.normalise_map_location(truck_transform.location.x, 'x'),
+                           core.normalise_map_location(truck_transform.location.y, 'y'),
                            0),
             carla.Rotation(0, 0, 0))
 
         # Getting trailer location
         trailer_transform = core.hero_trailer.get_transform()
         trailer_normalised_transform = carla.Transform(
-            carla.Location(self.normalise_map_location(trailer_transform.location.x, 'x'),
-                           self.normalise_map_location(trailer_transform.location.y, 'y'),
+            carla.Location(core.normalise_map_location(trailer_transform.location.x, 'x'),
+                           core.normalise_map_location(trailer_transform.location.y, 'y'),
                            0),
             carla.Rotation(0, 0, 0))
 
@@ -193,11 +202,14 @@ class PPOExperiment(BaseExperiment):
         # TODO Normalise acceleration
         acceleration = self.get_acceleration(core.hero)
 
+
         # Angle to center of lane
+        # Normalising it
         angle_to_center_of_lane_degrees = calculate_angle_with_center_of_lane(
             previous_position=core.route[core.last_waypoint_index].location,
             current_position=truck_normalised_transform.location,
             next_position=core.route[core.last_waypoint_index+1].location)
+        angle_to_center_of_lane_degrees = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
 
         # heading = np.sin(transform.rotation.yaw * np.pi / 180)
@@ -207,33 +219,66 @@ class PPOExperiment(BaseExperiment):
         lidar_data = None
         for sensor in sensor_data:
             if sensor == 'collision_truck':
-                # TODO check this
-                self.last_no_of_collisions = sensor_data[sensor][2]
-                print(f'NUMBER OF COLLISIONS {sensor_data[sensor][2]}')
+                # TODO change to only take collision with road
+
+                self.last_no_of_collisions = len(sensor_data[sensor][1])
+                print(f'COLLISIONS {sensor_data[sensor]}')
             elif sensor == 'lidar_truck':
-                lidar_data = sensor_data[sensor][2]
-                print(f'LIDAR Data Shape {sensor_data[sensor][2].shape}')
+                lidar_data = sensor_data[sensor]
+                print(f"LIDAR ONE {sensor_data['lidar_truck'][1][0]}")
+                print(f'LIDAR Data Shape {sensor_data[sensor][1].shape}')
+                # np.apply_along_axis(core.normalise_map_location(value=,axis='x'))
+
+        # print("OBSERVATIONS START")
+        # print(f"truck_normalised_transform.location.x {truck_normalised_transform.location.x}")
+        # print(f"truck_normalised_transform.location.y {truck_normalised_transform.location.y}")
+        # print(f"forward_velocity {forward_velocity}")
+        # print(f"acceleration {acceleration}")
+        # print(f"x_dist_to_next_waypoint {x_dist_to_next_waypoint}")
+        # print(f"y_dist_to_next_waypoint {y_dist_to_next_waypoint}")
+        # print(f"angle_to_center_of_lane_degrees {angle_to_center_of_lane_degrees}")
+        # print("OBSERVATIONS STOP")
 
 
-        print(f"truck_normalised_transform.location.x {truck_normalised_transform.location.x}")
-        print(f"truck_normalised_transform.location.y {truck_normalised_transform.location.y}")
-        print(f"forward_velocity {forward_velocity}")
-        print(f"acceleration {acceleration}")
-        print(f"x_dist_to_next_waypoint {x_dist_to_next_waypoint}")
-        print(f"y_dist_to_next_waypoint {y_dist_to_next_waypoint}")
-        print(f"angle_to_center_of_lane_degrees {angle_to_center_of_lane_degrees}")
+        # values = np.r_[
+        #         np.float32(truck_normalised_transform.location.x),
+        #         # np.float32(truck_normalised_transform.location.y),
+        #         # np.float32(forward_velocity),
+        #         # np.float32(acceleration),
+        #         # np.float32(x_dist_to_next_waypoint),
+        #         # np.float32(y_dist_to_next_waypoint),
+        #         # np.float32(angle_to_center_of_lane_degrees),
+        #         #LIDAR
+        #         # Last action here?
+        #     ]
 
-        return np.r_[
-                np.float32(truck_normalised_transform.location.x),
-                np.float32(truck_normalised_transform.location.y),
-                np.float32(forward_velocity),
-                np.float32(acceleration),
-                np.float32(x_dist_to_next_waypoint),
-                np.float32(y_dist_to_next_waypoint),
-                np.float32(angle_to_center_of_lane_degrees),
-                #LIDAR
-                # Last action here?
-            ], {}
+        print("DTYPE")
+        print(sensor_data['lidar_truck'][1][0:5,:])
+        print(sensor_data['lidar_truck'][1][0:5,:].dtype)
+        print("DTYPE")
+
+        return {'values': [
+            np.float32(truck_normalised_transform.location.x),
+            np.float32(truck_normalised_transform.location.y),
+            np.float32(forward_velocity),
+            np.float32(acceleration),
+            np.float32(x_dist_to_next_waypoint),
+            np.float32(y_dist_to_next_waypoint),
+            np.float32(angle_to_center_of_lane_degrees),
+                           ],
+                'lidar':sensor_data['lidar_truck'][1][0:5,:]
+        }, {}
+        # return  np.r_[
+        #                 np.float32(truck_normalised_transform.location.x),
+        #                 np.float32(truck_normalised_transform.location.y),
+        #                 np.float32(forward_velocity),
+        #                 np.float32(acceleration),
+        #                 np.float32(x_dist_to_next_waypoint),
+        #                 np.float32(y_dist_to_next_waypoint),
+        #                 np.float32(angle_to_center_of_lane_degrees),
+        #                 #LIDAR
+        #                 # Last action here?
+        #             ], {}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -244,16 +289,18 @@ class PPOExperiment(BaseExperiment):
         acc = hero.get_acceleration()
         return math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2)
 
-    def is_hero_near_finish_location(self, observation):
-
-        final_x = self.config["hero"]["final_location_x"]
-        final_y = self.config["hero"]["final_location_y"]
-
-        if abs(observation[0] - final_x) < 0.5 and abs(observation[1] - final_y) < 0.5:
-            return True
+    # def is_hero_near_finish_location(self, observation):
+    #
+    #     final_x = self.config["hero"]["final_location_x"]
+    #     final_y = self.config["hero"]["final_location_y"]
+    #
+    #     if abs(observation[0] - final_x) < 0.5 and abs(observation[1] - final_y) < 0.5:
+    #         return True
 
     def completed_route(self, core):
-        if len(core.route) == core.last_waypoint_index - 1:
+        # -2 Since we want to be done when the truck has passed the second to last point
+        # in order to have the next waypoint to calculate with
+        if len(core.route) == core.last_waypoint_index - 2:
             return True
 
 
@@ -304,26 +351,26 @@ class PPOExperiment(BaseExperiment):
         # np.float32(angle_to_center_of_lane_degrees),
 
 
-        forward_velocity = observation[2]
-        angle_to_center_of_lane_degrees = observation[6]
+        forward_velocity = observation['values'][0]
+        angle_to_center_of_lane_degrees = observation['values'][0]
 
         # When the angle with the center line is 0 the highest reward is given
         if angle_to_center_of_lane_degrees == 0:
             reward += 1
-            print(f'Reward for angle to center line is 0, R+= 1')
+            print(f'====> REWARD for angle to center line is 0, R+= 1')
         else:
             # Angle with the center line can deviate between 0 and 180 degrees
             # TODO Check this reward
             # Maybe this wil be too high?
             # Since the RL can stay there and get the reward
             reward += np.clip(1/angle_to_center_of_lane_degrees,0,1)
-            print(f'Reward for angle to center line { np.clip(1/angle_to_center_of_lane_degrees,0,1)}')
+            print(f'====> REWARD for angle to center line { np.clip(1/angle_to_center_of_lane_degrees,0,1)}')
 
 
         # Positive reward for higher velocity
         # Already normalised in observations
         reward += forward_velocity
-        print(f'Reward for forward_velocity {forward_velocity}')
+        print(f'====> REWARD for forward_velocity {forward_velocity}')
 
         # Negative reward each time step to push for completing the task.
         reward += -0.01
@@ -409,18 +456,18 @@ class PPOExperiment(BaseExperiment):
 
         if self.done_falling:
             reward += -1
-            print('Done falling')
+            print('====> REWARD Done falling')
         if self.done_collision:
-            print("Done collision")
+            print("====> REWARD Done collision")
             reward += -1
         if self.done_time_idle:
-            print("Done idle")
+            print("====> REWARD Done idle")
             reward += -1
         if self.done_time_episode:
-            print("Done max time")
+            print("====> REWARD Done max time")
             reward += -1
         if self.done_arrived:
-            print("Done arrived")
+            print("====> REWARD Done arrived")
             reward += 1
         # print('Reward: ' + str(reward))
         return reward
