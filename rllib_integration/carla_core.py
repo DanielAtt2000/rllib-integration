@@ -240,16 +240,24 @@ class CarlaCore:
         self.min_y = center_y - y_buffer
         self.max_y = center_y + y_buffer
 
-    def normalise_map_location(self, value, axis):
+    def normalise_map_location(self, value, axis,assertBetween=True):
         assert self.min_x != None and self.min_y != None and self.max_x != None and self.max_y != None
         if axis == 'x':
             x_value_normalised = (value - self.min_x) / (self.max_x - self.min_x)
-            assert 0 <= x_value_normalised <= 1
-            return x_value_normalised
+            if (0 <= x_value_normalised <= 1) or not assertBetween:
+                return x_value_normalised
+            else:
+                raise Exception(f"x_value_normalised of out of range between 0 and 1. "
+                                f"Input Value: {value}, Normalised Value: {x_value_normalised}")
+
         elif axis == 'y':
             y_value_normalised = (value - self.min_y) / (self.max_y - self.min_y)
-            assert 0 <= y_value_normalised <= 1
-            return y_value_normalised
+            if (0 <= y_value_normalised <= 1) or not assertBetween:
+                return y_value_normalised
+            else:
+                raise Exception(f"y_value_normalised of out of range between 0 and 1."
+                                f" Input Value: {value}, Normalised Value: {y_value_normalised}")
+
         else:
             raise Exception('Invalid axis given')
 

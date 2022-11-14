@@ -27,6 +27,8 @@ class PPOExperiment(BaseExperiment):
         self.allowed_types = [carla.LaneType.Driving, carla.LaneType.Parking]
         self.last_heading_deviation = 0
         self.last_action = None
+        self.lidar_points_count = []
+        self.lidar_max_points = 14000
 
 
     def reset(self):
@@ -50,6 +52,15 @@ class PPOExperiment(BaseExperiment):
         self.last_heading_deviation = 0
 
         self.last_no_of_collisions = 0
+
+
+        # Saving LIDAR point count
+        file_lidar_counts = open('lidar_point_counts.txt', 'a')
+        file_lidar_counts.write(str(self.lidar_points_count))
+        file_lidar_counts.write(str('\n'))
+        file_lidar_counts.close()
+        self.lidar_points_count = []
+
 
 
 
@@ -80,7 +91,7 @@ class PPOExperiment(BaseExperiment):
         """
         spaces = {
             'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
-            'lidar': Box(low=-5000, high=5000,shape=(5,6), dtype=np.float32),
+            'lidar': Box(low=-5000, high=5000,shape=(self.lidar_max_points,6), dtype=np.float32),
         }
         # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
         obs_space = Dict(spaces)
@@ -211,6 +222,8 @@ class PPOExperiment(BaseExperiment):
             next_position=core.route[core.last_waypoint_index+1].location)
         angle_to_center_of_lane_degrees = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
+        print(f'OBSERVATION angle_to_center_of_lane_degrees {angle_to_center_of_lane_degrees}')
+
 
         # heading = np.sin(transform.rotation.yaw * np.pi / 180)
         #
@@ -224,7 +237,39 @@ class PPOExperiment(BaseExperiment):
                 self.last_no_of_collisions = len(sensor_data[sensor][1])
                 print(f'COLLISIONS {sensor_data[sensor]}')
             elif sensor == 'lidar_truck':
-                pass
+                lidar_data = sensor_data['lidar_truck'][1]
+                # print(f'BEFORE {lidar_data}')
+                # print(f'BEFORE SHAPE{lidar_data.shape}')
+                self.lidar_points_count.append(len(lidar_data))
+                # NO Normalisation required on LIDAR since its coordinates are relative to the actor
+
+                # maybe need to normalise Z axis as well
+                # map_location_normaliser = np.vectorize(core.normalise_map_location)
+                # x_lidar_normalised = map_location_normaliser(sensor_data['lidar_truck'][1][:, 0], axis='x',assertBetween=False)
+                # y_lidar_normalised = map_location_normaliser(sensor_data['lidar_truck'][1][:, 1], axis='y',assertBetween=False)
+                #
+                # lidar_data = np.array([x_lidar_normalised, y_lidar_normalised, lidar_data[:,2], lidar_data[:,3], lidar_data[:,4],  lidar_data[:,5]]).T
+                # print(f'AFTER NORMALISATION{lidar_data}')
+                # print(f'AFTER NORMALISATION SHAPE{lidar_data.shape}')
+
+                # Deleting any lidar points with x and y positions outside the map
+                # lidar_data = np.delete(lidar_data, np.where((lidar_data[:, 0] > 1))[0], axis=0)
+                # lidar_data = np.delete(lidar_data, np.where((lidar_data[:, 0] < 0))[0], axis=0)
+                # lidar_data = np.delete(lidar_data, np.where((lidar_data[:, 1] > 1))[0], axis=0)
+                # lidar_data = np.delete(lidar_data, np.where((lidar_data[:, 1] < 0))[0], axis=0)
+
+                # print(f'AFTER DELETE {lidar_data}')
+                # print(f'AFTER DELETE SHAPE{lidar_data.shape}')
+
+                # Padding LIDAR to have constant number of points
+                number_of_rows_to_pad = self.lidar_max_points - len(lidar_data)
+                lidar_data_padded = np.pad(lidar_data, [(0, number_of_rows_to_pad), (0, 0)], mode='constant', constant_values=-1)
+
+                # print(f'AFTER PADDING{lidar_data_padded}')
+                # print(f'AFTER PADDING SHAPE{lidar_data_padded.shape}')
+
+
+
                 # lidar_data = sensor_data[sensor]
                 # print(f"LIDAR ONE {sensor_data['lidar_truck'][1][0]}")
                 # print(f'LIDAR Data Shape {sensor_data[sensor][1].shape}')
@@ -267,7 +312,7 @@ class PPOExperiment(BaseExperiment):
             np.float32(y_dist_to_next_waypoint),
             np.float32(angle_to_center_of_lane_degrees),
                            ],
-                'lidar':sensor_data['lidar_truck'][1][0:5,:]
+                'lidar':lidar_data_padded
         }, {}
         # return  np.r_[
         #                 np.float32(truck_normalised_transform.location.x),
@@ -352,8 +397,8 @@ class PPOExperiment(BaseExperiment):
         # np.float32(angle_to_center_of_lane_degrees),
 
 
-        forward_velocity = observation['values'][0]
-        angle_to_center_of_lane_degrees = observation['values'][0]
+        forward_velocity = observation['values'][2]
+        angle_to_center_of_lane_degrees = observation['values'][6]
 
         # When the angle with the center line is 0 the highest reward is given
         if angle_to_center_of_lane_degrees == 0:
