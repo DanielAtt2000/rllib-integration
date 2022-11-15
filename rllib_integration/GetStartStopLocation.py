@@ -40,10 +40,10 @@ def get_entry_exit_spawn_point_indices(debug=False):
         print('=====================')
 
     # Only to test in straight line
-    entry_spawn_point_index =33
-    exit_spawn_point_index = 35
+    # entry_spawn_point_index =29
+    # exit_spawn_point_index = 34
     return entry_spawn_point_index, exit_spawn_point_index
 
 
-for _ in range(1000):
-    get_entry_exit_spawn_point_indices()
+# for _ in range(1000):
+#     print(get_entry_exit_map_locations())

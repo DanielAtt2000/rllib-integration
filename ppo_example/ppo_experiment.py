@@ -201,8 +201,8 @@ class PPOExperiment(BaseExperiment):
             core.last_waypoint_index += 1
         else:
             pass
-        print(f"OBS -> Len(route) {len(core.route)}")
-        print(f'OBS -> core.last_waypoint_index {core.last_waypoint_index}')
+        #print(f"OBS -> Len(route) {len(core.route)}")
+        #print(f'OBS -> core.last_waypoint_index {core.last_waypoint_index}')
         # print(f"AFTER CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
 
 
@@ -352,9 +352,9 @@ class PPOExperiment(BaseExperiment):
     def completed_route(self, core):
         # -2 Since we want to be done when the truck has passed the second to last point
         # in order to have the next waypoint to calculate with
-        print("Inside Complete Route")
-        print(f"Len(core.route) -2 : {len(core.route) -2 }")
-        print(f"core.last_waypoint_index{core.last_waypoint_index}")
+        #print("Inside Complete Route")
+        #print(f"Len(core.route) -2 : {len(core.route) -2 }")
+        #print(f"core.last_waypoint_index{core.last_waypoint_index}")
         if len(core.route) - 2 == core.last_waypoint_index:
             return True
 
@@ -413,20 +413,20 @@ class PPOExperiment(BaseExperiment):
         # When the angle with the center line is 0 the highest reward is given
         if angle_to_center_of_lane_degrees == 0:
             reward += 1
-            # print(f'====> REWARD for angle to center line is 0, R+= 1')
+            print(f'====> REWARD for angle to center line is 0, R+= 1')
         else:
             # Angle with the center line can deviate between 0 and 180 degrees
             # TODO Check this reward
             # Maybe this wil be too high?
             # Since the RL can stay there and get the reward
             reward += np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)
-            # print(f'====> REWARD for angle to center line { np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)}')
+            print(f'====> REWARD for angle to center line { np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)}')
 
 
         # Positive reward for higher velocity
         # Already normalised in observations
         reward += forward_velocity
-        # print(f'====> REWARD for forward_velocity {forward_velocity}')
+        print(f'====> REWARD for forward_velocity {forward_velocity}')
 
         # Negative reward each time step to push for completing the task.
         reward += -0.01
