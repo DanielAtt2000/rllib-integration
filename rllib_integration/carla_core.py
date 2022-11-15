@@ -84,7 +84,7 @@ class CarlaCore:
         self.hero_trailer = None
         self.config = join_dicts(BASE_CORE_CONFIG, config)
         self.sensor_interface_truck = SensorInterface()
-        self.sensor_interface_trailer = SensorInterface()
+        self.sensor_interface_trailer = SensorInterface() if self.config["truckTrailerCombo"] else None
         self.server_port = 2000
         self.server_port_lines = ''
 
@@ -175,7 +175,7 @@ class CarlaCore:
                 return
 
             except Exception as e:
-                print(" Waiting for server to be ready: {}, attempt {} of {}".format(e, i + 1,                                                                                self.config["retries_on_error"]))
+                print(" Waiting for server to be ready: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
                 time.sleep(3)
 
         raise Exception("Cannot connect to server. Try increasing 'timeout' or 'retries_on_error' at the carla configuration")
@@ -345,7 +345,8 @@ class CarlaCore:
 
         # Part 1: destroy all sensors (if necessary)
         self.sensor_interface_truck.destroy()
-        self.sensor_interface_trailer.destroy()
+        if hero_config["truckTrailerCombo"]:
+            self.sensor_interface_trailer.destroy()
 
         self.world.tick()
 
@@ -420,18 +421,19 @@ class CarlaCore:
 
         # Spawning the actors
         # Where we generate the truck
-        self.hero_blueprints = random.choice(get_actor_blueprints(self.world, "DAFxf", "2"))
+        self.hero_blueprints = random.choice(get_actor_blueprints(self.world, hero_config["blueprintTruck"], "2"))
         self.hero_blueprints.set_attribute("role_name", "hero")
 
-        self.trailer_blueprints = random.choice(get_actor_blueprints(self.world, "trailer", "2"))
-        self.trailer_blueprints.set_attribute("role_name", "hero-trailer")
+        if hero_config["truckTrailerCombo"]:
+            self.trailer_blueprints = random.choice(get_actor_blueprints(self.world, hero_config["blueprintTrailer"], "2"))
+            self.trailer_blueprints.set_attribute("role_name", "hero-trailer")
 
         # If already spawned, destroy it
         if self.hero is not None:
             self.hero.destroy()
             self.hero = None
 
-        if self.hero_trailer is not None:
+        if hero_config["truckTrailerCombo"] and self.hero_trailer is not None:
             self.hero_trailer.destroy()
             self.hero_trailer = None
 
@@ -439,9 +441,10 @@ class CarlaCore:
         # # for i in range(0,len(spawn_points)):
         # next_spawn_point = spawn_points[i % len(spawn_points)]
 
-        # Spawning the trailer first and than spawning the truck in a location a bit forward up to connect with it
-        entry_spawn_point.location.z = 0.5
-        self.hero_trailer = self.world.try_spawn_actor(self.trailer_blueprints, entry_spawn_point)
+        if hero_config["truckTrailerCombo"]:
+            # Spawning the trailer first and than spawning the truck in a location a bit forward up to connect with it
+            entry_spawn_point.location.z = 0.5
+            self.hero_trailer = self.world.try_spawn_actor(self.trailer_blueprints, entry_spawn_point)
 
         # Moving the spawn point a bit further up
         entry_spawn_point.location.z = 0.5
@@ -451,18 +454,25 @@ class CarlaCore:
         # Spawning the truck
         self.hero = self.world.try_spawn_actor(self.hero_blueprints, entry_spawn_point)
 
-        if self.hero is not None and self.hero_trailer is not None:
-            print("Truck and Trailer spawned!")
+        if self.hero is not None:
+            print("Truck spawned!")
+            if hero_config["truckTrailerCombo"] and self.hero_trailer is not None:
+                print("Trailer spawned!")
 
             # break
         else:
             print("Could not spawn hero, changing spawn point")
             print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points <====')
 
-        if self.hero is None or self.hero_trailer is None:
+        if self.hero is None:
             print("We ran out of spawn points")
             print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points<====')
             return
+        if hero_config["truckTrailerCombo"] and self.hero_trailer is None:
+            print("We ran out of spawn points")
+            print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points<====')
+            return
+
 
 
         self.world.tick()
@@ -471,7 +481,7 @@ class CarlaCore:
         # Where we set the sensors
         for name, attributes in hero_config["sensors"].items():
             sensor_truck = SensorFactory.spawn(name, attributes, self.sensor_interface_truck, self.hero)
-            if name != 'lidar':
+            if hero_config["truckTrailerCombo"] and name != 'lidar':
                 sensor_trailer = SensorFactory.spawn(name, attributes, self.sensor_interface_trailer, self.hero_trailer)
 
         # Not needed anymore. This tick will happen when calling CarlaCore.tick()
@@ -606,11 +616,15 @@ class CarlaCore:
     def get_sensor_data(self):
         """Returns the data sent by the different sensors at this tick"""
         sensor_data_truck = self.sensor_interface_truck.get_data('truck')
-        sensor_data_trailer = self.sensor_interface_trailer.get_data('trailer')
+        if self.sensor_interface_trailer != None:
+            sensor_data_trailer = self.sensor_interface_trailer.get_data('trailer')
         # print("---------")
         # world_frame = self.world.get_snapshot().frame
         # print("World frame: {}".format(world_frame))
         # for name, data in sensor_data.items():
         #     print("{}: {}".format(name, data[0]))
-        merged_sensor_data = {**sensor_data_truck, **sensor_data_trailer}
-        return merged_sensor_data
+
+        if self.sensor_interface_trailer != None:
+            return {**sensor_data_truck, **sensor_data_trailer}
+        else:
+            return sensor_data_truck

@@ -52,10 +52,14 @@ env_config:
     enable_rendering: True
     show_display: True
     map_buffer : 1.2
+    truckTrailerCombo: False
+
 
   experiment:
     hero:
-      blueprintTruck: "DAFxf"
+      truckTrailerCombo: False
+#      blueprintTruck: "DAFxf"
+      blueprintTruck: "vehicle.audi.a2"
       blueprintTrailer: "trailer"
       sensors:
 #        obstacle:

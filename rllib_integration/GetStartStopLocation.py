@@ -2,10 +2,18 @@ import pandas as pd
 import random
 
 # [33,28, 27, 17,  14, 11, 10, 5]
-spawn_points = pd.DataFrame(data={'N_IN':[11,33], 'N_OUT':[18,32],
-                               'W_IN': [5,17], 'W_OUT': [15,34],
-                               'S_IN':[27,28], 'S_OUT':[2,21],
-                               'E_IN':[10,14], 'E_OUT':[4,31]
+# For Laptop
+# spawn_points = pd.DataFrame(data={'N_IN':[11,33], 'N_OUT':[18,32],
+#                                'W_IN': [5,17], 'W_OUT': [15,34],
+#                                'S_IN':[27,28], 'S_OUT':[2,21],
+#                                'E_IN':[10,14], 'E_OUT':[4,31]
+#                                })
+
+# For PC
+spawn_points = pd.DataFrame(data={'N_IN':[34], 'N_OUT':[25],
+                               'W_IN': [20], 'W_OUT': [12],
+                               'S_IN':[15], 'S_OUT':[10],
+                               'E_IN':[29], 'E_OUT':[2]
                                })
 
 
@@ -32,8 +40,8 @@ def get_entry_exit_spawn_point_indices(debug=False):
         print('=====================')
 
     # Only to test in straight line
-    entry_spawn_point_index = 33
-    exit_spawn_point_index = 11
+    entry_spawn_point_index =33
+    exit_spawn_point_index = 35
     return entry_spawn_point_index, exit_spawn_point_index
 
 

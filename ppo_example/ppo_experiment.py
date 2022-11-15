@@ -95,8 +95,8 @@ class PPOExperiment(BaseExperiment):
         }
         # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
         obs_space = Dict(spaces)
-        print('SAMPLE')
-        print(obs_space.sample())
+        # print('SAMPLE')
+        # print(obs_space.sample())
         return obs_space
 
 
@@ -185,24 +185,32 @@ class PPOExperiment(BaseExperiment):
                            0),
             carla.Rotation(0, 0, 0))
 
-        # Getting trailer location
-        trailer_transform = core.hero_trailer.get_transform()
-        trailer_normalised_transform = carla.Transform(
-            carla.Location(core.normalise_map_location(trailer_transform.location.x, 'x'),
-                           core.normalise_map_location(trailer_transform.location.y, 'y'),
-                           0),
-            carla.Rotation(0, 0, 0))
+        if core.config["truckTrailerCombo"]:
+            # Getting trailer location
+            trailer_transform = core.hero_trailer.get_transform()
+            trailer_normalised_transform = carla.Transform(
+                carla.Location(core.normalise_map_location(trailer_transform.location.x, 'x'),
+                               core.normalise_map_location(trailer_transform.location.y, 'y'),
+                               0),
+                carla.Rotation(0, 0, 0))
 
+        # print(f"BEFORE CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
         # Checking if we have passed the last way point
         in_front_of_waypoint = core.is_in_front_of_waypoint(truck_normalised_transform.location.x, truck_normalised_transform.location.y)
         if in_front_of_waypoint == 0 or in_front_of_waypoint == 1:
             core.last_waypoint_index += 1
         else:
             pass
+        print(f"OBS -> Len(route) {len(core.route)}")
+        print(f'OBS -> core.last_waypoint_index {core.last_waypoint_index}')
+        # print(f"AFTER CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
+
 
         # Distance to next waypoint
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index+1].location.x - truck_normalised_transform.location.x, )
         y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index+1].location.y - truck_normalised_transform.location.y )
+        # print(f"DISTANCE TO NEXT WAY POINT X {x_dist_to_next_waypoint}")
+        # print(f"DISTANCE TO NEXT WAY POINT Y {y_dist_to_next_waypoint}")
 
         # Forward Velocity
         # Normalising it between 0 and 50
@@ -221,8 +229,6 @@ class PPOExperiment(BaseExperiment):
             current_position=truck_normalised_transform.location,
             next_position=core.route[core.last_waypoint_index+1].location)
         angle_to_center_of_lane_degrees = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
-
-        print(f'OBSERVATION angle_to_center_of_lane_degrees {angle_to_center_of_lane_degrees}')
 
 
         # heading = np.sin(transform.rotation.yaw * np.pi / 180)
@@ -346,7 +352,10 @@ class PPOExperiment(BaseExperiment):
     def completed_route(self, core):
         # -2 Since we want to be done when the truck has passed the second to last point
         # in order to have the next waypoint to calculate with
-        if len(core.route) == core.last_waypoint_index - 2:
+        print("Inside Complete Route")
+        print(f"Len(core.route) -2 : {len(core.route) -2 }")
+        print(f"core.last_waypoint_index{core.last_waypoint_index}")
+        if len(core.route) - 2 == core.last_waypoint_index:
             return True
 
 
@@ -399,24 +408,25 @@ class PPOExperiment(BaseExperiment):
 
         forward_velocity = observation['values'][2]
         angle_to_center_of_lane_degrees = observation['values'][6]
+        # print(f"angle with center in REWARD {angle_to_center_of_lane_degrees}")
 
         # When the angle with the center line is 0 the highest reward is given
         if angle_to_center_of_lane_degrees == 0:
             reward += 1
-            print(f'====> REWARD for angle to center line is 0, R+= 1')
+            # print(f'====> REWARD for angle to center line is 0, R+= 1')
         else:
             # Angle with the center line can deviate between 0 and 180 degrees
             # TODO Check this reward
             # Maybe this wil be too high?
             # Since the RL can stay there and get the reward
-            reward += np.clip(1/angle_to_center_of_lane_degrees,0,1)
-            print(f'====> REWARD for angle to center line { np.clip(1/angle_to_center_of_lane_degrees,0,1)}')
+            reward += np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)
+            # print(f'====> REWARD for angle to center line { np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)}')
 
 
         # Positive reward for higher velocity
         # Already normalised in observations
         reward += forward_velocity
-        print(f'====> REWARD for forward_velocity {forward_velocity}')
+        # print(f'====> REWARD for forward_velocity {forward_velocity}')
 
         # Negative reward each time step to push for completing the task.
         reward += -0.01

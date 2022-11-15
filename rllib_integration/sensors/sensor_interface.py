@@ -49,12 +49,12 @@ class SensorInterface(object):
     def __init__(self):
         self._sensors = {}  # {name: Sensor object}
         self._data_buffers = queue.Queue()
-        self._queue_timeout = 10
+        self._queue_timeout = 20
 
         self._event_sensors = {}
         self._event_data_buffers = queue.Queue()
 
-        self.visualiseLIDAR = True
+        self.visualiseLIDAR = False
         self.counter = 0
         self.lidar_window()
 
