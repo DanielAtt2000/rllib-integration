@@ -308,7 +308,15 @@ class PPOExperiment(BaseExperiment):
         # print(sensor_data['lidar_truck'][1][0:5,:])
         # print(sensor_data['lidar_truck'][1][0:5,:].dtype)
         # print("DTYPE")
-
+        observation_file = open(f'results\\run_{core.current_time}\\observations_{core.current_time}.txt', 'a+')
+        observation_file.write(f"truck_x:{round(truck_normalised_transform.location.x,5)} "
+                               f"truck_y:{round(truck_normalised_transform.location.y,5)} "
+                               f"forward_velocity:{round(forward_velocity,5)} "
+                               f"acceleration:{round(acceleration,5)} "
+                               f"x_dist_to_next_waypoint:{round(x_dist_to_next_waypoint,5)} "
+                               f"y_dist_to_next_waypoint:{round(y_dist_to_next_waypoint,5)} "
+                               f"angle_to_center_of_lane_degrees:{round(angle_to_center_of_lane_degrees,5)}\n")
+        observation_file.close()
         return {'values': [
             np.float32(truck_normalised_transform.location.x),
             np.float32(truck_normalised_transform.location.y),
@@ -409,27 +417,32 @@ class PPOExperiment(BaseExperiment):
         forward_velocity = observation['values'][2]
         angle_to_center_of_lane_degrees = observation['values'][6]
         # print(f"angle with center in REWARD {angle_to_center_of_lane_degrees}")
+        reward_file = open(f'results\\run_{core.current_time}\\rewards_{core.current_time}.txt', 'a+')
 
         # When the angle with the center line is 0 the highest reward is given
         if angle_to_center_of_lane_degrees == 0:
             reward += 1
-            print(f'====> REWARD for angle to center line is 0, R+= 1')
+            # print(f'====> REWARD for angle to center line is 0, R+= 1')
+            reward_file.write(f"angle_to_center_of_lane_degrees == 0: +1 ")
         else:
             # Angle with the center line can deviate between 0 and 180 degrees
             # TODO Check this reward
             # Maybe this wil be too high?
             # Since the RL can stay there and get the reward
             reward += np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)
-            print(f'====> REWARD for angle to center line { np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)}')
+            # print(f'====> REWARD for angle to center line { np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)}')
+            reward_file.write(f"angle_to_center_of_lane_degrees is {round(angle_to_center_of_lane_degrees,5)}: {round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)} ")
 
 
         # Positive reward for higher velocity
         # Already normalised in observations
         reward += forward_velocity
-        print(f'====> REWARD for forward_velocity {forward_velocity}')
+        # print(f'====> REWARD for forward_velocity {forward_velocity} ')
+        reward_file.write(f"forward_velocity: {round(forward_velocity,5)} ")
 
         # Negative reward each time step to push for completing the task.
         reward += -0.01
+        reward_file.write(f"negative reward: -0.01 ")
 
 
 
@@ -510,20 +523,33 @@ class PPOExperiment(BaseExperiment):
         #     else:
         #         self.last_heading_deviation = 0
 
+
+
         if self.done_falling:
             reward += -1
             print('====> REWARD Done falling')
+            reward_file.write(f"done_falling:-1 ")
         if self.done_collision:
             print("====> REWARD Done collision")
             reward += -1
+            reward_file.write(f"done_collision:-1 ")
         if self.done_time_idle:
             print("====> REWARD Done idle")
             reward += -1
+            reward_file.write(f"done_time_idle:-1 ")
         if self.done_time_episode:
             print("====> REWARD Done max time")
             reward += -1
+            reward_file.write(f"done_time_episode:-1 ")
         if self.done_arrived:
             print("====> REWARD Done arrived")
             reward += 1
+            reward_file.write(f"done_arrived:+1 ")
+
         # print('Reward: ' + str(reward))
+
+
+        reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
+        reward_file.close()
+        print(f'Reward: {reward}')
         return reward

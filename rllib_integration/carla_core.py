@@ -13,6 +13,7 @@ import time
 import psutil
 import logging
 
+import datetime
 import carla
 
 from rllib_integration.RouteGeneration.global_route_planner import GlobalRoutePlanner
@@ -95,6 +96,9 @@ class CarlaCore:
         self.max_x = None
         self.min_y = None
         self.max_y = None
+
+        self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
+        os.mkdir(f"results\\run_{self.current_time}")
 
         # self.init_server()
         self.connect_client()
