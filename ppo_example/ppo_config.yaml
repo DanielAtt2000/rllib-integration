@@ -38,8 +38,8 @@ lr: 0.01
 
 env_config:
   carla:
-    host: "192.168.1.113"
-#    host: "127.0.0.1"
+ #   host: "192.168.1.113"
+    host: "127.0.0.1"
     timeout: 30.0
     # IF YOU ARE GOING TO CHANGE THE TIMESTEP CHANGE rotation_frequency of LIDAR
     timestep: 0.05 # IMP IMP
