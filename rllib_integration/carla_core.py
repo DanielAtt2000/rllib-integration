@@ -597,17 +597,19 @@ class CarlaCore:
 
         # Tick once the simulation
         self.world.tick()
-
         # Move the spectator
         if self.config["enable_rendering"]:
             self.set_spectator_camera_view()
 
+        print(f'SELFHER IN TICK {self.hero}')
         # Return the new sensor data
         return self.get_sensor_data()
 
     def set_spectator_camera_view(self):
         """This positions the spectator as a 3rd person view of the hero vehicle"""
         transform = self.hero.get_transform()
+
+        print(f"hero transform {transform}")
 
         # Get the camera position
         server_view_x = transform.location.x - 5 * transform.get_forward_vector().x

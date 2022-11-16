@@ -104,9 +104,9 @@ def main():
     args = argparser.parse_args()
     args.config = parse_config(args)
 
-    if not args.tboff:
-        launch_tensorboard(logdir=os.path.join(args.directory, args.name),
-                           host="0.0.0.0" if args.auto else "localhost")
+
+    launch_tensorboard(logdir=os.path.join(args.directory, args.name),
+                       host="0.0.0.0" if args.auto else "localhost")
 
     run(args)
 
