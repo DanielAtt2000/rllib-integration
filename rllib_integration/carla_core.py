@@ -450,12 +450,10 @@ class CarlaCore:
         # # for i in range(0,len(spawn_points)):
         # next_spawn_point = spawn_points[i % len(spawn_points)]
         failed_entry_spawn_locations = [-1]
-        print(f'self.hero {self.hero}')
         # while self.hero is None and (hero_config["truckTrailerCombo"] and self.hero_trailer is None) :
         while self.hero is None:
 
             entry_spawn_point_index, entry_spawn_point = self.set_route(failed_entry_spawn_locations)
-            print(f'SPAWN POINT FOUND AT {entry_spawn_point_index}')
 
             if hero_config["truckTrailerCombo"]:
                 # Spawning the trailer first and than spawning the truck in a location a bit forward up to connect with it
@@ -601,7 +599,7 @@ class CarlaCore:
         if self.config["enable_rendering"]:
             self.set_spectator_camera_view()
 
-        print(f'SELFHER IN TICK {self.hero}')
+
         # Return the new sensor data
         return self.get_sensor_data()
 
@@ -609,7 +607,7 @@ class CarlaCore:
         """This positions the spectator as a 3rd person view of the hero vehicle"""
         transform = self.hero.get_transform()
 
-        print(f"hero transform {transform}")
+
 
         # Get the camera position
         server_view_x = transform.location.x - 5 * transform.get_forward_vector().x

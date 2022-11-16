@@ -28,7 +28,7 @@ class PPOExperiment(BaseExperiment):
         self.last_heading_deviation = 0
         self.last_action = None
         self.lidar_points_count = []
-        self.lidar_max_points = 14000
+        self.lidar_max_points = self.config["hero"]["lidar_max_points"]
 
 
     def reset(self):
@@ -268,6 +268,14 @@ class PPOExperiment(BaseExperiment):
                 # print(f'AFTER DELETE SHAPE{lidar_data.shape}')
 
                 # Padding LIDAR to have constant number of points
+
+                if self.lidar_max_points < len(lidar_data):
+                    raise Exception(f'self.lidar_max_points < len(lidar_data)\n'
+                                    f'{self.lidar_max_points} < {len(lidar_data)}')
+                if (self.lidar_max_points - len(lidar_data)) > 2000 :
+                    print(f"Difference between lidar_max_points and points is {self.lidar_max_points - len(lidar_data)}")
+                    print(f"WASTING MEMORY")
+
                 number_of_rows_to_pad = self.lidar_max_points - len(lidar_data)
                 lidar_data_padded = np.pad(lidar_data, [(0, number_of_rows_to_pad), (0, 0)], mode='constant', constant_values=-1)
 
@@ -551,5 +559,5 @@ class PPOExperiment(BaseExperiment):
 
         reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
         reward_file.close()
-        print(f'Reward: {reward}')
+        # print(f'Reward: {reward}')
         return reward
