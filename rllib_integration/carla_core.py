@@ -365,6 +365,7 @@ class CarlaCore:
 
         route_waypoints = global_planner.trace_route(start_location, end_location)
         self.last_waypoint_index = 0
+        self.route.clear()
         last_x = -1
         last_y = -1
 

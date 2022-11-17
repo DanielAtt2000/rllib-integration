@@ -5,7 +5,7 @@
 #
 # This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
-
+import matplotlib.pyplot as plt
 import math
 import numpy as np
 from gym.spaces import Box, Discrete, Dict
@@ -29,6 +29,8 @@ class PPOExperiment(BaseExperiment):
         self.last_action = None
         self.lidar_points_count = []
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
+        self.counter = 0
+        self.visualiseRoute = True
 
 
     def reset(self):
@@ -60,6 +62,7 @@ class PPOExperiment(BaseExperiment):
         file_lidar_counts.write(str('\n'))
         file_lidar_counts.close()
         self.lidar_points_count = []
+        self.counter = 0
 
 
 
@@ -92,7 +95,7 @@ class PPOExperiment(BaseExperiment):
         spaces = {
             'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
 
-            'lidar': Box(low=-35, high=35,shape=(self.lidar_max_points,6), dtype=np.float32),
+            'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,6), dtype=np.float32),
 
         }
         # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
@@ -227,11 +230,30 @@ class PPOExperiment(BaseExperiment):
         # Angle to center of lane
         # Normalising it
         angle_to_center_of_lane_degrees = calculate_angle_with_center_of_lane(
-            previous_position=core.route[core.last_waypoint_index].location,
+            previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_normalised_transform.location,
-            next_position=core.route[core.last_waypoint_index+1].location)
+            next_position=core.route[core.last_waypoint_index+10].location)
         angle_to_center_of_lane_degrees = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
+        if self.visualiseRoute and self.counter % 30 == 0:
+            x_route = []
+            y_route = []
+            for point in core.route:
+                # print(f"X: {point.location.x} Y:{point.location.y}")
+                x_route.append(point.location.x)
+                y_route.append(point.location.y)
+            # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
+            plt.plot([x_route.pop(0)],y_route.pop(0),'bo')
+            plt.plot(x_route, y_route,'y^')
+            plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro')
+            plt.plot([truck_normalised_transform.location.x], [truck_normalised_transform.location.y], 'gs')
+            plt.plot([core.route[core.last_waypoint_index+10].location.x], [core.route[core.last_waypoint_index+10].location.y], 'bo')
+            plt.axis([0.3, 0.7, 0.3, 0.7])
+            # plt.axis([0, 1, 0, 1])
+            plt.title(f'{angle_to_center_of_lane_degrees*180}')
+            plt.gca().invert_yaxis()
+            plt.show()
+        self.counter +=1
 
         # heading = np.sin(transform.rotation.yaw * np.pi / 180)
         #
@@ -245,6 +267,7 @@ class PPOExperiment(BaseExperiment):
                 print(f'COLLISIONS {sensor_data[sensor]}')
             elif sensor == 'lidar_truck':
                 lidar_data = sensor_data['lidar_truck'][1]
+                # print(f'LIDAR DATA {lidar_data[0,:]}')
                 # print(f'BEFORE {lidar_data}')
                 # print(f'BEFORE SHAPE{lidar_data.shape}')
                 self.lidar_points_count.append(len(lidar_data))
@@ -379,7 +402,7 @@ class PPOExperiment(BaseExperiment):
         #print("Inside Complete Route")
         #print(f"Len(core.route) -2 : {len(core.route) -2 }")
         #print(f"core.last_waypoint_index{core.last_waypoint_index}")
-        if len(core.route) - 2 == core.last_waypoint_index:
+        if len(core.route) - 11 == core.last_waypoint_index:
             return True
 
 
@@ -435,6 +458,8 @@ class PPOExperiment(BaseExperiment):
         # print(f"angle with center in REWARD {angle_to_center_of_lane_degrees}")
         reward_file = open(f'results\\run_{core.current_time}\\rewards_{core.current_time}.txt', 'a+')
 
+
+        print("Angle with center line %.5f " % (angle_to_center_of_lane_degrees*180) )
         # When the angle with the center line is 0 the highest reward is given
         if angle_to_center_of_lane_degrees == 0:
             reward += 1
@@ -446,14 +471,14 @@ class PPOExperiment(BaseExperiment):
             # Maybe this wil be too high?
             # Since the RL can stay there and get the reward
             reward += np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)
-            # print(f'====> REWARD for angle to center line { np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)}')
+            # print(f'====> REWARD for angle ({round(angle_to_center_of_lane_degrees,5)}) to center line { round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)}',end='')
             reward_file.write(f"angle_to_center_of_lane_degrees is {round(angle_to_center_of_lane_degrees,5)}: {round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)} ")
 
 
         # Positive reward for higher velocity
         # Already normalised in observations
         reward += forward_velocity
-        # print(f'====> REWARD for forward_velocity {forward_velocity} ')
+        # print(f' REWARD for forward_velocity {forward_velocity} ')
         reward_file.write(f"forward_velocity: {round(forward_velocity,5)} ")
 
         # Negative reward each time step to push for completing the task.
