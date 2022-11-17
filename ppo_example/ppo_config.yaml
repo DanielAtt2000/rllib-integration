@@ -61,7 +61,7 @@ env_config:
 #      blueprintTruck: "DAFxf"
       blueprintTruck: "vehicle.audi.a2"
       blueprintTrailer: "trailer"
-      lidar_max_points : 14000
+      lidar_max_points : 2500
       sensors:
 #        obstacle:
 #          type: "sensor.other.obstacle"
@@ -69,15 +69,15 @@ env_config:
           type: "sensor.other.collision"
         lidar:
           type: "sensor.lidar.ray_cast_semantic"
-          channels : "64"
-          range : "100.0"
-          points_per_second : "500000"
+          channels : "32"
+          range : "30.0"
+          points_per_second : "56000"
           rotation_frequency : "20" #  IMP THIS IS 1 / delta (timestep)
-          upper_fov : '15.0'
-          lower_fov : '-25.0'
+          upper_fov : '5.0'
+          lower_fov : '-15.0'
           horizontal_fov : '360.0'
           sensor_tick : '0'
-          transform : '5,0.0,7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
+          transform : '0.0,0.0,1.6,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
 #        laneInvasion:
 #          type: "sensor.other.lane_invasion"
       spawn_points: [

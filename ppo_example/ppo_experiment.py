@@ -9,7 +9,7 @@
 import math
 import numpy as np
 from gym.spaces import Box, Discrete, Dict
-
+import warnings
 import carla
 
 from rllib_integration.GetAngle import calculate_angle_with_center_of_lane
@@ -91,7 +91,9 @@ class PPOExperiment(BaseExperiment):
         """
         spaces = {
             'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
-            'lidar': Box(low=-5000, high=5000,shape=(self.lidar_max_points,6), dtype=np.float32),
+
+            'lidar': Box(low=-35, high=35,shape=(self.lidar_max_points,6), dtype=np.float32),
+
         }
         # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
         obs_space = Dict(spaces)
@@ -234,8 +236,7 @@ class PPOExperiment(BaseExperiment):
         # heading = np.sin(transform.rotation.yaw * np.pi / 180)
         #
 
-        collision_counter = 0
-        lidar_data = None
+        lidar_data_padded = None
         for sensor in sensor_data:
             if sensor == 'collision_truck':
                 # TODO change to only take collision with road
@@ -270,11 +271,13 @@ class PPOExperiment(BaseExperiment):
                 # Padding LIDAR to have constant number of points
 
                 if self.lidar_max_points < len(lidar_data):
-                    raise Exception(f'self.lidar_max_points < len(lidar_data)\n'
-                                    f'{self.lidar_max_points} < {len(lidar_data)}')
+                    warnings.warn(f'self.lidar_max_points < len(lidar_data)\n'
+                                f'{self.lidar_max_points} < {len(lidar_data)}\n'
+                                f'LOSING LIDAR DATA')
+
                 if (self.lidar_max_points - len(lidar_data)) > 2000 :
-                    print(f"Difference between lidar_max_points and points is {self.lidar_max_points - len(lidar_data)}")
-                    print(f"WASTING MEMORY")
+                    warnings.warn(f"Difference between lidar_max_points and points is {self.lidar_max_points - len(lidar_data)}\n"
+                                  f"WASTING MEMORY")
 
                 number_of_rows_to_pad = self.lidar_max_points - len(lidar_data)
                 lidar_data_padded = np.pad(lidar_data, [(0, number_of_rows_to_pad), (0, 0)], mode='constant', constant_values=-1)
@@ -316,6 +319,11 @@ class PPOExperiment(BaseExperiment):
         # print(sensor_data['lidar_truck'][1][0:5,:])
         # print(sensor_data['lidar_truck'][1][0:5,:].dtype)
         # print("DTYPE")
+
+
+        if lidar_data_padded is None:
+            raise Exception('LIDAR DATA NOT FILLED')
+
         observation_file = open(f'results\\run_{core.current_time}\\observations_{core.current_time}.txt', 'a+')
         observation_file.write(f"truck_x:{round(truck_normalised_transform.location.x,5)} "
                                f"truck_y:{round(truck_normalised_transform.location.y,5)} "

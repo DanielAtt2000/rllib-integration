@@ -22,7 +22,7 @@ LABEL_COLORS = np.array([
     (220, 20, 60),  # Pedestrian
     (153, 153, 153),  # Pole
     (157, 234, 50),  # RoadLines
-    (128, 64, 128),  # Road
+    (255, 0, 4),  # Road
     (244, 35, 232),  # Sidewalk
     (107, 142, 35),  # Vegetation
     (0, 0, 142),  # Vehicle
@@ -107,6 +107,7 @@ class SensorInterface(object):
 
                 if self.counter > 20 and self.visualiseLIDAR:
                     data = sensor_data[2]
+                    # print(f"Number of LIDAR points {len(data)}")
 
                     # We're negating the y to correclty visualize a world that matches
                     # what we see in Unreal since Open3D uses a right-handed coordinate system
@@ -119,6 +120,8 @@ class SensorInterface(object):
                     # Colorize the pointcloud based on the CityScapes color palette
                     labels = data[:,5].astype('uint32')
                     # labels = np.array(data['ObjTag'])
+                    # import collections
+                    # print(f"COUNTER: {collections.Counter(labels)}")
 
                     int_color = LABEL_COLORS[labels]
 
