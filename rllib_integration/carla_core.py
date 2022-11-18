@@ -98,7 +98,8 @@ class CarlaCore:
         self.max_y = None
 
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
-        os.mkdir(f"results\\run_{self.current_time}")
+
+        os.mkdir(os.path.join("results", "run_" + str(self.current_time)))
 
         # self.init_server()
         self.connect_client()

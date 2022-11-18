@@ -11,6 +11,7 @@ import numpy as np
 from gym.spaces import Box, Discrete, Dict
 import warnings
 import carla
+import os
 
 from rllib_integration.GetAngle import calculate_angle_with_center_of_lane
 from rllib_integration.base_experiment import BaseExperiment
@@ -28,9 +29,11 @@ class PPOExperiment(BaseExperiment):
         self.last_heading_deviation = 0
         self.last_action = None
         self.lidar_points_count = []
+        self.min_lidar_values = 1000000
+        self.max_lidar_values = -100000
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
-        self.visualiseRoute = True
+        self.visualiseRoute = False
 
 
     def reset(self):
@@ -57,10 +60,23 @@ class PPOExperiment(BaseExperiment):
 
 
         # Saving LIDAR point count
-        file_lidar_counts = open('lidar_point_counts.txt', 'a')
+        file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
         file_lidar_counts.write(str(self.lidar_points_count))
         file_lidar_counts.write(str('\n'))
         file_lidar_counts.close()
+
+        file_lidar_counts = open(os.path.join('lidar_output', 'min_lidar_values.txt'), 'a')
+        file_lidar_counts.write(str("Min Lidar Value:" + str(self.min_lidar_values)))
+        file_lidar_counts.write(str('\n'))
+        file_lidar_counts.close()
+
+        file_lidar_counts = open(os.path.join('lidar_output', 'max_lidar_values.txt'), 'a')
+        file_lidar_counts.write(str("Max Lidar Value:" + str(self.max_lidar_values)))
+        file_lidar_counts.write(str('\n'))
+        file_lidar_counts.close()
+
+        self.min_lidar_values = 1000000
+        self.max_lidar_values = -100000
         self.lidar_points_count = []
         self.counter = 0
 
@@ -95,7 +111,7 @@ class PPOExperiment(BaseExperiment):
         spaces = {
             'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
 
-            'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,6), dtype=np.float32),
+            'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
 
         }
         # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
@@ -305,6 +321,20 @@ class PPOExperiment(BaseExperiment):
                 number_of_rows_to_pad = self.lidar_max_points - len(lidar_data)
                 lidar_data_padded = np.pad(lidar_data, [(0, number_of_rows_to_pad), (0, 0)], mode='constant', constant_values=-1)
 
+
+                for row in lidar_data_padded:
+                    for col in row:
+                        if col > self.max_lidar_values:
+                            self.max_lidar_values = col
+                        elif col < self.min_lidar_values:
+                            self.min_lidar_values = col
+
+                    # if len(np.where(row[:] > 999)) != 0:
+                    #     print(np.where(row[:] > 999))
+                    #     print(row[:])
+                    # elif len(np.where(row[:] < -999)) != 0:
+                    #     print(np.where(row[:] < -999))
+                    #     print(row[:])
                 # print(f'AFTER PADDING{lidar_data_padded}')
                 # print(f'AFTER PADDING SHAPE{lidar_data_padded.shape}')
 
@@ -347,7 +377,7 @@ class PPOExperiment(BaseExperiment):
         if lidar_data_padded is None:
             raise Exception('LIDAR DATA NOT FILLED')
 
-        observation_file = open(f'results\\run_{core.current_time}\\observations_{core.current_time}.txt', 'a+')
+        observation_file = open( os.path.join("results","run_" + str(core.current_time),"observations_" + str(core.current_time) + ".txt"), 'a+')
         observation_file.write(f"truck_x:{round(truck_normalised_transform.location.x,5)} "
                                f"truck_y:{round(truck_normalised_transform.location.y,5)} "
                                f"forward_velocity:{round(forward_velocity,5)} "
@@ -356,7 +386,7 @@ class PPOExperiment(BaseExperiment):
                                f"y_dist_to_next_waypoint:{round(y_dist_to_next_waypoint,5)} "
                                f"angle_to_center_of_lane_degrees:{round(angle_to_center_of_lane_degrees,5)}\n")
         observation_file.close()
-        return {'values': [
+        return {'values': np.array([
             np.float32(truck_normalised_transform.location.x),
             np.float32(truck_normalised_transform.location.y),
             np.float32(forward_velocity),
@@ -364,7 +394,7 @@ class PPOExperiment(BaseExperiment):
             np.float32(x_dist_to_next_waypoint),
             np.float32(y_dist_to_next_waypoint),
             np.float32(angle_to_center_of_lane_degrees),
-                           ],
+                           ]),
                 'lidar':lidar_data_padded
         }, {}
         # return  np.r_[
@@ -456,7 +486,11 @@ class PPOExperiment(BaseExperiment):
         forward_velocity = observation['values'][2]
         angle_to_center_of_lane_degrees = observation['values'][6]
         # print(f"angle with center in REWARD {angle_to_center_of_lane_degrees}")
-        reward_file = open(f'results\\run_{core.current_time}\\rewards_{core.current_time}.txt', 'a+')
+
+        reward_file = open(os.path.join("results",
+                                        "run_" + str(core.current_time),
+                                        "rewards_" + str(core.current_time) + ".txt")
+                           , 'a+')
 
 
         print("Angle with center line %.5f " % (angle_to_center_of_lane_degrees*180) )

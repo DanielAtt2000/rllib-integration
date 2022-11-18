@@ -118,7 +118,7 @@ class SensorInterface(object):
                     # points += np.random.uniform(-0.05, 0.05, size=points.shape)
 
                     # Colorize the pointcloud based on the CityScapes color palette
-                    labels = data[:,5].astype('uint32')
+                    labels = data[:,4].astype('uint32')
                     # labels = np.array(data['ObjTag'])
                     # import collections
                     # print(f"COUNTER: {collections.Counter(labels)}")

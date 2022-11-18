@@ -3,18 +3,18 @@ import random
 
 # [33,28, 27, 17,  14, 11, 10, 5]
 # For Laptop
-spawn_points = pd.DataFrame(data={'N_IN':[11], 'N_OUT':[32],
-                                'W_IN': [17], 'W_OUT': [15],
-                                'S_IN':[27], 'S_OUT':[2],
-                                'E_IN':[10], 'E_OUT':[4]
-                                })
+#spawn_points = pd.DataFrame(data={'N_IN':[11], 'N_OUT':[32],
+#                                'W_IN': [17], 'W_OUT': [15],
+#                                'S_IN':[27], 'S_OUT':[2],
+#                                'E_IN':[10], 'E_OUT':[4]
+#                                })
 
 # For PC
-# spawn_points = pd.DataFrame(data={'N_IN':[34], 'N_OUT':[25],
-#                               'W_IN': [20], 'W_OUT': [12],
-#                              'S_IN':[15], 'S_OUT':[10],
-#                               'E_IN':[29], 'E_OUT':[2]
-#                               })
+spawn_points = pd.DataFrame(data={'N_IN':[34], 'N_OUT':[25],
+                               'W_IN': [20], 'W_OUT': [12],
+                              'S_IN':[15], 'S_OUT':[10],
+                               'E_IN':[29], 'E_OUT':[2]
+                               })
 
 
 def get_entry_exit_spawn_point_indices(failed_spawn_locations,debug=False):
