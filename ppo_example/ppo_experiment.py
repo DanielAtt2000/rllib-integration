@@ -109,7 +109,8 @@ class PPOExperiment(BaseExperiment):
         :return:
         """
         spaces = {
-            'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
+            # 'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
+            'values': Box(low=np.array([0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1]), dtype=np.float32),
 
             'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
 
@@ -248,7 +249,7 @@ class PPOExperiment(BaseExperiment):
         angle_to_center_of_lane_degrees = calculate_angle_with_center_of_lane(
             previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_normalised_transform.location,
-            next_position=core.route[core.last_waypoint_index+10].location)
+            next_position=core.route[core.last_waypoint_index+5].location)
         angle_to_center_of_lane_degrees = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
         if self.visualiseRoute and self.counter % 30 == 0:
@@ -263,7 +264,7 @@ class PPOExperiment(BaseExperiment):
             plt.plot(x_route, y_route,'y^')
             plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro')
             plt.plot([truck_normalised_transform.location.x], [truck_normalised_transform.location.y], 'gs')
-            plt.plot([core.route[core.last_waypoint_index+10].location.x], [core.route[core.last_waypoint_index+10].location.y], 'bo')
+            plt.plot([core.route[core.last_waypoint_index+5].location.x], [core.route[core.last_waypoint_index+5].location.y], 'bo')
             plt.axis([0.3, 0.7, 0.3, 0.7])
             # plt.axis([0, 1, 0, 1])
             plt.title(f'{angle_to_center_of_lane_degrees*180}')
@@ -377,24 +378,29 @@ class PPOExperiment(BaseExperiment):
         if lidar_data_padded is None:
             raise Exception('LIDAR DATA NOT FILLED')
 
-        observation_file = open( os.path.join("results","run_" + str(core.current_time),"observations_" + str(core.current_time) + ".txt"), 'a+')
-        observation_file.write(f"truck_x:{round(truck_normalised_transform.location.x,5)} "
-                               f"truck_y:{round(truck_normalised_transform.location.y,5)} "
-                               f"forward_velocity:{round(forward_velocity,5)} "
-                               f"acceleration:{round(acceleration,5)} "
-                               f"x_dist_to_next_waypoint:{round(x_dist_to_next_waypoint,5)} "
-                               f"y_dist_to_next_waypoint:{round(y_dist_to_next_waypoint,5)} "
-                               f"angle_to_center_of_lane_degrees:{round(angle_to_center_of_lane_degrees,5)}\n")
-        observation_file.close()
-        return {'values': np.array([
+        name_observations = ["truck_normalised_transform.location.x",
+                             "truck_normalised_transform.location.y",
+                             "forward_velocity",
+                             # "acceleration",
+                             "x_dist_to_next_waypoint",
+                             "y_dist_to_next_waypoint",
+                             "angle_to_center_of_lane_degrees"]
+        observations = [
             np.float32(truck_normalised_transform.location.x),
             np.float32(truck_normalised_transform.location.y),
             np.float32(forward_velocity),
-            np.float32(acceleration),
+            # np.float32(acceleration),
             np.float32(x_dist_to_next_waypoint),
             np.float32(y_dist_to_next_waypoint),
             np.float32(angle_to_center_of_lane_degrees),
-                           ]),
+                           ]
+
+        observation_file = open( os.path.join("results","run_" + str(core.current_time),"observations_" + str(core.current_time) + ".txt"), 'a+')
+        for idx, obs in enumerate(observations):
+            observation_file.write(f"{name_observations[idx]}:{round(obs,5)}\n")
+        observation_file.close()
+
+        return {'values': np.array(observations),
                 'lidar':lidar_data_padded
         }, {}
         # return  np.r_[
@@ -484,7 +490,7 @@ class PPOExperiment(BaseExperiment):
 
 
         forward_velocity = observation['values'][2]
-        angle_to_center_of_lane_degrees = observation['values'][6]
+        angle_to_center_of_lane_degrees = observation['values'][5]
         # print(f"angle with center in REWARD {angle_to_center_of_lane_degrees}")
 
         reward_file = open(os.path.join("results",
@@ -511,13 +517,13 @@ class PPOExperiment(BaseExperiment):
 
         # Positive reward for higher velocity
         # Already normalised in observations
-        reward += forward_velocity
+        # reward += forward_velocity
         # print(f' REWARD for forward_velocity {forward_velocity} ')
-        reward_file.write(f"forward_velocity: {round(forward_velocity,5)} ")
+        # reward_file.write(f"forward_velocity: {round(forward_velocity,5)} ")
 
         # Negative reward each time step to push for completing the task.
-        reward += -0.01
-        reward_file.write(f"negative reward: -0.01 ")
+        # reward += -0.01
+        # reward_file.write(f"negative reward: -0.01 ")
 
 
 
