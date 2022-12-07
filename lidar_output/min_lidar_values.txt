@@ -93,3 +93,10 @@ Min Lidar Value:-28.376562
 Min Lidar Value:-28.362383
 Min Lidar Value:-29.963085
 Min Lidar Value:-29.961601
+Min Lidar Value:1000000
+Min Lidar Value:1000000
+Min Lidar Value:1000000
+Min Lidar Value:1000000
+Min Lidar Value:1000000
+Min Lidar Value:1000000
+Min Lidar Value:1000000

@@ -112,7 +112,8 @@ class PPOExperiment(BaseExperiment):
             # 'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
             'values': Box(low=np.array([0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1]), dtype=np.float32),
 
-            'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
+            # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
+            'semantic_camera': Box(low=0, high=256,shape=(600,800,3), dtype=np.float32),
 
         }
         # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
@@ -239,6 +240,12 @@ class PPOExperiment(BaseExperiment):
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
         forward_velocity = np.clip(forward_velocity, 0, 50.0) / 50
 
+        forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
+        forward_velocity_x = np.clip(forward_velocity_x, 0, 50.0) / 50
+
+        forward_velocity_y = np.clip(self.get_forward_velocity_y(core.hero), 0, None)
+        forward_velocity_y = np.clip(forward_velocity_y, 0, 50.0) / 50
+
         # Acceleration
         # TODO Normalise acceleration
         acceleration = self.get_acceleration(core.hero)
@@ -276,12 +283,18 @@ class PPOExperiment(BaseExperiment):
         #
 
         lidar_data_padded = None
+        semantic_camera_data = None
         for sensor in sensor_data:
             if sensor == 'collision_truck':
                 # TODO change to only take collision with road
 
                 self.last_no_of_collisions = len(sensor_data[sensor][1])
                 print(f'COLLISIONS {sensor_data[sensor]}')
+            elif sensor == 'semantic_camera_truck':
+                semantic_camera_data = sensor_data['semantic_camera_truck'][1]
+
+                assert semantic_camera_data is not None
+
             elif sensor == 'lidar_truck':
                 lidar_data = sensor_data['lidar_truck'][1]
                 # print(f'LIDAR DATA {lidar_data[0,:]}')
@@ -346,6 +359,8 @@ class PPOExperiment(BaseExperiment):
                 # print(f'LIDAR Data Shape {sensor_data[sensor][1].shape}')
                 # np.apply_along_axis(core.normalise_map_location(value=,axis='x'))
 
+                assert lidar_data_padded is not None
+
         # print("OBSERVATIONS START")
         # print(f"truck_normalised_transform.location.x {truck_normalised_transform.location.x}")
         # print(f"truck_normalised_transform.location.y {truck_normalised_transform.location.y}")
@@ -374,25 +389,26 @@ class PPOExperiment(BaseExperiment):
         # print(sensor_data['lidar_truck'][1][0:5,:].dtype)
         # print("DTYPE")
 
-
-        if lidar_data_padded is None:
-            raise Exception('LIDAR DATA NOT FILLED')
+        # 40 meters inside diameter
+        roundabout_diameter = 40
 
         name_observations = ["truck_normalised_transform.location.x",
                              "truck_normalised_transform.location.y",
-                             "forward_velocity",
-                             # "acceleration",
+                             "forward_velocity_x",
+                             "forward_velocity_y",
                              "x_dist_to_next_waypoint",
                              "y_dist_to_next_waypoint",
-                             "angle_to_center_of_lane_degrees"]
+                             "angle_to_center_of_lane_degrees",
+                             "roundabout_diameter"]
         observations = [
             np.float32(truck_normalised_transform.location.x),
             np.float32(truck_normalised_transform.location.y),
-            np.float32(forward_velocity),
-            # np.float32(acceleration),
+            np.float32(forward_velocity_x),
+            np.float32(forward_velocity_y),
             np.float32(x_dist_to_next_waypoint),
             np.float32(y_dist_to_next_waypoint),
             np.float32(angle_to_center_of_lane_degrees),
+            np.float32(roundabout_diameter)
                            ]
 
         observation_file = open( os.path.join("results","run_" + str(core.current_time),"observations_" + str(core.current_time) + ".txt"), 'a+')
@@ -401,7 +417,8 @@ class PPOExperiment(BaseExperiment):
         observation_file.close()
 
         return {'values': np.array(observations),
-                'lidar':lidar_data_padded
+                # 'lidar':lidar_data_padded,
+                'semantic_camera':semantic_camera_data
         }, {}
         # return  np.r_[
         #                 np.float32(truck_normalised_transform.location.x),
@@ -419,6 +436,14 @@ class PPOExperiment(BaseExperiment):
         """Computes the speed of the hero vehicle in Km/h"""
         vel = hero.get_velocity()
         return 3.6 * math.sqrt(vel.x ** 2 + vel.y ** 2 + vel.z ** 2)
+
+    def get_forward_velocity_x(self,hero):
+        vel = hero.get_velocity()
+        return 3.6 * vel.x
+
+    def get_forward_velocity_y(self,hero):
+        vel = hero.get_velocity()
+        return 3.6 * vel.y
 
     def get_acceleration(self,hero):
         acc = hero.get_acceleration()

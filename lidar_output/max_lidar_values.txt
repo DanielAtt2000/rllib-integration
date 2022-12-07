@@ -93,3 +93,10 @@ Max Lidar Value:29.025742
 Max Lidar Value:28.431112
 Max Lidar Value:29.95453
 Max Lidar Value:29.96457
+Max Lidar Value:-100000
+Max Lidar Value:-100000
+Max Lidar Value:-100000
+Max Lidar Value:-100000
+Max Lidar Value:-100000
+Max Lidar Value:-100000
+Max Lidar Value:-100000
