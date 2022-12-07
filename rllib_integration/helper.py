@@ -72,8 +72,7 @@ def find_latest_checkpoint(directory):
                                                   if n.isdigit()]))
                     if checkpoint_int > max_checkpoint_int:
                         max_checkpoint_int = checkpoint_int
-                        checkpoint_path = temp + "/" + c + "/" + c.replace(
-                            "_", "-")
+                        checkpoint_path = temp + "/" + c + "/" + "algorithm_state.pkl"
 
     if not checkpoint_path:
         raise FileNotFoundError(

@@ -1,1 +1,3 @@
+conda activate CarlaRlib
 python ppo_train.py ppo_example/ppo_config.yaml --name ppo
+python dqn_train.py dqn/dqn_config.yaml --name dqn

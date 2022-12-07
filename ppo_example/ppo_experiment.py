@@ -250,13 +250,14 @@ class PPOExperiment(BaseExperiment):
         # TODO Normalise acceleration
         acceleration = self.get_acceleration(core.hero)
 
+        number_of_points_ahead_to_calcualte_angle_with = 5
 
         # Angle to center of lane
         # Normalising it
         angle_to_center_of_lane_degrees = calculate_angle_with_center_of_lane(
             previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_normalised_transform.location,
-            next_position=core.route[core.last_waypoint_index+5].location)
+            next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location)
         angle_to_center_of_lane_degrees = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
         if self.visualiseRoute and self.counter % 30 == 0:
@@ -271,7 +272,7 @@ class PPOExperiment(BaseExperiment):
             plt.plot(x_route, y_route,'y^')
             plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro')
             plt.plot([truck_normalised_transform.location.x], [truck_normalised_transform.location.y], 'gs')
-            plt.plot([core.route[core.last_waypoint_index+5].location.x], [core.route[core.last_waypoint_index+5].location.y], 'bo')
+            plt.plot([core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.x], [core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.y], 'bo')
             plt.axis([0.3, 0.7, 0.3, 0.7])
             # plt.axis([0, 1, 0, 1])
             plt.title(f'{angle_to_center_of_lane_degrees*180}')
