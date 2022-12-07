@@ -10,7 +10,7 @@ train_batch_size: 64
 num_steps_sampled_before_learning_starts: 20000
 
 replay_buffer_config: {
-  capacity: 500
+  capacity: 100
 }
 
 double_q: False
