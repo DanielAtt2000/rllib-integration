@@ -13,6 +13,7 @@ import numpy as np
 import time, sys, pickle
 from datetime import datetime
 import pandas as pd
+from PIL import Image
 
 LABEL_COLORS = np.array([
     (255, 255, 255),  # None
@@ -54,7 +55,8 @@ class SensorInterface(object):
         self._event_sensors = {}
         self._event_data_buffers = queue.Queue()
 
-        self.visualiseLIDAR = False
+        self.visualiseLIDAR = True
+        self.visualiseCamera = False
         self.counter = 0
         self.lidar_window()
 
@@ -105,7 +107,7 @@ class SensorInterface(object):
             while len(data_dict.keys()) < len(self._sensors.keys()):
                 sensor_data = self._data_buffers.get(True, self._queue_timeout)
 
-                if self.counter > 20 and self.visualiseLIDAR:
+                if self.counter > 20 and sensor_data[0] == 'lidar' and self.visualiseLIDAR:
                     data = sensor_data[2]
                     # print(f"Number of LIDAR points {len(data)}")
 
@@ -147,6 +149,16 @@ class SensorInterface(object):
                     self.dt0 = datetime.now()
                     self.frame += 1
 
+
+                if self.visualiseCamera and sensor_data[0] == 'semantic_camera':
+
+                    # current_time = datetime.now().strftime("%Y-%m-%dT%H-%M-%S%Z")
+
+                    img = Image.fromarray(sensor_data[2],None)
+                    img.show()
+                    time.sleep(0.005)
+                    img.close()
+                    # sensor_data[2].save_to_disk("image" + str(current_time),carla.ColorConverter.CityScapesPalette)
 
                 data_dict[sensor_data[0]+'_'+blueprintName] = (sensor_data[1], sensor_data[2])
                 self.counter+=1

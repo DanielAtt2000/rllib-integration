@@ -41,10 +41,9 @@ def run(args):
                  # stop={"perf/ram_util_percent": 85.0},
                  checkpoint_freq=1,
                  # checkpoint_at_end=True,
-                 # restore=get_checkpoint(args.name, args.directory,
-                 #                        args.restore, args.overwrite),
+                 restore=get_checkpoint(args.name, args.directory, args.restore, args.overwrite),
                  config=args.config,
-                 # queue_trials=True
+                 # queue_trials=True,
                  resume=False,
                  reuse_actors=True,
 

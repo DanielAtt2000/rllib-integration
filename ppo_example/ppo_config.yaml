@@ -38,8 +38,8 @@ lr: 0.01
 
 env_config:
   carla:
-    host: "192.168.1.113"
-   # host: "127.0.0.1"
+#    host: "192.168.1.113"
+   host: "127.0.0.1"
     timeout: 30.0
     # IF YOU ARE GOING TO CHANGE THE TIMESTEP CHANGE rotation_frequency of LIDAR
     timestep: 0.05 # IMP IMP
@@ -78,7 +78,10 @@ env_config:
           horizontal_fov : '360.0'
           sensor_tick : '0'
           transform : '0.0,0.0,1.6,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
-#        laneInvasion:
+        semantic_camera:
+          type: "sensor.camera.semantic_segmentation"
+          transform: '0.0,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
+      #        laneInvasion:
 #          type: "sensor.other.lane_invasion"
       spawn_points: [
          "5.1,54.2,1",  # x,y,z[,roll,pitch,yaw]

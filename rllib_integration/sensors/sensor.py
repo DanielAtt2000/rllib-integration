@@ -98,6 +98,7 @@ class BaseCamera(CarlaSensor):
     def parse(self, sensor_data):
         """Parses the Image into an numpy array"""
         # sensor_data: [fov, height, width, raw_data]
+        sensor_data.convert(carla.ColorConverter.CityScapesPalette)
         array = np.frombuffer(sensor_data.raw_data, dtype=np.dtype("uint8"))
         array = np.reshape(array, (sensor_data.height, sensor_data.width, 4))
         array = array[:, :, :3]
