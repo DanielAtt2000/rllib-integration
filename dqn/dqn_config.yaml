@@ -6,8 +6,8 @@ num_gpus_per_worker: 1
 num_cpus_per_worker: 11
 rollout_fragment_length: 16
 #timesteps_per_iteration: 20000
-train_batch_size: 64
-num_steps_sampled_before_learning_starts: 20000
+train_batch_size: 32
+num_steps_sampled_before_learning_starts: 10000
 
 replay_buffer_config: {
   capacity: 100
@@ -16,7 +16,7 @@ replay_buffer_config: {
 double_q: False
 dueling: False
 # "batch_mode": "complete_episodes"
-lr: 0.0025
+lr: 0.01
 # "exploration_config": {
 #   "type": "EpsilonGreedy",
 #   "initial_epsilon": 1.0,
