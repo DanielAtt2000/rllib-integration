@@ -26,7 +26,7 @@ class PPOExperiment(BaseExperiment):
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
         self.allowed_types = [carla.LaneType.Driving, carla.LaneType.Parking]
-        self.last_heading_deviation = 0
+        self.last_angle_with_center = 0
         self.last_action = None
         self.lidar_points_count = []
         self.min_lidar_values = 1000000
@@ -54,7 +54,7 @@ class PPOExperiment(BaseExperiment):
         self.last_dist_to_finish = 0
 
 
-        self.last_heading_deviation = 0
+        self.last_angle_with_center = 0
 
         self.last_no_of_collisions = 0
 
@@ -108,9 +108,10 @@ class PPOExperiment(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
+
         spaces = {
             # 'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
-            'values': Box(low=np.array([0,0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,1,50]), dtype=np.float32),
+            'values': Box(low=np.array([0,0,0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,1,1,50]), dtype=np.float32),
 
             # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
             'semantic_camera': Box(low=0, high=256,shape=(480,640,3), dtype=np.float32),
@@ -395,6 +396,7 @@ class PPOExperiment(BaseExperiment):
 
         name_observations = ["truck_normalised_transform.location.x",
                              "truck_normalised_transform.location.y",
+                             "forward_velocity"
                              "forward_velocity_x",
                              "forward_velocity_y",
                              "x_dist_to_next_waypoint",
@@ -404,6 +406,7 @@ class PPOExperiment(BaseExperiment):
         observations = [
             np.float32(truck_normalised_transform.location.x),
             np.float32(truck_normalised_transform.location.y),
+            np.float32(forward_velocity),
             np.float32(forward_velocity_x),
             np.float32(forward_velocity_y),
             np.float32(x_dist_to_next_waypoint),
@@ -516,7 +519,8 @@ class PPOExperiment(BaseExperiment):
 
 
         forward_velocity = observation['values'][2]
-        angle_to_center_of_lane_degrees = observation['values'][5]
+        angle_to_center_of_lane_degrees = observation['values'][7]
+        self.last_angle_with_center = angle_to_center_of_lane_degrees
         # print(f"angle with center in REWARD {angle_to_center_of_lane_degrees}")
 
         reward_file = open(os.path.join("results",
@@ -526,19 +530,20 @@ class PPOExperiment(BaseExperiment):
 
 
         print("Angle with center line %.5f " % (angle_to_center_of_lane_degrees*180) )
-        # When the angle with the center line is 0 the highest reward is given
-        if angle_to_center_of_lane_degrees == 0:
-            reward += 1
-            # print(f'====> REWARD for angle to center line is 0, R+= 1')
-            reward_file.write(f"angle_to_center_of_lane_degrees == 0: +1 ")
-        else:
-            # Angle with the center line can deviate between 0 and 180 degrees
-            # TODO Check this reward
-            # Maybe this wil be too high?
-            # Since the RL can stay there and get the reward
-            reward += np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)
-            # print(f'====> REWARD for angle ({round(angle_to_center_of_lane_degrees,5)}) to center line { round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)}',end='')
-            reward_file.write(f"angle_to_center_of_lane_degrees is {round(angle_to_center_of_lane_degrees,5)}: {round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)} ")
+        if forward_velocity > 5:
+            # When the angle with the center line is 0 the highest reward is given
+            if angle_to_center_of_lane_degrees == 0:
+                reward += 1
+                print(f'====> REWARD for angle to center line is 0, R+= 1')
+                reward_file.write(f"angle_to_center_of_lane_degrees == 0: +1 ")
+            else:
+                # Angle with the center line can deviate between 0 and 180 degrees
+                # TODO Check this reward
+                # Maybe this wil be too high?
+                # Since the RL can stay there and get the reward
+                reward += np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)
+                print(f'====> REWARD for angle ({round(angle_to_center_of_lane_degrees,5)}) to center line { round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)}')
+                reward_file.write(f"angle_to_center_of_lane_degrees is {round(angle_to_center_of_lane_degrees,5)}: {round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)} ")
 
 
         # Positive reward for higher velocity
@@ -650,8 +655,8 @@ class PPOExperiment(BaseExperiment):
             reward_file.write(f"done_time_episode:-1 ")
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward += 1
-            reward_file.write(f"done_arrived:+1 ")
+            reward += 10
+            reward_file.write(f"done_arrived:+10 ")
 
         # print('Reward: ' + str(reward))
 

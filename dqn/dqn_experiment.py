@@ -108,10 +108,9 @@ class DQNExperiment(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
-        
         spaces = {
             # 'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
-            'values': Box(low=np.array([0,0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,1,50]), dtype=np.float32),
+            'values': Box(low=np.array([0,0,0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,1,1,50]), dtype=np.float32),
 
             # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
             'semantic_camera': Box(low=0, high=256,shape=(480,640,3), dtype=np.float32),
@@ -251,13 +250,14 @@ class DQNExperiment(BaseExperiment):
         # TODO Normalise acceleration
         acceleration = self.get_acceleration(core.hero)
 
+        number_of_points_ahead_to_calcualte_angle_with = 5
 
         # Angle to center of lane
         # Normalising it
         angle_to_center_of_lane_degrees = calculate_angle_with_center_of_lane(
             previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_normalised_transform.location,
-            next_position=core.route[core.last_waypoint_index+5].location)
+            next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location)
         angle_to_center_of_lane_degrees = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
         if self.visualiseRoute and self.counter % 30 == 0:
@@ -272,7 +272,7 @@ class DQNExperiment(BaseExperiment):
             plt.plot(x_route, y_route,'y^')
             plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro')
             plt.plot([truck_normalised_transform.location.x], [truck_normalised_transform.location.y], 'gs')
-            plt.plot([core.route[core.last_waypoint_index+5].location.x], [core.route[core.last_waypoint_index+5].location.y], 'bo')
+            plt.plot([core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.x], [core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.y], 'bo')
             plt.axis([0.3, 0.7, 0.3, 0.7])
             # plt.axis([0, 1, 0, 1])
             plt.title(f'{angle_to_center_of_lane_degrees*180}')
@@ -518,7 +518,7 @@ class DQNExperiment(BaseExperiment):
 
 
         forward_velocity = observation['values'][2]
-        angle_to_center_of_lane_degrees = observation['values'][5]
+        angle_to_center_of_lane_degrees = observation['values'][7]
         self.last_angle_with_center = angle_to_center_of_lane_degrees
         # print(f"angle with center in REWARD {angle_to_center_of_lane_degrees}")
 
@@ -529,19 +529,20 @@ class DQNExperiment(BaseExperiment):
 
 
         print("Angle with center line %.5f " % (angle_to_center_of_lane_degrees*180) )
-        # When the angle with the center line is 0 the highest reward is given
-        if angle_to_center_of_lane_degrees == 0:
-            reward += 1
-            # print(f'====> REWARD for angle to center line is 0, R+= 1')
-            reward_file.write(f"angle_to_center_of_lane_degrees == 0: +1 ")
-        else:
-            # Angle with the center line can deviate between 0 and 180 degrees
-            # TODO Check this reward
-            # Maybe this wil be too high?
-            # Since the RL can stay there and get the reward
-            reward += np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)
-            # print(f'====> REWARD for angle ({round(angle_to_center_of_lane_degrees,5)}) to center line { round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)}',end='')
-            reward_file.write(f"angle_to_center_of_lane_degrees is {round(angle_to_center_of_lane_degrees,5)}: {round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)} ")
+        if forward_velocity > 5:
+            # When the angle with the center line is 0 the highest reward is given
+            if angle_to_center_of_lane_degrees == 0:
+                reward += 1
+                print(f'====> REWARD for angle to center line is 0, R+= 1')
+                reward_file.write(f"angle_to_center_of_lane_degrees == 0: +1 ")
+            else:
+                # Angle with the center line can deviate between 0 and 180 degrees
+                # TODO Check this reward
+                # Maybe this wil be too high?
+                # Since the RL can stay there and get the reward
+                reward += np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)
+                print(f'====> REWARD for angle ({round(angle_to_center_of_lane_degrees,5)}) to center line { round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)}')
+                reward_file.write(f"angle_to_center_of_lane_degrees is {round(angle_to_center_of_lane_degrees,5)}: {round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)} ")
 
 
         # Positive reward for higher velocity
