@@ -12,12 +12,13 @@ else:
     latest_local_commit = repo.head.commit
 
     print(f"Latest commit is pushed: {latest_local_commit == latest_remote_commit}")
+    commit_value = latest_local_commit['hexsha'][:6]
     print()
     print()
 
     print("conda activate CarlaRlib")
-    print(f"python ppo_train.py ppo_example/ppo_config.yaml --name ppo_{latest_local_commit[:6]}")
-    print(f"python dqn_train.py dqn/dqn_config.yaml --name dqn_{latest_local_commit[:6]}")
+    print(f"python ppo_train.py ppo_example/ppo_config.yaml --name ppo_{commit_value}")
+    print(f"python dqn_train.py dqn/dqn_config.yaml --name dqn_{commit_value}")
 
 
 
