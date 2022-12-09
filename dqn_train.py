@@ -17,7 +17,7 @@ import yaml
 import ray
 from ray import tune
 
-from checker import check_with_user
+from checker import check_with_user, commit_hash
 from rllib_integration.carla_env import CarlaEnv
 from rllib_integration.carla_core import kill_all_servers
 
@@ -37,7 +37,7 @@ def run(args):
         os.environ['RAY_DISABLE_MEMORY_MONITOR'] = '1'
         ray.init( num_gpus=1,include_dashboard=True)
         tune.run(CustomDQNTrainer,
-                 name=args.name,
+                 name=args.name + '_' + str(commit_hash()),
                  local_dir=args.directory,
                  # stop={"perf/ram_util_percent": 85.0},
                  checkpoint_freq=1,
