@@ -529,6 +529,7 @@ class DQNExperiment(BaseExperiment):
 
 
         print("Angle with center line %.5f " % (angle_to_center_of_lane_degrees*180) )
+        print('Forward Velocity ' + str(forward_velocity))
         if forward_velocity > 1:
             # When the angle with the center line is 0 the highest reward is given
             if angle_to_center_of_lane_degrees == 0:
