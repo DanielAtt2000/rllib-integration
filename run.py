@@ -12,7 +12,7 @@ else:
     latest_local_commit = repo.head.commit
 
     print(f"Latest commit is pushed: {latest_local_commit == latest_remote_commit}")
-    commit_value = latest_local_commit['hexsha'][:6]
+    commit_value = str(latest_local_commit)[:6]
     print()
     print()
 
