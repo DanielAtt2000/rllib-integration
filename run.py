@@ -14,7 +14,6 @@ else:
     print(f"Latest commit is pushed: {latest_local_commit == latest_remote_commit}")
     commit_value = str(latest_local_commit)[:10]
     print()
-    print()
 
     print("conda activate CarlaRlib")
     print(f"python ppo_train.py ppo_example/ppo_config.yaml --name ppo_{commit_value}")
