@@ -395,7 +395,7 @@ class DQNExperiment(BaseExperiment):
 
         name_observations = ["truck_normalised_transform.location.x",
                              "truck_normalised_transform.location.y",
-                             "forward_velocity"
+                             "forward_velocity",
                              "forward_velocity_x",
                              "forward_velocity_y",
                              "x_dist_to_next_waypoint",
