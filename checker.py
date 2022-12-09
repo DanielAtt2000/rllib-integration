@@ -14,7 +14,7 @@ def check_with_user():
         print('----------> Uncommitted files <-------------')
         return False
 
-    user_input = input(f'Enter the value {verify_num}')
+    user_input = input(f'Enter the value {verify_num}: ')
 
     if int(user_input) == verify_num:
         return True
