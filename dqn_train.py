@@ -37,7 +37,7 @@ def run(args):
         os.environ['RAY_DISABLE_MEMORY_MONITOR'] = '1'
         ray.init( num_gpus=1,include_dashboard=True)
         tune.run(CustomDQNTrainer,
-                 name=args.name + '_' + str(commit_hash()),
+                 name=args.name,
                  local_dir=args.directory,
                  # stop={"perf/ram_util_percent": 85.0},
                  checkpoint_freq=1,
@@ -109,6 +109,8 @@ def main():
                        host="0.0.0.0" if args.auto else "localhost")
 
     if check_with_user():
+        args.name = args.name + '_' + str(commit_hash())
+        print(args.name)
         run(args)
 
 if __name__ == '__main__':
