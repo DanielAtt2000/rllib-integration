@@ -110,7 +110,6 @@ def main():
 
     if check_with_user():
         args.name = args.name + '_' + str(commit_hash())
-        print(args.name)
         run(args)
 
 if __name__ == '__main__':

@@ -108,7 +108,6 @@ class PPOExperiment(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
-
         spaces = {
             # 'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
             'values': Box(low=np.array([0,0,0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,1,1,50]), dtype=np.float32),
@@ -396,7 +395,7 @@ class PPOExperiment(BaseExperiment):
 
         name_observations = ["truck_normalised_transform.location.x",
                              "truck_normalised_transform.location.y",
-                             "forward_velocity"
+                             "forward_velocity",
                              "forward_velocity_x",
                              "forward_velocity_y",
                              "x_dist_to_next_waypoint",
@@ -530,7 +529,7 @@ class PPOExperiment(BaseExperiment):
 
 
         print("Angle with center line %.5f " % (angle_to_center_of_lane_degrees*180) )
-        if forward_velocity > 5:
+        if forward_velocity > 1:
             # When the angle with the center line is 0 the highest reward is given
             if angle_to_center_of_lane_degrees == 0:
                 reward += 1
