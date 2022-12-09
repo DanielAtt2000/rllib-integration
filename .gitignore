@@ -6,3 +6,6 @@ __pycache__
 
 map_cache
 /cuda-repo-ubuntu1804-11-8-local_11.8.0-520.61.05-1_amd64.deb
+/lidar_output/lidar_point_counts.txt
+/lidar_output/max_lidar_values.txt
+/lidar_output/min_lidar_values.txt
