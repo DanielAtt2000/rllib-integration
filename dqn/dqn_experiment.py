@@ -108,6 +108,7 @@ class DQNExperiment(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
+        
         spaces = {
             # 'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
             'values': Box(low=np.array([0,0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,1,50]), dtype=np.float32),
@@ -394,6 +395,7 @@ class DQNExperiment(BaseExperiment):
 
         name_observations = ["truck_normalised_transform.location.x",
                              "truck_normalised_transform.location.y",
+                             "forward_velocity"
                              "forward_velocity_x",
                              "forward_velocity_y",
                              "x_dist_to_next_waypoint",
@@ -403,6 +405,7 @@ class DQNExperiment(BaseExperiment):
         observations = [
             np.float32(truck_normalised_transform.location.x),
             np.float32(truck_normalised_transform.location.y),
+            np.float32(forward_velocity),
             np.float32(forward_velocity_x),
             np.float32(forward_velocity_y),
             np.float32(x_dist_to_next_waypoint),
@@ -650,8 +653,8 @@ class DQNExperiment(BaseExperiment):
             reward_file.write(f"done_time_episode:-1 ")
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward += 1
-            reward_file.write(f"done_arrived:+1 ")
+            reward += 10
+            reward_file.write(f"done_arrived:+10 ")
 
         # print('Reward: ' + str(reward))
 

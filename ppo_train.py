@@ -17,6 +17,7 @@ import yaml
 import ray
 from ray import tune
 
+from checker import check_with_user
 from rllib_integration.carla_env import CarlaEnv
 from rllib_integration.carla_core import kill_all_servers
 
@@ -107,7 +108,9 @@ def main():
     launch_tensorboard(logdir=os.path.join(args.directory, args.name),
                        host="0.0.0.0" if args.auto else "localhost")
 
-    run(args)
+    if check_with_user():
+
+        run(args)
 
 
 if __name__ == '__main__':

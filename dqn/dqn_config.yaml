@@ -16,7 +16,7 @@ replay_buffer_config: {
 double_q: False
 dueling: False
 # "batch_mode": "complete_episodes"
-lr: 0.01
+lr: 0.1
 # "exploration_config": {
 #   "type": "EpsilonGreedy",
 #   "initial_epsilon": 1.0,
