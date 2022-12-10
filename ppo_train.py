@@ -35,7 +35,7 @@ EXPERIMENT_CLASS = PPOExperiment
 def run(args):
     try:
         os.environ['RAY_DISABLE_MEMORY_MONITOR'] = '1'
-        ray.init( num_gpus=1,include_dashboard=True,_temp_dir='ray_logs')
+        ray.init( num_gpus=1,include_dashboard=True)
         tune.run(CustomPPOTrainer,
                  name=args.name,
                  local_dir=args.directory,
