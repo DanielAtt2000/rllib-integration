@@ -35,7 +35,7 @@ EXPERIMENT_CLASS = DQNExperiment
 def run(args):
     try:
         os.environ['RAY_DISABLE_MEMORY_MONITOR'] = '1'
-        ray.init( num_gpus=1,include_dashboard=True)
+        ray.init( num_gpus=1,include_dashboard=True,_temp_dir="/home/daniel/Desktop/ray_logs")
         tune.run(CustomDQNTrainer,
                  name=args.name,
                  local_dir=args.directory,
