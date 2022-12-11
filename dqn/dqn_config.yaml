@@ -12,7 +12,7 @@ train_batch_size: 16
 replay_buffer_config: {
   capacity: 50
 }
-
+horizon: 6500
 double_q: False
 dueling: False
 # "batch_mode": "complete_episodes"
