@@ -60,20 +60,20 @@ class DQNExperiment(BaseExperiment):
 
 
         # Saving LIDAR point count
-        file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
-        file_lidar_counts.write(str(self.lidar_points_count))
-        file_lidar_counts.write(str('\n'))
-        file_lidar_counts.close()
-
-        file_lidar_counts = open(os.path.join('lidar_output', 'min_lidar_values.txt'), 'a')
-        file_lidar_counts.write(str("Min Lidar Value:" + str(self.min_lidar_values)))
-        file_lidar_counts.write(str('\n'))
-        file_lidar_counts.close()
-
-        file_lidar_counts = open(os.path.join('lidar_output', 'max_lidar_values.txt'), 'a')
-        file_lidar_counts.write(str("Max Lidar Value:" + str(self.max_lidar_values)))
-        file_lidar_counts.write(str('\n'))
-        file_lidar_counts.close()
+        # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
+        # file_lidar_counts.write(str(self.lidar_points_count))
+        # file_lidar_counts.write(str('\n'))
+        # file_lidar_counts.close()
+        #
+        # file_lidar_counts = open(os.path.join('lidar_output', 'min_lidar_values.txt'), 'a')
+        # file_lidar_counts.write(str("Min Lidar Value:" + str(self.min_lidar_values)))
+        # file_lidar_counts.write(str('\n'))
+        # file_lidar_counts.close()
+        #
+        # file_lidar_counts = open(os.path.join('lidar_output', 'max_lidar_values.txt'), 'a')
+        # file_lidar_counts.write(str("Max Lidar Value:" + str(self.max_lidar_values)))
+        # file_lidar_counts.write(str('\n'))
+        # file_lidar_counts.close()
 
         self.min_lidar_values = 1000000
         self.max_lidar_values = -100000
