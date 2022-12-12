@@ -544,7 +544,9 @@ class DQNExperiment(BaseExperiment):
                 reward += np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)
                 print(f'====> REWARD for angle ({round(angle_to_center_of_lane_degrees,5)}) to center line { round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)}')
                 reward_file.write(f"angle_to_center_of_lane_degrees is {round(angle_to_center_of_lane_degrees,5)}: {round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)} ")
-
+        else:
+            # Negative reward for no velocity
+            reward += -0.5
 
         # Positive reward for higher velocity
         # Already normalised in observations
