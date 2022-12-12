@@ -638,20 +638,20 @@ class DQNExperiment(BaseExperiment):
 
 
         if self.done_falling:
-            reward += -1
+            reward += -10
             print('====> REWARD Done falling')
             reward_file.write(f"done_falling:-1 ")
         if self.done_collision:
             print("====> REWARD Done collision")
-            reward += -1
+            reward += -10
             reward_file.write(f"done_collision:-1 ")
         if self.done_time_idle:
             print("====> REWARD Done idle")
-            reward += -1
+            reward += -10
             reward_file.write(f"done_time_idle:-1 ")
         if self.done_time_episode:
             print("====> REWARD Done max time")
-            reward += -1
+            reward += -10
             reward_file.write(f"done_time_episode:-1 ")
         if self.done_arrived:
             print("====> REWARD Done arrived")
