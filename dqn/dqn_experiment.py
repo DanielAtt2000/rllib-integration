@@ -519,6 +519,8 @@ class DQNExperiment(BaseExperiment):
 
 
         forward_velocity = observation['values'][2]
+        x_dist_to_next_waypoint = observation['values'][5]
+        y_dist_to_next_waypoint = observation['values'][6]
         angle_to_center_of_lane_normalised = observation['values'][7]
         self.last_angle_with_center = angle_to_center_of_lane_normalised
         # print(f"angle with center in REWARD {angle_to_center_of_lane_normalised}")
@@ -527,6 +529,10 @@ class DQNExperiment(BaseExperiment):
                                         "run_" + str(core.current_time),
                                         "rewards_" + str(core.current_time) + ".txt")
                            , 'a+')
+
+        hyp_distance_to_next_waypoint = math.sqrt( (x_dist_to_next_waypoint)**2 + (y_dist_to_next_waypoint)**2)
+        reward += 1/hyp_distance_to_next_waypoint
+        print(f"hyp_distance_to_next_waypoint = {hyp_distance_to_next_waypoint}")
 
 
         # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
@@ -542,7 +548,7 @@ class DQNExperiment(BaseExperiment):
                 # TODO Check this reward
                 # Maybe this wil be too high?
                 # Since the RL can stay there and get the reward
-                reward_for_angle = 1/(angle_to_center_of_lane_normalised)
+                reward_for_angle = 1/(angle_to_center_of_lane_normalised*180)
                 reward += reward_for_angle
                 print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised*180,5)}) to center line { round(reward_for_angle,5)}')
                 reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised,5)}: {round(reward_for_angle,5)} ")
