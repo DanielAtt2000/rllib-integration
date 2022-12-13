@@ -531,8 +531,9 @@ class DQNExperiment(BaseExperiment):
                            , 'a+')
 
         hyp_distance_to_next_waypoint = math.sqrt( (x_dist_to_next_waypoint)**2 + (y_dist_to_next_waypoint)**2)
-        reward += 1/hyp_distance_to_next_waypoint
-        print(f"hyp_distance_to_next_waypoint = {hyp_distance_to_next_waypoint}")
+        reward_hyp_distance_to_next_waypoint = 1/hyp_distance_to_next_waypoint
+        reward += reward_hyp_distance_to_next_waypoint
+        print(f"hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
 
 
         # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
@@ -540,7 +541,7 @@ class DQNExperiment(BaseExperiment):
         if forward_velocity > 0.05:
             # When the angle with the center line is 0 the highest reward is given
             if angle_to_center_of_lane_normalised == 0:
-                reward += 500
+                reward += 10
                 print(f'====> REWARD for angle to center line is 0, R+= 1')
                 reward_file.write(f"angle_to_center_of_lane_normalised == 0: +1 ")
             else:
