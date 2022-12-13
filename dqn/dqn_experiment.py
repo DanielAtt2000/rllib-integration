@@ -18,6 +18,7 @@ from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
 
 
+
 class DQNExperiment(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
