@@ -530,15 +530,18 @@ class DQNExperiment(BaseExperiment):
                                         "rewards_" + str(core.current_time) + ".txt")
                            , 'a+')
 
-        hyp_distance_to_next_waypoint = math.sqrt( (x_dist_to_next_waypoint)**2 + (y_dist_to_next_waypoint)**2)
-        reward_hyp_distance_to_next_waypoint = 1/hyp_distance_to_next_waypoint
-        reward += reward_hyp_distance_to_next_waypoint
-        print(f"hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
+
 
 
         # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
         # print('Forward Velocity ' + str(forward_velocity))
         if forward_velocity > 0.05:
+
+            hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
+            reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
+            reward += reward_hyp_distance_to_next_waypoint
+            print(f"hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
+
             # When the angle with the center line is 0 the highest reward is given
             if angle_to_center_of_lane_normalised == 0:
                 reward += 10
@@ -549,7 +552,7 @@ class DQNExperiment(BaseExperiment):
                 # TODO Check this reward
                 # Maybe this wil be too high?
                 # Since the RL can stay there and get the reward
-                reward_for_angle = 1/(angle_to_center_of_lane_normalised*180)
+                reward_for_angle = 1/(angle_to_center_of_lane_normalised)
                 reward += reward_for_angle
                 print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised*180,5)}) to center line { round(reward_for_angle,5)}')
                 reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised,5)}: {round(reward_for_angle,5)} ")
@@ -649,24 +652,24 @@ class DQNExperiment(BaseExperiment):
 
 
         if self.done_falling:
-            reward += -10
+            reward += -10000
             print('====> REWARD Done falling')
             reward_file.write(f"done_falling:-1 ")
         if self.done_collision:
             print("====> REWARD Done collision")
-            reward += -10
+            reward += -10000
             reward_file.write(f"done_collision:-1 ")
         if self.done_time_idle:
             print("====> REWARD Done idle")
-            reward += -10
+            reward += -10000
             reward_file.write(f"done_time_idle:-1 ")
         if self.done_time_episode:
             print("====> REWARD Done max time")
-            reward += -10
+            reward += -10000
             reward_file.write(f"done_time_episode:-1 ")
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward += 10
+            reward += 10000
             reward_file.write(f"done_arrived:+10 ")
 
         # print('Reward: ' + str(reward))
