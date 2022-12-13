@@ -1,0 +1,317 @@
+loutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+2022-12-12 23:32:47,850	WARNING worker.py:1839 --
+The node with node id: 6d94b37a620b7f348c2974d13bd79d9c7b3e5fccb6b405410a7fbb7c and
+address: 192.168.1.205 and
+ node name: 192.168.1.205 has been marked dead because the detector has missed too many heartbeats from it.
+  This can happen when a
+  (1) raylet crashes unexpectedly (OOM, preempted node, etc.)
+	(2) raylet has lagging heartbeats due to slow network or busy workload.
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(RolloutWorker pid=23601) Reward: -0.5
+(raylet) [2022-12-12 23:32:45,788 C 13057 13057] (raylet) node_manager.cc:1024: [Timeout] Exiting because this node manager has mistakenly been marked as dead by the GCS: GCS didn't receive heartbeats from this node for 30000 ms. This is likely because the machine or raylet has become overloaded.
+(raylet) *** StackTrace Information ***
+2022-12-12 23:32:48,933	WARNING worker.py:1839 -- A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: fffffffffffffffff8353dc7b8338e8b0eec8cf501000000 Worker ID: 17beb748de5ad84186e8ec331596f7063f47f754e0fcc61f88c69763 Node ID: 6d94b37a620b7f348c2974d13bd79d9c7b3e5fccb6b405410a7fbb7c Worker IP address: 192.168.1.205 Worker port: 44425 Worker PID: 23601 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker unexpectedly exits with a connection error code 2. End of file. There are some potential root causes. (1) The process is killed by SIGKILL by OOM killer due to high memory usage. (2) ray stop --force is called. (3) The worker is crashed unexpectedly due to SIGSEGV or other unexpected errors.
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x49beda) [0x555f9f91feda] ray::operator<<()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x49d9b2) [0x555f9f9219b2] ray::SpdLogMessage::Flush()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x49dcc7) [0x555f9f921cc7] ray::RayLog::~RayLog()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x260c92) [0x555f9f6e4c92] ray::raylet::NodeManager::NodeRemoved()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x3cf94f) [0x555f9f85394f] ray::gcs::NodeInfoAccessor::HandleNotification()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x47fcf6) [0x555f9f903cf6] EventTracker::RecordExecution()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x42023e) [0x555f9f8a423e] std::_Function_handler<>::_M_invoke()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x420796) [0x555f9f8a4796] boost::asio::detail::completion_handler<>::do_complete()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x9adbcb) [0x555f9fe31bcb] boost::asio::detail::scheduler::do_run_one()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x9af391) [0x555f9fe33391] boost::asio::detail::scheduler::run()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x9af5c0) [0x555f9fe335c0] boost::asio::io_context::run()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x143794) [0x555f9f5c7794] main
+(raylet) /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xe7) [0x7f51ac427c87] __libc_start_main
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x1822a7) [0x555f9f6062a7]
+(raylet)
+(raylet) [2022-12-12 23:32:46,109 C 13057 13109] (raylet) node_manager.cc:173: This node has beem marked as dead.
+(raylet) *** StackTrace Information ***
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x49beda) [0x555f9f91feda] ray::operator<<()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x49d9b2) [0x555f9f9219b2] ray::SpdLogMessage::Flush()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x49dcc7) [0x555f9f921cc7] ray::RayLog::~RayLog()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x241d74) [0x555f9f6c5d74] std::_Function_handler<>::_M_invoke()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x375bd4) [0x555f9f7f9bd4] std::_Function_handler<>::_M_invoke()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x3cabe0) [0x555f9f84ebe0] ray::rpc::GcsRpcClient::ReportHeartbeat()::{lambda()#2}::operator()()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x373a42) [0x555f9f7f7a42] ray::rpc::ClientCallImpl<>::OnReplyReceived()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x228285) [0x555f9f6ac285] std::_Function_handler<>::_M_invoke()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x47fcf6) [0x555f9f903cf6] EventTracker::RecordExecution()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x42031e) [0x555f9f8a431e] std::_Function_handler<>::_M_invoke()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x420796) [0x555f9f8a4796] boost::asio::detail::completion_handler<>::do_complete()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x9adbcb) [0x555f9fe31bcb] boost::asio::detail::scheduler::do_run_one()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x9af391) [0x555f9fe33391] boost::asio::detail::scheduler::run()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x9af5c0) [0x555f9fe335c0] boost::asio::io_context::run()
+(raylet) /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x9fe2d0) [0x555f9fe822d0] execute_native_thread_routine
+(raylet) /lib/x86_64-linux-gnu/libpthread.so.0(+0x76db) [0x7f51ad3456db] start_thread
+(raylet) /lib/x86_64-linux-gnu/libc.so.6(clone+0x3f) [0x7f51ac52761f] __clone
+(raylet)
+2022-12-12 23:32:55,287	WARNING worker.py:1839 -- Raylet is terminated: ip=192.168.1.205, id=6d94b37a620b7f348c2974d13bd79d9c7b3e5fccb6b405410a7fbb7c. Termination is unexpected. Possible reasons include: (1) SIGKILL by the user or system OOM killer, (2) Invalid memory access from Raylet causing SIGSEGV or SIGBUS, (3) Other termination signals. Last 20 lines of the Raylet logs:
+    [2022-12-12 23:32:46,109 C 13057 13109] (raylet) node_manager.cc:173: This node has beem marked as dead.
+    *** StackTrace Information ***
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x49beda) [0x555f9f91feda] ray::operator<<()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x49d9b2) [0x555f9f9219b2] ray::SpdLogMessage::Flush()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x49dcc7) [0x555f9f921cc7] ray::RayLog::~RayLog()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x241d74) [0x555f9f6c5d74] std::_Function_handler<>::_M_invoke()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x375bd4) [0x555f9f7f9bd4] std::_Function_handler<>::_M_invoke()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x3cabe0) [0x555f9f84ebe0] ray::rpc::GcsRpcClient::ReportHeartbeat()::{lambda()#2}::operator()()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x373a42) [0x555f9f7f7a42] ray::rpc::ClientCallImpl<>::OnReplyReceived()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x228285) [0x555f9f6ac285] std::_Function_handler<>::_M_invoke()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x47fcf6) [0x555f9f903cf6] EventTracker::RecordExecution()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x42031e) [0x555f9f8a431e] std::_Function_handler<>::_M_invoke()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x420796) [0x555f9f8a4796] boost::asio::detail::completion_handler<>::do_complete()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x9adbcb) [0x555f9fe31bcb] boost::asio::detail::scheduler::do_run_one()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x9af391) [0x555f9fe33391] boost::asio::detail::scheduler::run()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x9af5c0) [0x555f9fe335c0] boost::asio::io_context::run()
+    /home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/core/src/ray/raylet/raylet(+0x9fe2d0) [0x555f9fe822d0] execute_native_thread_routine
+    /lib/x86_64-linux-gnu/libpthread.so.0(+0x76db) [0x7f51ad3456db] start_thread
+    /lib/x86_64-linux-gnu/libc.so.6(clone+0x3f) [0x7f51ac52761f] __clone
+
+
+== Status ==
+Current time: 2022-12-12 23:33:17 (running for 12:41:20.49)
+Memory usage on this node: 7.5/15.3 GiB
+Using FIFO scheduling algorithm.
+Resources requested: 12.0/12 CPUs, 1.0/1 GPUs, 0.0/4.41 GiB heap, 0.0/2.21 GiB objects (0.0/1.0 accelerator_type:G)
+Result logdir: /home/daniel/ray_results/carla_rllib/dqn_bbe7771b3d
+Number of trials: 1/1 (1 RUNNING)
++---------------------------------------+----------+---------------------+--------+------------------+-------+----------+------------------------+----------------------+----------------------+
+| Trial name                            | status   | loc                 |   iter |   total time (s) |    ts |   reward |   num_recreated_worker |   episode_reward_max |   episode_reward_min |
+|                                       |          |                     |        |                  |       |          |                      s |                      |                      |
+|---------------------------------------+----------+---------------------+--------+------------------+-------+----------+------------------------+----------------------+----------------------|
+| CustomDQNTrainer_CarlaEnv_9dab5_00000 | RUNNING  | 192.168.1.205:13505 |     65 |          45365.5 | 65520 | -163.787 |                      0 |              -148.39 |             -388.817 |
++---------------------------------------+----------+---------------------+--------+------------------+-------+----------+------------------------+----------------------+----------------------+
+
+
+2022-12-12 23:33:17,774	WARNING resource_updater.py:50 -- Cluster resources not detected or are 0. Attempt #2...
+2022-12-12 23:33:18,274	WARNING resource_updater.py:50 -- Cluster resources not detected or are 0. Attempt #3...
+2022-12-12 23:33:18,775	WARNING resource_updater.py:50 -- Cluster resources not detected or are 0. Attempt #4...
+2022-12-12 23:33:19,276	WARNING resource_updater.py:50 -- Cluster resources not detected or are 0. Attempt #5...
+2022-12-12 23:33:19,777	WARNING resource_updater.py:63 -- Cluster resources cannot be detected or are 0. You can resume this experiment by passing in `resume=True` to `run`.
+2022-12-12 23:33:19,777	WARNING util.py:244 -- The `on_step_begin` operation took 2.063 s, which may be a performance bottleneck.
+2022-12-12 23:33:20,107	ERROR trial_runner.py:993 -- Trial CustomDQNTrainer_CarlaEnv_9dab5_00000: Error processing event.
+ray.tune.error._TuneNoNextExecutorEventError: Traceback (most recent call last):
+  File "/home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/tune/execution/ray_trial_executor.py", line 1050, in get_next_executor_event
+    future_result = ray.get(ready_future)
+  File "/home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/_private/client_mode_hook.py", line 105, in wrapper
+    return func(*args, **kwargs)
+  File "/home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/_private/worker.py", line 2291, in get
+    raise value
+ray.exceptions.RayActorError: The actor died unexpectedly before finishing this task.
+	class_name: CustomDQNTrainer
+	actor_id: 3e3e0ea0562341d9830d6b9401000000
+	pid: 13505
+	namespace: 6728f4ea-5c40-46ce-9d6c-7d1e5bc27d69
+	ip: 192.168.1.205
+The actor is dead because its owner has died.
+Owner Id: 01000000ffffffffffffffffffffffffffffffffffffffffffffffff
+Owner Ip address: 192.168.1.205 Owner worker exit type: SYSTEM_ERROR Worker exit detail: Owner's node has crashed.
+
+Result for CustomDQNTrainer_CarlaEnv_9dab5_00000:
+  agent_timesteps_total: 65520
+  counters:
+    last_target_update_ts: 65520
+    num_agent_steps_sampled: 65520
+    num_agent_steps_trained: 64528
+    num_env_steps_sampled: 65520
+    num_env_steps_trained: 64528
+    num_target_updates: 127
+  custom_metrics:
+    angle_with_center_max: 0.4136456549167633
+    angle_with_center_mean: 0.3635787069797516
+    angle_with_center_min: 0.18985584378242493
+  date: 2022-12-12_23-28-56
+  done: false
+  episode_len_mean: 338.44
+  episode_media: {}
+  episode_reward_max: -148.38991452872688
+  episode_reward_mean: -163.7867108420375
+  episode_reward_min: -388.81679195632876
+  episodes_this_iter: 3
+  episodes_total: 186
+  experiment_id: 3143e7e4f64742e2905500c7fe1c078b
+  experiment_tag: '0'
+  hostname: daniel-AORUS-5-SB
+  info:
+    last_target_update_ts: 65520
+    learner:
+      default_policy:
+        custom_metrics: {}
+        learner_stats:
+          allreduce_latency: 0.0
+          cur_lr: 0.1
+          grad_gnorm: 40.0
+          max_q: 18396274688.0
+          mean_q: 17926758400.0
+          min_q: 17541093376.0
+        mean_td_error: 373424384.0
+        model: {}
+        num_agent_steps_trained: 16.0
+        td_error: [209643520.0, 582170624.0, 480567296.0, 191662080.0, 582170624.0,
+          457484288.0, 582170624.0, 457484288.0, 212475904.0, 191662080.0, 457484288.0,
+          480567296.0, 212475904.0, 457484288.0, 209643520.0, 209643520.0]
+    num_agent_steps_sampled: 65520
+    num_agent_steps_trained: 64528
+    num_env_steps_sampled: 65520
+    num_env_steps_trained: 64528
+    num_target_updates: 127
+  iterations_since_restore: 65
+  node_ip: 192.168.1.205
+  num_agent_steps_sampled: 65520
+  num_agent_steps_trained: 64528
+  num_env_steps_sampled: 65520
+  num_env_steps_sampled_this_iter: 1008
+  num_env_steps_trained: 64528
+  num_env_steps_trained_this_iter: 1008
+  num_faulty_episodes: 0
+  num_healthy_workers: 1
+  num_recreated_workers: 0
+  num_steps_trained_this_iter: 1008
+  perf:
+    cpu_util_percent: 2.5820058997050146
+    ram_util_percent: 75.26342182890855
+  pid: 13505
+  policy_reward_max: {}
+  policy_reward_mean: {}
+  policy_reward_min: {}
+  sampler_perf:
+    mean_action_processing_ms: 0.04659767199564981
+    mean_env_render_ms: 0.0
+    mean_env_wait_ms: 633.9213844045706
+    mean_inference_ms: 3.6399432423686044
+    mean_raw_obs_processing_ms: 6.425434443465766
+  sampler_results:
+    custom_metrics:
+      angle_with_center_max: 0.4136456549167633
+      angle_with_center_mean: 0.3635787069797516
+      angle_with_center_min: 0.18985584378242493
+    episode_len_mean: 338.44
+    episode_media: {}
+    episode_reward_max: -148.38991452872688
+    episode_reward_mean: -163.7867108420375
+    episode_reward_min: -388.81679195632876
+    episodes_this_iter: 3
+    hist_stats:
+      episode_lengths: [343, 343, 353, 313, 343, 329, 313, 343, 329, 329, 353, 329,
+        313, 329, 313, 343, 353, 329, 313, 313, 343, 343, 353, 313, 329, 313, 329, 313,
+        329, 353, 329, 329, 343, 344, 313, 313, 343, 353, 353, 343, 343, 343, 344, 353,
+        329, 353, 353, 343, 353, 329, 353, 343, 313, 353, 313, 329, 329, 329, 353, 353,
+        343, 353, 313, 343, 353, 313, 329, 353, 329, 343, 343, 343, 329, 343, 313, 329,
+        313, 329, 343, 329, 313, 343, 329, 329, 329, 329, 353, 313, 343, 313, 313, 329,
+        343, 767, 313, 353, 343, 313, 343, 329]
+      episode_reward: [-166.97570121321513, -166.97570121321513, -169.355149394512,
+        -148.38991452872688, -166.97570121321513, -161.19512986522994, -148.38991452872688,
+        -166.97570121321513, -161.19512986522994, -161.19512986522994, -169.355149394512,
+        -161.19512986522994, -148.38991452872688, -161.19512986522994, -148.38991452872688,
+        -166.97570121321513, -169.355149394512, -161.19512986522994, -148.38991452872688,
+        -148.38991452872688, -166.97570121321513, -166.97570121321513, -169.355149394512,
+        -148.38991452872688, -161.19512986522994, -148.38991452872688, -161.19512986522994,
+        -148.38991452872688, -161.19512986522994, -169.355149394512, -161.19512986522994,
+        -161.19512986522994, -166.97570121321513, -167.47570121321513, -148.38991452872688,
+        -148.38991452872688, -166.97570121321513, -169.355149394512, -169.355149394512,
+        -166.97570121321513, -166.97570121321513, -166.97570121321513, -167.47570121321513,
+        -169.355149394512, -161.19512986522994, -169.355149394512, -169.355149394512,
+        -166.97570121321513, -169.355149394512, -161.19512986522994, -169.355149394512,
+        -166.97570121321513, -148.38991452872688, -169.355149394512, -148.38991452872688,
+        -161.19512986522994, -161.19512986522994, -161.19512986522994, -169.355149394512,
+        -169.355149394512, -166.97570121321513, -169.355149394512, -148.38991452872688,
+        -166.97570121321513, -169.355149394512, -148.38991452872688, -161.19512986522994,
+        -169.355149394512, -161.19512986522994, -166.97570121321513, -166.97570121321513,
+        -166.97570121321513, -161.19512986522994, -166.97570121321513, -148.38991452872688,
+        -161.19512986522994, -148.38991452872688, -161.19512986522994, -166.97570121321513,
+        -161.19512986522994, -148.38991452872688, -166.97570121321513, -161.19512986522994,
+        -161.19512986522994, -161.19512986522994, -161.19512986522994, -169.355149394512,
+        -148.38991452872688, -166.97570121321513, -148.38991452872688, -148.38991452872688,
+        -161.19512986522994, -166.97570121321513, -388.81679195632876, -148.38991452872688,
+        -169.355149394512, -166.97570121321513, -148.38991452872688, -166.97570121321513,
+        -161.19512986522994]
+    num_faulty_episodes: 0
+    policy_reward_max: {}
+    policy_reward_mean: {}
+    policy_reward_min: {}
+    sampler_perf:
+      mean_action_processing_ms: 0.04659767199564981
+      mean_env_render_ms: 0.0
+      mean_env_wait_ms: 633.9213844045706
+      mean_inference_ms: 3.6399432423686044
+      mean_raw_obs_processing_ms: 6.425434443465766
+  time_since_restore: 45365.489685058594
+  time_this_iter_s: 476.5381987094879
+  time_total_s: 45365.489685058594
+  timers:
+    learn_throughput: 37.392
+    learn_time_ms: 427.904
+    load_throughput: 117487.507
+    load_time_ms: 0.136
+    synch_weights_time_ms: 1.716
+    training_iteration_time_ms: 7528.966
+  timestamp: 1670884136
+  timesteps_since_restore: 0
+  timesteps_total: 65520
+  training_iteration: 65
+  trial_id: 9dab5_00000
+  warmup_time: 10.857939004898071
+
+== Status ==
+Current time: 2022-12-12 23:33:58 (running for 12:42:01.17)
+Memory usage on this node: 7.4/15.3 GiB
+Using FIFO scheduling algorithm.
+Resources requested: 0/0 CPUs, 0/0 GPUs, 0.0/0.0 GiB heap, 0.0/0.0 GiB objects
+Result logdir: /home/daniel/ray_results/carla_rllib/dqn_bbe7771b3d
+Number of trials: 1/1 (1 ERROR)
++---------------------------------------+----------+---------------------+--------+------------------+-------+----------+------------------------+----------------------+----------------------+
+| Trial name                            | status   | loc                 |   iter |   total time (s) |    ts |   reward |   num_recreated_worker |   episode_reward_max |   episode_reward_min |
+|                                       |          |                     |        |                  |       |          |                      s |                      |                      |
+|---------------------------------------+----------+---------------------+--------+------------------+-------+----------+------------------------+----------------------+----------------------|
+| CustomDQNTrainer_CarlaEnv_9dab5_00000 | ERROR    | 192.168.1.205:13505 |     65 |          45365.5 | 65520 | -163.787 |                      0 |              -148.39 |             -388.817 |
++---------------------------------------+----------+---------------------+--------+------------------+-------+----------+------------------------+----------------------+----------------------+
+Number of errored trials: 1
++---------------------------------------+--------------+---------------------------------------------------------------------------------------------------------------------------+
+| Trial name                            |   # failures | error file                                                                                                                |
+|---------------------------------------+--------------+---------------------------------------------------------------------------------------------------------------------------|
+| CustomDQNTrainer_CarlaEnv_9dab5_00000 |            1 | /home/daniel/ray_results/carla_rllib/dqn_bbe7771b3d/CustomDQNTrainer_CarlaEnv_9dab5_00000_0_2022-12-12_10-51-57/error.txt |
++---------------------------------------+--------------+---------------------------------------------------------------------------------------------------------------------------+
+
+2022-12-12 23:33:58,446	ERROR ray_trial_executor.py:111 -- An exception occurred when trying to stop the Ray actor:Traceback (most recent call last):
+  File "/home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/tune/execution/ray_trial_executor.py", line 102, in _post_stop_cleanup
+    ray.get(future, timeout=timeout)
+  File "/home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/_private/client_mode_hook.py", line 105, in wrapper
+    return func(*args, **kwargs)
+  File "/home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/_private/worker.py", line 2291, in get
+    raise value
+ray.exceptions.RayActorError: The actor died unexpectedly before finishing this task.
+	class_name: CustomDQNTrainer
+	actor_id: 3e3e0ea0562341d9830d6b9401000000
+	pid: 13505
+	namespace: 6728f4ea-5c40-46ce-9d6c-7d1e5bc27d69
+	ip: 192.168.1.205
+The actor is dead because its owner has died. Owner Id: 01000000ffffffffffffffffffffffffffffffffffffffffffffffff Owner Ip address: 192.168.1.205 Owner worker exit type: SYSTEM_ERROR Worker exit detail: Owner's node has crashed.
+
+
+done.
+Traceback (most recent call last):
+  File "dqn_train.py", line 119, in <module>
+    main()
+  File "dqn_train.py", line 114, in main
+    run(args)
+  File "dqn_train.py", line 39, in run
+    tune.run(CustomDQNTrainer,
+  File "/home/daniel/anaconda3/envs/CarlaRlib/lib/python3.8/site-packages/ray/tune/tune.py", line 771, in run
+    raise TuneError("Trials did not complete", incomplete_trials)
+ray.tune.error.TuneError: ('Trials did not complete', [CustomDQNTrainer_CarlaEnv_9dab5_00000])
+(CarlaRlib) daniel@daniel-AORUS-5-SB:~/rllib-integration$

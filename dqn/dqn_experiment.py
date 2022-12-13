@@ -222,6 +222,7 @@ class DQNExperiment(BaseExperiment):
         in_front_of_waypoint = core.is_in_front_of_waypoint(truck_normalised_transform.location.x, truck_normalised_transform.location.y)
         if in_front_of_waypoint == 0 or in_front_of_waypoint == 1:
             core.last_waypoint_index += 1
+            print('Passed Waypoint <------------')
         else:
             pass
         #print(f"OBS -> Len(route) {len(core.route)}")
@@ -258,7 +259,7 @@ class DQNExperiment(BaseExperiment):
             previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_normalised_transform.location,
             next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location)
-        angle_to_center_of_lane_degrees = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
+        angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
         if self.visualiseRoute and self.counter % 30 == 0:
             x_route = []
@@ -275,7 +276,7 @@ class DQNExperiment(BaseExperiment):
             plt.plot([core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.x], [core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.y], 'bo')
             plt.axis([0.3, 0.7, 0.3, 0.7])
             # plt.axis([0, 1, 0, 1])
-            plt.title(f'{angle_to_center_of_lane_degrees*180}')
+            plt.title(f'{angle_to_center_of_lane_normalised*180}')
             plt.gca().invert_yaxis()
             plt.show()
         self.counter +=1
@@ -369,7 +370,7 @@ class DQNExperiment(BaseExperiment):
         # print(f"acceleration {acceleration}")
         # print(f"x_dist_to_next_waypoint {x_dist_to_next_waypoint}")
         # print(f"y_dist_to_next_waypoint {y_dist_to_next_waypoint}")
-        # print(f"angle_to_center_of_lane_degrees {angle_to_center_of_lane_degrees}")
+        # print(f"angle_to_center_of_lane_normalised {angle_to_center_of_lane_normalised}")
         # print("OBSERVATIONS STOP")
 
 
@@ -380,7 +381,7 @@ class DQNExperiment(BaseExperiment):
         #         # np.float32(acceleration),
         #         # np.float32(x_dist_to_next_waypoint),
         #         # np.float32(y_dist_to_next_waypoint),
-        #         # np.float32(angle_to_center_of_lane_degrees),
+        #         # np.float32(angle_to_center_of_lane_normalised),
         #         #LIDAR
         #         # Last action here?
         #     ]
@@ -400,7 +401,7 @@ class DQNExperiment(BaseExperiment):
                              "forward_velocity_y",
                              "x_dist_to_next_waypoint",
                              "y_dist_to_next_waypoint",
-                             "angle_to_center_of_lane_degrees",
+                             "angle_to_center_of_lane_normalised",
                              "roundabout_diameter"]
         observations = [
             np.float32(truck_normalised_transform.location.x),
@@ -410,7 +411,7 @@ class DQNExperiment(BaseExperiment):
             np.float32(forward_velocity_y),
             np.float32(x_dist_to_next_waypoint),
             np.float32(y_dist_to_next_waypoint),
-            np.float32(angle_to_center_of_lane_degrees),
+            np.float32(angle_to_center_of_lane_normalised),
             np.float32(roundabout_diameter)
                            ]
 
@@ -430,7 +431,7 @@ class DQNExperiment(BaseExperiment):
         #                 np.float32(acceleration),
         #                 np.float32(x_dist_to_next_waypoint),
         #                 np.float32(y_dist_to_next_waypoint),
-        #                 np.float32(angle_to_center_of_lane_degrees),
+        #                 np.float32(angle_to_center_of_lane_normalised),
         #                 #LIDAR
         #                 # Last action here?
         #             ], {}
@@ -514,13 +515,13 @@ class DQNExperiment(BaseExperiment):
         # np.float32(acceleration),
         # np.float32(x_dist_to_next_waypoint),
         # np.float32(y_dist_to_next_waypoint),
-        # np.float32(angle_to_center_of_lane_degrees),
+        # np.float32(angle_to_center_of_lane_normalised),
 
 
         forward_velocity = observation['values'][2]
-        angle_to_center_of_lane_degrees = observation['values'][7]
-        self.last_angle_with_center = angle_to_center_of_lane_degrees
-        # print(f"angle with center in REWARD {angle_to_center_of_lane_degrees}")
+        angle_to_center_of_lane_normalised = observation['values'][7]
+        self.last_angle_with_center = angle_to_center_of_lane_normalised
+        # print(f"angle with center in REWARD {angle_to_center_of_lane_normalised}")
 
         reward_file = open(os.path.join("results",
                                         "run_" + str(core.current_time),
@@ -528,25 +529,26 @@ class DQNExperiment(BaseExperiment):
                            , 'a+')
 
 
-        # print("Angle with center line %.5f " % (angle_to_center_of_lane_degrees*180) )
+        # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
         # print('Forward Velocity ' + str(forward_velocity))
         if forward_velocity > 0.05:
             # When the angle with the center line is 0 the highest reward is given
-            if angle_to_center_of_lane_degrees == 0:
-                reward += 1
+            if angle_to_center_of_lane_normalised == 0:
+                reward += 500
                 print(f'====> REWARD for angle to center line is 0, R+= 1')
-                reward_file.write(f"angle_to_center_of_lane_degrees == 0: +1 ")
+                reward_file.write(f"angle_to_center_of_lane_normalised == 0: +1 ")
             else:
                 # Angle with the center line can deviate between 0 and 180 degrees
                 # TODO Check this reward
                 # Maybe this wil be too high?
                 # Since the RL can stay there and get the reward
-                reward += np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)
-                print(f'====> REWARD for angle ({round(angle_to_center_of_lane_degrees,5)}) to center line { round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)}')
-                reward_file.write(f"angle_to_center_of_lane_degrees is {round(angle_to_center_of_lane_degrees,5)}: {round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)} ")
+                reward_for_angle = 1/(angle_to_center_of_lane_normalised)
+                reward += reward_for_angle
+                print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised,5)}) to center line { round(reward_for_angle,5)}')
+                reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised,5)}: {round(reward_for_angle,5)} ")
         else:
             # Negative reward for no velocity
-            reward += -0.5
+            reward += -0.1
 
         # Positive reward for higher velocity
         # Already normalised in observations
