@@ -114,7 +114,7 @@ class DQNExperiment(BaseExperiment):
             'values': Box(low=np.array([0,0,0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,1,1,50]), dtype=np.float32),
 
             # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
-            'semantic_camera': Box(low=0, high=256,shape=(480,100,3), dtype=np.float32),
+            'semantic_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
 
         }
         # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
