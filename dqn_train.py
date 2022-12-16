@@ -47,6 +47,7 @@ def run(args):
                  # queue_trials=True,
                  resume=False,
                  reuse_actors=True,
+                 verbose=2
 
         )
 

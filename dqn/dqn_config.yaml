@@ -10,7 +10,7 @@ train_batch_size: 16
 #num_steps_sampled_before_learning_starts: 10000
 recreate_failed_workers: True
 replay_buffer_config: {
-  capacity: 50
+  capacity: 10
 }
 horizon: 6500
 double_q: False
@@ -49,7 +49,7 @@ env_config:
 #   host: "127.0.0.1"
     timeout: 30.0
     # IF YOU ARE GOING TO CHANGE THE TIMESTEP CHANGE rotation_frequency of LIDAR
-    timestep: 0.06 # IMP IMP
+    timestep: 0.04 # IMP IMP
     # IMP
     retries_on_error: 25
     resolution_x: 300
@@ -79,7 +79,7 @@ env_config:
 #          channels : "32"
 #          range : "30.0"
 #          points_per_second : "56000"
-#          rotation_frequency : "16.6" #  IMP THIS IS 1 / delta (timestep)
+#          rotation_frequency : "25" #  IMP THIS IS 1 / delta (timestep)
 #          upper_fov : '5.0'
 #          lower_fov : '-15.0'
 #          horizontal_fov : '360.0'
