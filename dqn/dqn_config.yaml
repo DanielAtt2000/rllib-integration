@@ -12,6 +12,9 @@ recreate_failed_workers: True
 replay_buffer_config: {
   capacity: 10
 }
+spec: {
+  max_episode_steps: 6400
+}
 horizon: 6500
 double_q: False
 dueling: False
