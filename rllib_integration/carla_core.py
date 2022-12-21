@@ -99,7 +99,7 @@ class CarlaCore:
 
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
         os.mkdir('hello')
-        os.mkdir(os.path.join("/home/daniel/rllib-integration/results2", "run_" + str(self.current_time)))
+        # os.mkdir(os.path.join("/home/daniel/rllib-integration/results2", "run_" + str(self.current_time)))
 
         # self.init_server()
         self.connect_client()
