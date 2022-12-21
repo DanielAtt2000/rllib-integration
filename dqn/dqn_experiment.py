@@ -556,7 +556,7 @@ class DQNExperiment(BaseExperiment):
                 reward_for_angle = 1 / (angle_to_center_of_lane_normalised)
                 reward_for_angle = (reward_for_angle - 1) / (10 - 1)
                 reward += reward_for_angle
-                print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised * 180, 5)}) to center line = {round(reward_for_angle, 5)}')
+                print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
                 reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised, 5)}: {round(reward_for_angle, 5)} ")
         else:
             # Negative reward for no velocity
