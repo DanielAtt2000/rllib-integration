@@ -129,33 +129,33 @@ class DQNExperiment(BaseExperiment):
         return {
             0: [0.0, 0.00, 0.0, False, False],  # Coast
             1: [0.0, 0.00, 1.0, False, False],  # Apply Break
-            2: [0.0, 0.75, 0.0, False, False],  # Right
-            3: [0.0, 0.50, 0.0, False, False],  # Right
-            4: [0.0, 0.25, 0.0, False, False],  # Right
-            5: [0.0, -0.75, 0.0, False, False],  # Left
-            6: [0.0, -0.50, 0.0, False, False],  # Left
-            7: [0.0, -0.25, 0.0, False, False],  # Left
-            8: [0.3, 0.00, 0.0, False, False],  # Straight
-            9: [0.3, 0.75, 0.0, False, False],  # Right
-            10: [0.3, 0.50, 0.0, False, False],  # Right
-            11: [0.3, 0.25, 0.0, False, False],  # Right
-            12: [0.3, -0.75, 0.0, False, False],  # Left
-            13: [0.3, -0.50, 0.0, False, False],  # Left
-            14: [0.3, -0.25, 0.0, False, False],  # Left
-            15: [0.6, 0.00, 0.0, False, False],  # Straight
-            16: [0.6, 0.75, 0.0, False, False],  # Right
-            17: [0.6, 0.50, 0.0, False, False],  # Right
-            18: [0.6, 0.25, 0.0, False, False],  # Right
-            19: [0.6, -0.75, 0.0, False, False],  # Left
-            20: [0.6, -0.50, 0.0, False, False],  # Left
-            21: [0.6, -0.25, 0.0, False, False],  # Left
-            22: [1.0, 0.00, 0.0, False, False],  # Straight
-            23: [1.0, 0.75, 0.0, False, False],  # Right
-            24: [1.0, 0.50, 0.0, False, False],  # Right
-            25: [1.0, 0.25, 0.0, False, False],  # Right
-            26: [1.0, -0.75, 0.0, False, False],  # Left
-            27: [1.0, -0.50, 0.0, False, False],  # Left
-            28: [1.0, -0.25, 0.0, False, False],  # Left
+            # 2: [0.0, 0.75, 0.0, False, False],  # Right
+            # 3: [0.0, 0.50, 0.0, False, False],  # Right
+            # 4: [0.0, 0.25, 0.0, False, False],  # Right
+            # 5: [0.0, -0.75, 0.0, False, False],  # Left
+            # 6: [0.0, -0.50, 0.0, False, False],  # Left
+            # 7: [0.0, -0.25, 0.0, False, False],  # Left
+            2: [0.3, 0.00, 0.0, False, False],  # Straight
+            3: [0.3, 0.75, 0.0, False, False],  # Right
+            4: [0.3, 0.50, 0.0, False, False],  # Right
+            5: [0.3, 0.25, 0.0, False, False],  # Right
+            6: [0.3, -0.75, 0.0, False, False],  # Left
+            7: [0.3, -0.50, 0.0, False, False],  # Left
+            8: [0.3, -0.25, 0.0, False, False],  # Left
+            9: [0.6, 0.00, 0.0, False, False],  # Straight
+            10: [0.6, 0.75, 0.0, False, False],  # Right
+            11: [0.6, 0.50, 0.0, False, False],  # Right
+            12: [0.6, 0.25, 0.0, False, False],  # Right
+            13: [0.6, -0.75, 0.0, False, False],  # Left
+            14: [0.6, -0.50, 0.0, False, False],  # Left
+            15: [0.6, -0.25, 0.0, False, False],  # Left
+            16: [1.0, 0.00, 0.0, False, False],  # Straight
+            17: [1.0, 0.75, 0.0, False, False],  # Right
+            18: [1.0, 0.50, 0.0, False, False],  # Right
+            19: [1.0, 0.25, 0.0, False, False],  # Right
+            20: [1.0, -0.75, 0.0, False, False],  # Left
+            21: [1.0, -0.50, 0.0, False, False],  # Left
+            22: [1.0, -0.25, 0.0, False, False],  # Left
         }
 
     def compute_action(self, action):
@@ -545,7 +545,7 @@ class DQNExperiment(BaseExperiment):
 
             # When the angle with the center line is 0 the highest reward is given
             if angle_to_center_of_lane_normalised == 0:
-                reward += 10
+                reward += 1000
                 print(f'====> REWARD for angle to center line is 0, R+= 1')
                 reward_file.write(f"angle_to_center_of_lane_normalised == 0: +1 ")
             else:
@@ -553,13 +553,14 @@ class DQNExperiment(BaseExperiment):
                 # TODO Check this reward
                 # Maybe this wil be too high?
                 # Since the RL can stay there and get the reward
-                reward_for_angle = 1/(angle_to_center_of_lane_normalised)
+                reward_for_angle = 1 / (angle_to_center_of_lane_normalised)
+                reward_for_angle = (reward_for_angle - 1) / (1000 - 1)
                 reward += reward_for_angle
-                print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised*180,5)}) to center line { round(reward_for_angle,5)}')
-                reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised,5)}: {round(reward_for_angle,5)} ")
+                print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised * 180, 5)}) to center line = {round(reward_for_angle, 5)}')
+                reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised, 5)}: {round(reward_for_angle, 5)} ")
         else:
             # Negative reward for no velocity
-            reward += -0.1
+            reward += -100
 
         # Positive reward for higher velocity
         # Already normalised in observations
@@ -653,20 +654,20 @@ class DQNExperiment(BaseExperiment):
 
 
         if self.done_falling:
-            reward += -10000
+            reward += -100000
             print('====> REWARD Done falling')
             reward_file.write(f"done_falling:-1 ")
         if self.done_collision:
             print("====> REWARD Done collision")
-            reward += -10000
+            reward += -100000
             reward_file.write(f"done_collision:-1 ")
         if self.done_time_idle:
             print("====> REWARD Done idle")
-            reward += -10000
+            reward += -100000
             reward_file.write(f"done_time_idle:-1 ")
         if self.done_time_episode:
             print("====> REWARD Done max time")
-            reward += -10000
+            reward += -100000
             reward_file.write(f"done_time_episode:-1 ")
         if self.done_arrived:
             print("====> REWARD Done arrived")
