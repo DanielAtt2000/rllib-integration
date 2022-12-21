@@ -15,7 +15,7 @@ replay_buffer_config: {
 }
 
 horizon: 6500
-double_q: True
+double_q: False
 dueling: False
 # "batch_mode": "complete_episodes"
 lr: 0.001
