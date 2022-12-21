@@ -1,7 +1,7 @@
 # To see the complete list of configurable parameters see:
 # https://github.com/ray-project/ray/blob/master/rllib/agents/trainer.py
 framework: "torch"
-num_workers: 0
+num_workers: 1
 num_gpus: 1
 #num_gpus_per_worker: 1
 num_cpus_per_worker: 11
