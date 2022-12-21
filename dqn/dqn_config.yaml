@@ -11,11 +11,11 @@ train_batch_size: 16
 num_steps_sampled_before_learning_starts: 5000
 recreate_failed_workers: True
 replay_buffer_config: {
-  capacity: 5000
+  capacity: 10
 }
 
 horizon: 6500
-double_q: False
+double_q: True
 dueling: False
 # "batch_mode": "complete_episodes"
 lr: 0.001
