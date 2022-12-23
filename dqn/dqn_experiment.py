@@ -28,6 +28,7 @@ class DQNExperiment(BaseExperiment):
         self.max_time_episode = self.config["others"]["max_time_episode"]
         self.allowed_types = [carla.LaneType.Driving, carla.LaneType.Parking]
         self.last_angle_with_center = 0
+        self.last_forward_velocity = 0
         self.last_action = None
         self.lidar_points_count = []
         self.min_lidar_values = 1000000
@@ -56,6 +57,7 @@ class DQNExperiment(BaseExperiment):
 
 
         self.last_angle_with_center = 0
+        self.last_forward_velocity = 0
 
         self.last_no_of_collisions = 0
 
@@ -524,6 +526,7 @@ class DQNExperiment(BaseExperiment):
         y_dist_to_next_waypoint = observation['values'][6]
         angle_to_center_of_lane_normalised = observation['values'][7]
         self.last_angle_with_center = angle_to_center_of_lane_normalised
+        self.last_forward_velocity = forward_velocity
         # print(f"angle with center in REWARD {angle_to_center_of_lane_normalised}")
 
         reward_file = open(os.path.join("results",
