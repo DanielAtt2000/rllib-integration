@@ -106,9 +106,7 @@ def main():
     args.config = parse_config(args)
 
 
-    print(f"Tensorboard at {os.path.join(args.directory, args.name)}")
-    print(f"HERHRHHERHREHR {os.path.join(args.directory, args.name)}")
-    launch_tensorboard(logdir=os.path.join(args.directory, args.name),
+    launch_tensorboard(logdir=os.path.join(args.directory, args.name+  '_' + str(commit_hash())),
                        host="localhost")
 
     if check_with_user():
