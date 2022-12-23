@@ -72,9 +72,12 @@ assert update_next_waypoint(7,4,6,1,1,0) == -1
 # assert update_next_waypoint(0,0,10,5,10,20) == -1
 # assert update_next_waypoint(-5,0,10,5,10,20) == -1
 
+
 # importing the required module
 import matplotlib.pyplot as plt
-for x in range(100):
+def plot_points(previous_position, current_position, next_position):
+
+
     f = plt.figure()
     f.set_figwidth(6)
     f.set_figheight(6)
@@ -83,46 +86,37 @@ for x in range(100):
     plt.xlim([-12,12])
     plt.ylim([-12,12])
 
-    x_pos = random.uniform(-10,10)
-    y_pos = random.uniform(-10,10)
-
-    x_last = random.uniform(-10,10)
-    y_last = random.uniform(-10,10)
-
-    x_next = random.uniform(-10,10)
-    y_next = random.uniform(-10,10)
-
-    print(f"x_pos {x_pos} y_pos {y_pos}")
-    print(f"x_last {x_last} y_last {y_last}")
-    print(f"x_next {x_next} y_next {y_next}")
+    print(f"x_pos {current_position.x} y_pos {current_position.y}")
+    print(f"x_last {previous_position.x} y_last {previous_position.y}")
+    print(f"x_next {next_position.x} y_next {next_position.y}")
 
 
-    plt.plot([x_last,x_next],[y_last,y_next] )
+    plt.plot([previous_position.x,next_position.x],[previous_position.y,next_position.y] )
     # plotting the points
-    plt.plot(x_pos, y_pos, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green",)
+    plt.plot(current_position.x, current_position.y, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green",)
 
 
-    val = update_next_waypoint(x_pos,y_pos,x_last,y_last,x_next,y_next)
+    val = update_next_waypoint(current_position.x,current_position.y,previous_position.x,previous_position.y,next_position.x,next_position.y)
 
-    if x_next-x_last == 0:
+    if next_position.x-previous_position.x == 0:
         x= []
         y = []
         for a in range(-20,20):
             x.append(a)
-            y.append(y_last)
+            y.append(previous_position.y)
         plt.plot(x, y)
-    elif y_next-y_last == 0:
+    elif next_position.y-previous_position.y == 0:
         x = []
         y= []
         for a in range(-20,20):
-            x.append(x_last)
+            x.append(previous_position.x)
             y.append(a)
         plt.plot(x,y)
 
     else:
-        gradOfPrevToNext = (y_next-y_last) / (x_next-x_last)
+        gradOfPrevToNext = (next_position.y-previous_position.y) / (next_position.x-previous_position.x)
         gradOfPerpendicular = -1/gradOfPrevToNext
-        cOfPerpendicular = y_last - gradOfPerpendicular*x_last
+        cOfPerpendicular = previous_position.y - gradOfPerpendicular*previous_position.x
         print(f"gradOfPerpendicular {gradOfPerpendicular}")
         print(f"cOfPerpendicular {cOfPerpendicular}")
         x = []
@@ -141,13 +135,10 @@ for x in range(100):
         plt.title(f"Result = BACKWARD")
     print('--------------------')
 
-    # naming the x axis
+    # naming the x-axis
     plt.xlabel('x - axis')
-    # naming the y axis
+    # naming the y-axis
     plt.ylabel('y - axis')
-
-
-    # giving a title to my graph
 
     # function to show the plot
     plt.show()

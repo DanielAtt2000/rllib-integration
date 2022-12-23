@@ -14,6 +14,7 @@ import carla
 import os
 
 from rllib_integration.GetAngle import calculate_angle_with_center_of_lane
+from rllib_integration.TestingWayPointUpdater import plot_points
 from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
 
@@ -264,6 +265,10 @@ class DQNExperiment(BaseExperiment):
             next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location)
         angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
+        plot_points(previous_position=core.route[core.last_waypoint_index-1].location,
+                    current_position=truck_normalised_transform.location,
+                    next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location)
+
         if self.visualiseRoute and self.counter % 30 == 0:
             x_route = []
             y_route = []
@@ -511,30 +516,17 @@ class DQNExperiment(BaseExperiment):
 
         reward = 0
 
-        # Observations
-        # np.float32(truck_normalised_transform.location.x),
-        # np.float32(truck_normalised_transform.location.y),
-        # np.float32(forward_velocity),
-        # np.float32(acceleration),
-        # np.float32(x_dist_to_next_waypoint),
-        # np.float32(y_dist_to_next_waypoint),
-        # np.float32(angle_to_center_of_lane_normalised),
-
-
         forward_velocity = observation['values'][2]
         x_dist_to_next_waypoint = observation['values'][5]
         y_dist_to_next_waypoint = observation['values'][6]
         angle_to_center_of_lane_normalised = observation['values'][7]
         self.last_angle_with_center = angle_to_center_of_lane_normalised
         self.last_forward_velocity = forward_velocity
-        # print(f"angle with center in REWARD {angle_to_center_of_lane_normalised}")
 
         reward_file = open(os.path.join("results",
                                         "run_" + str(core.current_time),
                                         "rewards_" + str(core.current_time) + ".txt")
                            , 'a+')
-
-
 
 
         # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
