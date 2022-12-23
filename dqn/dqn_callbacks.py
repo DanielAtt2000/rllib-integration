@@ -14,7 +14,7 @@ from ray.rllib.algorithms.callbacks import DefaultCallbacks
 class DQNCallbacks(DefaultCallbacks):
     def on_episode_start(self, worker, base_env, policies, episode, **kwargs):
         episode.user_data["angle_with_center"] = []
-        episode.user_datap["forward_velocity"] = []
+        episode.user_data["forward_velocity"] = []
 
     def on_episode_step(self, worker, base_env, episode, **kwargs):
         # Angle with center

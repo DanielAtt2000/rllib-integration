@@ -107,6 +107,7 @@ def main():
 
 
     print(f"Tensorboard at {os.path.join(args.directory, args.name)}")
+    print(f"HERHRHHERHREHR {os.path.join(args.directory, args.name)}")
     launch_tensorboard(logdir=os.path.join(args.directory, args.name),
                        host="localhost")
 
