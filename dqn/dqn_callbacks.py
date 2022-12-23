@@ -23,7 +23,7 @@ class DQNCallbacks(DefaultCallbacks):
         episode.user_data["angle_with_center"].append(last_angle_with_center)
 
         # Forward Velocity
-        last_forward_velocity = worker.env.experiment.forward_velocity
+        last_forward_velocity = worker.env.experiment.last_forward_velocity
         episode.user_data["forward_velocity"].append(last_forward_velocity)
     def on_episode_end(self, worker, base_env, policies, episode, **kwargs):
         last_angle_with_center = episode.user_data["angle_with_center"]
