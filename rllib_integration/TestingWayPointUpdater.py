@@ -83,8 +83,8 @@ def plot_points(previous_position, current_position, next_position):
     f.set_figheight(6)
     # plt.(range(0,10))
     # plt.yticks(range(0,10))
-    plt.xlim([0,1])
-    plt.ylim([0,1])
+    plt.xlim([0.3,0.7])
+    plt.ylim([0.4,0.8])
 
     print(f"x_pos {current_position.x} y_pos {current_position.y}")
     print(f"x_last {previous_position.x} y_last {previous_position.y}")
