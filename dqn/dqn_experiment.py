@@ -36,7 +36,7 @@ class DQNExperiment(BaseExperiment):
         self.max_lidar_values = -100000
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
-        self.visualiseRoute = False
+        self.visualiseRoute = True
 
 
     def reset(self):
@@ -274,7 +274,7 @@ class DQNExperiment(BaseExperiment):
         angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
 
-        if self.visualiseRoute and self.counter % 30 == 0:
+        if self.visualiseRoute:
             x_route = []
             y_route = []
             for point in core.route:
