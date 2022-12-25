@@ -223,12 +223,12 @@ class DQNExperiment(BaseExperiment):
 
 
         number_of_points_ahead_to_calcualte_angle_with = 5
-
-        plot_points(previous_position=core.route[core.last_waypoint_index-1].location,
-                    current_position=truck_normalised_transform.location,
-                    next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location,
-                    current_waypoint=core.route[core.last_waypoint_index].location,
-                    next_waypoint=core.route[core.last_waypoint_index+1].location)
+        if self.visualiseRoute and self.counter > 30:
+            plot_points(previous_position=core.route[core.last_waypoint_index-1].location,
+                        current_position=truck_normalised_transform.location,
+                        next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location,
+                        current_waypoint=core.route[core.last_waypoint_index].location,
+                        next_waypoint=core.route[core.last_waypoint_index+1].location)
 
         # print(f"BEFORE CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
         # Checking if we have passed the last way point
@@ -274,7 +274,7 @@ class DQNExperiment(BaseExperiment):
         angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
 
-        if self.visualiseRoute:
+        if self.visualiseRoute and self.counter > 30:
             x_route = []
             y_route = []
             for point in core.route:
