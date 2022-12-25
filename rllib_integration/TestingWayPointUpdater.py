@@ -75,7 +75,7 @@ assert update_next_waypoint(7,4,6,1,1,0) == -1
 
 # importing the required module
 import matplotlib.pyplot as plt
-def plot_points(previous_position, current_position, next_position, current_waypoint, next_waypoint,in_front_of_waypoint):
+def plot_points(previous_position, current_position, next_position, current_waypoint, next_waypoint,in_front_of_waypoint,angle):
 
 
     f = plt.figure()
@@ -84,7 +84,7 @@ def plot_points(previous_position, current_position, next_position, current_wayp
     # plt.(range(0,10))
     # plt.yticks(range(0,10))
     plt.xlim([0.45,0.6])
-    plt.ylim([0.65,0.80])
+    plt.ylim([0.60,0.75])
 
     print(f"x_pos {current_position.x} y_pos {current_position.y}")
     print(f"x_last {previous_position.x} y_last {previous_position.y}")
@@ -130,11 +130,11 @@ def plot_points(previous_position, current_position, next_position, current_wayp
     leg = plt.legend(loc='upper center')
     if in_front_of_waypoint == 0:
         print('POINT ON LINE')
-        plt.title(f"Result = ONLINE")
+        plt.title(f"Result = ONLINE - {angle}")
     if in_front_of_waypoint == 1:
-        plt.title(f"Result = FORWARD")
+        plt.title(f"Result = FORWARD - {angle}")
     if in_front_of_waypoint == -1:
-        plt.title(f"Result = BACKWARD")
+        plt.title(f"Result = BACKWARD - {angle}")
     print('--------------------')
 
     # naming the x-axis

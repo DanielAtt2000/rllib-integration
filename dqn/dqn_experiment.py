@@ -270,7 +270,8 @@ class DQNExperiment(BaseExperiment):
                     next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location,
                     current_waypoint=core.route[core.last_waypoint_index].location,
                     next_waypoint=core.route[core.last_waypoint_index+1].location,
-                    in_front_of_waypoint=in_front_of_waypoint)
+                    in_front_of_waypoint=in_front_of_waypoint,
+                    angle=angle_to_center_of_lane_degrees)
 
         if self.visualiseRoute and self.counter % 30 == 0:
             x_route = []
