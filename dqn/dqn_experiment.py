@@ -284,13 +284,14 @@ class DQNExperiment(BaseExperiment):
             # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
             plt.plot([x_route.pop(0)],y_route.pop(0),'bo')
             plt.plot(x_route, y_route,'y^')
-            plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro')
-            plt.plot([truck_normalised_transform.location.x], [truck_normalised_transform.location.y], 'gs')
-            plt.plot([core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.x], [core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.y], 'bo')
+            plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro',label='Previous Waypoint')
+            plt.plot([truck_normalised_transform.location.x], [truck_normalised_transform.location.y], 'gs',label='Current Vehicle Location')
+            plt.plot([core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.x], [core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.y], 'bo', label=f"{number_of_points_ahead_to_calcualte_angle_with} waypoints ahead")
             plt.axis([0.3, 0.7, 0.3, 0.7])
             # plt.axis([0, 1, 0, 1])
             plt.title(f'{angle_to_center_of_lane_normalised*180}')
             plt.gca().invert_yaxis()
+            plt.legend(loc='upper center')
             plt.show()
         self.counter +=1
 
