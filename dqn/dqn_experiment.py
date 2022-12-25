@@ -221,6 +221,15 @@ class DQNExperiment(BaseExperiment):
                                0),
                 carla.Rotation(0, 0, 0))
 
+
+        number_of_points_ahead_to_calcualte_angle_with = 5
+
+        plot_points(previous_position=core.route[core.last_waypoint_index-1].location,
+                    current_position=truck_normalised_transform.location,
+                    next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location,
+                    current_waypoint=core.route[core.last_waypoint_index].location,
+                    next_waypoint=core.route[core.last_waypoint_index+1].location)
+
         # print(f"BEFORE CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
         # Checking if we have passed the last way point
         in_front_of_waypoint = core.is_in_front_of_waypoint(truck_normalised_transform.location.x, truck_normalised_transform.location.y)
@@ -255,7 +264,6 @@ class DQNExperiment(BaseExperiment):
         # TODO Normalise acceleration
         acceleration = self.get_acceleration(core.hero)
 
-        number_of_points_ahead_to_calcualte_angle_with = 5
 
         # Angle to center of lane
         # Normalising it
@@ -265,13 +273,6 @@ class DQNExperiment(BaseExperiment):
             next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location)
         angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
-        plot_points(previous_position=core.route[core.last_waypoint_index-1].location,
-                    current_position=truck_normalised_transform.location,
-                    next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location,
-                    current_waypoint=core.route[core.last_waypoint_index].location,
-                    next_waypoint=core.route[core.last_waypoint_index+1].location,
-                    in_front_of_waypoint=in_front_of_waypoint,
-                    angle=angle_to_center_of_lane_degrees)
 
         if self.visualiseRoute and self.counter % 30 == 0:
             x_route = []

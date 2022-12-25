@@ -75,7 +75,7 @@ assert update_next_waypoint(7,4,6,1,1,0) == -1
 
 # importing the required module
 import matplotlib.pyplot as plt
-def plot_points(previous_position, current_position, next_position, current_waypoint, next_waypoint,in_front_of_waypoint,angle):
+def plot_points(previous_position, current_position, next_position, current_waypoint, next_waypoint,in_front_of_waypoint=-5,angle=-1):
 
 
     f = plt.figure()
