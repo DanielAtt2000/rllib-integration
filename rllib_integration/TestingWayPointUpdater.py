@@ -98,8 +98,8 @@ def plot_points(previous_position, current_position, next_position, current_wayp
     plt.plot(next_waypoint.x, next_waypoint.y, marker="o", markersize=3, markeredgecolor="blue", markerfacecolor="blue",label='Next Waypoint')
     plt.plot(previous_position.x, previous_position.y, marker="o", markersize=3, markeredgecolor="green", markerfacecolor="green",label='Previous Waypoint')
     plt.plot(next_position.x, next_position.y, marker="o", markersize=3, markeredgecolor="yellow", markerfacecolor="yellow",label='Next Position')
-    plt.plot(x=[current_position.x,previous_position.x],y=[current_position.y,previous_position.y])
-    plt.plot(x=[current_position.x,next_position.x],y=[current_position.y,next_position.y])
+    plt.plot([current_position.x,previous_position.x],[current_position.y,previous_position.y])
+    plt.plot([current_position.x,next_position.x],[current_position.y,next_position.y])
 
     # val = update_next_waypoint(current_position.x,current_position.y,previous_position.x,previous_position.y,next_position.x,next_position.y)
 
