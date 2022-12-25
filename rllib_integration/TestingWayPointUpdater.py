@@ -75,7 +75,7 @@ assert update_next_waypoint(7,4,6,1,1,0) == -1
 
 # importing the required module
 import matplotlib.pyplot as plt
-def plot_points(previous_position, current_position, next_position):
+def plot_points(previous_position, current_position, next_position, current_waypoint, next_waypoint,in_front_of_waypoint):
 
 
     f = plt.figure()
@@ -93,10 +93,12 @@ def plot_points(previous_position, current_position, next_position):
 
     plt.plot([previous_position.x,next_position.x],[previous_position.y,next_position.y] )
     # plotting the points
-    plt.plot(current_position.x, current_position.y, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green",)
+    plt.plot(current_position.x, current_position.y, marker="o", markersize=3, markeredgecolor="red", markerfacecolor="red",)
+    plt.plot(current_waypoint.x, current_waypoint.y, marker="o", markersize=3, markeredgecolor="black", markerfacecolor="black",)
+    plt.plot(next_waypoint.x, next_waypoint.y, marker="o", markersize=3, markeredgecolor="blue", markerfacecolor="blue",)
 
 
-    val = update_next_waypoint(current_position.x,current_position.y,previous_position.x,previous_position.y,next_position.x,next_position.y)
+    # val = update_next_waypoint(current_position.x,current_position.y,previous_position.x,previous_position.y,next_position.x,next_position.y)
 
     if next_position.x-previous_position.x == 0:
         x= []
@@ -126,12 +128,12 @@ def plot_points(previous_position, current_position, next_position):
             y.append(gradOfPerpendicular*a+cOfPerpendicular)
         plt.plot(x,y,label="Perpendicular")
     leg = plt.legend(loc='upper center')
-    if val == 0:
+    if in_front_of_waypoint == 0:
         print('POINT ON LINE')
         plt.title(f"Result = ONLINE")
-    if val == 1:
+    if in_front_of_waypoint == 1:
         plt.title(f"Result = FORWARD")
-    if val == -1:
+    if in_front_of_waypoint == -1:
         plt.title(f"Result = BACKWARD")
     print('--------------------')
 

@@ -267,7 +267,10 @@ class DQNExperiment(BaseExperiment):
 
         plot_points(previous_position=core.route[core.last_waypoint_index-1].location,
                     current_position=truck_normalised_transform.location,
-                    next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location)
+                    next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location,
+                    current_waypoint=core.route[core.last_waypoint_index].location,
+                    next_waypoint=core.route[core.last_waypoint_index+1].location,
+                    in_front_of_waypoint=in_front_of_waypoint)
 
         if self.visualiseRoute and self.counter % 30 == 0:
             x_route = []
