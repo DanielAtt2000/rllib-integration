@@ -93,9 +93,9 @@ def plot_points(previous_position, current_position, next_position, current_wayp
 
     plt.plot([previous_position.x,next_position.x],[previous_position.y,next_position.y] )
     # plotting the points
-    plt.plot(current_position.x, current_position.y, marker="o", markersize=3, markeredgecolor="red", markerfacecolor="red",)
-    plt.plot(current_waypoint.x, current_waypoint.y, marker="o", markersize=3, markeredgecolor="black", markerfacecolor="black",)
-    plt.plot(next_waypoint.x, next_waypoint.y, marker="o", markersize=3, markeredgecolor="blue", markerfacecolor="blue",)
+    plt.plot(current_position.x, current_position.y, marker="o", markersize=3, markeredgecolor="red", markerfacecolor="red",label='Current Position')
+    plt.plot(current_waypoint.x, current_waypoint.y, marker="o", markersize=3, markeredgecolor="black", markerfacecolor="black",label='Current Waypoint')
+    plt.plot(next_waypoint.x, next_waypoint.y, marker="o", markersize=3, markeredgecolor="blue", markerfacecolor="blue",label='Next Waypoint')
 
 
     # val = update_next_waypoint(current_position.x,current_position.y,previous_position.x,previous_position.y,next_position.x,next_position.y)
