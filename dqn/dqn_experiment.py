@@ -12,7 +12,7 @@ from gym.spaces import Box, Discrete, Dict
 import warnings
 import carla
 import os
-
+import time
 from rllib_integration.GetAngle import calculate_angle_with_center_of_lane
 from rllib_integration.TestingWayPointUpdater import plot_points
 from rllib_integration.base_experiment import BaseExperiment
@@ -542,7 +542,7 @@ class DQNExperiment(BaseExperiment):
                                         "rewards_" + str(core.current_time) + ".txt")
                            , 'a+')
 
-
+        print("------------------------------")
         # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
         # print('Forward Velocity ' + str(forward_velocity))
         if forward_velocity > 0.05:
@@ -689,5 +689,6 @@ class DQNExperiment(BaseExperiment):
         reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
         reward_file.close()
         print(f'Reward: {reward}')
+        print("------------------------------")
         time.sleep(0.4)
         return reward
