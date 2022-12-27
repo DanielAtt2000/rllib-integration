@@ -239,8 +239,8 @@ class DQNExperiment(BaseExperiment):
 
 
         # Distance to next waypoint
-        x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index+1].location.x - truck_normalised_transform.location.x, )
-        y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index+1].location.y - truck_normalised_transform.location.y )
+        x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index].location.x - truck_normalised_transform.location.x, )
+        y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index].location.y - truck_normalised_transform.location.y )
         # print(f"DISTANCE TO NEXT WAY POINT X {x_dist_to_next_waypoint}")
         # print(f"DISTANCE TO NEXT WAY POINT Y {y_dist_to_next_waypoint}")
 
