@@ -36,7 +36,7 @@ class DQNExperiment(BaseExperiment):
         self.max_lidar_values = -100000
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
-        self.visualiseRoute = False
+        self.visualiseRoute = True
 
 
     def reset(self):
@@ -132,33 +132,36 @@ class DQNExperiment(BaseExperiment):
         return {
             0: [0.0, 0.00, 0.0, False, False],  # Coast
             1: [0.0, 0.00, 1.0, False, False],  # Apply Break
+            2: [0.5, 0.00, 0.0, False, False],  # Straight
+            3: [0.5, 0.50, 0.0, False, False],  # Right
+            4: [0.5, -0.50, 0.0, False, False],  # Left
             # 2: [0.0, 0.75, 0.0, False, False],  # Right
             # 3: [0.0, 0.50, 0.0, False, False],  # Right
             # 4: [0.0, 0.25, 0.0, False, False],  # Right
             # 5: [0.0, -0.75, 0.0, False, False],  # Left
             # 6: [0.0, -0.50, 0.0, False, False],  # Left
             # 7: [0.0, -0.25, 0.0, False, False],  # Left
-            2: [0.3, 0.00, 0.0, False, False],  # Straight
-            3: [0.3, 0.75, 0.0, False, False],  # Right
-            4: [0.3, 0.50, 0.0, False, False],  # Right
-            5: [0.3, 0.25, 0.0, False, False],  # Right
-            6: [0.3, -0.75, 0.0, False, False],  # Left
-            7: [0.3, -0.50, 0.0, False, False],  # Left
-            8: [0.3, -0.25, 0.0, False, False],  # Left
-            9: [0.6, 0.00, 0.0, False, False],  # Straight
-            10: [0.6, 0.75, 0.0, False, False],  # Right
-            11: [0.6, 0.50, 0.0, False, False],  # Right
-            12: [0.6, 0.25, 0.0, False, False],  # Right
-            13: [0.6, -0.75, 0.0, False, False],  # Left
-            14: [0.6, -0.50, 0.0, False, False],  # Left
-            15: [0.6, -0.25, 0.0, False, False],  # Left
-            16: [1.0, 0.00, 0.0, False, False],  # Straight
-            17: [1.0, 0.75, 0.0, False, False],  # Right
-            18: [1.0, 0.50, 0.0, False, False],  # Right
-            19: [1.0, 0.25, 0.0, False, False],  # Right
-            20: [1.0, -0.75, 0.0, False, False],  # Left
-            21: [1.0, -0.50, 0.0, False, False],  # Left
-            22: [1.0, -0.25, 0.0, False, False],  # Left
+            # 2: [0.3, 0.00, 0.0, False, False],  # Straight
+            # 3: [0.3, 0.75, 0.0, False, False],  # Right
+            # 4: [0.3, 0.50, 0.0, False, False],  # Right
+            # 5: [0.3, 0.25, 0.0, False, False],  # Right
+            # 6: [0.3, -0.75, 0.0, False, False],  # Left
+            # 7: [0.3, -0.50, 0.0, False, False],  # Left
+            # 8: [0.3, -0.25, 0.0, False, False],  # Left
+            # 9: [0.6, 0.00, 0.0, False, False],  # Straight
+            # 10: [0.6, 0.75, 0.0, False, False],  # Right
+            # 11: [0.6, 0.50, 0.0, False, False],  # Right
+            # 12: [0.6, 0.25, 0.0, False, False],  # Right
+            # 13: [0.6, -0.75, 0.0, False, False],  # Left
+            # 14: [0.6, -0.50, 0.0, False, False],  # Left
+            # 15: [0.6, -0.25, 0.0, False, False],  # Left
+            # 16: [1.0, 0.00, 0.0, False, False],  # Straight
+            # 17: [1.0, 0.75, 0.0, False, False],  # Right
+            # 18: [1.0, 0.50, 0.0, False, False],  # Right
+            # 19: [1.0, 0.25, 0.0, False, False],  # Right
+            # 20: [1.0, -0.75, 0.0, False, False],  # Left
+            # 21: [1.0, -0.50, 0.0, False, False],  # Left
+            # 22: [1.0, -0.25, 0.0, False, False],  # Left
         }
 
     def compute_action(self, action):
@@ -172,7 +175,7 @@ class DQNExperiment(BaseExperiment):
         action.reverse = action_control[3]
         action.hand_brake = action_control[4]
 
-        # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
+        print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
 
 
         self.last_action = action
@@ -222,7 +225,7 @@ class DQNExperiment(BaseExperiment):
                 carla.Rotation(0, 0, 0))
 
 
-        number_of_points_ahead_to_calcualte_angle_with = 5
+        number_of_points_ahead_to_calcualte_angle_with = 2
 
 
         # print(f"BEFORE CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
