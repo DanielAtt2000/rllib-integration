@@ -269,7 +269,7 @@ class DQNExperiment(BaseExperiment):
         angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
 
-        if self.visualiseRoute and self.counter > 30:
+        if self.visualiseRoute and self.counter > 50:
             plot_points(previous_position=core.route[core.last_waypoint_index-1].location,
                         current_position=truck_normalised_transform.location,
                         next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location,
@@ -278,7 +278,6 @@ class DQNExperiment(BaseExperiment):
                         in_front_of_waypoint=in_front_of_waypoint,
                         angle=angle_to_center_of_lane_degrees)
 
-        if self.visualiseRoute and self.counter > 30:
             x_route = []
             y_route = []
             for point in core.route:
