@@ -689,4 +689,5 @@ class DQNExperiment(BaseExperiment):
         reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
         reward_file.close()
         print(f'Reward: {reward}')
+        time.sleep(0.4)
         return reward

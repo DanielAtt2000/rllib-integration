@@ -12,9 +12,7 @@ def calculate_angle_with_center_of_lane(previous_position, current_position, nex
 
     angle_rad = math.acos(enumerator / denominator)
     angle_deg = angle_rad* 180/math.pi
-    print('HERE')
-    print(f"DEG - {angle_deg}")
-    print(f"RAD - {angle_rad}")
+
     #
     # print(f"In calculate_angle_with_center_of_lane")
     # print(f"Previous position X:{previous_position.x} Y:{previous_position.y}")
