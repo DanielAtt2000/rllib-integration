@@ -86,9 +86,9 @@ def plot_points(previous_position, current_position, next_position, current_wayp
     plt.xlim([0.48,0.58])
     plt.ylim([0.60,0.70])
 
-    print(f"x_pos {current_position.x} y_pos {current_position.y}")
-    print(f"x_last {previous_position.x} y_last {previous_position.y}")
-    print(f"x_next {next_position.x} y_next {next_position.y}")
+    # print(f"x_pos {current_position.x} y_pos {current_position.y}")
+    # print(f"x_last {previous_position.x} y_last {previous_position.y}")
+    # print(f"x_next {next_position.x} y_next {next_position.y}")
 
 
     plt.plot([previous_position.x,next_position.x],[previous_position.y,next_position.y] )
@@ -103,25 +103,27 @@ def plot_points(previous_position, current_position, next_position, current_wayp
 
     # val = update_next_waypoint(current_position.x,current_position.y,previous_position.x,previous_position.y,next_position.x,next_position.y)
 
-    if next_position.x-previous_position.x == 0:
+
+
+    if next_waypoint.x-current_waypoint.x == 0:
         x= []
         y = []
         for a in range(-20,20):
             x.append(a)
-            y.append(previous_position.y)
+            y.append(current_waypoint.y)
         plt.plot(x, y)
-    elif next_position.y-previous_position.y == 0:
+    elif next_waypoint.y-current_waypoint.y == 0:
         x = []
         y= []
         for a in range(-20,20):
-            x.append(previous_position.x)
+            x.append(current_waypoint.x)
             y.append(a)
         plt.plot(x,y)
 
     else:
-        gradOfPrevToNext = (next_position.y-previous_position.y) / (next_position.x-previous_position.x)
+        gradOfPrevToNext = (next_waypoint.y-current_waypoint.y) / (next_waypoint.x-current_waypoint.x)
         gradOfPerpendicular = -1/gradOfPrevToNext
-        cOfPerpendicular = previous_position.y - gradOfPerpendicular*previous_position.x
+        cOfPerpendicular = current_waypoint.y - gradOfPerpendicular*current_waypoint.x
         print(f"gradOfPerpendicular {gradOfPerpendicular}")
         print(f"cOfPerpendicular {cOfPerpendicular}")
         x = []
