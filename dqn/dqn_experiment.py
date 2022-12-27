@@ -270,6 +270,27 @@ class DQNExperiment(BaseExperiment):
 
 
         if self.visualiseRoute and self.counter > 50:
+            def plot_route():
+                x_route = []
+                y_route = []
+                for point in core.route:
+                    # print(f"X: {point.location.x} Y:{point.location.y}")
+                    x_route.append(point.location.x)
+                    y_route.append(point.location.y)
+                # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
+                plt.plot([x_route.pop(0)],y_route.pop(0),'bo')
+                plt.plot(x_route, y_route,'y^')
+                plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro',label='Previous Waypoint')
+                plt.plot([truck_normalised_transform.location.x], [truck_normalised_transform.location.y], 'gs',label='Current Vehicle Location')
+                plt.plot([core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.x], [core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.y], 'bo', label=f"{number_of_points_ahead_to_calcualte_angle_with} waypoints ahead")
+                plt.axis([0.3, 0.7, 0.3, 0.7])
+                # plt.axis([0, 1, 0, 1])
+                plt.title(f'{angle_to_center_of_lane_normalised*180}')
+                plt.gca().invert_yaxis()
+                plt.legend(loc='upper center')
+                plt.show()
+
+
             plot_points(previous_position=core.route[core.last_waypoint_index-1].location,
                         current_position=truck_normalised_transform.location,
                         next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location,
@@ -278,24 +299,8 @@ class DQNExperiment(BaseExperiment):
                         in_front_of_waypoint=in_front_of_waypoint,
                         angle=angle_to_center_of_lane_degrees)
 
-            x_route = []
-            y_route = []
-            for point in core.route:
-                # print(f"X: {point.location.x} Y:{point.location.y}")
-                x_route.append(point.location.x)
-                y_route.append(point.location.y)
-            # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
-            plt.plot([x_route.pop(0)],y_route.pop(0),'bo')
-            plt.plot(x_route, y_route,'y^')
-            plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro',label='Previous Waypoint')
-            plt.plot([truck_normalised_transform.location.x], [truck_normalised_transform.location.y], 'gs',label='Current Vehicle Location')
-            plt.plot([core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.x], [core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.y], 'bo', label=f"{number_of_points_ahead_to_calcualte_angle_with} waypoints ahead")
-            plt.axis([0.3, 0.7, 0.3, 0.7])
-            # plt.axis([0, 1, 0, 1])
-            plt.title(f'{angle_to_center_of_lane_normalised*180}')
-            plt.gca().invert_yaxis()
-            plt.legend(loc='upper center')
-            plt.show()
+            # plot_route()
+
         self.counter +=1
 
         # heading = np.sin(transform.rotation.yaw * np.pi / 180)

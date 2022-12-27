@@ -132,7 +132,7 @@ def plot_points(previous_position, current_position, next_position, current_wayp
             x.append(a)
             y.append(gradOfPerpendicular*a+cOfPerpendicular)
         plt.plot(x,y,label="Perpendicular")
-    leg = plt.legend(loc='lower right')
+    leg = plt.legend(loc='upper right')
     if in_front_of_waypoint == 0:
         print('POINT ON LINE')
         plt.title(f"Result = ONLINE - {angle}")
