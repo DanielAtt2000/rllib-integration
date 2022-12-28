@@ -12,6 +12,8 @@ from __future__ import print_function
 
 import argparse
 import os
+import random
+
 import yaml
 
 import ray
@@ -113,7 +115,12 @@ def main():
 
     if check_with_user():
         args.name = args.name + '_' + str(commit_hash())
-        run(args)
+        args.name = "dqn_e01b7ba099"
+        x = random.randint()
+        inp = input(f'SPECIFIC NAME APPLIED ENTER {x} to confirm:')
+
+        if x == inp:
+            run(args)
 
 if __name__ == '__main__':
 
