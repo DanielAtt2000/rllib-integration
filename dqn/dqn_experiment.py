@@ -39,7 +39,8 @@ class DQNExperiment(BaseExperiment):
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
         self.visualiseRoute = False
-        self.visualiseImage = True
+        self.visualiseImage = False
+        self.counterThreshold = 100
 
 
     def reset(self):
@@ -282,7 +283,7 @@ class DQNExperiment(BaseExperiment):
         angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
 
-        if self.visualiseRoute and self.counter > 50:
+        if self.visualiseRoute and self.counter > self.counterThreshold:
             def plot_route():
                 x_route = []
                 y_route = []
@@ -450,7 +451,7 @@ class DQNExperiment(BaseExperiment):
             np.float32(roundabout_diameter)
                            ]
 
-        if self.visualiseImage and self.counter > 100:
+        if self.visualiseImage and self.counter > self.counterThreshold:
             plt.imshow(semantic_camera_data, interpolation='nearest')
             plt.show()
 
