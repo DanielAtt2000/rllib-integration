@@ -136,8 +136,12 @@ class DQNExperiment(BaseExperiment):
             3: [1.0, 0.00, 0.0, False, False],  # Straight
             4: [0.5, 0.50, 0.0, False, False],  # Right
             5: [0.5, 1.00, 0.0, False, False],  # Right
-            6: [0.5, -0.50, 0.0, False, False],  # Left
-            7: [0.5, -1.00, 0.0, False, False],  # Left
+            6: [1.0, 0.50, 0.0, False, False],  # Right
+            7: [1.0, 1.00, 0.0, False, False],  # Right
+            8: [0.5, -0.50, 0.0, False, False],  # Left
+            9: [0.5, -1.00, 0.0, False, False],  # Left
+            10: [1.0, -0.50, 0.0, False, False],  # Left
+            11: [1.0, -1.00, 0.0, False, False],  # Left
             # 2: [0.0, 0.75, 0.0, False, False],  # Right
             # 3: [0.0, 0.50, 0.0, False, False],  # Right
             # 4: [0.0, 0.25, 0.0, False, False],  # Right
