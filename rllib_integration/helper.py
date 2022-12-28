@@ -79,6 +79,9 @@ def find_latest_checkpoint(directory):
             "Could not find any checkpoint, make sure that you have selected the correct folder path"
         )
 
+    print(checkpoint_path)
+    print('------------------')
+
     return checkpoint_path
 
 
