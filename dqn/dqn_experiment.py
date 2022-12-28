@@ -39,6 +39,7 @@ class DQNExperiment(BaseExperiment):
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
         self.visualiseRoute = False
+        self.visualiseImage = True
 
 
     def reset(self):
@@ -449,8 +450,9 @@ class DQNExperiment(BaseExperiment):
             np.float32(roundabout_diameter)
                            ]
 
-        plt.imshow(semantic_camera_data, interpolation='nearest')
-        plt.show()
+        if self.visualiseImage and self.counter > 100:
+            plt.imshow(semantic_camera_data, interpolation='nearest')
+            plt.show()
 
         observation_file = open( os.path.join("results","run_" + str(core.current_time),"observations_" + str(core.current_time) + ".txt"), 'a+')
         for idx, obs in enumerate(observations):
