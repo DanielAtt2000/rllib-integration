@@ -7,7 +7,7 @@
 # For a copy, see <https://opensource.org/licenses/MIT>.
 import matplotlib.pyplot as plt
 
-import cv2
+
 import math
 import numpy as np
 from gym.spaces import Box, Discrete, Dict
@@ -449,7 +449,8 @@ class DQNExperiment(BaseExperiment):
             np.float32(roundabout_diameter)
                            ]
 
-        plt.show(semantic_camera_data)
+        plt.imshow(semantic_camera_data, interpolation='nearest')
+        plt.show()
 
         observation_file = open( os.path.join("results","run_" + str(core.current_time),"observations_" + str(core.current_time) + ".txt"), 'a+')
         for idx, obs in enumerate(observations):
