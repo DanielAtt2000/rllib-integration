@@ -116,7 +116,7 @@ def main():
     if check_with_user():
         args.name = args.name + '_' + str(commit_hash())
         args.name = "dqn_e01b7ba099"
-        x = random.randint()
+        x = random.randint(0,100)
         inp = input(f'SPECIFIC NAME APPLIED ENTER {x} to confirm:')
 
         if x == inp:
