@@ -6,6 +6,8 @@
 # This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
 import matplotlib.pyplot as plt
+
+import cv2
 import math
 import numpy as np
 from gym.spaces import Box, Discrete, Dict
@@ -446,6 +448,8 @@ class DQNExperiment(BaseExperiment):
             np.float32(angle_to_center_of_lane_normalised),
             np.float32(roundabout_diameter)
                            ]
+
+        plt.show(semantic_camera_data)
 
         observation_file = open( os.path.join("results","run_" + str(core.current_time),"observations_" + str(core.current_time) + ".txt"), 'a+')
         for idx, obs in enumerate(observations):
