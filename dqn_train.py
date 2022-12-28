@@ -119,7 +119,7 @@ def main():
         x = random.randint(0,100)
         inp = input(f'SPECIFIC NAME APPLIED ENTER {x} to confirm:')
 
-        if x == inp:
+        if int(x) == int(inp):
             run(args)
 
 if __name__ == '__main__':
