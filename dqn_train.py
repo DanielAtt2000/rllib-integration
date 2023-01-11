@@ -113,13 +113,19 @@ def main():
     launch_tensorboard(logdir= path,
                        host="localhost")
 
+    specific_version = False
+
     if check_with_user():
         args.name = args.name + '_' + str(commit_hash())
-        args.name = "dqn_e01b7ba099"
-        x = random.randint(0,100)
-        inp = input(f'SPECIFIC NAME APPLIED ENTER {x} to confirm:')
 
-        if int(x) == int(inp):
+        if specific_version:
+            args.name = "dqn_e01b7ba099"
+            x = random.randint(0,100)
+            inp = input(f'SPECIFIC NAME APPLIED ENTER {x} to confirm:')
+
+            if int(x) == int(inp):
+                run(args)
+        else:
             run(args)
 
 if __name__ == '__main__':

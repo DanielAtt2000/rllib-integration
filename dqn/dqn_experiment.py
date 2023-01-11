@@ -118,7 +118,7 @@ class DQNExperiment(BaseExperiment):
         """
         spaces = {
             # 'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
-            'values': Box(low=np.array([0,0,0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,1,1,50]), dtype=np.float32),
+            'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,50]), dtype=np.float32),
 
             # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
             'semantic_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
@@ -430,8 +430,9 @@ class DQNExperiment(BaseExperiment):
         # 40 meters inside diameter
         roundabout_diameter = 40
 
-        name_observations = ["truck_normalised_transform.location.x",
-                             "truck_normalised_transform.location.y",
+        name_observations = [
+                            # "truck_normalised_transform.location.x",
+                            #  "truck_normalised_transform.location.y",
                              "forward_velocity",
                              "forward_velocity_x",
                              "forward_velocity_y",
@@ -440,8 +441,8 @@ class DQNExperiment(BaseExperiment):
                              "angle_to_center_of_lane_normalised",
                              "roundabout_diameter"]
         observations = [
-            np.float32(truck_normalised_transform.location.x),
-            np.float32(truck_normalised_transform.location.y),
+            # np.float32(truck_normalised_transform.location.x),
+            # np.float32(truck_normalised_transform.location.y),
             np.float32(forward_velocity),
             np.float32(forward_velocity_x),
             np.float32(forward_velocity_y),
@@ -548,10 +549,10 @@ class DQNExperiment(BaseExperiment):
 
         reward = 0
 
-        forward_velocity = observation['values'][2]
-        x_dist_to_next_waypoint = observation['values'][5]
-        y_dist_to_next_waypoint = observation['values'][6]
-        angle_to_center_of_lane_normalised = observation['values'][7]
+        forward_velocity = observation['values'][0]
+        x_dist_to_next_waypoint = observation['values'][3]
+        y_dist_to_next_waypoint = observation['values'][4]
+        angle_to_center_of_lane_normalised = observation['values'][5]
         self.last_angle_with_center = angle_to_center_of_lane_normalised
         self.last_forward_velocity = forward_velocity
 

@@ -52,7 +52,7 @@ env_config:
 #   host: "127.0.0.1"
     timeout: 30.0
     # IF YOU ARE GOING TO CHANGE THE TIMESTEP CHANGE rotation_frequency of LIDAR
-    timestep: 0.06 # IMP IMP
+    timestep: 0.08 # IMP IMP
     # IMP
     retries_on_error: 25
     resolution_x: 300
