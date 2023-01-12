@@ -77,20 +77,20 @@ env_config:
 #          type: "sensor.other.obstacle"
         collision:
           type: "sensor.other.collision"
-#        lidar:
-#          type: "sensor.lidar.ray_cast_semantic"
-#          channels : "32"
-#          range : "30.0"
-#          points_per_second : "56000"
-#          rotation_frequency : "16.67" #  IMP THIS IS 1 / delta (timestep)
-#          upper_fov : '5.0'
-#          lower_fov : '-15.0'
-#          horizontal_fov : '360.0'
-#          sensor_tick : '0'
-#          transform : '0.0,0.0,1.6,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
-        semantic_camera:
-          type: "sensor.camera.semantic_segmentation"
-          transform: '0.0,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
+        lidar:
+          type: "sensor.lidar.ray_cast_semantic"
+          channels : "32"
+          range : "30.0"
+          points_per_second : "56000"
+          rotation_frequency : "12.5" #  IMP THIS IS 1 / delta (timestep)
+          upper_fov : '5.0'
+          lower_fov : '-15.0'
+          horizontal_fov : '360.0'
+          sensor_tick : '0'
+          transform : '0.0,0.0,1.6,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
+#        semantic_camera:
+#          type: "sensor.camera.semantic_segmentation"
+#          transform: '0.0,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
       #        laneInvasion:
 #          type: "sensor.other.lane_invasion"
       spawn_points: [
