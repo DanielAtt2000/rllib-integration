@@ -372,7 +372,9 @@ class DQNExperiment(BaseExperiment):
 
                 number_of_rows_to_pad = self.lidar_max_points - len(lidar_data)
 
-                assert number_of_rows_to_pad >= 0
+                if number_of_rows_to_pad < 0:
+                    raise Exception(f"number_of_rows_to_pad is negative: {number_of_rows_to_pad}")
+
 
                 lidar_data_padded = np.pad(lidar_data, [(0, number_of_rows_to_pad), (0, 0)], mode='constant', constant_values=-1)
 
