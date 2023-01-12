@@ -71,7 +71,7 @@ env_config:
 #      blueprintTruck: "DAFxf"
       blueprintTruck: "vehicle.audi.a2"
       blueprintTrailer: "trailer"
-      lidar_max_points : 2500
+      lidar_max_points : 3000
       sensors:
 #        obstacle:
 #          type: "sensor.other.obstacle"
