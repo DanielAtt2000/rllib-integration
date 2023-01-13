@@ -19,6 +19,7 @@ from rllib_integration.GetAngle import calculate_angle_with_center_of_lane
 from rllib_integration.TestingWayPointUpdater import plot_points
 from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
+from PIL import Image
 
 
 
@@ -117,16 +118,18 @@ class DQNExperiment(BaseExperiment):
         :return:
         """
         spaces = {
-            # 'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
-            'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,50]), dtype=np.float32),
+
+            # 'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,50]), dtype=np.float32),
+            'depth_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
 
             # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
             # 'semantic_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
 
         }
         # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
-        obs_space = Dict(spaces)
+        # obs_space = Dict(spaces)
         # print('SAMPLE')
+        obs_space = Box(low=0, high=256,shape=(240,320,3), dtype=np.float32)
         # print(obs_space.sample())
         return obs_space
 
@@ -322,6 +325,7 @@ class DQNExperiment(BaseExperiment):
 
         lidar_data_padded = None
         semantic_camera_data = None
+        depth_camera_data = None
         for sensor in sensor_data:
             if sensor == 'collision_truck':
                 # TODO change to only take collision with road
@@ -404,6 +408,19 @@ class DQNExperiment(BaseExperiment):
 
                 assert lidar_data_padded is not None
 
+            elif sensor == "depth_camera_truck":
+                depth_camera_data = sensor_data['depth_camera_truck'][1]
+
+                img = Image.fromarray(sensor_data[2], None)
+                img.show()
+                time.sleep(0.005)
+                img.close()
+
+                print(depth_camera_data.shape())
+
+                assert depth_camera_data is not None
+
+
         # print("OBSERVATIONS START")
         # print(f"truck_normalised_transform.location.x {truck_normalised_transform.location.x}")
         # print(f"truck_normalised_transform.location.y {truck_normalised_transform.location.y}")
@@ -466,7 +483,9 @@ class DQNExperiment(BaseExperiment):
             observation_file.write(f"{name_observations[idx]}:{round(obs,5)}\n")
         observation_file.close()
 
-        return {'values': np.array(observations),
+        return {
+                # 'values': np.array(observations),
+                'depth_camera': depth_camera_data,
                 # 'lidar':lidar_data_padded,
                 # 'semantic_camera':semantic_camera_data
         }, {}

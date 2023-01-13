@@ -56,7 +56,7 @@ class SensorInterface(object):
         self._event_data_buffers = queue.Queue()
 
         self.visualiseLIDAR = False
-        self.visualiseCamera = True
+        self.visualiseCamera = False
         self.counter = 0
         self.lidar_window()
 
