@@ -92,13 +92,14 @@ class PseudoSensor(BaseSensor):
 # -- Cameras -----------------------------------------------------------------------------------
 # ==================================================================================================
 class BaseCamera(CarlaSensor):
-    def __init__(self, name, attributes, interface, parent):
+    def __init__(self, name, attributes, interface, parent, converter):
+        self.converter = converter
         super().__init__(name, attributes, interface, parent)
 
     def parse(self, sensor_data):
         """Parses the Image into an numpy array"""
         # sensor_data: [fov, height, width, raw_data]
-        sensor_data.convert(carla.ColorConverter.CityScapesPalette)
+        sensor_data.convert(self.converter)
         array = np.frombuffer(sensor_data.raw_data, dtype=np.dtype("uint8"))
         array = np.reshape(array, (sensor_data.height, sensor_data.width, 4))
         array = array[:, :, :3]
@@ -124,13 +125,13 @@ class CameraRGB(BaseCamera):
 class CameraDepth(BaseCamera):
 
     def __init__(self, name, attributes, interface, parent):
-        super().__init__(name, attributes, interface, parent)
+        super().__init__(name, attributes, interface, parent,carla.ColorConverter.LogarithmicDepth)
 
 
 class CameraSemanticSegmentation(BaseCamera):
 
     def __init__(self, name, attributes, interface, parent):
-        super().__init__(name, attributes, interface, parent)
+        super().__init__(name, attributes, interface, parent,carla.ColorConverter.CityScapesPalette)
 
 
 class CameraDVS(CarlaSensor):

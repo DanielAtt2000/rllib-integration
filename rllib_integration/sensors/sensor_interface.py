@@ -56,7 +56,7 @@ class SensorInterface(object):
         self._event_data_buffers = queue.Queue()
 
         self.visualiseLIDAR = False
-        self.visualiseCamera = False
+        self.visualiseCamera = True
         self.counter = 0
         self.lidar_window()
 
@@ -150,7 +150,7 @@ class SensorInterface(object):
                     self.frame += 1
 
 
-                if self.visualiseCamera and sensor_data[0] == 'semantic_camera':
+                if self.visualiseCamera and (sensor_data[0] == 'semantic_camera' or sensor_data[0] == "depth_camera"):
 
                     # current_time = datetime.now().strftime("%Y-%m-%dT%H-%M-%S%Z")
 
