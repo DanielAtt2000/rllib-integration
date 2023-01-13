@@ -194,23 +194,23 @@ class DQNExperiment(BaseExperiment):
         action_msg = ""
 
         if action_control[0] != 0:
-            action_msg += "Forward"
+            action_msg += " Forward "
 
         if action_control[1] < 0:
-            action_msg += "Left"
+            action_msg += " Left "
 
         if action_control[1] > 0:
-            action_msg += "Right"
+            action_msg += " Right "
 
         if action_control[2] != 0:
-            action_msg += "Break"
+            action_msg += " Break "
 
         if action_msg == "":
-            action_msg += "Coast"
+            action_msg += " Coast "
 
 
         # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
-        print(f"{action_msg}")
+        print(f"----------------------------------->{action_msg}")
 
         self.last_action = action
 
