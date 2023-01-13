@@ -416,7 +416,7 @@ class DQNExperiment(BaseExperiment):
                 time.sleep(0.005)
                 img.close()
 
-                print(depth_camera_data.shape())
+                print(depth_camera_data.shape)
 
                 assert depth_camera_data is not None
 
