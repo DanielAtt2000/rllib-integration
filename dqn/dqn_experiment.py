@@ -579,7 +579,7 @@ class DQNExperiment(BaseExperiment):
 
         reward = 0
 
-        with_values = True
+        with_values = False
 
         if with_values:
 
