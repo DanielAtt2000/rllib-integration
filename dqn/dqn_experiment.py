@@ -489,12 +489,16 @@ class DQNExperiment(BaseExperiment):
             observation_file.write(f"{name_observations[idx]}:{round(obs,5)}\n")
         observation_file.close()
 
-        return {
-                # 'values': np.array(observations),
-                'depth_camera': depth_camera_data,
-                # 'lidar':lidar_data_padded,
-                # 'semantic_camera':semantic_camera_data
-        }, {}
+        # return {
+        #         # 'values': np.array(observations),
+        #         'depth_camera': depth_camera_data,
+        #         # 'lidar':lidar_data_padded,
+        #         # 'semantic_camera':semantic_camera_data
+        # }, {}
+        #
+
+        return depth_camera_data, {}
+
         # return  np.r_[
         #                 np.float32(truck_normalised_transform.location.x),
         #                 np.float32(truck_normalised_transform.location.y),
