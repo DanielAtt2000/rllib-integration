@@ -42,6 +42,8 @@ class DQNExperiment(BaseExperiment):
         self.visualiseRoute = False
         self.visualiseImage = False
         self.counterThreshold = 100
+        self.x_dist_to_finish = 0
+        self.y_dist_to_finish = 0
 
 
     def reset(self):
@@ -261,6 +263,10 @@ class DQNExperiment(BaseExperiment):
         # print(f"DISTANCE TO NEXT WAY POINT X {x_dist_to_next_waypoint}")
         # print(f"DISTANCE TO NEXT WAY POINT Y {y_dist_to_next_waypoint}")
 
+        self.x_dist_to_finish = abs(core.route[len(core.route) - 15].location.x - truck_normalised_transform.location.x, )
+        self.y_dist_to_finish = abs(core.route[len(core.route) - 15].location.y - truck_normalised_transform.location.y )
+
+
         # Forward Velocity
         # Normalising it between 0 and 50
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
@@ -411,12 +417,12 @@ class DQNExperiment(BaseExperiment):
             elif sensor == "depth_camera_truck":
                 depth_camera_data = sensor_data['depth_camera_truck'][1]
 
-                img = Image.fromarray(depth_camera_data, None)
-                img.show()
-                time.sleep(0.005)
-                img.close()
-
-                print(depth_camera_data.shape)
+                # img = Image.fromarray(depth_camera_data, None)
+                # img.show()
+                # time.sleep(0.005)
+                # img.close()
+                #
+                # print(depth_camera_data.shape)
 
                 assert depth_camera_data is not None
 
@@ -573,165 +579,195 @@ class DQNExperiment(BaseExperiment):
 
         reward = 0
 
-        forward_velocity = observation['values'][0]
-        x_dist_to_next_waypoint = observation['values'][3]
-        y_dist_to_next_waypoint = observation['values'][4]
-        angle_to_center_of_lane_normalised = observation['values'][5]
-        self.last_angle_with_center = angle_to_center_of_lane_normalised
-        self.last_forward_velocity = forward_velocity
+        with_values = True
 
-        reward_file = open(os.path.join("results",
-                                        "run_" + str(core.current_time),
-                                        "rewards_" + str(core.current_time) + ".txt")
-                           , 'a+')
+        if with_values:
 
-        print("------------------------------")
-        # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
-        # print('Forward Velocity ' + str(forward_velocity))
-        if forward_velocity > 0.05:
+            forward_velocity = observation['values'][0]
+            x_dist_to_next_waypoint = observation['values'][3]
+            y_dist_to_next_waypoint = observation['values'][4]
+            angle_to_center_of_lane_normalised = observation['values'][5]
+            self.last_angle_with_center = angle_to_center_of_lane_normalised
+            self.last_forward_velocity = forward_velocity
 
-            hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
-            reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
-            reward += reward_hyp_distance_to_next_waypoint
-            print(f"hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
+            reward_file = open(os.path.join("results",
+                                            "run_" + str(core.current_time),
+                                            "rewards_" + str(core.current_time) + ".txt")
+                               , 'a+')
 
-            # When the angle with the center line is 0 the highest reward is given
-            if angle_to_center_of_lane_normalised == 0:
-                reward += 1000
-                print(f'====> REWARD for angle to center line is 0, R+= 1')
-                reward_file.write(f"angle_to_center_of_lane_normalised == 0: +1 ")
+            print("------------------------------")
+            # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
+            # print('Forward Velocity ' + str(forward_velocity))
+            if forward_velocity > 0.05:
+
+                hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
+                reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
+                reward += reward_hyp_distance_to_next_waypoint
+                print(f"hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
+
+                # When the angle with the center line is 0 the highest reward is given
+                if angle_to_center_of_lane_normalised == 0:
+                    reward += 1000
+                    print(f'====> REWARD for angle to center line is 0, R+= 1')
+                    reward_file.write(f"angle_to_center_of_lane_normalised == 0: +1 ")
+                else:
+                    # Angle with the center line can deviate between 0 and 180 degrees
+                    # TODO Check this reward
+                    # Maybe this wil be too high?
+                    # Since the RL can stay there and get the reward
+                    reward_for_angle = 1 / (angle_to_center_of_lane_normalised)
+                    reward_for_angle = ((reward_for_angle - 1) / (10 - 1))*100
+                    reward += reward_for_angle
+                    print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
+                    reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised, 5)}: {round(reward_for_angle, 5)} ")
             else:
-                # Angle with the center line can deviate between 0 and 180 degrees
-                # TODO Check this reward
-                # Maybe this wil be too high?
-                # Since the RL can stay there and get the reward
-                reward_for_angle = 1 / (angle_to_center_of_lane_normalised)
-                reward_for_angle = ((reward_for_angle - 1) / (10 - 1))*100
-                reward += reward_for_angle
-                print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
-                reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised, 5)}: {round(reward_for_angle, 5)} ")
+                # Negative reward for no velocity
+                reward += -100
+
+            # Positive reward for higher velocity
+            # Already normalised in observations
+            # reward += forward_velocity
+            # print(f' REWARD for forward_velocity {forward_velocity} ')
+            # reward_file.write(f"forward_velocity: {round(forward_velocity,5)} ")
+
+            # Negative reward each time step to push for completing the task.
+            # reward += -0.01
+            # reward_file.write(f"negative reward: -0.01 ")
+
+
+
+
+            # Current position and heading of the vehicle
+            # velocity
+            # Final position and heading
+
+            # collision
+            # laneInvasion
+            # Time
+
+
+            # # Hero-related variables
+            # hero_location = hero.get_location()
+            # # hero_velocity = self.get_speed(hero)
+            # hero_heading = hero.get_transform().get_forward_vector()
+            # hero_heading = [hero_heading.x, hero_heading.y]
+            #
+            # # Initialize last location
+            # if self.last_location == None:
+            #     self.last_location = hero_location
+
+            # Compute deltas
+            # delta_distance = float(np.sqrt(np.square(hero_location.x - self.last_location.x) + np.square(hero_location.y - self.last_location.y)))
+
+            # Reward if going forward
+            # reward = delta_distance
+            # delta_velocity = hero_velocity - self.last_velocity
+
+
+            # print('Distance to finish: ' + str(hero_dist_to_finish))
+            # reward += 100 * (self.last_dist_to_finish - hero_dist_to_finish)
+
+            # print('Delta distance ' + str(100 * (self.last_dist_to_finish - hero_dist_to_finish)))
+
+            # Update variables
+            # self.last_location = hero_location
+            # self.last_velocity = hero_velocity
+            # self.last_dist_to_finish = hero_dist_to_finish
+            #
+
+
+
+
+            # Reward if going faster than last step
+            # if hero_velocity < 20.0:
+            #     reward += 0.05 * delta_velocity
+
+            # La duracion de estas infracciones deberia ser 2 segundos?
+            # Penalize if not inside the lane
+            # closest_waypoint = map_.get_waypoint(
+            #     hero_location,
+            #     project_to_road=False,
+            #     lane_type=carla.LaneType.Any
+            # )
+            # if closest_waypoint is None or closest_waypoint.lane_type not in self.allowed_types:
+            #     reward += -0.5
+            #     self.last_heading_deviation = math.pi
+            # else:
+            #     if not closest_waypoint.is_junction:
+            #         wp_heading = closest_waypoint.transform.get_forward_vector()
+            #         wp_heading = [wp_heading.x, wp_heading.y]
+            #         angle = compute_angle(hero_heading, wp_heading)
+            #         self.last_heading_deviation = abs(angle)
+            #
+            #         if np.dot(hero_heading, wp_heading) < 0:
+            #             # We are going in the wrong direction
+            #             reward += -0.5
+            #
+            #         else:
+            #             if abs(math.sin(angle)) > 0.4:
+            #                 if self.last_action == None:
+            #                     self.last_action = carla.VehicleControl()
+            #
+            #                 if self.last_action.steer * math.sin(angle) >= 0:
+            #                     reward -= 0.05
+            #     else:
+            #         self.last_heading_deviation = 0
+
+
+
+            if self.done_falling:
+                reward += -100000
+                print('====> REWARD Done falling')
+                reward_file.write(f"done_falling:-1 ")
+            if self.done_collision:
+                print("====> REWARD Done collision")
+                reward += -100000
+                reward_file.write(f"done_collision:-1 ")
+            if self.done_time_idle:
+                print("====> REWARD Done idle")
+                reward += -100000
+                reward_file.write(f"done_time_idle:-1 ")
+            if self.done_time_episode:
+                print("====> REWARD Done max time")
+                reward += -100000
+                reward_file.write(f"done_time_episode:-1 ")
+            if self.done_arrived:
+                print("====> REWARD Done arrived")
+                reward += 10000
+                reward_file.write(f"done_arrived:+10 ")
+
+            # print('Reward: ' + str(reward))
+
+
+            reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
+            reward_file.close()
+            print(f'Reward: {reward}')
+            print("------------------------------")
+            time.sleep(0.4)
+            return reward
+
         else:
-            # Negative reward for no velocity
-            reward += -100
 
-        # Positive reward for higher velocity
-        # Already normalised in observations
-        # reward += forward_velocity
-        # print(f' REWARD for forward_velocity {forward_velocity} ')
-        # reward_file.write(f"forward_velocity: {round(forward_velocity,5)} ")
+            reward = reward + (1/self.y_dist_to_finish)
+            reward = reward + (1/self.x_dist_to_finish)
 
-        # Negative reward each time step to push for completing the task.
-        # reward += -0.01
-        # reward_file.write(f"negative reward: -0.01 ")
+            if self.done_falling:
+                reward += -100000
+                print('====> REWARD Done falling')
+            if self.done_collision:
+                print("====> REWARD Done collision")
+                reward += -100000
+            if self.done_time_idle:
+                print("====> REWARD Done idle")
+                reward += -100000
+            if self.done_time_episode:
+                print("====> REWARD Done max time")
+                reward += -100000
+            if self.done_arrived:
+                print("====> REWARD Done arrived")
+                reward += 10000
+            print(f'Reward: {reward}')
+            print("------------------------------")
+            time.sleep(0.4)
+            return reward
 
-
-
-
-        # Current position and heading of the vehicle
-        # velocity
-        # Final position and heading
-
-        # collision
-        # laneInvasion
-        # Time
-
-
-        # # Hero-related variables
-        # hero_location = hero.get_location()
-        # # hero_velocity = self.get_speed(hero)
-        # hero_heading = hero.get_transform().get_forward_vector()
-        # hero_heading = [hero_heading.x, hero_heading.y]
-        #
-        # # Initialize last location
-        # if self.last_location == None:
-        #     self.last_location = hero_location
-
-        # Compute deltas
-        # delta_distance = float(np.sqrt(np.square(hero_location.x - self.last_location.x) + np.square(hero_location.y - self.last_location.y)))
-
-        # Reward if going forward
-        # reward = delta_distance
-        # delta_velocity = hero_velocity - self.last_velocity
-
-
-        # print('Distance to finish: ' + str(hero_dist_to_finish))
-        # reward += 100 * (self.last_dist_to_finish - hero_dist_to_finish)
-
-        # print('Delta distance ' + str(100 * (self.last_dist_to_finish - hero_dist_to_finish)))
-
-        # Update variables
-        # self.last_location = hero_location
-        # self.last_velocity = hero_velocity
-        # self.last_dist_to_finish = hero_dist_to_finish
-        #
-
-
-
-
-        # Reward if going faster than last step
-        # if hero_velocity < 20.0:
-        #     reward += 0.05 * delta_velocity
-
-        # La duracion de estas infracciones deberia ser 2 segundos?
-        # Penalize if not inside the lane
-        # closest_waypoint = map_.get_waypoint(
-        #     hero_location,
-        #     project_to_road=False,
-        #     lane_type=carla.LaneType.Any
-        # )
-        # if closest_waypoint is None or closest_waypoint.lane_type not in self.allowed_types:
-        #     reward += -0.5
-        #     self.last_heading_deviation = math.pi
-        # else:
-        #     if not closest_waypoint.is_junction:
-        #         wp_heading = closest_waypoint.transform.get_forward_vector()
-        #         wp_heading = [wp_heading.x, wp_heading.y]
-        #         angle = compute_angle(hero_heading, wp_heading)
-        #         self.last_heading_deviation = abs(angle)
-        #
-        #         if np.dot(hero_heading, wp_heading) < 0:
-        #             # We are going in the wrong direction
-        #             reward += -0.5
-        #
-        #         else:
-        #             if abs(math.sin(angle)) > 0.4:
-        #                 if self.last_action == None:
-        #                     self.last_action = carla.VehicleControl()
-        #
-        #                 if self.last_action.steer * math.sin(angle) >= 0:
-        #                     reward -= 0.05
-        #     else:
-        #         self.last_heading_deviation = 0
-
-
-
-        if self.done_falling:
-            reward += -100000
-            print('====> REWARD Done falling')
-            reward_file.write(f"done_falling:-1 ")
-        if self.done_collision:
-            print("====> REWARD Done collision")
-            reward += -100000
-            reward_file.write(f"done_collision:-1 ")
-        if self.done_time_idle:
-            print("====> REWARD Done idle")
-            reward += -100000
-            reward_file.write(f"done_time_idle:-1 ")
-        if self.done_time_episode:
-            print("====> REWARD Done max time")
-            reward += -100000
-            reward_file.write(f"done_time_episode:-1 ")
-        if self.done_arrived:
-            print("====> REWARD Done arrived")
-            reward += 10000
-            reward_file.write(f"done_arrived:+10 ")
-
-        # print('Reward: ' + str(reward))
-
-
-        reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
-        reward_file.close()
-        print(f'Reward: {reward}')
-        print("------------------------------")
-        time.sleep(0.4)
-        return reward
