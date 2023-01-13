@@ -411,7 +411,7 @@ class DQNExperiment(BaseExperiment):
             elif sensor == "depth_camera_truck":
                 depth_camera_data = sensor_data['depth_camera_truck'][1]
 
-                img = Image.fromarray(sensor_data[2], None)
+                img = Image.fromarray(depth_camera_data, None)
                 img.show()
                 time.sleep(0.005)
                 img.close()
