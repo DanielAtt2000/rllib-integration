@@ -191,8 +191,26 @@ class DQNExperiment(BaseExperiment):
         action.reverse = action_control[3]
         action.hand_brake = action_control[4]
 
-        print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
+        action_msg = ""
 
+        if action_control[0] != 0:
+            action_msg += "Forward"
+
+        if action_control[1] < 0:
+            action_msg += "Left"
+
+        if action_control[1] > 0:
+            action_msg += "Right"
+
+        if action_control[2] != 0:
+            action_msg += "Break"
+
+        if action_msg == "":
+            action_msg += "Coast"
+
+
+        # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
+        print(f"{action_msg}")
 
         self.last_action = action
 
