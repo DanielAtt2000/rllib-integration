@@ -120,7 +120,7 @@ class DQNExperiment(BaseExperiment):
             # 'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
             'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,50]), dtype=np.float32),
 
-            'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
+            # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
             # 'semantic_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
 
         }
@@ -467,7 +467,7 @@ class DQNExperiment(BaseExperiment):
         observation_file.close()
 
         return {'values': np.array(observations),
-                'lidar':lidar_data_padded,
+                # 'lidar':lidar_data_padded,
                 # 'semantic_camera':semantic_camera_data
         }, {}
         # return  np.r_[
