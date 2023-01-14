@@ -113,7 +113,7 @@ def main():
     launch_tensorboard(logdir= path,
                        host="localhost")
 
-    specific_version = True
+    specific_version = False
 
     if check_with_user():
         args.name = args.name + '_' + str(commit_hash())
