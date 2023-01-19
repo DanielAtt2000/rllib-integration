@@ -11,7 +11,7 @@ train_batch_size: 16
 num_steps_sampled_before_learning_starts: 2500
 recreate_failed_workers: True
 replay_buffer_config: {
-  capacity: 1000
+  capacity: 100000
 }
 
 horizon: 6500
