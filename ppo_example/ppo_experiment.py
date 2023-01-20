@@ -494,10 +494,10 @@ class PPOExperiment(BaseExperiment):
             plt.imshow(semantic_camera_data, interpolation='nearest')
             plt.show()
 
-        observation_file = open( os.path.join("results","run_" + str(core.current_time),"observations_" + str(core.current_time) + ".txt"), 'a+')
-        for idx, obs in enumerate(observations):
-            observation_file.write(f"{name_observations[idx]}:{round(obs,5)}\n")
-        observation_file.close()
+        # observation_file = open( os.path.join("results","run_" + str(core.current_time),"observations_" + str(core.current_time) + ".txt"), 'a+')
+        # for idx, obs in enumerate(observations):
+        #     observation_file.write(f"{name_observations[idx]}:{round(obs,5)}\n")
+        # observation_file.close()
 
         return {
                 'values': np.array(observations),
@@ -600,10 +600,12 @@ class PPOExperiment(BaseExperiment):
             self.last_angle_with_center = angle_to_center_of_lane_normalised
             self.last_forward_velocity = forward_velocity
 
-            reward_file = open(os.path.join("results",
-                                            "run_" + str(core.current_time),
-                                            "rewards_" + str(core.current_time) + ".txt")
-                               , 'a+')
+            reward_file_save = True
+            if reward_file_save:
+                reward_file = open(os.path.join("results",
+                                                "run_" + str(core.current_time),
+                                                "rewards_" + str(core.current_time) + ".txt")
+                                   , 'a+')
 
             print("------------------------------")
             # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
@@ -619,7 +621,8 @@ class PPOExperiment(BaseExperiment):
                 if angle_to_center_of_lane_normalised == 0:
                     reward += 1000
                     print(f'====> REWARD for angle to center line is 0, R+= 1')
-                    reward_file.write(f"angle_to_center_of_lane_normalised == 0: +1 ")
+                    if reward_file_save:
+                        reward_file.write(f"angle_to_center_of_lane_normalised == 0: +1 ")
                 else:
                     # Angle with the center line can deviate between 0 and 180 degrees
                     # TODO Check this reward
@@ -629,7 +632,8 @@ class PPOExperiment(BaseExperiment):
                     reward_for_angle = ((reward_for_angle - 1) / (10 - 1))*100
                     reward += reward_for_angle
                     print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
-                    reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised, 5)}: {round(reward_for_angle, 5)} ")
+                    if reward_file_save:
+                        reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised, 5)}: {round(reward_for_angle, 5)} ")
             else:
                 # Negative reward for no velocity
                 reward += -100
@@ -728,29 +732,34 @@ class PPOExperiment(BaseExperiment):
             if self.done_falling:
                 reward += -100000
                 print('====> REWARD Done falling')
-                reward_file.write(f"done_falling:-1 ")
+                if reward_file_save:
+                    reward_file.write(f"done_falling:-1 ")
             if self.done_collision:
                 print("====> REWARD Done collision")
                 reward += -100000
-                reward_file.write(f"done_collision:-1 ")
+                if reward_file_save:
+                    reward_file.write(f"done_collision:-1 ")
             if self.done_time_idle:
                 print("====> REWARD Done idle")
                 reward += -100000
-                reward_file.write(f"done_time_idle:-1 ")
+                if reward_file_save:
+                    reward_file.write(f"done_time_idle:-1 ")
             if self.done_time_episode:
                 print("====> REWARD Done max time")
                 reward += -100000
-                reward_file.write(f"done_time_episode:-1 ")
+                if reward_file_save:
+                    reward_file.write(f"done_time_episode:-1 ")
             if self.done_arrived:
                 print("====> REWARD Done arrived")
                 reward += 10000
-                reward_file.write(f"done_arrived:+10 ")
+                if reward_file_save:
+                    reward_file.write(f"done_arrived:+10 ")
 
             # print('Reward: ' + str(reward))
 
-
-            reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
-            reward_file.close()
+            if reward_file_save:
+                reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
+                reward_file.close()
             print(f'Reward: {reward}')
             print("------------------------------")
             time.sleep(0.4)
