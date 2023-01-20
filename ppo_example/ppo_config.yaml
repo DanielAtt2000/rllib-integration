@@ -19,7 +19,7 @@ horizon: 6500
 #rollout_fragment_length: auto
 
 num_gpus: 1
-num_gpus_per_worker: 1
+#num_gpus_per_worker: 1
 num_cpus_per_worker: 11
 
 #num_workers: 1
