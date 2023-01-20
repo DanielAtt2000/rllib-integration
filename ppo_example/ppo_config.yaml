@@ -1,31 +1,49 @@
 # To see the complete list of configurable parameters see:
 # https://github.com/ray-project/ray/blob/master/rllib/agents/trainer.py
-framework: "torch"
-num_workers: 1
-num_gpus: 1
-#num_gpus_per_worker: 1
-num_cpus_per_worker: 11
-rollout_fragment_length: 16
-#timesteps_per_iteration: 20000
-train_batch_size: 16
-num_steps_sampled_before_learning_starts: 2500
-recreate_failed_workers: True
-replay_buffer_config: {
-  capacity: 100000
-}
 
+
+use_critic: True
+
+gamma: 0.99
+lr: 0.0001
+train_batch_size: 128
+
+clip_rewards: False
+
+framework: "torch"
 horizon: 6500
-double_q: True
-dueling: False
-# "batch_mode": "complete_episodes"
-lr: 0.001
-"exploration_config": {
-   "type": "EpsilonGreedy",
-   "initial_epsilon": 1.0,
-   "final_epsilon": 0.02,
-   "epsilon_timesteps": 1000000
-}
-target_network_update_freq: 8000
+
+
+#num_rollout_workers: 5
+#num_envs_per_worker: 5
+#rollout_fragment_length: auto
+
+num_gpus: 1
+num_gpus_per_worker: 1
+num_cpus_per_worker: 11
+
+#num_workers: 1
+#num_gpus: 1
+##num_gpus_per_worker: 1
+#num_cpus_per_worker: 11
+##timesteps_per_iteration: 20000
+#
+#num_steps_sampled_before_learning_starts: 2500
+#recreate_failed_workers: True
+#replay_buffer_config: {
+#  capacity: 100000
+#}
+#
+#
+## "batch_mode": "complete_episodes"
+#
+#"exploration_config": {
+#   "type": "EpsilonGreedy",
+#   "initial_epsilon": 1.0,
+#   "final_epsilon": 0.02,
+#   "epsilon_timesteps": 1000000
+#}
+#target_network_update_freq: 8000
 #exploration_config: {
 #  type: "SoftQ",
 #  temperature: 1.0,
