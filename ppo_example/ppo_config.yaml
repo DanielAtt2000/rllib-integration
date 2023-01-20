@@ -1,26 +1,26 @@
 # To see the complete list of configurable parameters see:
 # https://github.com/ray-project/ray/blob/master/rllib/agents/trainer.py
 
-
-use_critic: False
-
-gamma: 0.99
-lr: 0.0001
-train_batch_size: 128
-
-clip_rewards: False
-
-framework: "torch"
-horizon: 6500
-
-
-#num_rollout_workers: 5
-#num_envs_per_worker: 5
-#rollout_fragment_length: auto
-
-num_gpus: 1
-#num_gpus_per_worker: 1
-num_cpus_per_worker: 11
+#
+#use_critic: False
+#
+#gamma: 0.99
+#lr: 0.0001
+#train_batch_size: 128
+#
+#clip_rewards: False
+#
+#framework: "torch"
+#horizon: 6500
+#
+#
+##num_rollout_workers: 5
+##num_envs_per_worker: 5
+##rollout_fragment_length: auto
+#
+#num_gpus: 1
+##num_gpus_per_worker: 1
+#num_cpus_per_worker: 11
 
 #num_workers: 1
 #num_gpus: 1
