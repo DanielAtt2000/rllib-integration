@@ -6,16 +6,21 @@
 # This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
 import matplotlib.pyplot as plt
+
+
 import math
 import numpy as np
 from gym.spaces import Box, Discrete, Dict
 import warnings
 import carla
 import os
-
+import time
 from rllib_integration.GetAngle import calculate_angle_with_center_of_lane
+from rllib_integration.TestingWayPointUpdater import plot_points
 from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
+from PIL import Image
+
 
 
 class PPOExperiment(BaseExperiment):
@@ -27,6 +32,7 @@ class PPOExperiment(BaseExperiment):
         self.max_time_episode = self.config["others"]["max_time_episode"]
         self.allowed_types = [carla.LaneType.Driving, carla.LaneType.Parking]
         self.last_angle_with_center = 0
+        self.last_forward_velocity = 0
         self.last_action = None
         self.lidar_points_count = []
         self.min_lidar_values = 1000000
@@ -34,6 +40,8 @@ class PPOExperiment(BaseExperiment):
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
         self.visualiseRoute = False
+        self.visualiseImage = False
+        self.counterThreshold = 100
 
 
     def reset(self):
@@ -55,25 +63,26 @@ class PPOExperiment(BaseExperiment):
 
 
         self.last_angle_with_center = 0
+        self.last_forward_velocity = 0
 
         self.last_no_of_collisions = 0
 
 
         # Saving LIDAR point count
-        file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
-        file_lidar_counts.write(str(self.lidar_points_count))
-        file_lidar_counts.write(str('\n'))
-        file_lidar_counts.close()
-
-        file_lidar_counts = open(os.path.join('lidar_output', 'min_lidar_values.txt'), 'a')
-        file_lidar_counts.write(str("Min Lidar Value:" + str(self.min_lidar_values)))
-        file_lidar_counts.write(str('\n'))
-        file_lidar_counts.close()
-
-        file_lidar_counts = open(os.path.join('lidar_output', 'max_lidar_values.txt'), 'a')
-        file_lidar_counts.write(str("Max Lidar Value:" + str(self.max_lidar_values)))
-        file_lidar_counts.write(str('\n'))
-        file_lidar_counts.close()
+        # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
+        # file_lidar_counts.write(str(self.lidar_points_count))
+        # file_lidar_counts.write(str('\n'))
+        # file_lidar_counts.close()
+        #
+        # file_lidar_counts = open(os.path.join('lidar_output', 'min_lidar_values.txt'), 'a')
+        # file_lidar_counts.write(str("Min Lidar Value:" + str(self.min_lidar_values)))
+        # file_lidar_counts.write(str('\n'))
+        # file_lidar_counts.close()
+        #
+        # file_lidar_counts = open(os.path.join('lidar_output', 'max_lidar_values.txt'), 'a')
+        # file_lidar_counts.write(str("Max Lidar Value:" + str(self.max_lidar_values)))
+        # file_lidar_counts.write(str('\n'))
+        # file_lidar_counts.close()
 
         self.min_lidar_values = 1000000
         self.max_lidar_values = -100000
@@ -109,16 +118,15 @@ class PPOExperiment(BaseExperiment):
         :return:
         """
         spaces = {
-            # 'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,float("inf"),1,1,1]), dtype=np.float32),
-            'values': Box(low=np.array([0,0,0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,1,1,50]), dtype=np.float32),
-
+            'values': Box(low=np.array([0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1]), dtype=np.float32),
+            'depth_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
             # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
-            'semantic_camera': Box(low=0, high=256,shape=(480,640,3), dtype=np.float32),
-
+            # 'semantic_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
         }
         # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
         obs_space = Dict(spaces)
         # print('SAMPLE')
+        # obs_space = Box(low=0, high=256,shape=(240,320,3), dtype=np.float32)
         # print(obs_space.sample())
         return obs_space
 
@@ -128,33 +136,43 @@ class PPOExperiment(BaseExperiment):
         return {
             0: [0.0, 0.00, 0.0, False, False],  # Coast
             1: [0.0, 0.00, 1.0, False, False],  # Apply Break
-            2: [0.0, 0.75, 0.0, False, False],  # Right
-            3: [0.0, 0.50, 0.0, False, False],  # Right
-            4: [0.0, 0.25, 0.0, False, False],  # Right
-            5: [0.0, -0.75, 0.0, False, False],  # Left
-            6: [0.0, -0.50, 0.0, False, False],  # Left
-            7: [0.0, -0.25, 0.0, False, False],  # Left
-            8: [0.3, 0.00, 0.0, False, False],  # Straight
-            9: [0.3, 0.75, 0.0, False, False],  # Right
-            10: [0.3, 0.50, 0.0, False, False],  # Right
-            11: [0.3, 0.25, 0.0, False, False],  # Right
-            12: [0.3, -0.75, 0.0, False, False],  # Left
-            13: [0.3, -0.50, 0.0, False, False],  # Left
-            14: [0.3, -0.25, 0.0, False, False],  # Left
-            15: [0.6, 0.00, 0.0, False, False],  # Straight
-            16: [0.6, 0.75, 0.0, False, False],  # Right
-            17: [0.6, 0.50, 0.0, False, False],  # Right
-            18: [0.6, 0.25, 0.0, False, False],  # Right
-            19: [0.6, -0.75, 0.0, False, False],  # Left
-            20: [0.6, -0.50, 0.0, False, False],  # Left
-            21: [0.6, -0.25, 0.0, False, False],  # Left
-            22: [1.0, 0.00, 0.0, False, False],  # Straight
-            23: [1.0, 0.75, 0.0, False, False],  # Right
-            24: [1.0, 0.50, 0.0, False, False],  # Right
-            25: [1.0, 0.25, 0.0, False, False],  # Right
-            26: [1.0, -0.75, 0.0, False, False],  # Left
-            27: [1.0, -0.50, 0.0, False, False],  # Left
-            28: [1.0, -0.25, 0.0, False, False],  # Left
+            2: [0.5, 0.00, 0.0, False, False],  # Straight
+            3: [1.0, 0.00, 0.0, False, False],  # Straight
+            4: [0.5, 0.50, 0.0, False, False],  # Right
+            5: [0.5, 1.00, 0.0, False, False],  # Right
+            6: [1.0, 0.50, 0.0, False, False],  # Right
+            7: [1.0, 1.00, 0.0, False, False],  # Right
+            8: [0.5, -0.50, 0.0, False, False],  # Left
+            9: [0.5, -1.00, 0.0, False, False],  # Left
+            10: [1.0, -0.50, 0.0, False, False],  # Left
+            11: [1.0, -1.00, 0.0, False, False],  # Left
+            # 2: [0.0, 0.75, 0.0, False, False],  # Right
+            # 3: [0.0, 0.50, 0.0, False, False],  # Right
+            # 4: [0.0, 0.25, 0.0, False, False],  # Right
+            # 5: [0.0, -0.75, 0.0, False, False],  # Left
+            # 6: [0.0, -0.50, 0.0, False, False],  # Left
+            # 7: [0.0, -0.25, 0.0, False, False],  # Left
+            # 2: [0.3, 0.00, 0.0, False, False],  # Straight
+            # 3: [0.3, 0.75, 0.0, False, False],  # Right
+            # 4: [0.3, 0.50, 0.0, False, False],  # Right
+            # 5: [0.3, 0.25, 0.0, False, False],  # Right
+            # 6: [0.3, -0.75, 0.0, False, False],  # Left
+            # 7: [0.3, -0.50, 0.0, False, False],  # Left
+            # 8: [0.3, -0.25, 0.0, False, False],  # Left
+            # 9: [0.6, 0.00, 0.0, False, False],  # Straight
+            # 10: [0.6, 0.75, 0.0, False, False],  # Right
+            # 11: [0.6, 0.50, 0.0, False, False],  # Right
+            # 12: [0.6, 0.25, 0.0, False, False],  # Right
+            # 13: [0.6, -0.75, 0.0, False, False],  # Left
+            # 14: [0.6, -0.50, 0.0, False, False],  # Left
+            # 15: [0.6, -0.25, 0.0, False, False],  # Left
+            # 16: [1.0, 0.00, 0.0, False, False],  # Straight
+            # 17: [1.0, 0.75, 0.0, False, False],  # Right
+            # 18: [1.0, 0.50, 0.0, False, False],  # Right
+            # 19: [1.0, 0.25, 0.0, False, False],  # Right
+            # 20: [1.0, -0.75, 0.0, False, False],  # Left
+            # 21: [1.0, -0.50, 0.0, False, False],  # Left
+            # 22: [1.0, -0.25, 0.0, False, False],  # Left
         }
 
     def compute_action(self, action):
@@ -168,8 +186,26 @@ class PPOExperiment(BaseExperiment):
         action.reverse = action_control[3]
         action.hand_brake = action_control[4]
 
-        # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
+        action_msg = ""
 
+        if action_control[0] != 0:
+            action_msg += " Forward "
+
+        if action_control[1] < 0:
+            action_msg += " Left "
+
+        if action_control[1] > 0:
+            action_msg += " Right "
+
+        if action_control[2] != 0:
+            action_msg += " Break "
+
+        if action_msg == "":
+            action_msg += " Coast "
+
+
+        # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
+        print(f"----------------------------------->{action_msg}")
 
         self.last_action = action
 
@@ -217,11 +253,16 @@ class PPOExperiment(BaseExperiment):
                                0),
                 carla.Rotation(0, 0, 0))
 
+
+        number_of_points_ahead_to_calcualte_angle_with = 2
+
+
         # print(f"BEFORE CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
         # Checking if we have passed the last way point
         in_front_of_waypoint = core.is_in_front_of_waypoint(truck_normalised_transform.location.x, truck_normalised_transform.location.y)
         if in_front_of_waypoint == 0 or in_front_of_waypoint == 1:
             core.last_waypoint_index += 1
+            print('Passed Waypoint <------------')
         else:
             pass
         #print(f"OBS -> Len(route) {len(core.route)}")
@@ -230,8 +271,8 @@ class PPOExperiment(BaseExperiment):
 
 
         # Distance to next waypoint
-        x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index+1].location.x - truck_normalised_transform.location.x, )
-        y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index+1].location.y - truck_normalised_transform.location.y )
+        x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index].location.x - truck_normalised_transform.location.x, )
+        y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index].location.y - truck_normalised_transform.location.y )
         # print(f"DISTANCE TO NEXT WAY POINT X {x_dist_to_next_waypoint}")
         # print(f"DISTANCE TO NEXT WAY POINT Y {y_dist_to_next_waypoint}")
 
@@ -250,7 +291,6 @@ class PPOExperiment(BaseExperiment):
         # TODO Normalise acceleration
         acceleration = self.get_acceleration(core.hero)
 
-        number_of_points_ahead_to_calcualte_angle_with = 5
 
         # Angle to center of lane
         # Normalising it
@@ -258,26 +298,41 @@ class PPOExperiment(BaseExperiment):
             previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_normalised_transform.location,
             next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location)
-        angle_to_center_of_lane_degrees = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
+        angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
-        if self.visualiseRoute and self.counter % 30 == 0:
-            x_route = []
-            y_route = []
-            for point in core.route:
-                # print(f"X: {point.location.x} Y:{point.location.y}")
-                x_route.append(point.location.x)
-                y_route.append(point.location.y)
-            # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
-            plt.plot([x_route.pop(0)],y_route.pop(0),'bo')
-            plt.plot(x_route, y_route,'y^')
-            plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro')
-            plt.plot([truck_normalised_transform.location.x], [truck_normalised_transform.location.y], 'gs')
-            plt.plot([core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.x], [core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.y], 'bo')
-            plt.axis([0.3, 0.7, 0.3, 0.7])
-            # plt.axis([0, 1, 0, 1])
-            plt.title(f'{angle_to_center_of_lane_degrees*180}')
-            plt.gca().invert_yaxis()
-            plt.show()
+
+        if self.visualiseRoute and self.counter > self.counterThreshold:
+            def plot_route():
+                x_route = []
+                y_route = []
+                for point in core.route:
+                    # print(f"X: {point.location.x} Y:{point.location.y}")
+                    x_route.append(point.location.x)
+                    y_route.append(point.location.y)
+                # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
+                plt.plot([x_route.pop(0)],y_route.pop(0),'bo')
+                plt.plot(x_route, y_route,'y^')
+                plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro',label='Previous Waypoint')
+                plt.plot([truck_normalised_transform.location.x], [truck_normalised_transform.location.y], 'gs',label='Current Vehicle Location')
+                plt.plot([core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.x], [core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location.y], 'bo', label=f"{number_of_points_ahead_to_calcualte_angle_with} waypoints ahead")
+                plt.axis([0.3, 0.7, 0.3, 0.7])
+                # plt.axis([0, 1, 0, 1])
+                plt.title(f'{angle_to_center_of_lane_normalised*180}')
+                plt.gca().invert_yaxis()
+                plt.legend(loc='upper center')
+                plt.show()
+
+
+            plot_points(previous_position=core.route[core.last_waypoint_index-1].location,
+                        current_position=truck_normalised_transform.location,
+                        next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location,
+                        current_waypoint=core.route[core.last_waypoint_index].location,
+                        next_waypoint=core.route[core.last_waypoint_index+1].location,
+                        in_front_of_waypoint=in_front_of_waypoint,
+                        angle=angle_to_center_of_lane_degrees)
+
+            # plot_route()
+
         self.counter +=1
 
         # heading = np.sin(transform.rotation.yaw * np.pi / 180)
@@ -285,6 +340,7 @@ class PPOExperiment(BaseExperiment):
 
         lidar_data_padded = None
         semantic_camera_data = None
+        depth_camera_data = None
         for sensor in sensor_data:
             if sensor == 'collision_truck':
                 # TODO change to only take collision with road
@@ -334,6 +390,11 @@ class PPOExperiment(BaseExperiment):
                                   f"WASTING MEMORY")
 
                 number_of_rows_to_pad = self.lidar_max_points - len(lidar_data)
+
+                if number_of_rows_to_pad < 0:
+                    raise Exception(f"number_of_rows_to_pad is negative: {number_of_rows_to_pad}")
+
+
                 lidar_data_padded = np.pad(lidar_data, [(0, number_of_rows_to_pad), (0, 0)], mode='constant', constant_values=-1)
 
 
@@ -362,6 +423,19 @@ class PPOExperiment(BaseExperiment):
 
                 assert lidar_data_padded is not None
 
+            elif sensor == "depth_camera_truck":
+                depth_camera_data = sensor_data['depth_camera_truck'][1]
+
+                # img = Image.fromarray(depth_camera_data, None)
+                # img.show()
+                # time.sleep(0.005)
+                # img.close()
+                #
+                # print(depth_camera_data.shape)
+
+                assert depth_camera_data is not None
+
+
         # print("OBSERVATIONS START")
         # print(f"truck_normalised_transform.location.x {truck_normalised_transform.location.x}")
         # print(f"truck_normalised_transform.location.y {truck_normalised_transform.location.y}")
@@ -369,7 +443,7 @@ class PPOExperiment(BaseExperiment):
         # print(f"acceleration {acceleration}")
         # print(f"x_dist_to_next_waypoint {x_dist_to_next_waypoint}")
         # print(f"y_dist_to_next_waypoint {y_dist_to_next_waypoint}")
-        # print(f"angle_to_center_of_lane_degrees {angle_to_center_of_lane_degrees}")
+        # print(f"angle_to_center_of_lane_normalised {angle_to_center_of_lane_normalised}")
         # print("OBSERVATIONS STOP")
 
 
@@ -380,7 +454,7 @@ class PPOExperiment(BaseExperiment):
         #         # np.float32(acceleration),
         #         # np.float32(x_dist_to_next_waypoint),
         #         # np.float32(y_dist_to_next_waypoint),
-        #         # np.float32(angle_to_center_of_lane_degrees),
+        #         # np.float32(angle_to_center_of_lane_normalised),
         #         #LIDAR
         #         # Last action here?
         #     ]
@@ -393,35 +467,43 @@ class PPOExperiment(BaseExperiment):
         # 40 meters inside diameter
         roundabout_diameter = 40
 
-        name_observations = ["truck_normalised_transform.location.x",
-                             "truck_normalised_transform.location.y",
+        name_observations = [
+                            # "truck_normalised_transform.location.x",
+                            #  "truck_normalised_transform.location.y",
                              "forward_velocity",
                              "forward_velocity_x",
                              "forward_velocity_y",
                              "x_dist_to_next_waypoint",
                              "y_dist_to_next_waypoint",
-                             "angle_to_center_of_lane_degrees",
-                             "roundabout_diameter"]
+                             "angle_to_center_of_lane_normalised",
+                             # "roundabout_diameter"
+        ]
         observations = [
-            np.float32(truck_normalised_transform.location.x),
-            np.float32(truck_normalised_transform.location.y),
+            # np.float32(truck_normalised_transform.location.x),
+            # np.float32(truck_normalised_transform.location.y),
             np.float32(forward_velocity),
             np.float32(forward_velocity_x),
             np.float32(forward_velocity_y),
             np.float32(x_dist_to_next_waypoint),
             np.float32(y_dist_to_next_waypoint),
-            np.float32(angle_to_center_of_lane_degrees),
-            np.float32(roundabout_diameter)
+            np.float32(angle_to_center_of_lane_normalised),
+            # np.float32(roundabout_diameter)
                            ]
+
+        if self.visualiseImage and self.counter > self.counterThreshold:
+            plt.imshow(semantic_camera_data, interpolation='nearest')
+            plt.show()
 
         observation_file = open( os.path.join("results","run_" + str(core.current_time),"observations_" + str(core.current_time) + ".txt"), 'a+')
         for idx, obs in enumerate(observations):
             observation_file.write(f"{name_observations[idx]}:{round(obs,5)}\n")
         observation_file.close()
 
-        return {'values': np.array(observations),
+        return {
+                'values': np.array(observations),
+                'depth_camera': depth_camera_data,
                 # 'lidar':lidar_data_padded,
-                'semantic_camera':semantic_camera_data
+                # 'semantic_camera':semantic_camera_data
         }, {}
         # return  np.r_[
         #                 np.float32(truck_normalised_transform.location.x),
@@ -430,7 +512,7 @@ class PPOExperiment(BaseExperiment):
         #                 np.float32(acceleration),
         #                 np.float32(x_dist_to_next_waypoint),
         #                 np.float32(y_dist_to_next_waypoint),
-        #                 np.float32(angle_to_center_of_lane_degrees),
+        #                 np.float32(angle_to_center_of_lane_normalised),
         #                 #LIDAR
         #                 # Last action here?
         #             ], {}
@@ -466,7 +548,7 @@ class PPOExperiment(BaseExperiment):
         #print("Inside Complete Route")
         #print(f"Len(core.route) -2 : {len(core.route) -2 }")
         #print(f"core.last_waypoint_index{core.last_waypoint_index}")
-        if len(core.route) - 11 == core.last_waypoint_index:
+        if len(core.route) - 15 <= core.last_waypoint_index:
             return True
 
 
@@ -507,160 +589,195 @@ class PPOExperiment(BaseExperiment):
 
         reward = 0
 
-        # Observations
-        # np.float32(truck_normalised_transform.location.x),
-        # np.float32(truck_normalised_transform.location.y),
-        # np.float32(forward_velocity),
-        # np.float32(acceleration),
-        # np.float32(x_dist_to_next_waypoint),
-        # np.float32(y_dist_to_next_waypoint),
-        # np.float32(angle_to_center_of_lane_degrees),
+        with_values = True
 
+        if with_values:
 
-        forward_velocity = observation['values'][2]
-        angle_to_center_of_lane_degrees = observation['values'][7]
-        self.last_angle_with_center = angle_to_center_of_lane_degrees
-        # print(f"angle with center in REWARD {angle_to_center_of_lane_degrees}")
+            forward_velocity = observation['values'][0]
+            x_dist_to_next_waypoint = observation['values'][3]
+            y_dist_to_next_waypoint = observation['values'][4]
+            angle_to_center_of_lane_normalised = observation['values'][5]
+            self.last_angle_with_center = angle_to_center_of_lane_normalised
+            self.last_forward_velocity = forward_velocity
 
-        reward_file = open(os.path.join("results",
-                                        "run_" + str(core.current_time),
-                                        "rewards_" + str(core.current_time) + ".txt")
-                           , 'a+')
+            reward_file = open(os.path.join("results",
+                                            "run_" + str(core.current_time),
+                                            "rewards_" + str(core.current_time) + ".txt")
+                               , 'a+')
 
+            print("------------------------------")
+            # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
+            # print('Forward Velocity ' + str(forward_velocity))
+            if forward_velocity > 0.05:
 
-        print("Angle with center line %.5f " % (angle_to_center_of_lane_degrees*180) )
-        if forward_velocity > 0.05:
-            # When the angle with the center line is 0 the highest reward is given
-            if angle_to_center_of_lane_degrees == 0:
-                reward += 1
-                print(f'====> REWARD for angle to center line is 0, R+= 1')
-                reward_file.write(f"angle_to_center_of_lane_degrees == 0: +1 ")
+                hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
+                reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
+                reward += reward_hyp_distance_to_next_waypoint
+                print(f"hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
+
+                # When the angle with the center line is 0 the highest reward is given
+                if angle_to_center_of_lane_normalised == 0:
+                    reward += 1000
+                    print(f'====> REWARD for angle to center line is 0, R+= 1')
+                    reward_file.write(f"angle_to_center_of_lane_normalised == 0: +1 ")
+                else:
+                    # Angle with the center line can deviate between 0 and 180 degrees
+                    # TODO Check this reward
+                    # Maybe this wil be too high?
+                    # Since the RL can stay there and get the reward
+                    reward_for_angle = 1 / (angle_to_center_of_lane_normalised)
+                    reward_for_angle = ((reward_for_angle - 1) / (10 - 1))*100
+                    reward += reward_for_angle
+                    print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
+                    reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised, 5)}: {round(reward_for_angle, 5)} ")
             else:
-                # Angle with the center line can deviate between 0 and 180 degrees
-                # TODO Check this reward
-                # Maybe this wil be too high?
-                # Since the RL can stay there and get the reward
-                reward += np.clip(1/(angle_to_center_of_lane_degrees*180),0,1)
-                print(f'====> REWARD for angle ({round(angle_to_center_of_lane_degrees,5)}) to center line { round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)}')
-                reward_file.write(f"angle_to_center_of_lane_degrees is {round(angle_to_center_of_lane_degrees,5)}: {round(np.clip(1/(angle_to_center_of_lane_degrees*180),0,1),5)} ")
+                # Negative reward for no velocity
+                reward += -100
 
+            # Positive reward for higher velocity
+            # Already normalised in observations
+            # reward += forward_velocity
+            # print(f' REWARD for forward_velocity {forward_velocity} ')
+            # reward_file.write(f"forward_velocity: {round(forward_velocity,5)} ")
 
-        # Positive reward for higher velocity
-        # Already normalised in observations
-        # reward += forward_velocity
-        # print(f' REWARD for forward_velocity {forward_velocity} ')
-        # reward_file.write(f"forward_velocity: {round(forward_velocity,5)} ")
-
-        # Negative reward each time step to push for completing the task.
-        # reward += -0.01
-        # reward_file.write(f"negative reward: -0.01 ")
+            # Negative reward each time step to push for completing the task.
+            # reward += -0.01
+            # reward_file.write(f"negative reward: -0.01 ")
 
 
 
 
-        # Current position and heading of the vehicle
-        # velocity
-        # Final position and heading
+            # Current position and heading of the vehicle
+            # velocity
+            # Final position and heading
 
-        # collision
-        # laneInvasion
-        # Time
-
-
-        # # Hero-related variables
-        # hero_location = hero.get_location()
-        # # hero_velocity = self.get_speed(hero)
-        # hero_heading = hero.get_transform().get_forward_vector()
-        # hero_heading = [hero_heading.x, hero_heading.y]
-        #
-        # # Initialize last location
-        # if self.last_location == None:
-        #     self.last_location = hero_location
-
-        # Compute deltas
-        # delta_distance = float(np.sqrt(np.square(hero_location.x - self.last_location.x) + np.square(hero_location.y - self.last_location.y)))
-
-        # Reward if going forward
-        # reward = delta_distance
-        # delta_velocity = hero_velocity - self.last_velocity
+            # collision
+            # laneInvasion
+            # Time
 
 
-        # print('Distance to finish: ' + str(hero_dist_to_finish))
-        # reward += 100 * (self.last_dist_to_finish - hero_dist_to_finish)
+            # # Hero-related variables
+            # hero_location = hero.get_location()
+            # # hero_velocity = self.get_speed(hero)
+            # hero_heading = hero.get_transform().get_forward_vector()
+            # hero_heading = [hero_heading.x, hero_heading.y]
+            #
+            # # Initialize last location
+            # if self.last_location == None:
+            #     self.last_location = hero_location
 
-        # print('Delta distance ' + str(100 * (self.last_dist_to_finish - hero_dist_to_finish)))
+            # Compute deltas
+            # delta_distance = float(np.sqrt(np.square(hero_location.x - self.last_location.x) + np.square(hero_location.y - self.last_location.y)))
 
-        # Update variables
-        # self.last_location = hero_location
-        # self.last_velocity = hero_velocity
-        # self.last_dist_to_finish = hero_dist_to_finish
-        #
-
+            # Reward if going forward
+            # reward = delta_distance
+            # delta_velocity = hero_velocity - self.last_velocity
 
 
+            # print('Distance to finish: ' + str(hero_dist_to_finish))
+            # reward += 100 * (self.last_dist_to_finish - hero_dist_to_finish)
 
-        # Reward if going faster than last step
-        # if hero_velocity < 20.0:
-        #     reward += 0.05 * delta_velocity
+            # print('Delta distance ' + str(100 * (self.last_dist_to_finish - hero_dist_to_finish)))
 
-        # La duracion de estas infracciones deberia ser 2 segundos?
-        # Penalize if not inside the lane
-        # closest_waypoint = map_.get_waypoint(
-        #     hero_location,
-        #     project_to_road=False,
-        #     lane_type=carla.LaneType.Any
-        # )
-        # if closest_waypoint is None or closest_waypoint.lane_type not in self.allowed_types:
-        #     reward += -0.5
-        #     self.last_heading_deviation = math.pi
-        # else:
-        #     if not closest_waypoint.is_junction:
-        #         wp_heading = closest_waypoint.transform.get_forward_vector()
-        #         wp_heading = [wp_heading.x, wp_heading.y]
-        #         angle = compute_angle(hero_heading, wp_heading)
-        #         self.last_heading_deviation = abs(angle)
-        #
-        #         if np.dot(hero_heading, wp_heading) < 0:
-        #             # We are going in the wrong direction
-        #             reward += -0.5
-        #
-        #         else:
-        #             if abs(math.sin(angle)) > 0.4:
-        #                 if self.last_action == None:
-        #                     self.last_action = carla.VehicleControl()
-        #
-        #                 if self.last_action.steer * math.sin(angle) >= 0:
-        #                     reward -= 0.05
-        #     else:
-        #         self.last_heading_deviation = 0
+            # Update variables
+            # self.last_location = hero_location
+            # self.last_velocity = hero_velocity
+            # self.last_dist_to_finish = hero_dist_to_finish
+            #
 
 
 
-        if self.done_falling:
-            reward += -1
-            print('====> REWARD Done falling')
-            reward_file.write(f"done_falling:-1 ")
-        if self.done_collision:
-            print("====> REWARD Done collision")
-            reward += -1
-            reward_file.write(f"done_collision:-1 ")
-        if self.done_time_idle:
-            print("====> REWARD Done idle")
-            reward += -1
-            reward_file.write(f"done_time_idle:-1 ")
-        if self.done_time_episode:
-            print("====> REWARD Done max time")
-            reward += -1
-            reward_file.write(f"done_time_episode:-1 ")
-        if self.done_arrived:
-            print("====> REWARD Done arrived")
-            reward += 10
-            reward_file.write(f"done_arrived:+10 ")
 
-        # print('Reward: ' + str(reward))
+            # Reward if going faster than last step
+            # if hero_velocity < 20.0:
+            #     reward += 0.05 * delta_velocity
+
+            # La duracion de estas infracciones deberia ser 2 segundos?
+            # Penalize if not inside the lane
+            # closest_waypoint = map_.get_waypoint(
+            #     hero_location,
+            #     project_to_road=False,
+            #     lane_type=carla.LaneType.Any
+            # )
+            # if closest_waypoint is None or closest_waypoint.lane_type not in self.allowed_types:
+            #     reward += -0.5
+            #     self.last_heading_deviation = math.pi
+            # else:
+            #     if not closest_waypoint.is_junction:
+            #         wp_heading = closest_waypoint.transform.get_forward_vector()
+            #         wp_heading = [wp_heading.x, wp_heading.y]
+            #         angle = compute_angle(hero_heading, wp_heading)
+            #         self.last_heading_deviation = abs(angle)
+            #
+            #         if np.dot(hero_heading, wp_heading) < 0:
+            #             # We are going in the wrong direction
+            #             reward += -0.5
+            #
+            #         else:
+            #             if abs(math.sin(angle)) > 0.4:
+            #                 if self.last_action == None:
+            #                     self.last_action = carla.VehicleControl()
+            #
+            #                 if self.last_action.steer * math.sin(angle) >= 0:
+            #                     reward -= 0.05
+            #     else:
+            #         self.last_heading_deviation = 0
 
 
-        reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
-        reward_file.close()
-        # print(f'Reward: {reward}')
-        return reward
+
+            if self.done_falling:
+                reward += -100000
+                print('====> REWARD Done falling')
+                reward_file.write(f"done_falling:-1 ")
+            if self.done_collision:
+                print("====> REWARD Done collision")
+                reward += -100000
+                reward_file.write(f"done_collision:-1 ")
+            if self.done_time_idle:
+                print("====> REWARD Done idle")
+                reward += -100000
+                reward_file.write(f"done_time_idle:-1 ")
+            if self.done_time_episode:
+                print("====> REWARD Done max time")
+                reward += -100000
+                reward_file.write(f"done_time_episode:-1 ")
+            if self.done_arrived:
+                print("====> REWARD Done arrived")
+                reward += 10000
+                reward_file.write(f"done_arrived:+10 ")
+
+            # print('Reward: ' + str(reward))
+
+
+            reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
+            reward_file.close()
+            print(f'Reward: {reward}')
+            print("------------------------------")
+            time.sleep(0.4)
+            return reward
+
+        else:
+
+            reward = reward + (1/self.y_dist_to_finish)
+            reward = reward + (1/self.x_dist_to_finish)
+
+            if self.done_falling:
+                reward += -100000
+                print('====> REWARD Done falling')
+            if self.done_collision:
+                print("====> REWARD Done collision")
+                reward += -100000
+            if self.done_time_idle:
+                print("====> REWARD Done idle")
+                reward += -100000
+            if self.done_time_episode:
+                print("====> REWARD Done max time")
+                reward += -100000
+            if self.done_arrived:
+                print("====> REWARD Done arrived")
+                reward += 10000
+            print(f'Reward: {reward}')
+            print("------------------------------")
+            time.sleep(0.4)
+            return reward
+

@@ -12,6 +12,8 @@ from __future__ import print_function
 
 import argparse
 import os
+import random
+
 import yaml
 
 import ray
@@ -104,13 +106,26 @@ def main():
     args = argparser.parse_args()
     args.config = parse_config(args)
 
+    path = os.path.join(args.directory, args.name + '_' + str(commit_hash()))
 
-    launch_tensorboard(logdir=os.path.join(args.directory, args.name),
+
+    launch_tensorboard(logdir= path,
                        host="localhost")
+
+    specific_version = False
 
     if check_with_user():
         args.name = args.name + '_' + str(commit_hash())
-        run(args)
+
+        if specific_version:
+            args.name = "dqn_9b664eb1e1"
+            x = random.randint(0,100)
+            inp = input(f'SPECIFIC NAME APPLIED ENTER {x} to confirm:')
+
+            if int(x) == int(inp):
+                run(args)
+        else:
+            run(args)
 
 if __name__ == '__main__':
 

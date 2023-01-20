@@ -13,17 +13,30 @@ from ray.rllib.algorithms.callbacks import DefaultCallbacks
 
 class PPOCallbacks(DefaultCallbacks):
     def on_episode_start(self, worker, base_env, policies, episode, **kwargs):
-        episode.user_data["heading_deviation"] = []
+        episode.user_data["angle_with_center"] = []
+        episode.user_data["forward_velocity"] = []
 
     def on_episode_step(self, worker, base_env, episode, **kwargs):
-        heading_deviation = worker.env.experiment.last_heading_deviation
-        if heading_deviation > 0:
-            episode.user_data["heading_deviation"].append(heading_deviation)
+        # Angle with center
+        last_angle_with_center = worker.env.experiment.last_angle_with_center
+        # if last_angle_with_center >= 0:
+        episode.user_data["angle_with_center"].append(last_angle_with_center)
 
+        # Forward Velocity
+        last_forward_velocity = worker.env.experiment.last_forward_velocity
+        episode.user_data["forward_velocity"].append(last_forward_velocity)
     def on_episode_end(self, worker, base_env, policies, episode, **kwargs):
-        heading_deviation = episode.user_data["heading_deviation"]
-        if len(heading_deviation) > 0:
-            heading_deviation = np.mean(episode.user_data["heading_deviation"])
+        last_angle_with_center = episode.user_data["angle_with_center"]
+        if len(last_angle_with_center) > 0:
+            last_angle_with_center = np.mean(episode.user_data["angle_with_center"])
         else:
-            heading_deviation = 0
-        episode.custom_metrics["heading_deviation"] = heading_deviation
+            last_angle_with_center = 0
+        episode.custom_metrics["angle_with_center"] = last_angle_with_center
+
+        # Forward Velocity
+        last_forward_velocity = episode.user_data["forward_velocity"]
+        if len(last_forward_velocity) > 0:
+            last_forward_velocity = np.mean(episode.user_data["forward_velocity"])
+        else:
+            last_forward_velocity = 0
+        episode.custom_metrics["forward_velocity"] = last_forward_velocity

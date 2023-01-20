@@ -2,21 +2,30 @@
 # https://github.com/ray-project/ray/blob/master/rllib/agents/trainer.py
 framework: "torch"
 num_workers: 1
-num_gpus_per_worker: 1
+num_gpus: 1
+#num_gpus_per_worker: 1
 num_cpus_per_worker: 11
-#rollout_fragment_length: 16
+rollout_fragment_length: 16
 #timesteps_per_iteration: 20000
-#train_batch_size: 128
-#learning_starts: 20000
-#buffer_size: 1
+train_batch_size: 16
+num_steps_sampled_before_learning_starts: 2500
+recreate_failed_workers: True
+replay_buffer_config: {
+  capacity: 100000
+}
+
+horizon: 6500
+double_q: True
+dueling: False
 # "batch_mode": "complete_episodes"
-lr: 0.01
-# "exploration_config": {
-#   "type": "EpsilonGreedy",
-#   "initial_epsilon": 1.0,
-#   "final_epsilon": 0.02,
-#   "epsilon_timesteps": 2000000
-# }
+lr: 0.001
+"exploration_config": {
+   "type": "EpsilonGreedy",
+   "initial_epsilon": 1.0,
+   "final_epsilon": 0.02,
+   "epsilon_timesteps": 1000000
+}
+target_network_update_freq: 8000
 #exploration_config: {
 #  type: "SoftQ",
 #  temperature: 1.0,
@@ -39,10 +48,11 @@ lr: 0.01
 env_config:
   carla:
     host: "192.168.1.113"
+#    host: "172.17.0.1"
 #   host: "127.0.0.1"
     timeout: 30.0
     # IF YOU ARE GOING TO CHANGE THE TIMESTEP CHANGE rotation_frequency of LIDAR
-    timestep: 0.05 # IMP IMP
+    timestep: 0.07 # IMP IMP
     # IMP
     retries_on_error: 25
     resolution_x: 300
@@ -61,26 +71,29 @@ env_config:
 #      blueprintTruck: "DAFxf"
       blueprintTruck: "vehicle.audi.a2"
       blueprintTrailer: "trailer"
-      lidar_max_points : 2500
+      lidar_max_points : 3000
       sensors:
 #        obstacle:
 #          type: "sensor.other.obstacle"
         collision:
           type: "sensor.other.collision"
-#        lidar:
+        depth_camera:
+          type: "sensor.camera.depth"
+          transform: '0.0,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
+#       lidar:
 #          type: "sensor.lidar.ray_cast_semantic"
 #          channels : "32"
 #          range : "30.0"
-#          points_per_second : "56000"
-#          rotation_frequency : "20" #  IMP THIS IS 1 / delta (timestep)
+#          points_per_second : "45000"
+#          rotation_frequency : "14.3" #  IMP THIS IS 1 / delta (timestep)
 #          upper_fov : '5.0'
 #          lower_fov : '-15.0'
 #          horizontal_fov : '360.0'
 #          sensor_tick : '0'
 #          transform : '0.0,0.0,1.6,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
-        semantic_camera:
-          type: "sensor.camera.semantic_segmentation"
-          transform: '0.0,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
+#        semantic_camera:
+#          type: "sensor.camera.semantic_segmentation"
+#          transform: '0.0,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
       #        laneInvasion:
 #          type: "sensor.other.lane_invasion"
       spawn_points: [

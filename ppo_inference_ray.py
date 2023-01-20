@@ -22,6 +22,9 @@ from dqn.dqn_experiment import DQNExperiment
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
 EXPERIMENT_CLASS = DQNExperiment
 
+# RUN FUNCTION
+# python3 ./ppo_inference_ray.py dqn/dqn_config.yaml "/home/daniel/ray_results/carla_rllib/dqn_9b664eb1e1/CustomDQNTrainer_CarlaEnv_fc10a_00000_0_2023-01-16_19-09-57/checkpoint_000219"
+
 def parse_config(args):
     """
     Parses the .yaml configuration file into a readable dictionary
