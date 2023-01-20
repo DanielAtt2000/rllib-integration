@@ -2,7 +2,7 @@ import random
 
 from git import Repo
 
-def check_with_user():
+def check_with_user(check_commit):
     repo = Repo('.')
     verify_num = random.randint(0,100)
     print('=========================================')
@@ -11,7 +11,7 @@ def check_with_user():
     print('Using the latest version of the experiment?')
     print('=========================================')
 
-    if repo.is_dirty():
+    if repo.is_dirty() and check_commit:
         print('----------> Uncommitted files <-------------')
         return False
 

@@ -1,6 +1,7 @@
 # To see the complete list of configurable parameters see:
 # https://github.com/ray-project/ray/blob/master/rllib/agents/trainer.py
 
+framework: "torch"
 #
 #use_critic: False
 #
@@ -10,7 +11,7 @@
 #
 #clip_rewards: False
 #
-#framework: "torch"
+
 #horizon: 6500
 #
 #
