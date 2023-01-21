@@ -10,7 +10,7 @@ import random
 #                                })
 
 # For PC
-spawn_points = pd.DataFrame(data={'N_IN':[34], 'N_OUT':[25],
+spawn_points = pd.DataFrame(data={'N_IN':[34,40,41,42,43,44], 'N_OUT':[25],
                                'W_IN': [20], 'W_OUT': [12],
                               'S_IN':[15], 'S_OUT':[10],
                                'E_IN':[29], 'E_OUT':[2]
