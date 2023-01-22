@@ -15,6 +15,7 @@ class PPOCallbacks(DefaultCallbacks):
     def on_episode_start(self, worker, base_env, policies, episode, **kwargs):
         episode.user_data["angle_with_center"] = []
         episode.user_data["forward_velocity"] = []
+        episode.user_data["custom_done_arrived"] = -1
 
     def on_episode_step(self, worker, base_env, episode, **kwargs):
         # Angle with center
@@ -40,3 +41,12 @@ class PPOCallbacks(DefaultCallbacks):
         else:
             last_forward_velocity = 0
         episode.custom_metrics["forward_velocity"] = last_forward_velocity
+
+        if not worker.env.experiment.custom_done_arrived:
+            episode.custom_metrics["custom_done_arrived"] = 0
+
+        elif worker.env.experiment.custom_done_arrived:
+            episode.custom_metrics["custom_done_arrived"] = 1
+
+        else:
+            episode.custom_metrics["custom_done_arrived"] = -2

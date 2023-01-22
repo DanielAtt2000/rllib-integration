@@ -33,6 +33,7 @@ class PPOExperiment(BaseExperiment):
         self.allowed_types = [carla.LaneType.Driving, carla.LaneType.Parking]
         self.last_angle_with_center = 0
         self.last_forward_velocity = 0
+        self.custom_done_arrived = False
         self.last_action = None
         self.lidar_points_count = []
         self.min_lidar_values = 1000000
@@ -55,6 +56,7 @@ class PPOExperiment(BaseExperiment):
         self.done_time_episode = False
         self.done_collision = False
         self.done_arrived = False
+        self.custom_done_arrived = False
 
         # hero variables
         self.last_location = None
@@ -568,6 +570,7 @@ class PPOExperiment(BaseExperiment):
         self.done_arrived = self.completed_route(core)
 
         output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision or self.done_arrived
+        self.custom_done_arrived = self.done_arrived
         return bool(output)
 
     def compute_reward(self, observation, core):
