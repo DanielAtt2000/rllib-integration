@@ -12,19 +12,19 @@ import argparse
 import yaml
 
 import ray
-from ray.rllib.algorithms.ppo import PPO
+from ray.rllib.algorithms.dqn import DQN
 
 from rllib_integration.carla_env import CarlaEnv
 from rllib_integration.carla_core import kill_all_servers
 
-from ppo_example.ppo_experiment import PPOExperiment
+from dqn.dqn_experiment import DQNExperiment
 
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
-EXPERIMENT_CLASS = PPOExperiment
+EXPERIMENT_CLASS = DQNExperiment
 
 # RUN FUNCTION
-# python3 ./ppo_inference_ray.py ppo_example/ppo_config.yaml "/home/daniel/ray_results/carla_rllib/ppo_77e99cc55c/CustomPPOTrainer_CarlaEnv_e71d2_00000_0_2023-01-21_15-14-24/checkpoint_000571"
-#
+# python3 ./dqn_inference_ray.py dqn/dqn_config.yaml "/home/daniel/ray_results/carla_rllib/dqn_9b664eb1e1/CustomDQNTrainer_CarlaEnv_fc10a_00000_0_2023-01-16_19-09-57/checkpoint_000219"
+# /home/daniel/ray_results/carla_rllib/ppo_77e99cc55c/CustomPPOTrainer_CarlaEnv_e71d2_00000_0_2023-01-21_15-14-24/checkpoint_000571
 def parse_config(args):
     """
     Parses the .yaml configuration file into a readable dictionary
@@ -57,7 +57,7 @@ def main():
         ray.init()
 
         # Restore agent
-        agent = PPO(env=CarlaEnv, config=args.config)
+        agent = DQN(env=CarlaEnv, config=args.config)
         agent.restore(args.checkpoint)
 
         # Initalize the CARLA environment
