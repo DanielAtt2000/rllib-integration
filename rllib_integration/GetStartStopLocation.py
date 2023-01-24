@@ -50,9 +50,9 @@ def get_entry_exit_spawn_point_indices(failed_spawn_locations,debug=False):
     if entry_spawn_point_index == -1 or exit_spawn_point_index == -1:
         raise Exception('Failed to find spawnable location')
     #TEMP
-    temp_entry_points = [34,40,41,42,43,44]
-    entry_spawn_point_index = random.choice(temp_entry_points)
-    exit_spawn_point_index = 10
+    # temp_entry_points = [34,40,41,42,43,44]
+    # entry_spawn_point_index = random.choice(temp_entry_points)
+    # exit_spawn_point_index = 10
     return entry_spawn_point_index, exit_spawn_point_index
 
 
