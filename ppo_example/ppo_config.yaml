@@ -15,7 +15,7 @@ clip_rewards: False
 
 horizon: 6500
 vf_clip_param: 20000
-log_level: "DEBUG"
+log_level: "INFO"
 
 
 #num_rollout_workers: 5
