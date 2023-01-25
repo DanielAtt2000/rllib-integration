@@ -207,7 +207,7 @@ class PPOExperiment(BaseExperiment):
 
 
         # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
-        print(f"----------------------------------->{action_msg}")
+        # print(f"----------------------------------->{action_msg}")
 
         self.last_action = action
 
@@ -264,7 +264,7 @@ class PPOExperiment(BaseExperiment):
         in_front_of_waypoint = core.is_in_front_of_waypoint(truck_normalised_transform.location.x, truck_normalised_transform.location.y)
         if in_front_of_waypoint == 0 or in_front_of_waypoint == 1:
             core.last_waypoint_index += 1
-            print('Passed Waypoint <------------')
+            # print('Passed Waypoint <------------')
         else:
             pass
         #print(f"OBS -> Len(route) {len(core.route)}")
@@ -610,7 +610,7 @@ class PPOExperiment(BaseExperiment):
                                                 "rewards_" + str(core.current_time) + ".txt")
                                    , 'a+')
 
-            print("------------------------------")
+            # print("------------------------------")
             # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
             # print('Forward Velocity ' + str(forward_velocity))
             if forward_velocity > 0.05:
@@ -618,7 +618,7 @@ class PPOExperiment(BaseExperiment):
                 hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
                 reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
                 reward += reward_hyp_distance_to_next_waypoint
-                print(f"hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
+                # print(f"hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
 
                 # When the angle with the center line is 0 the highest reward is given
                 if angle_to_center_of_lane_normalised == 0:
@@ -634,7 +634,7 @@ class PPOExperiment(BaseExperiment):
                     reward_for_angle = 1 / (angle_to_center_of_lane_normalised)
                     reward_for_angle = ((reward_for_angle - 1) / (10 - 1))*100
                     reward += reward_for_angle
-                    print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
+                    # print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
                     if reward_file_save:
                         reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised, 5)}: {round(reward_for_angle, 5)} ")
             else:
@@ -763,8 +763,8 @@ class PPOExperiment(BaseExperiment):
             if reward_file_save:
                 reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
                 reward_file.close()
-            print(f'Reward: {reward}')
-            print("------------------------------")
+            # print(f'Reward: {reward}')
+            # print("------------------------------")
             time.sleep(0.4)
             return reward
 
@@ -788,8 +788,8 @@ class PPOExperiment(BaseExperiment):
             if self.done_arrived:
                 print("====> REWARD Done arrived")
                 reward += 10000
-            print(f'Reward: {reward}')
-            print("------------------------------")
+            # print(f'Reward: {reward}')
+            # print("------------------------------")
             time.sleep(0.4)
             return reward
 
