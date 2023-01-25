@@ -6,7 +6,7 @@ num_workers: 1
 
 gamma: 0.99
 lr: 0.0001
-train_batch_size: 128
+train_batch_size: 64
 
 clip_rewards: False
 
