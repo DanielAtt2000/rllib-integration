@@ -13,7 +13,6 @@ clip_rewards: False
 
 
 horizon: 6500
-vf_clip_param: 20000
 log_level: "INFO"
 
 
