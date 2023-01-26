@@ -110,7 +110,7 @@ class BaseCamera(CarlaSensor):
         from PIL import Image
 
         sourceimage = Image.fromarray(array)  # original image of size 150x150
-        resized_image = sourceimage.resize((320, 240) )  # resized image of size 24x24
+        resized_image = sourceimage.resize((84, 84) )  # resized image of size 24x24
         array = np.array(resized_image)
 
         return array

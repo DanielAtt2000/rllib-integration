@@ -121,7 +121,7 @@ class SACExperiment(BaseExperiment):
         """
         spaces = {
             'values': Box(low=np.array([0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1]), dtype=np.float32),
-            'depth_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
+            'depth_camera': Box(low=0, high=256,shape=(84,84,3), dtype=np.float32),
             # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
             # 'semantic_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
         }
@@ -501,7 +501,7 @@ class SACExperiment(BaseExperiment):
                            ]
 
         if self.visualiseImage and self.counter > self.counterThreshold:
-            plt.imshow(semantic_camera_data, interpolation='nearest')
+            plt.imshow(depth_camera_data, interpolation='nearest')
             plt.show()
 
         # observation_file = open( os.path.join("results","run_" + str(core.current_time),"observations_" + str(core.current_time) + ".txt"), 'a+')
