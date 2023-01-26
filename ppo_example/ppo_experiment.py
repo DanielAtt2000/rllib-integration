@@ -303,7 +303,7 @@ class PPOExperiment(BaseExperiment):
         angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
 
-        if self.visualiseRoute and self.counter > self.counterThreshold:
+        if self.visualiseRoute and self.counter > self.counterThreshold and self.counter < self.counterThreshold+2:
             def plot_route():
                 x_route = []
                 y_route = []
