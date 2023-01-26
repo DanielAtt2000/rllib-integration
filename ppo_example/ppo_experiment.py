@@ -325,6 +325,14 @@ class PPOExperiment(BaseExperiment):
                 plt.show()
 
 
+            print(f"previous_position={core.route[core.last_waypoint_index-1].location}")
+            print(f"current_position={truck_normalised_transform.location}")
+            print(f"next_position={core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location}")
+            print(f"current_waypoint={core.route[core.last_waypoint_index].location}")
+            print(f"next_waypoint={core.route[core.last_waypoint_index+1].location}")
+            print(f"in_front_of_waypoint={in_front_of_waypoint}")
+            print(f"angle={angle_to_center_of_lane_degrees}")
+
             plot_points(previous_position=core.route[core.last_waypoint_index-1].location,
                         current_position=truck_normalised_transform.location,
                         next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location,
