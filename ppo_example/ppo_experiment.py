@@ -264,7 +264,7 @@ class PPOExperiment(BaseExperiment):
         in_front_of_waypoint = core.is_in_front_of_waypoint(truck_normalised_transform.location.x, truck_normalised_transform.location.y)
         if in_front_of_waypoint == 0 or in_front_of_waypoint == 1:
             core.last_waypoint_index += 1
-            # print('Passed Waypoint <------------')
+            print('Passed Waypoint <------------')
         else:
             pass
         #print(f"OBS -> Len(route) {len(core.route)}")
@@ -634,7 +634,7 @@ class PPOExperiment(BaseExperiment):
                     reward_for_angle = 1 / (angle_to_center_of_lane_normalised)
                     reward_for_angle = ((reward_for_angle - 1) / (10 - 1))*100
                     reward += reward_for_angle
-                    # print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
+                    print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
                     if reward_file_save:
                         reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised, 5)}: {round(reward_for_angle, 5)} ")
             else:
@@ -763,8 +763,8 @@ class PPOExperiment(BaseExperiment):
             if reward_file_save:
                 reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
                 reward_file.close()
-            # print(f'Reward: {reward}')
-            # print("------------------------------")
+            print(f'Reward: {reward}')
+            print("------------------------------")
             time.sleep(0.4)
             return reward
 
