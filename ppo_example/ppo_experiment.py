@@ -42,7 +42,7 @@ class PPOExperiment(BaseExperiment):
         self.counter = 0
         self.visualiseRoute = True
         self.visualiseImage = False
-        self.counterThreshold = 100
+        self.counterThreshold = 10
 
 
     def reset(self):
