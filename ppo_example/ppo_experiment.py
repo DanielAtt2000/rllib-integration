@@ -333,7 +333,7 @@ class PPOExperiment(BaseExperiment):
                         in_front_of_waypoint=in_front_of_waypoint,
                         angle=angle_to_center_of_lane_degrees)
 
-            # plot_route()
+            plot_route()
 
         self.counter +=1
 
