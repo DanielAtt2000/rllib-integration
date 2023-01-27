@@ -36,6 +36,8 @@ replay_buffer_config: {
   capacity: 100000
 }
 
+store_buffer_in_checkpoints: True
+
 #num_workers: 1
 #num_gpus: 1
 ##num_gpus_per_worker: 1
