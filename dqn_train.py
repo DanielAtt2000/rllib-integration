@@ -42,14 +42,13 @@ def run(args):
                  name=args.name,
                  local_dir=args.directory,
                  # stop={"perf/ram_util_percent": 85.0},
-                 checkpoint_freq=1,
+                 checkpoint_freq=5,
                  # checkpoint_at_end=True,
                  restore=get_checkpoint(args.name, args.directory, args.restore, args.overwrite),
                  config=args.config,
                  # queue_trials=True,
                  resume=False,
                  reuse_actors=True,
-                 verbose=2
 
         )
 
@@ -84,8 +83,8 @@ def main():
                            help="Specified directory to save results (default: ~/ray_results/carla_rllib")
     argparser.add_argument("-n", "--name",
                            metavar="N",
-                           default="ppo_example",
-                           help="Name of the experiment (default: ppo_example)")
+                           default="dqn_example",
+                           help="Name of the experiment (default: dqn_example)")
     argparser.add_argument("--restore",
                            action="store_true",
                            default=False,
@@ -114,13 +113,13 @@ def main():
                        host="localhost")
 
     specific_version = False
-    check_commit = False
+    check_commit = True
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())
 
         if specific_version:
-            args.name = "dqn_9b664eb1e1"
+            args.name = "dqn_303c235c74"
             x = random.randint(0,100)
             inp = input(f'SPECIFIC NAME APPLIED ENTER {x} to confirm:')
 
