@@ -16,14 +16,14 @@ replay_buffer_config: {
 
 horizon: 6500
 double_q: True
-dueling: False
+dueling: True
 # "batch_mode": "complete_episodes"
 lr: 0.001
 "exploration_config": {
    "type": "EpsilonGreedy",
    "initial_epsilon": 1.0,
    "final_epsilon": 0.02,
-   "epsilon_timesteps": 1000000
+   "epsilon_timesteps": 400000
 }
 target_network_update_freq: 8000
 #exploration_config: {

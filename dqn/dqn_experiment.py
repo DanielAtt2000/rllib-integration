@@ -33,6 +33,7 @@ class DQNExperiment(BaseExperiment):
         self.allowed_types = [carla.LaneType.Driving, carla.LaneType.Parking]
         self.last_angle_with_center = 0
         self.last_forward_velocity = 0
+        self.custom_done_arrived = False
         self.last_action = None
         self.lidar_points_count = []
         self.min_lidar_values = 1000000
@@ -41,9 +42,7 @@ class DQNExperiment(BaseExperiment):
         self.counter = 0
         self.visualiseRoute = False
         self.visualiseImage = False
-        self.counterThreshold = 100
-        self.x_dist_to_finish = 0
-        self.y_dist_to_finish = 0
+        self.counterThreshold = 10
 
 
     def reset(self):
@@ -57,6 +56,7 @@ class DQNExperiment(BaseExperiment):
         self.done_time_episode = False
         self.done_collision = False
         self.done_arrived = False
+        self.custom_done_arrived = False
 
         # hero variables
         self.last_location = None
@@ -120,18 +120,15 @@ class DQNExperiment(BaseExperiment):
         :return:
         """
         spaces = {
-
-            # 'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,50]), dtype=np.float32),
-            'depth_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
-
+            'values': Box(low=np.array([0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1]), dtype=np.float32),
+            'depth_camera': Box(low=0, high=256,shape=(84,84,3), dtype=np.float32),
             # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
             # 'semantic_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
-
         }
         # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
-        # obs_space = Dict(spaces)
+        obs_space = Dict(spaces)
         # print('SAMPLE')
-        obs_space = Box(low=0, high=256,shape=(240,320,3), dtype=np.float32)
+        # obs_space = Box(low=0, high=256,shape=(240,320,3), dtype=np.float32)
         # print(obs_space.sample())
         return obs_space
 
@@ -210,7 +207,7 @@ class DQNExperiment(BaseExperiment):
 
 
         # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
-        print(f"----------------------------------->{action_msg}")
+        # print(f"----------------------------------->{action_msg}")
 
         self.last_action = action
 
@@ -281,10 +278,6 @@ class DQNExperiment(BaseExperiment):
         # print(f"DISTANCE TO NEXT WAY POINT X {x_dist_to_next_waypoint}")
         # print(f"DISTANCE TO NEXT WAY POINT Y {y_dist_to_next_waypoint}")
 
-        self.x_dist_to_finish = abs(core.route[len(core.route) - 15].location.x - truck_normalised_transform.location.x, )
-        self.y_dist_to_finish = abs(core.route[len(core.route) - 15].location.y - truck_normalised_transform.location.y )
-
-
         # Forward Velocity
         # Normalising it between 0 and 50
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
@@ -310,7 +303,7 @@ class DQNExperiment(BaseExperiment):
         angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
 
-        if self.visualiseRoute and self.counter > self.counterThreshold:
+        if self.visualiseRoute and self.counter > self.counterThreshold and self.counter < self.counterThreshold+2:
             def plot_route():
                 x_route = []
                 y_route = []
@@ -332,6 +325,14 @@ class DQNExperiment(BaseExperiment):
                 plt.show()
 
 
+            print(f"previous_position={core.route[core.last_waypoint_index-1].location}")
+            print(f"current_position={truck_normalised_transform.location}")
+            print(f"next_position={core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location}")
+            print(f"current_waypoint={core.route[core.last_waypoint_index].location}")
+            print(f"next_waypoint={core.route[core.last_waypoint_index+1].location}")
+            print(f"in_front_of_waypoint={in_front_of_waypoint}")
+            print(f"angle={angle_to_center_of_lane_degrees}")
+
             plot_points(previous_position=core.route[core.last_waypoint_index-1].location,
                         current_position=truck_normalised_transform.location,
                         next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location,
@@ -340,7 +341,7 @@ class DQNExperiment(BaseExperiment):
                         in_front_of_waypoint=in_front_of_waypoint,
                         angle=angle_to_center_of_lane_degrees)
 
-            # plot_route()
+            plot_route()
 
         self.counter +=1
 
@@ -485,7 +486,8 @@ class DQNExperiment(BaseExperiment):
                              "x_dist_to_next_waypoint",
                              "y_dist_to_next_waypoint",
                              "angle_to_center_of_lane_normalised",
-                             "roundabout_diameter"]
+                             # "roundabout_diameter"
+        ]
         observations = [
             # np.float32(truck_normalised_transform.location.x),
             # np.float32(truck_normalised_transform.location.y),
@@ -495,28 +497,24 @@ class DQNExperiment(BaseExperiment):
             np.float32(x_dist_to_next_waypoint),
             np.float32(y_dist_to_next_waypoint),
             np.float32(angle_to_center_of_lane_normalised),
-            np.float32(roundabout_diameter)
+            # np.float32(roundabout_diameter)
                            ]
 
         if self.visualiseImage and self.counter > self.counterThreshold:
-            plt.imshow(semantic_camera_data, interpolation='nearest')
+            plt.imshow(depth_camera_data, interpolation='nearest')
             plt.show()
 
-        observation_file = open( os.path.join("results","run_" + str(core.current_time),"observations_" + str(core.current_time) + ".txt"), 'a+')
-        for idx, obs in enumerate(observations):
-            observation_file.write(f"{name_observations[idx]}:{round(obs,5)}\n")
-        observation_file.close()
+        # observation_file = open( os.path.join("results","run_" + str(core.current_time),"observations_" + str(core.current_time) + ".txt"), 'a+')
+        # for idx, obs in enumerate(observations):
+        #     observation_file.write(f"{name_observations[idx]}:{round(obs,5)}\n")
+        # observation_file.close()
 
-        # return {
-        #         # 'values': np.array(observations),
-        #         'depth_camera': depth_camera_data,
-        #         # 'lidar':lidar_data_padded,
-        #         # 'semantic_camera':semantic_camera_data
-        # }, {}
-        #
-
-        return depth_camera_data, {}
-
+        return {
+                'values': np.array(observations),
+                'depth_camera': depth_camera_data,
+                # 'lidar':lidar_data_padded,
+                # 'semantic_camera':semantic_camera_data
+        }, {}
         # return  np.r_[
         #                 np.float32(truck_normalised_transform.location.x),
         #                 np.float32(truck_normalised_transform.location.y),
@@ -580,6 +578,7 @@ class DQNExperiment(BaseExperiment):
         self.done_arrived = self.completed_route(core)
 
         output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision or self.done_arrived
+        self.custom_done_arrived = self.done_arrived
         return bool(output)
 
     def compute_reward(self, observation, core):
@@ -601,7 +600,7 @@ class DQNExperiment(BaseExperiment):
 
         reward = 0
 
-        with_values = False
+        with_values = True
 
         if with_values:
 
@@ -612,12 +611,14 @@ class DQNExperiment(BaseExperiment):
             self.last_angle_with_center = angle_to_center_of_lane_normalised
             self.last_forward_velocity = forward_velocity
 
-            reward_file = open(os.path.join("results",
-                                            "run_" + str(core.current_time),
-                                            "rewards_" + str(core.current_time) + ".txt")
-                               , 'a+')
+            reward_file_save = True
+            if reward_file_save:
+                reward_file = open(os.path.join("results",
+                                                "run_" + str(core.current_time),
+                                                "rewards_" + str(core.current_time) + ".txt")
+                                   , 'a+')
 
-            print("------------------------------")
+            # print("------------------------------")
             # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
             # print('Forward Velocity ' + str(forward_velocity))
             if forward_velocity > 0.05:
@@ -625,13 +626,14 @@ class DQNExperiment(BaseExperiment):
                 hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
                 reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
                 reward += reward_hyp_distance_to_next_waypoint
-                print(f"hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
+                # print(f"hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
 
                 # When the angle with the center line is 0 the highest reward is given
                 if angle_to_center_of_lane_normalised == 0:
                     reward += 1000
                     print(f'====> REWARD for angle to center line is 0, R+= 1')
-                    reward_file.write(f"angle_to_center_of_lane_normalised == 0: +1 ")
+                    if reward_file_save:
+                        reward_file.write(f"angle_to_center_of_lane_normalised == 0: +1 ")
                 else:
                     # Angle with the center line can deviate between 0 and 180 degrees
                     # TODO Check this reward
@@ -641,7 +643,8 @@ class DQNExperiment(BaseExperiment):
                     reward_for_angle = ((reward_for_angle - 1) / (10 - 1))*100
                     reward += reward_for_angle
                     print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
-                    reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised, 5)}: {round(reward_for_angle, 5)} ")
+                    if reward_file_save:
+                        reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised, 5)}: {round(reward_for_angle, 5)} ")
             else:
                 # Negative reward for no velocity
                 reward += -100
@@ -740,29 +743,34 @@ class DQNExperiment(BaseExperiment):
             if self.done_falling:
                 reward += -100000
                 print('====> REWARD Done falling')
-                reward_file.write(f"done_falling:-1 ")
+                if reward_file_save:
+                    reward_file.write(f"done_falling:-1 ")
             if self.done_collision:
                 print("====> REWARD Done collision")
                 reward += -100000
-                reward_file.write(f"done_collision:-1 ")
+                if reward_file_save:
+                    reward_file.write(f"done_collision:-1 ")
             if self.done_time_idle:
                 print("====> REWARD Done idle")
                 reward += -100000
-                reward_file.write(f"done_time_idle:-1 ")
+                if reward_file_save:
+                    reward_file.write(f"done_time_idle:-1 ")
             if self.done_time_episode:
                 print("====> REWARD Done max time")
                 reward += -100000
-                reward_file.write(f"done_time_episode:-1 ")
+                if reward_file_save:
+                    reward_file.write(f"done_time_episode:-1 ")
             if self.done_arrived:
                 print("====> REWARD Done arrived")
                 reward += 10000
-                reward_file.write(f"done_arrived:+10 ")
+                if reward_file_save:
+                    reward_file.write(f"done_arrived:+10 ")
 
             # print('Reward: ' + str(reward))
 
-
-            reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
-            reward_file.close()
+            if reward_file_save:
+                reward_file.write(f'FINAL REWARD {round(reward,5)} \n')
+                reward_file.close()
             print(f'Reward: {reward}')
             print("------------------------------")
             time.sleep(0.4)
@@ -788,8 +796,8 @@ class DQNExperiment(BaseExperiment):
             if self.done_arrived:
                 print("====> REWARD Done arrived")
                 reward += 10000
-            print(f'Reward: {reward}')
-            print("------------------------------")
+            # print(f'Reward: {reward}')
+            # print("------------------------------")
             time.sleep(0.4)
             return reward
 
