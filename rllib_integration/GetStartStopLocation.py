@@ -53,6 +53,11 @@ def get_entry_exit_spawn_point_indices(failed_spawn_locations,debug=False):
     # temp_entry_points = [34,40,41,42,43,44]
     # entry_spawn_point_index = random.choice(temp_entry_points)
     # exit_spawn_point_index = 10
+    print(spawn_points)
+    print(f"Starting from {entry_spawn_point_index} to {exit_spawn_point_index}")
+    print("------N-----")
+    print("W-----|----E")
+    print("------S-----")
     return entry_spawn_point_index, exit_spawn_point_index
 
 

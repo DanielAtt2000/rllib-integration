@@ -25,6 +25,7 @@ EXPERIMENT_CLASS = DQNExperiment
 # RUN FUNCTION
 # python3 ./dqn_inference_ray.py dqn/dqn_config.yaml "/home/daniel/ray_results/carla_rllib/dqn_9b664eb1e1/CustomDQNTrainer_CarlaEnv_fc10a_00000_0_2023-01-16_19-09-57/checkpoint_000219"
 # /home/daniel/ray_results/carla_rllib/ppo_77e99cc55c/CustomPPOTrainer_CarlaEnv_e71d2_00000_0_2023-01-21_15-14-24/checkpoint_000571
+# /home/daniel/ray_results/carla_rllib/dqn_8138f8582f/CustomDQNTrainer_CarlaEnv_93bce_00000_0_2023-01-30_18-07-29/checkpoint_000750
 def parse_config(args):
     """
     Parses the .yaml configuration file into a readable dictionary
