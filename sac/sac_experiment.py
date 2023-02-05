@@ -41,7 +41,7 @@ class SACExperiment(BaseExperiment):
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
         self.visualiseRoute = False
-        self.visualiseImage = True
+        self.visualiseImage = False
         self.counterThreshold = 10
 
 
@@ -121,7 +121,7 @@ class SACExperiment(BaseExperiment):
         """
         spaces = {
             'values': Box(low=np.array([0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1]), dtype=np.float32),
-            'depth_camera': Box(low=0, high=256,shape=(84,84,3), dtype=np.float32),
+            'depth_camera': Box(low=0, high=255,shape=(84,84,1), dtype=np.float32),
             # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
             # 'semantic_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
         }

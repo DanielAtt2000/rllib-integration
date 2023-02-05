@@ -102,16 +102,29 @@ class BaseCamera(CarlaSensor):
         sensor_data.convert(self.converter)
         array = np.frombuffer(sensor_data.raw_data, dtype=np.dtype("uint8"))
         array = np.reshape(array, (sensor_data.height, sensor_data.width, 4))
-        array = array[:, :, :3]
+        # array = array[int(array.shape[0]/2):, :, :1]
+        # array = array[:, :, :3]
+        array = array[:, :, :1]
         array = array[:, :, ::-1]
 
-        #480,640
+        # import matplotlib.pyplot as plt
+        # plt.imshow(array, interpolation='nearest')
+        # plt.show()
+        # #480,640
+        #
+        # from PIL import Image
+        #
+        # sourceimage = Image.fromarray(array)  # original image of size 150x150
+        # resized_image = sourceimage.resize((84, 84) )  # resized image of size 24x24
+        # array = np.array(resized_image)
 
-        from PIL import Image
-
-        sourceimage = Image.fromarray(array)  # original image of size 150x150
-        resized_image = sourceimage.resize((84, 84) )  # resized image of size 24x24
-        array = np.array(resized_image)
+        # import pickle
+        #
+        #
+        # with open('image.pickle', 'wb') as handle:
+        #     pickle.dump(array, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        #
+        #
 
         return array
 
