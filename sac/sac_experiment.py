@@ -624,16 +624,16 @@ class SACExperiment(BaseExperiment):
             # print("------------------------------")
             # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
             # print('Forward Velocity ' + str(forward_velocity))
-            if forward_velocity > 0.05:
+            if forward_velocity > 0.001:
 
                 hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
                 reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
-                reward += reward_hyp_distance_to_next_waypoint
+                reward += reward_hyp_distance_to_next_waypoint*forward_velocity
                 # print(f"hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
 
                 # When the angle with the center line is 0 the highest reward is given
                 if angle_to_center_of_lane_normalised == 0:
-                    reward += 1000
+                    reward += 1000*forward_velocity
                     print(f'====> REWARD for angle to center line is 0, R+= 1')
                     if reward_file_save:
                         reward_file.write(f"angle_to_center_of_lane_normalised == 0: +1 ")
@@ -644,7 +644,7 @@ class SACExperiment(BaseExperiment):
                     # Since the RL can stay there and get the reward
                     reward_for_angle = 1 / (angle_to_center_of_lane_normalised)
                     reward_for_angle = ((reward_for_angle - 1) / (10 - 1))*100
-                    reward += reward_for_angle
+                    reward += reward_for_angle*forward_velocity
                     print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
                     if reward_file_save:
                         reward_file.write(f"angle_to_center_of_lane_normalised is {round(angle_to_center_of_lane_normalised, 5)}: {round(reward_for_angle, 5)} ")
