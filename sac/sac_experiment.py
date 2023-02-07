@@ -281,10 +281,10 @@ class SACExperiment(BaseExperiment):
 
 
         x_dist_to_next_waypoint = np.clip(x_dist_to_next_waypoint, 0, None)
-        x_dist_to_next_waypoint = np.clip(x_dist_to_next_waypoint, 0, 0.5) / 0.5
+        x_dist_to_next_waypoint = np.clip(x_dist_to_next_waypoint, 0, 0.1) / 0.1
 
         y_dist_to_next_waypoint = np.clip(y_dist_to_next_waypoint, 0, None)
-        y_dist_to_next_waypoint = np.clip(y_dist_to_next_waypoint, 0, 0.5) / 0.5
+        y_dist_to_next_waypoint = np.clip(y_dist_to_next_waypoint, 0, 0.1) / 0.1
         # print(f"DISTANCE TO NEXT WAY POINT X {x_dist_to_next_waypoint}")
         # print(f"DISTANCE TO NEXT WAY POINT Y {y_dist_to_next_waypoint}")
 
