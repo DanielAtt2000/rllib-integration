@@ -322,11 +322,11 @@ class SACExperiment(BaseExperiment):
 
 
         x_dist_to_next_waypoint = np.clip(x_dist_to_next_waypoint, 0, None)
-        x_dist_to_next_waypoint = np.clip(x_dist_to_next_waypoint, 0, 0.005) / 0.005
+        x_dist_to_next_waypoint = self.scaling_to_range(x_dist_to_next_waypoint,0,0.005)
 
 
         y_dist_to_next_waypoint = np.clip(y_dist_to_next_waypoint, 0, None)
-        y_dist_to_next_waypoint = np.clip(y_dist_to_next_waypoint, 0, 0.007) / 0.007
+        y_dist_to_next_waypoint = self.scaling_to_range(y_dist_to_next_waypoint,0,0.007)
         # print(f"DISTANCE TO NEXT WAY POINT X {x_dist_to_next_waypoint}")
         # print(f"DISTANCE TO NEXT WAY POINT Y {y_dist_to_next_waypoint}")
 
@@ -334,20 +334,20 @@ class SACExperiment(BaseExperiment):
         # Forward Velocity
         # Normalising it between 0 and 50
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
-        forward_velocity = np.clip(forward_velocity, 0, 12.0) / 12.0
+        forward_velocity = self.scaling_to_range(forward_velocity,0,9)
 
         forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
-        forward_velocity_x = np.clip(forward_velocity_x, 0, 7.0) / 7.0
+        forward_velocity_x = self.scaling_to_range(forward_velocity_x,0,7)
 
         forward_velocity_z = np.clip(self.get_forward_velocity_z(core.hero), 0, None)
-        forward_velocity_z = np.clip(forward_velocity_z, 0, 7.0) / 7.0
+        forward_velocity_z = self.scaling_to_range(forward_velocity_z,0,7)
 
 
         # Acceleration
         # TODO Normalise acceleration
         acceleration = self.get_acceleration(core.hero)
         acceleration = np.clip(acceleration, 0, None)
-        acceleration = np.clip(acceleration, 0, 10.0) / 10
+        acceleration = np.clip(acceleration, 0, 7.0) / 7.0
 
 
 
@@ -358,7 +358,7 @@ class SACExperiment(BaseExperiment):
             previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_normalised_transform.location,
             next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location)
-        angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,80) / 80
+        angle_to_center_of_lane_normalised = self.scaling_to_range(angle_to_center_of_lane_degrees,0,70)
 
 
         if self.visualiseRoute and self.counter > self.counterThreshold:
@@ -569,13 +569,13 @@ class SACExperiment(BaseExperiment):
         self.angle_with_center.append(np.float32(angle_to_center_of_lane_normalised))
         self.acceleration.append(np.float32(acceleration))
 
-        # print(f"angle_to_center_of_lane_normalised:{np.float32(angle_to_center_of_lane_normalised)}")
-        # print(f"x_dist_to_next_waypoint:{np.float32(x_dist_to_next_waypoint)}")
-        # print(f"y_dist_to_next_waypoint:{np.float32(y_dist_to_next_waypoint)}")
-        # print(f"forward_velocity:{np.float32(forward_velocity)}")
-        # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
-        # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
-        # print(f"acceleration:{np.float32(acceleration)}")
+        print(f"angle_to_center_of_lane_normalised:{np.float32(angle_to_center_of_lane_normalised)}")
+        print(f"x_dist_to_next_waypoint:{np.float32(x_dist_to_next_waypoint)}")
+        print(f"y_dist_to_next_waypoint:{np.float32(y_dist_to_next_waypoint)}")
+        print(f"forward_velocity:{np.float32(forward_velocity)}")
+        print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
+        print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
+        print(f"acceleration:{np.float32(acceleration)}")
 
         if self.visualiseImage and self.counter > self.counterThreshold:
             plt.imshow(depth_camera_data, interpolation='nearest')
@@ -712,7 +712,7 @@ class SACExperiment(BaseExperiment):
                 hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
                 reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
 
-                reward_hyp_distance_to_next_waypoint = self.scaling_to_range(reward_hyp_distance_to_next_waypoint,0.7,500)
+                reward_hyp_distance_to_next_waypoint = self.scaling_to_range(reward_hyp_distance_to_next_waypoint,0.7,7)
                 reward += reward_hyp_distance_to_next_waypoint
 
                 print(f"REWARD hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
@@ -731,7 +731,7 @@ class SACExperiment(BaseExperiment):
                     reward_for_angle = 1 / (angle_to_center_of_lane_normalised)
                     # reward_for_angle = ((reward_for_angle - 1) / (10 - 1))*100
                     # 1-> 1000
-                    reward_for_angle = self.scaling_to_range(reward_for_angle,1,500)
+                    reward_for_angle = self.scaling_to_range(reward_for_angle,1,10)
                     reward += reward_for_angle
                     print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
                     if reward_file_save:
