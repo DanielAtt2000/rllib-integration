@@ -714,7 +714,7 @@ class SACExperiment(BaseExperiment):
                 if hyp_distance_to_next_waypoint != 0:
                     reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
                     reward_hyp_distance_to_next_waypoint = self.scaling_to_range(reward_hyp_distance_to_next_waypoint,
-                                                                                 0, 10)
+                                                                                 0, 5)
                 reward += reward_hyp_distance_to_next_waypoint
 
                 print(f"REWARD hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
