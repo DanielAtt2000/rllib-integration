@@ -733,7 +733,7 @@ class SACExperiment(BaseExperiment):
                     reward_for_angle = 1 / (angle_to_center_of_lane_normalised)
                     # reward_for_angle = ((reward_for_angle - 1) / (10 - 1))*100
                     # 1-> 1000
-                    reward_for_angle = self.scaling_to_range(reward_for_angle,1,10)
+                    reward_for_angle = self.scaling_to_range(reward_for_angle,0,13)
                     reward += reward_for_angle
                     print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
                     if reward_file_save:
