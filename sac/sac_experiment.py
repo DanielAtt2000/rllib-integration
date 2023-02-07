@@ -36,6 +36,7 @@ class SACExperiment(BaseExperiment):
         self.custom_done_arrived = False
         self.last_action = None
         self.lidar_points_count = []
+
         self.min_lidar_values = 1000000
         self.max_lidar_values = -100000
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
@@ -44,6 +45,20 @@ class SACExperiment(BaseExperiment):
         self.visualiseImage = False
         self.counterThreshold = 10
 
+        self.x_dist_to_waypoint = []
+        self.y_dist_to_waypoint = []
+        self.angle_with_center = []
+        self.forward_velocity = []
+        self.forward_velocity_x = []
+        self.forward_velocity_z = []
+        self.acceleration = []
+
+    def save_file(self,file_name, data):
+        # Saving LIDAR point count
+        counts = open(file_name, 'a')
+        counts.write(str(data))
+        counts.write(str('\n'))
+        counts.close()
 
     def reset(self):
         """Called at the beginning and each time the simulation is reset"""
@@ -69,6 +84,13 @@ class SACExperiment(BaseExperiment):
 
         self.last_no_of_collisions = 0
 
+        self.save_file("data/x_dist_to_waypoint",self.x_dist_to_waypoint)
+        self.save_file("data/y_dist_to_waypoint",self.y_dist_to_waypoint)
+        self.save_file("data/angle_with_center",self.angle_with_center)
+        self.save_file("data/forward_velocity",self.forward_velocity)
+        self.save_file("data/forward_velocity_x",self.forward_velocity_x)
+        self.save_file("data/forward_velocity_z",self.forward_velocity_z)
+        self.save_file("data/acceleration",self.acceleration)
 
         # Saving LIDAR point count
         # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
@@ -90,6 +112,14 @@ class SACExperiment(BaseExperiment):
         self.max_lidar_values = -100000
         self.lidar_points_count = []
         self.counter = 0
+        self.x_dist_to_waypoint = []
+        self.y_dist_to_waypoint = []
+        self.angle_with_center = []
+        self.forward_velocity = []
+        self.forward_velocity_x = []
+        self.forward_velocity_z = []
+        self.acceleration = []
+
 
 
 
@@ -119,18 +149,29 @@ class SACExperiment(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
-        spaces = {
-            'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,10000,10000,1,1]), dtype=np.float32),
-            'depth_camera': Box(low=0, high=255,shape=(84,84,1), dtype=np.float32),
-            # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
-            # 'semantic_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
-        }
-        # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
-        obs_space = Dict(spaces)
-        # print('SAMPLE')
-        # obs_space = Box(low=0, high=256,shape=(240,320,3), dtype=np.float32)
-        # print(obs_space.sample())
-        return obs_space
+
+        image_space = Box(
+                low=np.array([0,0,0,0,0,0,0]),
+                high=np.array([1,1,1,10000,10000,1,1]),
+                dtype=np.float32,
+            )
+        return image_space
+
+
+        # spaces = {
+        #     'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,10000,10000,1,1]), dtype=np.float32),
+        #     'depth_camera': Box(low=0, high=255,shape=(84,84,1), dtype=np.float32),
+        #     # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
+        #     # 'semantic_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
+        # }
+        # # return Box(low=np.array([float("-inf"), float("-inf"),-1.0,0,float("-inf"),0,0]), high=np.array([float("inf"),float("inf"),1.0,1.0,float("inf"),20,20]), dtype=np.float32)
+        # obs_space = Dict(spaces)
+        # # print('SAMPLE')
+        # # obs_space = Box(low=0, high=256,shape=(240,320,3), dtype=np.float32)
+        # # print(obs_space.sample())
+        # return obs_space
+
+
 
 
 
@@ -281,10 +322,10 @@ class SACExperiment(BaseExperiment):
 
 
         x_dist_to_next_waypoint = np.clip(x_dist_to_next_waypoint, 0, None)
-        x_dist_to_next_waypoint = np.clip(x_dist_to_next_waypoint, 0, 0.1) / 0.1
+        x_dist_to_next_waypoint = np.clip(x_dist_to_next_waypoint, 0, 0.01) / 0.01
 
         y_dist_to_next_waypoint = np.clip(y_dist_to_next_waypoint, 0, None)
-        y_dist_to_next_waypoint = np.clip(y_dist_to_next_waypoint, 0, 0.1) / 0.1
+        y_dist_to_next_waypoint = np.clip(y_dist_to_next_waypoint, 0, 0.01) / 0.01
         # print(f"DISTANCE TO NEXT WAY POINT X {x_dist_to_next_waypoint}")
         # print(f"DISTANCE TO NEXT WAY POINT Y {y_dist_to_next_waypoint}")
 
@@ -519,12 +560,19 @@ class SACExperiment(BaseExperiment):
             # np.float32(roundabout_diameter)
                            ]
 
+        self.forward_velocity.append(np.float32(forward_velocity))
+        self.forward_velocity_x.append(np.float32(forward_velocity_x))
+        self.forward_velocity_z.append(np.float32(forward_velocity_z))
+        self.x_dist_to_waypoint.append(np.float32(x_dist_to_next_waypoint))
+        self.y_dist_to_waypoint.append(np.float32(y_dist_to_next_waypoint))
+        self.angle_with_center.append(np.float32(angle_to_center_of_lane_normalised))
+        self.acceleration.append(np.float32(acceleration))
+
         print(f"angle_to_center_of_lane_normalised:{np.float32(angle_to_center_of_lane_normalised)}")
         print(f"x_dist_to_next_waypoint:{np.float32(x_dist_to_next_waypoint)}")
         print(f"y_dist_to_next_waypoint:{np.float32(y_dist_to_next_waypoint)}")
         print(f"forward_velocity:{np.float32(forward_velocity)}")
         print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
-        print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         print(f"acceleration:{np.float32(acceleration)}")
 
@@ -537,12 +585,13 @@ class SACExperiment(BaseExperiment):
         #     observation_file.write(f"{name_observations[idx]}:{round(obs,5)}\n")
         # observation_file.close()
 
-        return {
-                'values': np.array(observations),
-                'depth_camera': depth_camera_data,
-                # 'lidar':lidar_data_padded,
-                # 'semantic_camera':semantic_camera_data
-        }, {}
+        # return {
+        #         'values': np.array(observations),
+        #         'depth_camera': depth_camera_data,
+        #         # 'lidar':lidar_data_padded,
+        #         # 'semantic_camera':semantic_camera_data
+        # }, {}
+        return np.array(observations),{}
         # return  np.r_[
         #                 np.float32(truck_normalised_transform.location.x),
         #                 np.float32(truck_normalised_transform.location.y),
@@ -632,10 +681,16 @@ class SACExperiment(BaseExperiment):
 
         if with_values:
 
-            forward_velocity = observation['values'][0]
-            x_dist_to_next_waypoint = observation['values'][3]
-            y_dist_to_next_waypoint = observation['values'][4]
-            angle_to_center_of_lane_normalised = observation['values'][5]
+            forward_velocity = observation[0]
+            x_dist_to_next_waypoint = observation[3]
+            y_dist_to_next_waypoint = observation[4]
+            angle_to_center_of_lane_normalised = observation[5]
+
+            # print(f"Reward forward_velocity: {forward_velocity}")
+            # print(f"Reward x_dist_to_next_waypoint: {x_dist_to_next_waypoint}")
+            # print(f"Reward y_dist_to_next_waypoint: {y_dist_to_next_waypoint}")
+            # print(f"Reward angle_to_center_of_lane_normalised: {angle_to_center_of_lane_normalised}")
+
             self.last_angle_with_center = angle_to_center_of_lane_normalised
             self.last_forward_velocity = forward_velocity
 
