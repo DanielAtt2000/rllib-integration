@@ -152,7 +152,7 @@ class SACExperiment(BaseExperiment):
 
         image_space = Box(
                 low=np.array([0,0,0,0,0,0,0]),
-                high=np.array([2,2,2,2,2,2,2]),
+                high=np.array([5,5,5,5,5,5,5]),
                 dtype=np.float32,
             )
         return image_space
