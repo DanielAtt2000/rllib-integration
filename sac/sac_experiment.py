@@ -41,7 +41,7 @@ class SACExperiment(BaseExperiment):
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
         self.visualiseRoute = False
-        self.visualiseImage = True
+        self.visualiseImage = False
         self.counterThreshold = 10
 
 
@@ -281,10 +281,10 @@ class SACExperiment(BaseExperiment):
 
 
         x_dist_to_next_waypoint = np.clip(x_dist_to_next_waypoint, 0, None)
-        x_dist_to_next_waypoint = np.clip(x_dist_to_next_waypoint, 0, 2) / 2
+        x_dist_to_next_waypoint = np.clip(x_dist_to_next_waypoint, 0, 0.5) / 0.5
 
         y_dist_to_next_waypoint = np.clip(y_dist_to_next_waypoint, 0, None)
-        y_dist_to_next_waypoint = np.clip(y_dist_to_next_waypoint, 0, 2) / 2
+        y_dist_to_next_waypoint = np.clip(y_dist_to_next_waypoint, 0, 0.5) / 0.5
         # print(f"DISTANCE TO NEXT WAY POINT X {x_dist_to_next_waypoint}")
         # print(f"DISTANCE TO NEXT WAY POINT Y {y_dist_to_next_waypoint}")
 
