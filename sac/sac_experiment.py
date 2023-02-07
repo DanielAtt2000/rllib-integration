@@ -287,20 +287,20 @@ class SACExperiment(BaseExperiment):
         # Forward Velocity
         # Normalising it between 0 and 50
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
-        forward_velocity = np.clip(forward_velocity, 0, 25.0) / 25
+        forward_velocity = np.clip(forward_velocity, 0, 20.0) / 20
 
         forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
-        forward_velocity_x = np.clip(forward_velocity_x, 0, 25.0) / 25
+        forward_velocity_x = np.clip(forward_velocity_x, 0, 20.0) / 20
 
         forward_velocity_y = np.clip(self.get_forward_velocity_y(core.hero), 0, None)
-        forward_velocity_y = np.clip(forward_velocity_y, 0, 25.0) / 25
+        forward_velocity_y = np.clip(forward_velocity_y, 0, 20.0) / 20
 
 
         # Acceleration
         # TODO Normalise acceleration
         acceleration = self.get_acceleration(core.hero)
         acceleration = np.clip(acceleration, 0, None)
-        acceleration = np.clip(acceleration, 0, 25.0) / 25
+        acceleration = np.clip(acceleration, 0, 12.0) / 12
 
 
 
