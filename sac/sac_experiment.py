@@ -281,6 +281,7 @@ class SACExperiment(BaseExperiment):
         # print(f"DISTANCE TO NEXT WAY POINT X {x_dist_to_next_waypoint}")
         # print(f"DISTANCE TO NEXT WAY POINT Y {y_dist_to_next_waypoint}")
 
+
         # Forward Velocity
         # Normalising it between 0 and 50
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
@@ -291,6 +292,7 @@ class SACExperiment(BaseExperiment):
 
         forward_velocity_y = np.clip(self.get_forward_velocity_y(core.hero), 0, None)
         forward_velocity_y = np.clip(forward_velocity_y, 0, 50.0) / 50
+
 
         # Acceleration
         # TODO Normalise acceleration
@@ -306,7 +308,7 @@ class SACExperiment(BaseExperiment):
         angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
 
 
-        if self.visualiseRoute and self.counter > self.counterThreshold and self.counter < self.counterThreshold+2:
+        if self.visualiseRoute and self.counter > self.counterThreshold:
             def plot_route():
                 x_route = []
                 y_route = []
@@ -448,6 +450,12 @@ class SACExperiment(BaseExperiment):
 
                 assert depth_camera_data is not None
 
+        print(f"angle_to_center_of_lane_normalised:{angle_to_center_of_lane_normalised}")
+        print(f"x_dist_to_next_waypoint:{x_dist_to_next_waypoint}")
+        print(f"y_dist_to_next_waypoint:{y_dist_to_next_waypoint}")
+        print(f"forward_velocity:{forward_velocity}")
+        print(f"forward_velocity_x:{forward_velocity_x}")
+        print(f"forward_velocity_y:{forward_velocity_y}")
 
         # print("OBSERVATIONS START")
         # print(f"truck_normalised_transform.location.x {truck_normalised_transform.location.x}")
