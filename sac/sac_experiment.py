@@ -120,7 +120,7 @@ class SACExperiment(BaseExperiment):
         :return:
         """
         spaces = {
-            'values': Box(low=np.array([0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1]), dtype=np.float32),
+            'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,1]), dtype=np.float32),
             'depth_camera': Box(low=0, high=255,shape=(84,84,1), dtype=np.float32),
             # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
             # 'semantic_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
@@ -278,6 +278,8 @@ class SACExperiment(BaseExperiment):
         # Distance to next waypoint
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index].location.x - truck_normalised_transform.location.x, )
         y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index].location.y - truck_normalised_transform.location.y )
+        x_dist_to_next_waypoint *= 100000
+        y_dist_to_next_waypoint *= 100000
         # print(f"DISTANCE TO NEXT WAY POINT X {x_dist_to_next_waypoint}")
         # print(f"DISTANCE TO NEXT WAY POINT Y {y_dist_to_next_waypoint}")
 
@@ -285,18 +287,22 @@ class SACExperiment(BaseExperiment):
         # Forward Velocity
         # Normalising it between 0 and 50
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
-        forward_velocity = np.clip(forward_velocity, 0, 50.0) / 50
+        forward_velocity = np.clip(forward_velocity, 0, 25.0) / 25
 
         forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
-        forward_velocity_x = np.clip(forward_velocity_x, 0, 50.0) / 50
+        forward_velocity_x = np.clip(forward_velocity_x, 0, 25.0) / 25
 
         forward_velocity_y = np.clip(self.get_forward_velocity_y(core.hero), 0, None)
-        forward_velocity_y = np.clip(forward_velocity_y, 0, 50.0) / 50
+        forward_velocity_y = np.clip(forward_velocity_y, 0, 25.0) / 25
 
 
         # Acceleration
         # TODO Normalise acceleration
         acceleration = self.get_acceleration(core.hero)
+        acceleration = np.clip(acceleration, 0, None)
+        acceleration = np.clip(acceleration, 0, 25.0) / 25
+
+
 
 
         # Angle to center of lane
@@ -450,12 +456,8 @@ class SACExperiment(BaseExperiment):
 
                 assert depth_camera_data is not None
 
-        print(f"angle_to_center_of_lane_normalised:{angle_to_center_of_lane_normalised}")
-        print(f"x_dist_to_next_waypoint:{x_dist_to_next_waypoint}")
-        print(f"y_dist_to_next_waypoint:{y_dist_to_next_waypoint}")
-        print(f"forward_velocity:{forward_velocity}")
-        print(f"forward_velocity_x:{forward_velocity_x}")
-        print(f"forward_velocity_y:{forward_velocity_y}")
+
+
 
         # print("OBSERVATIONS START")
         # print(f"truck_normalised_transform.location.x {truck_normalised_transform.location.x}")
@@ -508,8 +510,17 @@ class SACExperiment(BaseExperiment):
             np.float32(x_dist_to_next_waypoint),
             np.float32(y_dist_to_next_waypoint),
             np.float32(angle_to_center_of_lane_normalised),
+            np.float32(acceleration)
             # np.float32(roundabout_diameter)
                            ]
+
+        print(f"angle_to_center_of_lane_normalised:{np.float32(angle_to_center_of_lane_normalised)}")
+        print(f"x_dist_to_next_waypoint:{np.float32(x_dist_to_next_waypoint)}")
+        print(f"y_dist_to_next_waypoint:{np.float32(y_dist_to_next_waypoint)}")
+        print(f"forward_velocity:{np.float32(forward_velocity)}")
+        print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
+        print(f"forward_velocity_y:{np.float32(forward_velocity_y)}")
+        print(f"acceleration:{np.float32(acceleration)}")
 
         if self.visualiseImage and self.counter > self.counterThreshold:
             plt.imshow(depth_camera_data, interpolation='nearest')
@@ -632,7 +643,7 @@ class SACExperiment(BaseExperiment):
             # print("------------------------------")
             # print("Angle with center line %.5f " % (angle_to_center_of_lane_normalised*180) )
             # print('Forward Velocity ' + str(forward_velocity))
-            if forward_velocity > 0.001:
+            if forward_velocity > 0.005:
 
                 hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
                 reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
