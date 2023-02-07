@@ -41,7 +41,7 @@ class SACExperiment(BaseExperiment):
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
         self.visualiseRoute = False
-        self.visualiseImage = False
+        self.visualiseImage = True
         self.counterThreshold = 10
 
 
@@ -292,8 +292,8 @@ class SACExperiment(BaseExperiment):
         forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
         forward_velocity_x = np.clip(forward_velocity_x, 0, 20.0) / 20
 
-        forward_velocity_y = np.clip(self.get_forward_velocity_y(core.hero), 0, None)
-        forward_velocity_y = np.clip(forward_velocity_y, 0, 20.0) / 20
+        forward_velocity_z = np.clip(self.get_forward_velocity_z(core.hero), 0, None)
+        forward_velocity_z = np.clip(forward_velocity_z, 0, 20.0) / 20
 
 
         # Acceleration
@@ -495,7 +495,7 @@ class SACExperiment(BaseExperiment):
                             #  "truck_normalised_transform.location.y",
                              "forward_velocity",
                              "forward_velocity_x",
-                             "forward_velocity_y",
+                             "forward_velocity_z",
                              "x_dist_to_next_waypoint",
                              "y_dist_to_next_waypoint",
                              "angle_to_center_of_lane_normalised",
@@ -506,7 +506,7 @@ class SACExperiment(BaseExperiment):
             # np.float32(truck_normalised_transform.location.y),
             np.float32(forward_velocity),
             np.float32(forward_velocity_x),
-            np.float32(forward_velocity_y),
+            np.float32(forward_velocity_z),
             np.float32(x_dist_to_next_waypoint),
             np.float32(y_dist_to_next_waypoint),
             np.float32(angle_to_center_of_lane_normalised),
@@ -519,7 +519,8 @@ class SACExperiment(BaseExperiment):
         print(f"y_dist_to_next_waypoint:{np.float32(y_dist_to_next_waypoint)}")
         print(f"forward_velocity:{np.float32(forward_velocity)}")
         print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
-        print(f"forward_velocity_y:{np.float32(forward_velocity_y)}")
+        print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
+        print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         print(f"acceleration:{np.float32(acceleration)}")
 
         if self.visualiseImage and self.counter > self.counterThreshold:
@@ -558,9 +559,9 @@ class SACExperiment(BaseExperiment):
         vel = hero.get_velocity()
         return 3.6 * vel.x
 
-    def get_forward_velocity_y(self,hero):
+    def get_forward_velocity_z(self, hero):
         vel = hero.get_velocity()
-        return 3.6 * vel.y
+        return 3.6 * vel.z
 
     def get_acceleration(self,hero):
         acc = hero.get_acceleration()
