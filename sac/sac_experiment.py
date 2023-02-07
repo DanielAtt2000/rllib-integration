@@ -120,7 +120,7 @@ class SACExperiment(BaseExperiment):
         :return:
         """
         spaces = {
-            'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,1,1,1,1]), dtype=np.float32),
+            'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,1000,1000,1,1]), dtype=np.float32),
             'depth_camera': Box(low=0, high=255,shape=(84,84,1), dtype=np.float32),
             # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
             # 'semantic_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
@@ -311,7 +311,7 @@ class SACExperiment(BaseExperiment):
             previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_normalised_transform.location,
             next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location)
-        angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,180) / 180
+        angle_to_center_of_lane_normalised = np.clip(angle_to_center_of_lane_degrees,0,90) / 90
 
 
         if self.visualiseRoute and self.counter > self.counterThreshold:
