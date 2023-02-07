@@ -120,7 +120,7 @@ class SACExperiment(BaseExperiment):
         :return:
         """
         spaces = {
-            'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,1000,1000,1,1]), dtype=np.float32),
+            'values': Box(low=np.array([0,0,0,0,0,0,0]), high=np.array([1,1,1,10000,10000,1,1]), dtype=np.float32),
             'depth_camera': Box(low=0, high=255,shape=(84,84,1), dtype=np.float32),
             # 'lidar': Box(low=-1000, high=1000,shape=(self.lidar_max_points,5), dtype=np.float32),
             # 'semantic_camera': Box(low=0, high=256,shape=(240,320,3), dtype=np.float32),
@@ -278,8 +278,8 @@ class SACExperiment(BaseExperiment):
         # Distance to next waypoint
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index].location.x - truck_normalised_transform.location.x, )
         y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index].location.y - truck_normalised_transform.location.y )
-        x_dist_to_next_waypoint *= 10000
-        y_dist_to_next_waypoint *= 10000
+        x_dist_to_next_waypoint *= 100000
+        y_dist_to_next_waypoint *= 100000
         # print(f"DISTANCE TO NEXT WAY POINT X {x_dist_to_next_waypoint}")
         # print(f"DISTANCE TO NEXT WAY POINT Y {y_dist_to_next_waypoint}")
 
