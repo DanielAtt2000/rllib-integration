@@ -152,7 +152,7 @@ class SACExperiment(BaseExperiment):
 
         image_space = Box(
                 low=np.array([0,0,0,0,0,0,0]),
-                high=np.array([1,1,1,10000,10000,1,1]),
+                high=np.array([2,2,2,2,2,2,2]),
                 dtype=np.float32,
             )
         return image_space
@@ -710,9 +710,11 @@ class SACExperiment(BaseExperiment):
             if forward_velocity > 0.005:
 
                 hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
-                reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
-
-                reward_hyp_distance_to_next_waypoint = self.scaling_to_range(reward_hyp_distance_to_next_waypoint,0.7,7)
+                reward_hyp_distance_to_next_waypoint = 0
+                if hyp_distance_to_next_waypoint != 0:
+                    reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
+                    reward_hyp_distance_to_next_waypoint = self.scaling_to_range(reward_hyp_distance_to_next_waypoint,
+                                                                                 0, 500)
                 reward += reward_hyp_distance_to_next_waypoint
 
                 print(f"REWARD hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
@@ -731,7 +733,7 @@ class SACExperiment(BaseExperiment):
                     reward_for_angle = 1 / (angle_to_center_of_lane_normalised)
                     # reward_for_angle = ((reward_for_angle - 1) / (10 - 1))*100
                     # 1-> 1000
-                    reward_for_angle = self.scaling_to_range(reward_for_angle,1,10)
+                    reward_for_angle = self.scaling_to_range(reward_for_angle,1,1000)
                     reward += reward_for_angle
                     print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
                     if reward_file_save:
