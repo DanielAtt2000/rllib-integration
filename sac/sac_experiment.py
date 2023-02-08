@@ -714,8 +714,7 @@ class SACExperiment(BaseExperiment):
                 reward_hyp_distance_to_next_waypoint = 0
                 if hyp_distance_to_next_waypoint != 0:
                     reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
-                    reward_hyp_distance_to_next_waypoint = self.min_max_normalisation(reward_hyp_distance_to_next_waypoint,
-                                                                                      0, 5)
+                    # reward_hyp_distance_to_next_waypoint = self.min_max_normalisation(reward_hyp_distance_to_next_waypoint,0, 5)
                 reward += reward_hyp_distance_to_next_waypoint
 
                 print(f"REWARD hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
@@ -734,7 +733,7 @@ class SACExperiment(BaseExperiment):
                     reward_for_angle = 1 / (angle_to_center_of_lane_normalised)
                     # reward_for_angle = ((reward_for_angle - 1) / (10 - 1))*100
                     # 1-> 1000
-                    reward_for_angle = self.min_max_normalisation(reward_for_angle, 0, 13)
+                    # reward_for_angle = self.min_max_normalisation(reward_for_angle, 0, 13)
                     reward += reward_for_angle
                     print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
                     if reward_file_save:
