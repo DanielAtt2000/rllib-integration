@@ -152,7 +152,7 @@ class SACExperiment(BaseExperiment):
 
         image_space = Box(
                 low=np.array([0,0,0,0,0,0,0]),
-                high=np.array([5,5,5,5,5,5,5]),
+                high=np.array([5000,5000,5000,5000,5000,5000,5000]),
                 dtype=np.float32,
             )
         return image_space
@@ -322,11 +322,11 @@ class SACExperiment(BaseExperiment):
 
 
         x_dist_to_next_waypoint = np.clip(x_dist_to_next_waypoint, 0, None)
-        x_dist_to_next_waypoint = self.scaling_to_range(x_dist_to_next_waypoint,0,0.005)
+        # x_dist_to_next_waypoint = self.min_max_normalisation(x_dist_to_next_waypoint, 0, 0.005)
 
 
         y_dist_to_next_waypoint = np.clip(y_dist_to_next_waypoint, 0, None)
-        y_dist_to_next_waypoint = self.scaling_to_range(y_dist_to_next_waypoint,0,0.007)
+        # y_dist_to_next_waypoint = self.min_max_normalisation(y_dist_to_next_waypoint, 0, 0.007)
         # print(f"DISTANCE TO NEXT WAY POINT X {x_dist_to_next_waypoint}")
         # print(f"DISTANCE TO NEXT WAY POINT Y {y_dist_to_next_waypoint}")
 
@@ -334,20 +334,20 @@ class SACExperiment(BaseExperiment):
         # Forward Velocity
         # Normalising it between 0 and 50
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
-        forward_velocity = self.scaling_to_range(forward_velocity,0,9)
+        # forward_velocity = self.min_max_normalisation(forward_velocity, 0, 9)
 
         forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
-        forward_velocity_x = self.scaling_to_range(forward_velocity_x,0,7)
+        # forward_velocity_x = self.min_max_normalisation(forward_velocity_x, 0, 7)
 
         forward_velocity_z = np.clip(self.get_forward_velocity_z(core.hero), 0, None)
-        forward_velocity_z = self.scaling_to_range(forward_velocity_z,0,7)
+        # forward_velocity_z = self.min_max_normalisation(forward_velocity_z, 0, 7)
 
 
         # Acceleration
         # TODO Normalise acceleration
         acceleration = self.get_acceleration(core.hero)
         acceleration = np.clip(acceleration, 0, None)
-        acceleration = np.clip(acceleration, 0, 7.0) / 7.0
+        # acceleration = np.clip(acceleration, 0, 7.0) / 7.0
 
 
 
@@ -358,7 +358,8 @@ class SACExperiment(BaseExperiment):
             previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_normalised_transform.location,
             next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calcualte_angle_with].location)
-        angle_to_center_of_lane_normalised = self.scaling_to_range(angle_to_center_of_lane_degrees,0,70)
+        angle_to_center_of_lane_normalised = angle_to_center_of_lane_degrees
+        # angle_to_center_of_lane_normalised = self.min_max_normalisation(angle_to_center_of_lane_degrees, 0, 70)
 
 
         if self.visualiseRoute and self.counter > self.counterThreshold:
@@ -639,7 +640,7 @@ class SACExperiment(BaseExperiment):
         if len(core.route) - 15 <= core.last_waypoint_index:
             return True
 
-    def scaling_to_range(self,value,min,max):
+    def min_max_normalisation(self, value, min, max):
         return (value - min) / (max -min)
 
     def get_done_status(self, observation, core):
@@ -713,8 +714,8 @@ class SACExperiment(BaseExperiment):
                 reward_hyp_distance_to_next_waypoint = 0
                 if hyp_distance_to_next_waypoint != 0:
                     reward_hyp_distance_to_next_waypoint = 1 / hyp_distance_to_next_waypoint
-                    reward_hyp_distance_to_next_waypoint = self.scaling_to_range(reward_hyp_distance_to_next_waypoint,
-                                                                                 0, 5)
+                    reward_hyp_distance_to_next_waypoint = self.min_max_normalisation(reward_hyp_distance_to_next_waypoint,
+                                                                                      0, 5)
                 reward += reward_hyp_distance_to_next_waypoint
 
                 print(f"REWARD hyp_distance_to_next_waypoint = {reward_hyp_distance_to_next_waypoint}")
@@ -733,7 +734,7 @@ class SACExperiment(BaseExperiment):
                     reward_for_angle = 1 / (angle_to_center_of_lane_normalised)
                     # reward_for_angle = ((reward_for_angle - 1) / (10 - 1))*100
                     # 1-> 1000
-                    reward_for_angle = self.scaling_to_range(reward_for_angle,0,13)
+                    reward_for_angle = self.min_max_normalisation(reward_for_angle, 0, 13)
                     reward += reward_for_angle
                     print(f'====> REWARD for angle ({round(angle_to_center_of_lane_normalised, 5)}) to center line = {round(reward_for_angle, 5)}')
                     if reward_file_save:
