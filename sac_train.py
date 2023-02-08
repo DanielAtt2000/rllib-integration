@@ -25,13 +25,13 @@ from rllib_integration.carla_core import kill_all_servers
 
 from rllib_integration.helper import get_checkpoint, launch_tensorboard
 
-from sac.sac_experiment import SACExperiment
+from sac.sac_experiment_basic import SACExperimentBasic
 from sac.sac_callbacks import SACCallbacks
 from sac.sac_trainer import CustomSACTrainer
 
 
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
-EXPERIMENT_CLASS = SACExperiment
+EXPERIMENT_CLASS = SACExperimentBasic
 
 
 def run(args):
@@ -95,7 +95,7 @@ def main():
                            help="Flag to overwrite a specific directory (warning: all content of the folder will be lost.)")
     argparser.add_argument("--tboff",
                            action="store_true",
-                           default=False,
+                           default=True,
                            help="Flag to deactivate Tensorboard")
     argparser.add_argument("--auto",
                            action="store_true",
@@ -113,7 +113,7 @@ def main():
                        host="localhost")
 
     specific_version = False
-    check_commit = False
+    check_commit = True
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())

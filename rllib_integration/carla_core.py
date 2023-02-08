@@ -381,11 +381,13 @@ class CarlaCore:
             last_x = round(route_waypoint[0].transform.location.x, 5)
             last_y = round(route_waypoint[0].transform.location.y, 5)
 
-            self.route.append(carla.Transform(
-                carla.Location(self.normalise_map_location(route_waypoint[0].transform.location.x, 'x'),
-                               self.normalise_map_location(route_waypoint[0].transform.location.y, 'y'),
-                               0),
-                carla.Rotation(0, 0, 0)))
+            # self.route.append(carla.Transform(
+            #     carla.Location(self.normalise_map_location(route_waypoint[0].transform.location.x, 'x'),
+            #                    self.normalise_map_location(route_waypoint[0].transform.location.y, 'y'),
+            #                    0),
+            #     carla.Rotation(0, 0, 0)))
+
+            self.route.append(route_waypoint[0].transform)
 
         return entry_spawn_point_index, entry_spawn_point
 
