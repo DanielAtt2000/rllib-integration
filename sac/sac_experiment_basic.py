@@ -328,14 +328,14 @@ class SACExperimentBasic(BaseExperiment):
         self.bearing_to_waypoint.append(np.float32(bearing_to_waypoint))
         self.acceleration.append(np.float32(acceleration))
 
-        print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
-        print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
-        print(f"x_dist_to_next_waypoint:{np.float32(x_dist_to_next_waypoint)}")
-        print(f"y_dist_to_next_waypoint:{np.float32(y_dist_to_next_waypoint)}")
-        print(f"forward_velocity:{np.float32(forward_velocity)}")
-        print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
-        print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
-        print(f"acceleration:{np.float32(acceleration)}")
+        # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
+        # print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
+        # print(f"x_dist_to_next_waypoint:{np.float32(x_dist_to_next_waypoint)}")
+        # print(f"y_dist_to_next_waypoint:{np.float32(y_dist_to_next_waypoint)}")
+        # print(f"forward_velocity:{np.float32(forward_velocity)}")
+        # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
+        # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
+        # print(f"acceleration:{np.float32(acceleration)}")
 
         return np.array(observations),{}
 
