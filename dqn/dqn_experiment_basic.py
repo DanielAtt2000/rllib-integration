@@ -41,7 +41,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.max_lidar_values = -100000
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
-        self.visualiseRoute = False
+        self.visualiseRoute = True
         self.visualiseImage = False
         self.counterThreshold = 10
         self.last_hyp_distance_to_next_waypoint = 0
@@ -259,7 +259,7 @@ class DQNExperimentBasic(BaseExperiment):
         acceleration = np.clip(self.get_acceleration(core.hero), 0, None)
 
         # Angle to center of lane
-        number_of_points_ahead_to_calculate_angle_with = 2
+        number_of_points_ahead_to_calculate_angle_with = 1
         angle_to_center_of_lane_degrees = calculate_angle_with_center_of_lane(
             previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_transform.location,
