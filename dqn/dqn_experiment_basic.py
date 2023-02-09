@@ -241,10 +241,12 @@ class DQNExperimentBasic(BaseExperiment):
         bearing_to_waypoint = abs(core.route[core.last_waypoint_index].rotation.yaw - truck_transform.rotation.yaw)
 
         if bearing_to_waypoint > 359:
-            strings = [f"bearing_to_waypoint: {bearing_to_waypoint}",
-                       f"Truck: {truck_transform}",
-                       f"Truck Waypoint : {core.route[core.last_waypoint_index]}",
-                       f"bearing_to_waypoint: {bearing_to_waypoint}"]
+            strings = [ f"-------------------------------------------\n"
+                        f"bearing_to_waypoint: {bearing_to_waypoint}\n",
+                        f"Truck: {truck_transform}\n",
+                        f"Truck Waypoint : {core.route[core.last_waypoint_index]}\n",
+                        f"bearing_to_waypoint: {bearing_to_waypoint}\n",
+                        f"-------------------------------------------\n"]
 
             print(strings)
             with open('bearing.txt', 'a') as file:
