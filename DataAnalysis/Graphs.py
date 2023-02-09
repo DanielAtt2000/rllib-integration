@@ -8,9 +8,9 @@ import numpy as np
 
 
 
-directory = 'data_f78824a118f'
+directory = 'data_7ba3a56f814'
 df= pd.DataFrame()
-string= '_BoxCox-1Normalisation'
+string= '_beforeNormalisation'
 for filename in os.listdir(directory):
     file = os.path.join(directory, filename)
     # checking if it is a file
@@ -18,7 +18,8 @@ for filename in os.listdir(directory):
         with open(file, 'rb') as handle:
             data = pickle.load(handle)
 
-            df[str(filename+string)] = data
+            df[str(filename+string)] = pd.Series(data)
+            df = df.fillna(0)
 
 
 for filename in os.listdir(directory):

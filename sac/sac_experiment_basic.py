@@ -241,10 +241,15 @@ class SACExperimentBasic(BaseExperiment):
         bearing_to_waypoint = abs(core.route[core.last_waypoint_index].rotation.yaw - truck_transform.rotation.yaw)
 
         if bearing_to_waypoint > 359:
-            print(f"bearing_to_waypoint: {bearing_to_waypoint}")
-            print(core.route[core.last_waypoint_index].rotation.yaw)
-            print(truck_transform.rotation.yaw)
-            print(f"bearing_to_waypoint: {bearing_to_waypoint}")
+            strings = [f"bearing_to_waypoint: {bearing_to_waypoint}",
+                       f"Truck: {truck_transform}",
+                       f"Truck Waypoint : {core.route[core.last_waypoint_index]}",
+                       f"bearing_to_waypoint: {bearing_to_waypoint}"]
+
+            print(strings)
+            with open('bearing.txt', 'a') as file:
+                file.writelines(strings)
+
 
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
         forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
@@ -328,14 +333,14 @@ class SACExperimentBasic(BaseExperiment):
         self.bearing_to_waypoint.append(np.float32(bearing_to_waypoint))
         self.acceleration.append(np.float32(acceleration))
 
-        # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
-        # print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
-        # print(f"x_dist_to_next_waypoint:{np.float32(x_dist_to_next_waypoint)}")
-        # print(f"y_dist_to_next_waypoint:{np.float32(y_dist_to_next_waypoint)}")
-        # print(f"forward_velocity:{np.float32(forward_velocity)}")
-        # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
-        # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
-        # print(f"acceleration:{np.float32(acceleration)}")
+        print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
+        print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
+        print(f"x_dist_to_next_waypoint:{np.float32(x_dist_to_next_waypoint)}")
+        print(f"y_dist_to_next_waypoint:{np.float32(y_dist_to_next_waypoint)}")
+        print(f"forward_velocity:{np.float32(forward_velocity)}")
+        print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
+        print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
+        print(f"acceleration:{np.float32(acceleration)}")
 
         return np.array(observations),{}
 
@@ -397,20 +402,6 @@ class SACExperimentBasic(BaseExperiment):
 
     def compute_reward(self, observation, core):
         """Computes the reward"""
-        def unit_vector(vector):
-            return vector / np.linalg.norm(vector)
-        def compute_angle(u, v):
-            return -math.atan2(u[0]*v[1] - u[1]*v[0], u[0]*v[0] + u[1]*v[1])
-        def find_current_waypoint(map_, hero):
-            return map_.get_waypoint(hero.get_location(), project_to_road=False, lane_type=carla.LaneType.Any)
-        def inside_lane(waypoint, allowed_types):
-            if waypoint is not None:
-                return waypoint.lane_type in allowed_types
-            return False
-
-        world = core.world
-        hero = core.hero
-        map_ = core.map
 
         reward = 0
 
@@ -428,7 +419,6 @@ class SACExperimentBasic(BaseExperiment):
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
 
 
-
         if self.done_falling:
             reward += -100000
             print('====> REWARD Done falling')
@@ -443,7 +433,7 @@ class SACExperimentBasic(BaseExperiment):
             reward += -100000
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward += 10000
+            reward += 100000
 
         print(f"Reward: {reward}")
         return reward
