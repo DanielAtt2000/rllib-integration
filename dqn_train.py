@@ -25,13 +25,13 @@ from rllib_integration.carla_core import kill_all_servers
 
 from rllib_integration.helper import get_checkpoint, launch_tensorboard
 
-from dqn.dqn_experiment import DQNExperiment
+from dqn.dqn_experiment_basic import DQNExperimentBasic
 from dqn.dqn_callbacks import DQNCallbacks
 from dqn.dqn_trainer import CustomDQNTrainer
 
 
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
-EXPERIMENT_CLASS = DQNExperiment
+EXPERIMENT_CLASS = DQNExperimentBasic
 
 
 def run(args):
@@ -112,7 +112,7 @@ def main():
     launch_tensorboard(logdir= path,
                        host="localhost")
 
-    specific_version = True
+    specific_version = False
     check_commit = True
 
     if check_with_user(check_commit):
