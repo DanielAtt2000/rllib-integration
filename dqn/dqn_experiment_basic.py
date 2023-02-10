@@ -41,7 +41,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.max_lidar_values = -100000
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
-        self.visualiseRoute = False
+        self.visualiseRoute = True
         self.visualiseImage = False
         self.counterThreshold = 10
         self.last_hyp_distance_to_next_waypoint = 0
@@ -239,6 +239,8 @@ class DQNExperimentBasic(BaseExperiment):
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
         y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y - truck_transform.location.y)
 
+        print(f"Waypoint forward vector :{core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector()}")
+        print(f"Truck forward vector :{truck_transform.get_forward_vector}")
         bearing_to_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].rotation.yaw - truck_transform.rotation.yaw)
 
         if bearing_to_waypoint > 359:
@@ -276,19 +278,19 @@ class DQNExperimentBasic(BaseExperiment):
                     x_route.append(point.location.x)
                     y_route.append(point.location.y)
 
-                x_min = x_route.index(min(x_route))
-                x_max = x_route.index(max(x_route))
+                x_min = min(x_route)
+                x_max = max(x_route)
 
-                y_min = y_route.index(min(y_route))
-                y_max = y_route.index(max(y_route))
-                buffer = 20
+                y_min = min(y_route)
+                y_max = max(y_route)
+                buffer = 10
 
                 # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
                 plt.plot([x_route.pop(0)],y_route.pop(0),'bo')
                 plt.plot(x_route, y_route,'y^')
                 plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro',label='Previous Waypoint')
                 plt.plot([truck_transform.location.x], [truck_transform.location.y], 'gs',label='Current Vehicle Location')
-                plt.plot([core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location.x], [core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location.y], 'bo', label=f"{number_of_points_ahead_to_calculate_angle_with} waypoints ahead")
+                plt.plot([core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location.x], [core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location.y], 'bo', label=f"{number_of_waypoints_ahead_to_calculate_with} waypoints ahead")
                 plt.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
                 # plt.axis([0, 1, 0, 1])
                 plt.title(f'{angle_to_center_of_lane_degrees*180}')

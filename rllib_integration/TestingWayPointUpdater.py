@@ -85,12 +85,12 @@ def plot_points(previous_position, current_position, next_position, current_wayp
     # plt.yticks(range(0,10))
     x_values = [previous_position.x,current_position.x,next_position.x,current_waypoint.x,next_waypoint.x]
     y_values = [previous_position.y,current_position.y,next_position.y,current_waypoint.y,next_waypoint.y]
-    x_min = x_values.index(min(x_values))
-    x_max = x_values.index(max(x_values))
+    x_min = min(x_values)
+    x_max = max(x_values)
 
-    y_min = y_values.index(min(y_values))
-    y_max = y_values.index(max(y_values))
-    buffer = 20
+    y_min = min(y_values)
+    y_max = max(y_values)
+    buffer = 3
 
     plt.xlim([x_min - buffer,x_max + buffer])
     plt.ylim([y_min - buffer,y_max + buffer])
