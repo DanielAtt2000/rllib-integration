@@ -15,7 +15,7 @@ import warnings
 import carla
 import os
 import time
-from rllib_integration.GetAngle import calculate_angle_with_center_of_lane
+from rllib_integration.GetAngle import calculate_angle_with_center_of_lane, angle_between
 from rllib_integration.TestingWayPointUpdater import plot_points
 from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
@@ -239,9 +239,7 @@ class DQNExperimentBasic(BaseExperiment):
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
         y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y - truck_transform.location.y)
 
-        print(f"Waypoint forward vector :{core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector()}")
-        print(f"Truck forward vector :{truck_transform.get_forward_vector}")
-        bearing_to_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].rotation.yaw - truck_transform.rotation.yaw)
+        bearing_to_waypoint = angle_between(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),truck_transform.get_forward_vector())
 
         if bearing_to_waypoint > 359:
             strings = [ f"-------------------------------------------\n"
