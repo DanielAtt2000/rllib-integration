@@ -83,8 +83,17 @@ def plot_points(previous_position, current_position, next_position, current_wayp
     f.set_figheight(6)
     # plt.(range(0,10))
     # plt.yticks(range(0,10))
-    plt.xlim([0.48,0.58])
-    plt.ylim([0.60,0.70])
+    x_values = [previous_position.x,current_position.x,next_position.x,current_waypoint.x,next_waypoint.x]
+    y_values = [previous_position.y,current_position.y,next_position.y,current_waypoint.y,next_waypoint.y]
+    x_min = x_values.index(min(x_values))
+    x_max = x_values.index(max(x_values))
+
+    y_min = y_values.index(min(y_values))
+    y_max = y_values.index(max(y_values))
+    buffer = 20
+
+    plt.xlim([x_min - buffer,x_max + buffer])
+    plt.ylim([y_min - buffer,y_max + buffer])
 
     # print(f"x_pos {current_position.x} y_pos {current_position.y}")
     # print(f"x_last {previous_position.x} y_last {previous_position.y}")

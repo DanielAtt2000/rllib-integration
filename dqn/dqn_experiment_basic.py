@@ -218,6 +218,7 @@ class DQNExperimentBasic(BaseExperiment):
             # angle
             # collision
 
+        number_of_waypoints_ahead_to_calculate_with = 1
 
         # Getting truck location
         truck_transform = core.hero.get_transform()
@@ -235,16 +236,16 @@ class DQNExperimentBasic(BaseExperiment):
         else:
             pass
 
-        x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index].location.x - truck_transform.location.x)
-        y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index].location.y - truck_transform.location.y)
+        x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
+        y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y - truck_transform.location.y)
 
-        bearing_to_waypoint = abs(core.route[core.last_waypoint_index].rotation.yaw - truck_transform.rotation.yaw)
+        bearing_to_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].rotation.yaw - truck_transform.rotation.yaw)
 
         if bearing_to_waypoint > 359:
             strings = [ f"-------------------------------------------\n"
                         f"bearing_to_waypoint: {bearing_to_waypoint}\n",
                         f"Truck: {truck_transform}\n",
-                        f"Truck Waypoint : {core.route[core.last_waypoint_index]}\n",
+                        f"Truck Waypoint : {core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with]}\n",
                         f"bearing_to_waypoint: {bearing_to_waypoint}\n",
                         f"-------------------------------------------\n"]
 
@@ -259,11 +260,11 @@ class DQNExperimentBasic(BaseExperiment):
         acceleration = np.clip(self.get_acceleration(core.hero), 0, None)
 
         # Angle to center of lane
-        number_of_points_ahead_to_calculate_angle_with = 1
+
         angle_to_center_of_lane_degrees = calculate_angle_with_center_of_lane(
             previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_transform.location,
-            next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calculate_angle_with].location)
+            next_position=core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location)
 
 
         if self.visualiseRoute and self.counter > self.counterThreshold:
@@ -274,13 +275,21 @@ class DQNExperimentBasic(BaseExperiment):
                     # print(f"X: {point.location.x} Y:{point.location.y}")
                     x_route.append(point.location.x)
                     y_route.append(point.location.y)
+
+                x_min = x_route.index(min(x_route))
+                x_max = x_route.index(max(x_route))
+
+                y_min = y_route.index(min(y_route))
+                y_max = y_route.index(max(y_route))
+                buffer = 20
+
                 # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
                 plt.plot([x_route.pop(0)],y_route.pop(0),'bo')
                 plt.plot(x_route, y_route,'y^')
                 plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro',label='Previous Waypoint')
                 plt.plot([truck_transform.location.x], [truck_transform.location.y], 'gs',label='Current Vehicle Location')
-                plt.plot([core.route[core.last_waypoint_index+number_of_points_ahead_to_calculate_angle_with].location.x], [core.route[core.last_waypoint_index+number_of_points_ahead_to_calculate_angle_with].location.y], 'bo', label=f"{number_of_points_ahead_to_calculate_angle_with} waypoints ahead")
-                plt.axis([0.3, 0.7, 0.3, 0.7])
+                plt.plot([core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location.x], [core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location.y], 'bo', label=f"{number_of_points_ahead_to_calculate_angle_with} waypoints ahead")
+                plt.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
                 # plt.axis([0, 1, 0, 1])
                 plt.title(f'{angle_to_center_of_lane_degrees*180}')
                 plt.gca().invert_yaxis()
@@ -290,7 +299,7 @@ class DQNExperimentBasic(BaseExperiment):
 
             print(f"previous_position={core.route[core.last_waypoint_index-1].location}")
             print(f"current_position={truck_transform.location}")
-            print(f"next_position={core.route[core.last_waypoint_index+number_of_points_ahead_to_calculate_angle_with].location}")
+            print(f"next_position={core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location}")
             print(f"current_waypoint={core.route[core.last_waypoint_index].location}")
             print(f"next_waypoint={core.route[core.last_waypoint_index+1].location}")
             print(f"in_front_of_waypoint={in_front_of_waypoint}")
@@ -298,7 +307,7 @@ class DQNExperimentBasic(BaseExperiment):
 
             plot_points(previous_position=core.route[core.last_waypoint_index-1].location,
                         current_position=truck_transform.location,
-                        next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calculate_angle_with].location,
+                        next_position=core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location,
                         current_waypoint=core.route[core.last_waypoint_index].location,
                         next_waypoint=core.route[core.last_waypoint_index+1].location,
                         in_front_of_waypoint=in_front_of_waypoint,
