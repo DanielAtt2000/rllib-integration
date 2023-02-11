@@ -15,7 +15,7 @@ import warnings
 import carla
 import os
 import time
-from rllib_integration.GetAngle import calculate_angle_with_center_of_lane
+from rllib_integration.GetAngle import calculate_angle_with_center_of_lane, angle_between
 from rllib_integration.TestingWayPointUpdater import plot_points
 from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
@@ -53,9 +53,10 @@ class SACExperimentBasic(BaseExperiment):
         self.forward_velocity = []
         self.forward_velocity_x = []
         self.forward_velocity_z = []
+        self.hyp_distance_to_next_waypoint = []
         self.acceleration = []
 
-    def save_file(self,file_name, data):
+    def save_to_file(self, file_name, data):
         # Saving LIDAR point count
         counts = open(file_name, 'a')
         counts.write(str(data))
@@ -86,14 +87,13 @@ class SACExperimentBasic(BaseExperiment):
 
         self.last_no_of_collisions = 0
 
-        self.save_file("data/x_dist_to_waypoint",self.x_dist_to_waypoint)
-        self.save_file("data/y_dist_to_waypoint",self.y_dist_to_waypoint)
-        self.save_file("data/angle_with_center",self.angle_with_center)
-        self.save_file("data/bearing",self.bearing_to_waypoint)
-        self.save_file("data/forward_velocity",self.forward_velocity)
-        self.save_file("data/forward_velocity_x",self.forward_velocity_x)
-        self.save_file("data/forward_velocity_z",self.forward_velocity_z)
-        self.save_file("data/acceleration",self.acceleration)
+        self.save_to_file("data/hyp_distance_to_next_waypoint", self.hyp_distance_to_next_waypoint)
+        self.save_to_file("data/angle_with_center", self.angle_with_center)
+        self.save_to_file("data/bearing", self.bearing_to_waypoint)
+        self.save_to_file("data/forward_velocity", self.forward_velocity)
+        self.save_to_file("data/forward_velocity_x", self.forward_velocity_x)
+        self.save_to_file("data/forward_velocity_z", self.forward_velocity_z)
+        self.save_to_file("data/acceleration", self.acceleration)
 
         # Saving LIDAR point count
         # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
@@ -122,6 +122,7 @@ class SACExperimentBasic(BaseExperiment):
         self.forward_velocity = []
         self.forward_velocity_x = []
         self.forward_velocity_z = []
+        self.hyp_distance_to_next_waypoint = []
         self.acceleration = []
 
 
@@ -140,8 +141,8 @@ class SACExperimentBasic(BaseExperiment):
         :return:
         """
         image_space = Box(
-                low=np.array([0,0,0,0,0,0,0,0]),
-                high=np.array([100,100,100,100,100,400,400,100]),
+                low=np.array([0,0,0,0,0,0,0]),
+                high=np.array([100,100,100,100,400,400,100]),
                 dtype=np.float32,
             )
         return image_space
@@ -218,6 +219,7 @@ class SACExperimentBasic(BaseExperiment):
             # angle
             # collision
 
+        number_of_waypoints_ahead_to_calculate_with = 0
 
         # Getting truck location
         truck_transform = core.hero.get_transform()
@@ -235,16 +237,19 @@ class SACExperimentBasic(BaseExperiment):
         else:
             pass
 
-        x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index].location.x - truck_transform.location.x)
-        y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index].location.y - truck_transform.location.y)
+        x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
+        y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y - truck_transform.location.y)
+        hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
 
-        bearing_to_waypoint = abs(core.route[core.last_waypoint_index].rotation.yaw - truck_transform.rotation.yaw)
+        bearing_to_waypoint = angle_between(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),truck_transform.get_forward_vector())
 
         if bearing_to_waypoint > 359:
-            strings = [f"bearing_to_waypoint: {bearing_to_waypoint}",
-                       f"Truck: {truck_transform}",
-                       f"Truck Waypoint : {core.route[core.last_waypoint_index]}",
-                       f"bearing_to_waypoint: {bearing_to_waypoint}"]
+            strings = [ f"-------------------------------------------\n"
+                        f"bearing_to_waypoint: {bearing_to_waypoint}\n",
+                        f"Truck: {truck_transform}\n",
+                        f"Truck Waypoint : {core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with]}\n",
+                        f"bearing_to_waypoint: {bearing_to_waypoint}\n",
+                        f"-------------------------------------------\n"]
 
             print(strings)
             with open('bearing.txt', 'a') as file:
@@ -257,11 +262,11 @@ class SACExperimentBasic(BaseExperiment):
         acceleration = np.clip(self.get_acceleration(core.hero), 0, None)
 
         # Angle to center of lane
-        number_of_points_ahead_to_calculate_angle_with = 2
+
         angle_to_center_of_lane_degrees = calculate_angle_with_center_of_lane(
             previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_transform.location,
-            next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calculate_angle_with].location)
+            next_position=core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location)
 
 
         if self.visualiseRoute and self.counter > self.counterThreshold:
@@ -272,13 +277,21 @@ class SACExperimentBasic(BaseExperiment):
                     # print(f"X: {point.location.x} Y:{point.location.y}")
                     x_route.append(point.location.x)
                     y_route.append(point.location.y)
+
+                x_min = min(x_route)
+                x_max = max(x_route)
+
+                y_min = min(y_route)
+                y_max = max(y_route)
+                buffer = 10
+
                 # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
                 plt.plot([x_route.pop(0)],y_route.pop(0),'bo')
                 plt.plot(x_route, y_route,'y^')
                 plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro',label='Previous Waypoint')
                 plt.plot([truck_transform.location.x], [truck_transform.location.y], 'gs',label='Current Vehicle Location')
-                plt.plot([core.route[core.last_waypoint_index+number_of_points_ahead_to_calculate_angle_with].location.x], [core.route[core.last_waypoint_index+number_of_points_ahead_to_calculate_angle_with].location.y], 'bo', label=f"{number_of_points_ahead_to_calculate_angle_with} waypoints ahead")
-                plt.axis([0.3, 0.7, 0.3, 0.7])
+                plt.plot([core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location.x], [core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location.y], 'bo', label=f"{number_of_waypoints_ahead_to_calculate_with} waypoints ahead")
+                plt.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
                 # plt.axis([0, 1, 0, 1])
                 plt.title(f'{angle_to_center_of_lane_degrees*180}')
                 plt.gca().invert_yaxis()
@@ -288,7 +301,7 @@ class SACExperimentBasic(BaseExperiment):
 
             print(f"previous_position={core.route[core.last_waypoint_index-1].location}")
             print(f"current_position={truck_transform.location}")
-            print(f"next_position={core.route[core.last_waypoint_index+number_of_points_ahead_to_calculate_angle_with].location}")
+            print(f"next_position={core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location}")
             print(f"current_waypoint={core.route[core.last_waypoint_index].location}")
             print(f"next_waypoint={core.route[core.last_waypoint_index+1].location}")
             print(f"in_front_of_waypoint={in_front_of_waypoint}")
@@ -296,7 +309,7 @@ class SACExperimentBasic(BaseExperiment):
 
             plot_points(previous_position=core.route[core.last_waypoint_index-1].location,
                         current_position=truck_transform.location,
-                        next_position=core.route[core.last_waypoint_index+number_of_points_ahead_to_calculate_angle_with].location,
+                        next_position=core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location,
                         current_waypoint=core.route[core.last_waypoint_index].location,
                         next_waypoint=core.route[core.last_waypoint_index+1].location,
                         in_front_of_waypoint=in_front_of_waypoint,
@@ -317,8 +330,7 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(forward_velocity),
             np.float32(forward_velocity_x),
             np.float32(forward_velocity_z),
-            np.float32(x_dist_to_next_waypoint),
-            np.float32(y_dist_to_next_waypoint),
+            np.float32(hyp_distance_to_next_waypoint),
             np.float32(angle_to_center_of_lane_degrees),
             np.float32(bearing_to_waypoint),
             np.float32(acceleration)
@@ -327,16 +339,14 @@ class SACExperimentBasic(BaseExperiment):
         self.forward_velocity.append(np.float32(forward_velocity))
         self.forward_velocity_x.append(np.float32(forward_velocity_x))
         self.forward_velocity_z.append(np.float32(forward_velocity_z))
-        self.x_dist_to_waypoint.append(np.float32(x_dist_to_next_waypoint))
-        self.y_dist_to_waypoint.append(np.float32(y_dist_to_next_waypoint))
+        self.hyp_distance_to_next_waypoint.append(np.float32(hyp_distance_to_next_waypoint))
         self.angle_with_center.append(np.float32(angle_to_center_of_lane_degrees))
         self.bearing_to_waypoint.append(np.float32(bearing_to_waypoint))
         self.acceleration.append(np.float32(acceleration))
 
         print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
         print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
-        print(f"x_dist_to_next_waypoint:{np.float32(x_dist_to_next_waypoint)}")
-        print(f"y_dist_to_next_waypoint:{np.float32(y_dist_to_next_waypoint)}")
+        print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
         print(f"forward_velocity:{np.float32(forward_velocity)}")
         print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
         print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
@@ -398,6 +408,23 @@ class SACExperimentBasic(BaseExperiment):
 
         output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision or self.done_arrived
         self.custom_done_arrived = self.done_arrived
+
+        done_reason = ""
+        if self.done_time_idle:
+            done_reason += "done_time_idle"
+        if self.done_falling:
+            done_reason += "done_falling"
+        if self.done_time_episode:
+            done_reason += "done_time_episode"
+        if self.done_collision:
+            done_reason += "done_collision"
+        if self.done_arrived:
+            done_reason += "done_arrived"
+
+        if done_reason != "":
+            data = f"ENTRY: {core.entry_spawn_point_index} EXIT: {core.exit_spawn_point_index} - {done_reason} \n"
+            self.save_to_file('data/done',data)
+
         return bool(output)
 
     def compute_reward(self, observation, core):
@@ -405,10 +432,7 @@ class SACExperimentBasic(BaseExperiment):
 
         reward = 0
 
-        x_dist_to_next_waypoint = observation[3]
-        y_dist_to_next_waypoint = observation[4]
-
-        hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
+        hyp_distance_to_next_waypoint = observation[3]
 
         print(hyp_distance_to_next_waypoint)
         if self.last_hyp_distance_to_next_waypoint != 0:
