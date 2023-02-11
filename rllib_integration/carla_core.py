@@ -101,6 +101,9 @@ class CarlaCore:
 
         os.mkdir(os.path.join("results", "run_" + str(self.current_time)))
 
+        self.entry_spawn_point_index = -1
+        self.exit_spawn_point_index = -1
+
         # self.init_server()
         self.connect_client()
 
@@ -346,9 +349,9 @@ class CarlaCore:
             return -1
 
     def set_route(self,failed_entry_spawn_locations):
-        entry_spawn_point_index, exit_spawn_point_index = get_entry_exit_spawn_point_indices(failed_entry_spawn_locations)
-        entry_spawn_point = self.map.get_spawn_points()[entry_spawn_point_index]
-        exit_spawn_point = self.map.get_spawn_points()[exit_spawn_point_index]
+        self.entry_spawn_point_index, self.exit_spawn_point_index = get_entry_exit_spawn_point_indices(failed_entry_spawn_locations)
+        entry_spawn_point = self.map.get_spawn_points()[self.entry_spawn_point_index]
+        exit_spawn_point = self.map.get_spawn_points()[self.exit_spawn_point_index]
 
         # # Specify more than one starting point so the RL doesn't always start from the same position
         # spawn_point_no = random.choice([33, 28, 27, 17, 14, 11, 10, 5])
@@ -389,7 +392,7 @@ class CarlaCore:
 
             self.route.append(route_waypoint[0].transform)
 
-        return entry_spawn_point_index, entry_spawn_point
+        return self.entry_spawn_point_index, entry_spawn_point
 
     def reset_hero(self, hero_config):
         """This function resets / spawns the hero vehicle and its sensors"""

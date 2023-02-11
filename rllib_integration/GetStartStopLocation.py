@@ -45,8 +45,8 @@ def get_entry_exit_spawn_point_indices(failed_spawn_locations,debug=False):
             print('=====================')
 
         # Only to test in straight line
-        # entry_spawn_point_index =29
-        # exit_spawn_point_index = 34
+        entry_spawn_point_index = 34
+        # exit_spawn_point_index = -1
     if entry_spawn_point_index == -1 or exit_spawn_point_index == -1:
         raise Exception('Failed to find spawnable location')
     #TEMP
