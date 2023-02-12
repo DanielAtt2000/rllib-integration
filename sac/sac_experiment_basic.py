@@ -56,6 +56,13 @@ class SACExperimentBasic(BaseExperiment):
         self.hyp_distance_to_next_waypoint = []
         self.acceleration = []
 
+        from git import Repo
+        repo = Repo('.')
+        remote = repo.remote('origin')
+        remote.fetch()
+        self.directory = f"data/data_{repo.head.commit}"
+        os.mkdir(self.directory)
+
     def save_to_file(self, file_name, data):
         # Saving LIDAR point count
         counts = open(file_name, 'a')
@@ -87,13 +94,13 @@ class SACExperimentBasic(BaseExperiment):
 
         self.last_no_of_collisions = 0
 
-        self.save_to_file("data/hyp_distance_to_next_waypoint", self.hyp_distance_to_next_waypoint)
-        self.save_to_file("data/angle_with_center", self.angle_with_center)
-        self.save_to_file("data/bearing", self.bearing_to_waypoint)
-        self.save_to_file("data/forward_velocity", self.forward_velocity)
-        self.save_to_file("data/forward_velocity_x", self.forward_velocity_x)
-        self.save_to_file("data/forward_velocity_z", self.forward_velocity_z)
-        self.save_to_file("data/acceleration", self.acceleration)
+        self.save_to_file(f"{self.directory}/hyp_distance_to_next_waypoint", self.hyp_distance_to_next_waypoint)
+        self.save_to_file(f"{self.directory}/angle_with_center", self.angle_with_center)
+        self.save_to_file(f"{self.directory}/bearing", self.bearing_to_waypoint)
+        self.save_to_file(f"{self.directory}/forward_velocity", self.forward_velocity)
+        self.save_to_file(f"{self.directory}/forward_velocity_x", self.forward_velocity_x)
+        self.save_to_file(f"{self.directory}/forward_velocity_z", self.forward_velocity_z)
+        self.save_to_file(f"{self.directory}/acceleration", self.acceleration)
 
         # Saving LIDAR point count
         # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
@@ -423,7 +430,7 @@ class SACExperimentBasic(BaseExperiment):
 
         if done_reason != "":
             data = f"ENTRY: {core.entry_spawn_point_index} EXIT: {core.exit_spawn_point_index} - {done_reason} \n"
-            self.save_to_file('data/done',data)
+            self.save_to_file(f"{self.directory}/done",data)
 
         return bool(output)
 
