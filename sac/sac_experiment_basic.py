@@ -60,7 +60,7 @@ class SACExperimentBasic(BaseExperiment):
         repo = Repo('.')
         remote = repo.remote('origin')
         remote.fetch()
-        self.directory = f"data/data_{repo.head.commit}"
+        self.directory = f"data/data_{repo.head.commit[:11]}"
         os.mkdir(self.directory)
 
     def save_to_file(self, file_name, data):

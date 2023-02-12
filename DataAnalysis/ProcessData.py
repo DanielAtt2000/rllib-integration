@@ -3,6 +3,10 @@ import os
 from git import Repo
 import pickle
 import numpy as np
+from numpy import exp
+from scipy.stats import boxcox
+
+
 def min_max_normalisation(name, value):
     min = float(min_max_values[name][0])
     max = float(min_max_values[name][1])
@@ -10,17 +14,12 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-directory = '../data'
+directory = '../data/data_xyz'
 
 assert no_changes == True and log == False
 
-repo = Repo('../')
-remote = repo.remote('origin')
-commit_hash = repo.head.commit
 
-new_file_dir = f"data_{str(commit_hash)[:11]}"
-
-
+new_file_dir = directory.split('/')[2]
 
 if not os.path.exists(new_file_dir):
     os.mkdir(new_file_dir)
@@ -45,43 +44,59 @@ for filename in os.listdir(directory):
             lines = open_file.readlines()
 
             new_data = []
+            temp_array_1 = []
+            temp_array_2 = []
+
             for line in lines:
-                for data_entry in line.split(','):
-                    data_entry = data_entry.strip()
-                    for data in data_entry.split(','):
-                        if data != '[]':
-                            if data[0] == '[':
-                                data = data[1:]
-                            if data[-1] == ']':
-                                data = data[:-1]
+                if filename == "done":
+                    if line != "\n":
 
-                            from numpy import exp
-                            from scipy.stats import boxcox
+                        entry_pos = line.find("ENTRY: ")
+                        exit_pos = line.find("EXIT: ")
+                        dash_pos = line.find("-")
 
+                        entry_point = line[entry_pos+len("ENTRY: "):exit_pos].strip()
+                        exit_point = line[exit_pos+len("EXIT: "):dash_pos].strip()
+                        output = line[dash_pos+len('-'):].strip()
 
+                        temp_array_1.append(f"{entry_point},{exit_point}")
+                        temp_array_2.append(output)
 
-                            if no_changes:
-                                new_data.append(float(data))
-                            else:
-                                if log:
-                                    # try:
-                                    #     x = math.log10(float(data)+1)
-                                    #     if x >3:
-                                    #         print(data)
-                                    #     new_data.append(x)
-                                    # except ValueError:
-                                    #     print(data)
-                                    #     new_data.append(-10)
+                else:
 
-                                    # transform to be exponential
-                                    data = exp(float(data))
-                                    # power transform
-                                    new_data.append(boxcox(data,-1))
-                                else:
-                                    data = clip_custom(filename,float(data))
-                                    data = min_max_normalisation(filename,float(data))
+                    for data_entry in line.split(','):
+                        data_entry = data_entry.strip()
+                        for data in data_entry.split(','):
+                            if data != '[]':
+                                if data[0] == '[':
+                                    data = data[1:]
+                                if data[-1] == ']':
+                                    data = data[:-1]
+
+                                if no_changes:
                                     new_data.append(float(data))
+                                else:
+                                    if log:
+                                        # try:
+                                        #     x = math.log10(float(data)+1)
+                                        #     if x >3:
+                                        #         print(data)
+                                        #     new_data.append(x)
+                                        # except ValueError:
+                                        #     print(data)
+                                        #     new_data.append(-10)
 
+                                        # transform to be exponential
+                                        data = exp(float(data))
+                                        # power transform
+                                        new_data.append(boxcox(data,-1))
+                                    else:
+                                        data = clip_custom(filename,float(data))
+                                        data = min_max_normalisation(filename,float(data))
+                                        new_data.append(float(data))
+
+            if filename == "done":
+                new_data.append([temp_array_1,temp_array_2])
             with open(os.path.join(new_file_dir,filename + '.pkl'), 'wb') as handle:
                 pickle.dump(new_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
