@@ -6,8 +6,8 @@ num_workers: 1
 
 gamma: 0.99
 lr: 0.0001
-train_batch_size: 64
-rollout_fragment_length: 64
+train_batch_size: 16
+rollout_fragment_length: 16
 
 clip_rewards: False
 
@@ -30,7 +30,7 @@ num_cpus_per_worker: 11
    "type": "EpsilonGreedy",
    "initial_epsilon": 1.0,
    "final_epsilon": 0.02,
-   "epsilon_timesteps": 400000
+   "epsilon_timesteps": 200000
 }
 
 replay_buffer_config: {
@@ -82,7 +82,7 @@ env_config:
 #   host: "127.0.0.1"
     timeout: 30.0
     # IF YOU ARE GOING TO CHANGE THE TIMESTEP CHANGE rotation_frequency of LIDAR
-    timestep: 0.07 # IMP IMP
+    timestep: 0.1 # IMP IMP
     # IMP
     retries_on_error: 25
     resolution_x: 300

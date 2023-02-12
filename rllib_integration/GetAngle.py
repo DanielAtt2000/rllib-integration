@@ -11,7 +11,7 @@ def calculate_angle_with_center_of_lane(previous_position, current_position, nex
     denominator = math.sqrt(math.pow(Vl_x, 2) + math.pow(Vl_y, 2)) * math.sqrt(math.pow(Vj_x, 2) + math.pow(Vj_y, 2))
 
     angle_rad = math.acos(enumerator / denominator)
-    angle_deg = angle_rad* 180/math.pi
+    # angle_deg = angle_rad* 180/math.pi
 
     #
     # print(f"In calculate_angle_with_center_of_lane")
@@ -20,7 +20,7 @@ def calculate_angle_with_center_of_lane(previous_position, current_position, nex
     # print(f"Next position X:{next_position.x} Y:{next_position.y}")
     # print(f"Output angle in degrees {angle_deg}")
 
-    return angle_deg
+    return angle_rad
 
 
 import numpy as np
@@ -43,8 +43,8 @@ def angle_between(angle_1, angle_2):
     v1_u = unit_vector((angle_1.x,angle_1.y,angle_1.z))
     v2_u = unit_vector((angle_2.x,angle_2.y,angle_2.z))
     angle_rad = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
-    angle_deg = angle_rad * 180 / math.pi
-    return angle_deg
+    # angle_deg = angle_rad * 180 / math.pi
+    return angle_rad
 
 class Angle:
     def __init__(self,x,y):

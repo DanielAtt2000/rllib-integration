@@ -23,7 +23,7 @@ lr: 0.001
    "type": "EpsilonGreedy",
    "initial_epsilon": 1.0,
    "final_epsilon": 0.02,
-   "epsilon_timesteps": 400000
+   "epsilon_timesteps": 200000
 }
 target_network_update_freq: 8000
 #exploration_config: {

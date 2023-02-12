@@ -148,8 +148,8 @@ class SACExperimentBasic(BaseExperiment):
         :return:
         """
         image_space = Box(
-                low=np.array([0,0,0,0,0,0,0]),
-                high=np.array([100,100,100,100,400,400,100]),
+                low=np.array([0,0,0,0]),
+                high=np.array([100,100,2*math.pi,2*math.pi]),
                 dtype=np.float32,
             )
         return image_space
@@ -273,7 +273,7 @@ class SACExperimentBasic(BaseExperiment):
         angle_to_center_of_lane_degrees = calculate_angle_with_center_of_lane(
             previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_transform.location,
-            next_position=core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location)
+            next_position=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location)
 
 
         if self.visualiseRoute and self.counter > self.counterThreshold:
@@ -335,31 +335,31 @@ class SACExperimentBasic(BaseExperiment):
 
         observations = [
             np.float32(forward_velocity),
-            np.float32(forward_velocity_x),
-            np.float32(forward_velocity_z),
+            # np.float32(forward_velocity_x),
+            # np.float32(forward_velocity_z),
             np.float32(hyp_distance_to_next_waypoint),
             np.float32(angle_to_center_of_lane_degrees),
             np.float32(bearing_to_waypoint),
-            np.float32(acceleration)
+            # np.float32(acceleration)
                            ]
 
         self.forward_velocity.append(np.float32(forward_velocity))
-        self.forward_velocity_x.append(np.float32(forward_velocity_x))
-        self.forward_velocity_z.append(np.float32(forward_velocity_z))
+        # self.forward_velocity_x.append(np.float32(forward_velocity_x))
+        # self.forward_velocity_z.append(np.float32(forward_velocity_z))
         self.hyp_distance_to_next_waypoint.append(np.float32(hyp_distance_to_next_waypoint))
         self.angle_with_center.append(np.float32(angle_to_center_of_lane_degrees))
         self.bearing_to_waypoint.append(np.float32(bearing_to_waypoint))
-        self.acceleration.append(np.float32(acceleration))
+        # self.acceleration.append(np.float32(acceleration))
 
         print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
         print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
         print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
         print(f"forward_velocity:{np.float32(forward_velocity)}")
-        print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
-        print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
-        print(f"acceleration:{np.float32(acceleration)}")
+        # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
+        # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
+        # print(f"acceleration:{np.float32(acceleration)}")
 
-        return np.array(observations),{}
+        return observations,{}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -439,32 +439,32 @@ class SACExperimentBasic(BaseExperiment):
 
         reward = 0
 
-        hyp_distance_to_next_waypoint = observation[3]
+        hyp_distance_to_next_waypoint = observation[1]
 
         print(hyp_distance_to_next_waypoint)
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            reward =+ hyp_reward*1000
+            reward =+ hyp_reward*100
             print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward}")
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
 
 
         if self.done_falling:
-            reward += -100000
+            reward += -1000
             print('====> REWARD Done falling')
         if self.done_collision:
             print("====> REWARD Done collision")
-            reward += -100000
+            reward += -1000
         if self.done_time_idle:
             print("====> REWARD Done idle")
-            reward += -100000
+            reward += -1000
         if self.done_time_episode:
             print("====> REWARD Done max time")
-            reward += -100000
+            reward += -1000
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward += 100000
+            reward += 1000
 
         print(f"Reward: {reward}")
         return reward
