@@ -25,7 +25,8 @@ def get_entry_exit_spawn_point_indices(failed_spawn_locations,debug=False):
     while entry_spawn_point_index in failed_spawn_locations:
         number_of_exists = int(len(spawn_points.axes[1]) / 2)
         entry_idx = random.randint(0, number_of_exists-1) * 2
-        exit_number = random.randint(1,number_of_exists)
+        # exit_number = random.randint(1,number_of_exists)
+        exit_number = 1
         exit_idx = int((entry_idx + (exit_number * 2) + 1) % (number_of_exists * 2))
 
 
@@ -45,7 +46,7 @@ def get_entry_exit_spawn_point_indices(failed_spawn_locations,debug=False):
             print('=====================')
 
         # Only to test in straight line
-        entry_spawn_point_index = 34
+        # entry_spawn_point_index = 34
         # exit_spawn_point_index = -1
     if entry_spawn_point_index == -1 or exit_spawn_point_index == -1:
         raise Exception('Failed to find spawnable location')
