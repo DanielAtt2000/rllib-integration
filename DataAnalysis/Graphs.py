@@ -8,7 +8,7 @@ import numpy as np
 
 
 
-directory = 'data_xyz'
+directory = 'data_9d073b36404c1294ec5663a37231647afedafa67'
 df= pd.DataFrame()
 df_done = pd.DataFrame()
 string= '_beforeNormalisation'
