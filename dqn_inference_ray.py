@@ -17,15 +17,16 @@ from ray.rllib.algorithms.dqn import DQN
 from rllib_integration.carla_env import CarlaEnv
 from rllib_integration.carla_core import kill_all_servers
 
-from dqn.dqn_experiment import DQNExperiment
+from dqn.dqn_experiment_basic import DQNExperimentBasic
 
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
-EXPERIMENT_CLASS = DQNExperiment
+EXPERIMENT_CLASS = DQNExperimentBasic
 
 # RUN FUNCTION
 # python3 ./dqn_inference_ray.py dqn/dqn_config.yaml "/home/daniel/ray_results/carla_rllib/dqn_9b664eb1e1/CustomDQNTrainer_CarlaEnv_fc10a_00000_0_2023-01-16_19-09-57/checkpoint_000219"
 # /home/daniel/ray_results/carla_rllib/ppo_77e99cc55c/CustomPPOTrainer_CarlaEnv_e71d2_00000_0_2023-01-21_15-14-24/checkpoint_000571
 # /home/daniel/ray_results/carla_rllib/dqn_8138f8582f/CustomDQNTrainer_CarlaEnv_93bce_00000_0_2023-01-30_18-07-29/checkpoint_000750
+# /home/daniel/ray_results/carla_rllib/dqn_ea8eefa922/CustomDQNTrainer_CarlaEnv_16957_00000_0_2023-02-13_23-52-27/checkpoint_000305
 def parse_config(args):
     """
     Parses the .yaml configuration file into a readable dictionary

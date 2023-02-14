@@ -42,7 +42,7 @@ def run(args):
                  name=args.name,
                  local_dir=args.directory,
                  # stop={"perf/ram_util_percent": 85.0},
-                 checkpoint_freq=5,
+                 checkpoint_freq=1,
                  # checkpoint_at_end=True,
                  restore=get_checkpoint(args.name, args.directory, args.restore, args.overwrite),
                  config=args.config,
@@ -112,7 +112,7 @@ def main():
     launch_tensorboard(logdir= path,
                        host="localhost")
 
-    specific_version = True
+    specific_version = False
     check_commit = True
 
     if check_with_user(check_commit):

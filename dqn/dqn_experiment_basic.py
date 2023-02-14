@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 import math
 import numpy as np
-from gym.spaces import Box, Discrete, Dict
+from gym.spaces import Box, Discrete, Dict, Tuple
 import warnings
 import carla
 import os
@@ -55,13 +55,16 @@ class DQNExperimentBasic(BaseExperiment):
         self.forward_velocity_z = []
         self.hyp_distance_to_next_waypoint = []
         self.acceleration = []
+        self.no_of_collisions = []
 
         from git import Repo
         repo = Repo('.')
         remote = repo.remote('origin')
         remote.fetch()
         self.directory = f"data/data_{repo.head.commit}"
-        os.mkdir(self.directory)
+
+        if not os.path.exists(self.directory):
+            os.mkdir(self.directory)
 
     def save_to_file(self, file_name, data):
         # Saving LIDAR point count
@@ -101,6 +104,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.save_to_file(f"{self.directory}/forward_velocity_x", self.forward_velocity_x)
         self.save_to_file(f"{self.directory}/forward_velocity_z", self.forward_velocity_z)
         self.save_to_file(f"{self.directory}/acceleration", self.acceleration)
+        self.save_to_file(f"{self.directory}/no_of_collision", self.no_of_collisions)
 
         # Saving LIDAR point count
         # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
@@ -131,6 +135,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.forward_velocity_z = []
         self.hyp_distance_to_next_waypoint = []
         self.acceleration = []
+        self.no_of_collisions = []
 
 
 
@@ -147,22 +152,23 @@ class DQNExperimentBasic(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
-        image_space = Box(
-                low=np.array([0,0,0,0]),
-                high=np.array([100,100,2*math.pi,2*math.pi]),
-                dtype=np.float32,
-            )
+        image_space = Dict({"values":Box(
+                    low=np.array([0,0,0,0]),
+                    high=np.array([100,100,2*math.pi,2*math.pi]),
+                    dtype=np.float32,
+                ),"collisions": Discrete(1)})
+
         return image_space
 
     def get_actions(self):
         return {
-            0: [0.4, 0.00, 0.0, False, False],  # Coast
-            1: [0.4, 0.75, 0.0, False, False],  # Right
-            2: [0.4, 0.50, 0.0, False, False],  # Right
-            3: [0.4, 0.25, 0.0, False, False],  # Right
-            4: [0.4, -0.75, 0.0, False, False],  # Left
-            5: [0.4, -0.50, 0.0, False, False],  # Left
-            6: [0.4, -0.25, 0.0, False, False],  # Left
+            0: [0.3, 0.00, 0.0, False, False],  # Coast
+            1: [0.3, 0.75, 0.0, False, False],  # Right
+            2: [0.3, 0.50, 0.0, False, False],  # Right
+            3: [0.3, 0.25, 0.0, False, False],  # Right
+            4: [0.3, -0.75, 0.0, False, False],  # Left
+            5: [0.3, -0.50, 0.0, False, False],  # Left
+            6: [0.3, -0.25, 0.0, False, False],  # Left
         }
 
 
@@ -349,17 +355,19 @@ class DQNExperimentBasic(BaseExperiment):
         self.hyp_distance_to_next_waypoint.append(np.float32(hyp_distance_to_next_waypoint))
         self.angle_with_center.append(np.float32(angle_to_center_of_lane_degrees))
         self.bearing_to_waypoint.append(np.float32(bearing_to_waypoint))
+        self.no_of_collisions.append(np.float32(self.last_no_of_collisions))
         # self.acceleration.append(np.float32(acceleration))
 
         print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
         print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
         print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
         print(f"forward_velocity:{np.float32(forward_velocity)}")
+        print(f"no_of_collisions:{np.float32(self.last_no_of_collisions)}")
         # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
         # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         # print(f"acceleration:{np.float32(acceleration)}")
 
-        return observations,{}
+        return {"values":observations,"collisions":self.last_no_of_collisions},{}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -439,7 +447,7 @@ class DQNExperimentBasic(BaseExperiment):
 
         reward = 0
 
-        hyp_distance_to_next_waypoint = observation[1]
+        hyp_distance_to_next_waypoint = observation['values'][1]
 
         print(hyp_distance_to_next_waypoint)
         if self.last_hyp_distance_to_next_waypoint != 0:
@@ -464,7 +472,7 @@ class DQNExperimentBasic(BaseExperiment):
             reward += -1000
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward += 1000
+            reward += 10000
 
         print(f"Reward: {reward}")
         return reward

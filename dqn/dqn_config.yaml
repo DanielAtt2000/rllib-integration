@@ -5,24 +5,28 @@ num_workers: 1
 num_gpus: 1
 #num_gpus_per_worker: 1
 num_cpus_per_worker: 11
-rollout_fragment_length: 16
+rollout_fragment_length: 4
 #timesteps_per_iteration: 20000
-train_batch_size: 16
-num_steps_sampled_before_learning_starts: 2500
+train_batch_size: 32
+num_steps_sampled_before_learning_starts: 10000
 recreate_failed_workers: True
 replay_buffer_config: {
   capacity: 500000
 }
 
 horizon: 6500
-double_q: True
-dueling: True
+#double_q: True
+#dueling: True
+n_step: 5
+num_atoms: 51
+noisy: True
 # "batch_mode": "complete_episodes"
-lr: 0.001
+lr: 0.0001
+gamma: 0.99
 "exploration_config": {
-   "type": "EpsilonGreedy",
-   "initial_epsilon": 1.0,
-   "final_epsilon": 0.02,
+#  "type": "EpsilonGreedy",
+#  "initial_epsilon": 1.0,
+   "final_epsilon": 0.01,
    "epsilon_timesteps": 200000
 }
 target_network_update_freq: 8000
