@@ -156,7 +156,7 @@ class DQNExperimentBasic(BaseExperiment):
                     low=np.array([0,0,0,0]),
                     high=np.array([100,100,2*math.pi,2*math.pi]),
                     dtype=np.float32,
-                ),"collisions": Discrete(1)})
+                ),"collisions": Discrete(5)})
 
         return image_space
 
