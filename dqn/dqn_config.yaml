@@ -19,9 +19,9 @@ horizon: 6500
 #dueling: True
 n_step: 5
 num_atoms: 51
-noisy: True
+noisy: False
 # "batch_mode": "complete_episodes"
-lr: 0.0001
+lr: 0.0005
 gamma: 0.99
 "exploration_config": {
 #  "type": "EpsilonGreedy",
