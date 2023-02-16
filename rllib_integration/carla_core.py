@@ -458,7 +458,13 @@ class CarlaCore:
         # next_spawn_point = spawn_points[i % len(spawn_points)]
         failed_entry_spawn_locations = [-1]
         # while self.hero is None and (hero_config["truckTrailerCombo"] and self.hero_trailer is None) :
-        while self.hero is None:
+        if hero_config["truckTrailerCombo"]:
+            checkIfNone = (self.hero is None) or (self.hero_trailer is None)
+        else:
+            checkIfNone = self.hero is None
+
+
+        while checkIfNone:
 
             entry_spawn_point_index, entry_spawn_point = self.set_route(failed_entry_spawn_locations)
 

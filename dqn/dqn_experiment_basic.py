@@ -50,12 +50,18 @@ class DQNExperimentBasic(BaseExperiment):
         self.y_dist_to_waypoint = []
         self.angle_with_center = []
         self.bearing_to_waypoint = []
+        self.angle_between_truck_and_trailer = []
         self.forward_velocity = []
-        self.forward_velocity_x = []
-        self.forward_velocity_z = []
+        # self.forward_velocity_x = []
+        # self.forward_velocity_z = []
+        self.vehicle_path = []
+        self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
-        self.acceleration = []
+        # self.acceleration = []
         self.no_of_collisions = []
+
+        self.last_no_of_collisions_truck = 0
+        self.last_no_of_collisions_trailer = 0
 
         from git import Repo
         repo = Repo('.')
@@ -95,15 +101,19 @@ class DQNExperimentBasic(BaseExperiment):
         self.last_angle_with_center = 0
         self.last_forward_velocity = 0
 
-        self.last_no_of_collisions = 0
+        self.last_no_of_collisions_truck = 0
+        self.last_no_of_collisions_trailer = 0
 
         self.save_to_file(f"{self.directory}/hyp_distance_to_next_waypoint", self.hyp_distance_to_next_waypoint)
         self.save_to_file(f"{self.directory}/angle_with_center", self.angle_with_center)
         self.save_to_file(f"{self.directory}/bearing", self.bearing_to_waypoint)
+        self.save_to_file(f"{self.directory}/angle_between_truck_and_trailer", self.angle_between_truck_and_trailer)
         self.save_to_file(f"{self.directory}/forward_velocity", self.forward_velocity)
-        self.save_to_file(f"{self.directory}/forward_velocity_x", self.forward_velocity_x)
-        self.save_to_file(f"{self.directory}/forward_velocity_z", self.forward_velocity_z)
-        self.save_to_file(f"{self.directory}/acceleration", self.acceleration)
+        # self.save_to_file(f"{self.directory}/forward_velocity_x", self.forward_velocity_x)
+        # self.save_to_file(f"{self.directory}/forward_velocity_z", self.forward_velocity_z)
+        # self.save_to_file(f"{self.directory}/acceleration", self.acceleration)
+        self.save_to_file(f"{self.directory}/route", self.vehicle_path)
+        self.save_to_file(f"{self.directory}/path", self.temp_route)
 
         # Saving LIDAR point count
         # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
@@ -129,11 +139,14 @@ class DQNExperimentBasic(BaseExperiment):
         self.y_dist_to_waypoint = []
         self.angle_with_center = []
         self.bearing_to_waypoint = []
+        self.angle_between_truck_and_trailer = []
         self.forward_velocity = []
-        self.forward_velocity_x = []
-        self.forward_velocity_z = []
+        # self.forward_velocity_x = []
+        # self.forward_velocity_z = []
+        self.vehicle_path = []
+        self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
-        self.acceleration = []
+        # self.acceleration = []
 
 
 
@@ -151,8 +164,8 @@ class DQNExperimentBasic(BaseExperiment):
         :return:
         """
         image_space = Box(
-                low=np.array([0,0,-math.pi,-math.pi]),
-                high=np.array([100,100,math.pi,math.pi]),
+                low=np.array([0,0,-math.pi,-math.pi,-math.pi]),
+                high=np.array([100,100,math.pi,math.pi,math.pi]),
                 dtype=np.float32,
             )
         return image_space
@@ -234,8 +247,9 @@ class DQNExperimentBasic(BaseExperiment):
         # Getting truck location
         truck_transform = core.hero.get_transform()
 
-
-
+        if core.config["truckTrailerCombo"]:
+            # Getting trailer location
+            trailer_transform = core.hero_trailer.get_transform()
 
         # print(f"BEFORE CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
         # Checking if we have passed the last way point
@@ -253,23 +267,15 @@ class DQNExperimentBasic(BaseExperiment):
 
         bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
 
-        if bearing_to_waypoint > 359:
-            strings = [ f"-------------------------------------------\n"
-                        f"bearing_to_waypoint: {bearing_to_waypoint}\n",
-                        f"Truck: {truck_transform.get_forward_vector()}\n",
-                        f"Waypoint : {core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector()}\n",
-                        f"bearing_to_waypoint: {bearing_to_waypoint}\n",
-                        f"-------------------------------------------\n"]
+        angle_between_truck_and_trailer = angle_between(waypoint_forward_vector=truck_transform.get_forward_vector(),vehicle_forward_vector=trailer_transform.get_forward_vector())
 
-            print(strings)
-            with open('bearing.txt', 'a') as file:
-                file.writelines(strings)
-
+        self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
+        self.temp_route.append(core.route)
 
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
-        forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
-        forward_velocity_z = np.clip(self.get_forward_velocity_z(core.hero), 0, None)
-        acceleration = np.clip(self.get_acceleration(core.hero), 0, None)
+        # forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
+        # forward_velocity_z = np.clip(self.get_forward_velocity_z(core.hero), 0, None)
+        # acceleration = np.clip(self.get_acceleration(core.hero), 0, None)
 
         # Angle to center of lane
 
@@ -333,8 +339,12 @@ class DQNExperimentBasic(BaseExperiment):
             if sensor == 'collision_truck':
                 # TODO change to only take collision with road
 
-                self.last_no_of_collisions = len(sensor_data[sensor][1])
-                print(f'COLLISIONS {sensor_data[sensor]}')
+                self.last_no_of_collisions_truck = len(sensor_data[sensor][1])
+                print(f'COLLISIONS TRUCK {sensor_data[sensor]}')
+
+            elif sensor == "collision_trailer":
+                self.last_no_of_collisions_trailer = len(sensor_data[sensor][1])
+                print(f'COLLISIONS TRAILER {sensor_data[sensor]}')
 
         observations = [
             np.float32(forward_velocity),
@@ -343,6 +353,7 @@ class DQNExperimentBasic(BaseExperiment):
             np.float32(hyp_distance_to_next_waypoint),
             np.float32(angle_to_center_of_lane_degrees),
             np.float32(bearing_to_waypoint),
+            np.float32(angle_between_truck_and_trailer),
             # np.float32(acceleration)
                            ]
 
@@ -352,12 +363,14 @@ class DQNExperimentBasic(BaseExperiment):
         self.hyp_distance_to_next_waypoint.append(np.float32(hyp_distance_to_next_waypoint))
         self.angle_with_center.append(np.float32(angle_to_center_of_lane_degrees))
         self.bearing_to_waypoint.append(np.float32(bearing_to_waypoint))
+        self.angle_between_truck_and_trailer.append(np.float32(angle_between_truck_and_trailer))
         # self.acceleration.append(np.float32(acceleration))
 
         print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
         print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
         print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
         print(f"forward_velocity:{np.float32(forward_velocity)}")
+        print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
         # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
         # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         # print(f"acceleration:{np.float32(acceleration)}")
@@ -413,7 +426,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.time_episode += 1
         self.done_time_episode = self.max_time_episode < self.time_episode
         self.done_falling = hero.get_location().z < -0.5
-        self.done_collision = self.last_no_of_collisions > 0
+        self.done_collision = (self.last_no_of_collisions_truck > 0) or (self.last_no_of_collisions_trailer > 0)
         self.done_arrived = self.completed_route(core)
 
         output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision or self.done_arrived
