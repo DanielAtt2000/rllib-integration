@@ -61,7 +61,7 @@ class DQNExperimentBasic(BaseExperiment):
         repo = Repo('.')
         remote = repo.remote('origin')
         remote.fetch()
-        self.directory = f"data/data_{repo.head.commit}"
+        self.directory = f"data/data_{str(repo.head.commit)[:11]}"
 
         if not os.path.exists(self.directory):
             os.mkdir(self.directory)
@@ -253,11 +253,11 @@ class DQNExperimentBasic(BaseExperiment):
 
         bearing_to_waypoint = angle_between(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),truck_transform.get_forward_vector())
 
-        if bearing_to_waypoint > 359:
+        if bearing_to_waypoint > 0:
             strings = [ f"-------------------------------------------\n"
                         f"bearing_to_waypoint: {bearing_to_waypoint}\n",
-                        f"Truck: {truck_transform}\n",
-                        f"Truck Waypoint : {core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with]}\n",
+                        f"Truck: {truck_transform.get_forward_vector()}\n",
+                        f"Waypoint : {core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector()}\n",
                         f"bearing_to_waypoint: {bearing_to_waypoint}\n",
                         f"-------------------------------------------\n"]
 
@@ -395,7 +395,7 @@ class DQNExperimentBasic(BaseExperiment):
         #print("Inside Complete Route")
         #print(f"Len(core.route) -2 : {len(core.route) -2 }")
         #print(f"core.last_waypoint_index{core.last_waypoint_index}")
-        if len(core.route) - 15 <= core.last_waypoint_index:
+        if len(core.route) - 20 <= core.last_waypoint_index:
             return True
 
     def min_max_normalisation(self, value, min, max):
