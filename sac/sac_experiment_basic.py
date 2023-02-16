@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 import math
 import numpy as np
-from gym.spaces import Box, Discrete, Dict
+from gym.spaces import Box, Discrete, Dict, Tuple
 import warnings
 import carla
 import os
@@ -55,13 +55,16 @@ class SACExperimentBasic(BaseExperiment):
         self.forward_velocity_z = []
         self.hyp_distance_to_next_waypoint = []
         self.acceleration = []
+        self.no_of_collisions = []
 
         from git import Repo
         repo = Repo('.')
         remote = repo.remote('origin')
         remote.fetch()
-        self.directory = f"data/data_{repo.head.commit}"
-        os.mkdir(self.directory)
+        self.directory = f"data/data_{str(repo.head.commit)[:11]}"
+
+        if not os.path.exists(self.directory):
+            os.mkdir(self.directory)
 
     def save_to_file(self, file_name, data):
         # Saving LIDAR point count
@@ -148,21 +151,21 @@ class SACExperimentBasic(BaseExperiment):
         :return:
         """
         image_space = Box(
-                low=np.array([0,0,0,0]),
-                high=np.array([100,100,2*math.pi,2*math.pi]),
+                low=np.array([0,0,-math.pi,-math.pi]),
+                high=np.array([100,100,math.pi,math.pi]),
                 dtype=np.float32,
             )
         return image_space
 
     def get_actions(self):
         return {
-            0: [0.4, 0.00, 0.0, False, False],  # Coast
-            1: [0.4, 0.75, 0.0, False, False],  # Right
-            2: [0.4, 0.50, 0.0, False, False],  # Right
-            3: [0.4, 0.25, 0.0, False, False],  # Right
-            4: [0.4, -0.75, 0.0, False, False],  # Left
-            5: [0.4, -0.50, 0.0, False, False],  # Left
-            6: [0.4, -0.25, 0.0, False, False],  # Left
+            0: [0.3, 0.00, 0.0, False, False],  # Coast
+            1: [0.3, 0.75, 0.0, False, False],  # Right
+            2: [0.3, 0.50, 0.0, False, False],  # Right
+            3: [0.3, 0.25, 0.0, False, False],  # Right
+            4: [0.3, -0.75, 0.0, False, False],  # Left
+            5: [0.3, -0.50, 0.0, False, False],  # Left
+            6: [0.3, -0.25, 0.0, False, False],  # Left
         }
 
 
@@ -248,13 +251,13 @@ class SACExperimentBasic(BaseExperiment):
         y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y - truck_transform.location.y)
         hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
 
-        bearing_to_waypoint = angle_between(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),truck_transform.get_forward_vector())
+        bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
 
         if bearing_to_waypoint > 359:
             strings = [ f"-------------------------------------------\n"
                         f"bearing_to_waypoint: {bearing_to_waypoint}\n",
-                        f"Truck: {truck_transform}\n",
-                        f"Truck Waypoint : {core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with]}\n",
+                        f"Truck: {truck_transform.get_forward_vector()}\n",
+                        f"Waypoint : {core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector()}\n",
                         f"bearing_to_waypoint: {bearing_to_waypoint}\n",
                         f"-------------------------------------------\n"]
 
@@ -359,7 +362,7 @@ class SACExperimentBasic(BaseExperiment):
         # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         # print(f"acceleration:{np.float32(acceleration)}")
 
-        return observations,{}
+        return observations, {}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -392,7 +395,7 @@ class SACExperimentBasic(BaseExperiment):
         #print("Inside Complete Route")
         #print(f"Len(core.route) -2 : {len(core.route) -2 }")
         #print(f"core.last_waypoint_index{core.last_waypoint_index}")
-        if len(core.route) - 15 <= core.last_waypoint_index:
+        if len(core.route) - 22 <= core.last_waypoint_index:
             return True
 
     def min_max_normalisation(self, value, min, max):
@@ -464,7 +467,7 @@ class SACExperimentBasic(BaseExperiment):
             reward += -1000
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward += 1000
+            reward += 10000
 
         print(f"Reward: {reward}")
         return reward
