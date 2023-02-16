@@ -253,7 +253,7 @@ class DQNExperimentBasic(BaseExperiment):
 
         bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
 
-        if bearing_to_waypoint > 0:
+        if bearing_to_waypoint > 359:
             strings = [ f"-------------------------------------------\n"
                         f"bearing_to_waypoint: {bearing_to_waypoint}\n",
                         f"Truck: {truck_transform.get_forward_vector()}\n",
