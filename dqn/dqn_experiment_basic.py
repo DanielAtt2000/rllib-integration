@@ -151,8 +151,8 @@ class DQNExperimentBasic(BaseExperiment):
         :return:
         """
         image_space = Box(
-                low=np.array([0,0,0,0]),
-                high=np.array([100,100,2*math.pi,2*math.pi]),
+                low=np.array([0,0,-math.pi,-math.pi]),
+                high=np.array([100,100,math.pi,math.pi]),
                 dtype=np.float32,
             )
         return image_space
