@@ -20,7 +20,16 @@ def calculate_angle_with_center_of_lane(previous_position, current_position, nex
     # print(f"Next position X:{next_position.x} Y:{next_position.y}")
     # print(f"Output angle in degrees {angle_deg}")
 
-    return angle_rad
+    # Finding on which side the angle
+    x = np.array([
+        [1, previous_position.x, previous_position.y],
+        [1, next_position.x, next_position.y],
+        [1, current_position.x, current_position.y]])
+    det = np.linalg.det(x)
+    if det < 0:
+        return -angle_rad
+    else:
+        return angle_rad
 
 
 import numpy as np
@@ -29,7 +38,7 @@ def unit_vector(vector):
     """ Returns the unit vector of the vector.  """
     return vector / np.linalg.norm(vector)
 
-def angle_between(angle_1, angle_2):
+def angle_between(waypoint_forward_vector, vehicle_forward_vector):
     """ Returns the angle in radians between vectors 'v1' and 'v2'::
 
             # >>> angle_between((1, 0, 0), (0, 1, 0))
@@ -40,45 +49,60 @@ def angle_between(angle_1, angle_2):
             3.141592653589793
     """
 
-    v1_u = unit_vector((angle_1.x,angle_1.y,angle_1.z))
-    v2_u = unit_vector((angle_2.x,angle_2.y,angle_2.z))
+    v1_u = unit_vector((waypoint_forward_vector.x, waypoint_forward_vector.y, waypoint_forward_vector.z))
+    v2_u = unit_vector((vehicle_forward_vector.x, vehicle_forward_vector.y, vehicle_forward_vector.z))
     angle_rad = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
     # angle_deg = angle_rad * 180 / math.pi
-    return angle_rad
 
-class Angle:
+    # Finding on which side the angle
+    point_on_waypoint_forward_vector_1 = Vector(0,0)
+    point_on_waypoint_forward_vector_2 = Vector(waypoint_forward_vector.x,waypoint_forward_vector.y)
+    point_on_truck_forward_vector_1 = Vector(0.5*vehicle_forward_vector.x,0.5*vehicle_forward_vector.y)
+
+    x = np.array([
+        [1,point_on_waypoint_forward_vector_1.x,point_on_waypoint_forward_vector_1.y],
+        [1,point_on_waypoint_forward_vector_2.x,point_on_waypoint_forward_vector_2.y],
+        [1,point_on_truck_forward_vector_1.x,point_on_truck_forward_vector_1.y]])
+    det = np.linalg.det(x)
+    if det < 0:
+        return -angle_rad
+    else:
+        return angle_rad
+
+
+class Vector:
     def __init__(self,x,y):
         self.x =x
         self.y = y
 def run_tests():
-    assert round(calculate_angle_with_center_of_lane(Angle(50,20),Angle(10,50),Angle(50,80)),2) == 53.13
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(30,50),Angle(100,70)),2) == 29.74
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(-30,0),Angle(100,70)),2) == 160.35
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(30,0),Angle(50,70)),2) == 82.87
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(40,10),Angle(10,70)),2) == 90.00
+    assert round(calculate_angle_with_center_of_lane(Vector(50, 20), Vector(10, 50), Vector(50, 80)), 2) == 53.13
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(30, 50), Vector(100, 70)), 2) == 29.74
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-30, 0), Vector(100, 70)), 2) == 160.35
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(30, 0), Vector(50, 70)), 2) == 82.87
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(40, 10), Vector(10, 70)), 2) == 90.00
 
 
     # First quadrant
 
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(50,50),Angle(10,70)),2) == 45.00
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(50,50),Angle(20,70)),2) == 35.54
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(50, 50), Vector(10, 70)), 2) == 45.00
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(50, 50), Vector(20, 70)), 2) == 35.54
 
     # Vertical
 
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(10,90),Angle(10,70)),2) == 0
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(10,90),Angle(20,70)),2) == 9.46
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(10, 90), Vector(10, 70)), 2) == 0
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(10, 90), Vector(20, 70)), 2) == 9.46
     # Second quadrant
 
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(-40,30),Angle(10,70)),2) == 68.20
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(-40,30),Angle(20,70)),2) == 77.66
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-40, 30), Vector(10, 70)), 2) == 68.20
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-40, 30), Vector(20, 70)), 2) == 77.66
 
     # Third quadrant
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(-20,-50),Angle(10,70)),2) == 153.43
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(-20,-50),Angle(20,70)),2) == 162.90
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-20, -50), Vector(10, 70)), 2) == 153.43
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-20, -50), Vector(20, 70)), 2) == 162.90
 
     # fourth quadrant
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(50,-60),Angle(10,70)),2) == 150.26
-    assert round(calculate_angle_with_center_of_lane(Angle(10,10), Angle(50,-60),Angle(20,70)),2) == 140.79
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(50, -60), Vector(10, 70)), 2) == 150.26
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(50, -60), Vector(20, 70)), 2) == 140.79
     print('All assertions passed')
 # run_tests()
 

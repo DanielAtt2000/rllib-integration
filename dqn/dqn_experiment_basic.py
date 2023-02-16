@@ -251,7 +251,7 @@ class DQNExperimentBasic(BaseExperiment):
         y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y - truck_transform.location.y)
         hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
 
-        bearing_to_waypoint = angle_between(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),truck_transform.get_forward_vector())
+        bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
 
         if bearing_to_waypoint > 0:
             strings = [ f"-------------------------------------------\n"
