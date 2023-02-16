@@ -515,7 +515,7 @@ class CarlaCore:
         for name, attributes in hero_config["sensors"].items():
             sensor_truck = SensorFactory.spawn(name, attributes, self.sensor_interface_truck, self.hero)
             if hero_config["truckTrailerCombo"] and (name != 'lidar' and name != 'semantic_camera'):
-                print("TRAILER PART 1/7")
+                print("TRAILER PART 7/7")
                 sensor_trailer = SensorFactory.spawn(name, attributes, self.sensor_interface_trailer, self.hero_trailer)
 
         # Not needed anymore. This tick will happen when calling CarlaCore.tick()
