@@ -71,10 +71,10 @@ env_config:
 
   experiment:
     hero:
-      truckTrailerCombo: False
-#      blueprintTruck: "DAFxf"
-      blueprintTruck: "vehicle.audi.a2"
-      blueprintTrailer: "trailer"
+      truckTrailerCombo: True
+      blueprintTruck: "vehicle.daf.dafxf"
+#      blueprintTruck: "vehicle.audi.a2"
+      blueprintTrailer: "vehicle.trailer.trailer"
       lidar_max_points : 3000
       sensors:
 #        obstacle:

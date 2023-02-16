@@ -85,7 +85,7 @@ class CarlaCore:
         self.hero_trailer = None
         self.config = join_dicts(BASE_CORE_CONFIG, config)
         self.sensor_interface_truck = SensorInterface()
-        self.sensor_interface_trailer = SensorInterface() if self.config["truckTrailerCombo"] else None
+        self.sensor_interface_trailer = SensorInterface()
         self.server_port = 2000
         self.server_port_lines = ''
 
@@ -458,13 +458,8 @@ class CarlaCore:
         # next_spawn_point = spawn_points[i % len(spawn_points)]
         failed_entry_spawn_locations = [-1]
         # while self.hero is None and (hero_config["truckTrailerCombo"] and self.hero_trailer is None) :
-        if hero_config["truckTrailerCombo"]:
-            checkIfNone = (self.hero is None) or (self.hero_trailer is None)
-        else:
-            checkIfNone = self.hero is None
 
-
-        while checkIfNone:
+        while ((self.hero is None) or (self.hero_trailer is None)) if hero_config["truckTrailerCombo"] else (self.hero is None):
 
             entry_spawn_point_index, entry_spawn_point = self.set_route(failed_entry_spawn_locations)
 
@@ -623,14 +618,26 @@ class CarlaCore:
 
 
         # Get the camera position
-        server_view_x = transform.location.x - 5 * transform.get_forward_vector().x
-        server_view_y = transform.location.y - 5 * transform.get_forward_vector().y
-        server_view_z = transform.location.z + 3
+        server_view_x = transform.location.x - 11 * transform.get_forward_vector().x
+        server_view_y = transform.location.y - 11 * transform.get_forward_vector().y
+        server_view_z = transform.location.z + 18
+        # For car
+        # server_view_x = transform.location.x - 5 * transform.get_forward_vector().x
+        # server_view_y = transform.location.y - 5 * transform.get_forward_vector().y
+        # server_view_z = transform.location.z + 3
+
+        # For truck
+        # server_view_x = transform.location.x - 11 * transform.get_forward_vector().x
+        # server_view_y = transform.location.y - 11 * transform.get_forward_vector().y
+        # server_view_z = transform.location.z + 18
+
 
         # Get the camera orientation
         server_view_roll = transform.rotation.roll
         server_view_yaw = transform.rotation.yaw
-        server_view_pitch = transform.rotation.pitch
+        server_view_pitch = transform.rotation.pitch - 75
+        # For car transform.rotation.pitch
+        # For truck transform.rotation.pitch - 75
 
         # Get the spectator and place it on the desired position
         self.spectator = self.world.get_spectator()
