@@ -392,7 +392,7 @@ class CarlaCore:
             #     carla.Rotation(0, 0, 0)))
 
             self.route.append(route_waypoint[0].transform)
-            self.route_points.append((route_waypoint[0].transform.x,route_waypoint[0].transform.y))
+            self.route_points.append((route_waypoint[0].transform.location.x,route_waypoint[0].transform.location.y))
 
         return self.entry_spawn_point_index, entry_spawn_point
 
