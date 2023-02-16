@@ -90,6 +90,7 @@ class CarlaCore:
         self.server_port_lines = ''
 
         self.route = []
+        self.route_points = []
         self.last_waypoint_index = None
 
         self.min_x = None
@@ -391,6 +392,7 @@ class CarlaCore:
             #     carla.Rotation(0, 0, 0)))
 
             self.route.append(route_waypoint[0].transform)
+            self.route_points.append((route_waypoint[0].transform.x,route_waypoint[0].transform.y))
 
         return self.entry_spawn_point_index, entry_spawn_point
 

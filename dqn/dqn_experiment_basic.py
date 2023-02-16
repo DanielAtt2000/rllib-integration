@@ -270,7 +270,7 @@ class DQNExperimentBasic(BaseExperiment):
         angle_between_truck_and_trailer = angle_between(waypoint_forward_vector=truck_transform.get_forward_vector(),vehicle_forward_vector=trailer_transform.get_forward_vector())
 
         self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
-        self.temp_route.append(core.route)
+        self.temp_route.append(core.route_points)
 
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
         # forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
