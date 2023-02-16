@@ -58,7 +58,8 @@ class DQNExperimentBasic(BaseExperiment):
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
         # self.acceleration = []
-        self.no_of_collisions = []
+        self.truck_collisions = []
+        self.trailer_collisions =[]
 
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
@@ -114,6 +115,8 @@ class DQNExperimentBasic(BaseExperiment):
         # self.save_to_file(f"{self.directory}/acceleration", self.acceleration)
         self.save_to_file(f"{self.directory}/route", self.vehicle_path)
         self.save_to_file(f"{self.directory}/path", self.temp_route)
+        self.save_to_file(f"{self.directory}/truck_collisions", self.truck_collisions)
+        self.save_to_file(f"{self.directory}/trailer_collisions", self.trailer_collisions)
 
         # Saving LIDAR point count
         # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
@@ -146,6 +149,8 @@ class DQNExperimentBasic(BaseExperiment):
         self.vehicle_path = []
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
+        self.truck_collisions = []
+        self.trailer_collisions =[]
         # self.acceleration = []
 
 
@@ -340,10 +345,12 @@ class DQNExperimentBasic(BaseExperiment):
                 # TODO change to only take collision with road
 
                 self.last_no_of_collisions_truck = len(sensor_data[sensor][1])
+                self.truck_collisions.append(str(sensor_data[sensor][1][0]))
                 print(f'COLLISIONS TRUCK {sensor_data[sensor][1][0]}')
 
             elif sensor == "collision_trailer":
                 self.last_no_of_collisions_trailer = len(sensor_data[sensor][1])
+                self.trailer_collisions.append(str(sensor_data[sensor][1][0]))
                 print(f'COLLISIONS TRAILER {sensor_data[sensor][1][0]}')
 
         observations = [
