@@ -104,7 +104,13 @@ class BaseCamera(CarlaSensor):
         array = np.reshape(array, (sensor_data.height, sensor_data.width, 4))
         # array = array[int(array.shape[0]/2):, :, :1]
         # array = array[:, :, :3]
-        array = array[:, :, :1]
+
+        # 1D Image
+        # array = array[:, :, :1]
+
+        # 3D Image
+        array = array[:, :, :3]
+
         array = array[:, :, ::-1]
 
         # import matplotlib.pyplot as plt

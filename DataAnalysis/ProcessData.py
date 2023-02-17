@@ -14,7 +14,7 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-directory = '../data/data_748f57b0cf74210691f80efd69763beaf9cb4379'
+directory = '../data/data_d8ccb284873'
 
 assert no_changes == True and log == False
 
@@ -61,9 +61,14 @@ for filename in os.listdir(directory):
 
                         temp_array_1.append(f"{entry_point},{exit_point}")
                         temp_array_2.append(output)
-
+                elif filename == "trailer_collisions" or filename == "truck_collisions":
+                    entry_pos = line.find("type=")
+                    collision_object = str(line[entry_pos + len("type="):-3].strip())
+                    new_data.append(collision_object)
+                elif filename == "path" or filename == "route":
+                    if line != "[]":
+                        new_data.append(line)
                 else:
-
                     for data_entry in line.split(','):
                         data_entry = data_entry.strip()
                         for data in data_entry.split(','):

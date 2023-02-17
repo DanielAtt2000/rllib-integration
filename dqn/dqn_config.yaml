@@ -11,7 +11,7 @@ train_batch_size: 32
 num_steps_sampled_before_learning_starts: 10000
 recreate_failed_workers: True
 replay_buffer_config: {
-  capacity: 500000
+  capacity: 300000
 }
 
 horizon: 6500
@@ -30,6 +30,8 @@ gamma: 0.99
    "epsilon_timesteps": 200000
 }
 target_network_update_freq: 8000
+model:
+  grayscale: True
 #exploration_config: {
 #  type: "SoftQ",
 #  temperature: 1.0,
@@ -83,7 +85,9 @@ env_config:
           type: "sensor.other.collision"
         depth_camera:
           type: "sensor.camera.depth"
-          transform: '0.0,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
+          image_size_x: 84
+          image_size_y: 84
+          transform: '2.3,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
 #       lidar:
 #          type: "sensor.lidar.ray_cast_semantic"
 #          channels : "32"
