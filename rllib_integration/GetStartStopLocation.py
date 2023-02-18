@@ -25,8 +25,7 @@ def get_entry_exit_spawn_point_indices(failed_spawn_locations,debug=False):
     while entry_spawn_point_index in failed_spawn_locations:
         number_of_exists = int(len(spawn_points.axes[1]) / 2)
         entry_idx = random.randint(0, number_of_exists-1) * 2
-        # exit_number = random.randint(1,number_of_exists)
-        exit_number = 1
+        exit_number = random.randint(1,number_of_exists)
         exit_idx = int((entry_idx + (exit_number * 2) + 1) % (number_of_exists * 2))
 
 
