@@ -112,14 +112,14 @@ def main():
     launch_tensorboard(logdir= path,
                        host="localhost")
 
-    specific_version = False
-    check_commit = False
+    specific_version = True
+    check_commit = True
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())
 
         if specific_version:
-            args.name = "dqn_ea8eefa922"
+            args.name = "dqn_1e6ea7f4"
             x = random.randint(0,100)
             inp = input(f'SPECIFIC NAME APPLIED ENTER {x} to confirm:')
 
