@@ -185,13 +185,35 @@ class DQNExperimentBasic(BaseExperiment):
 
     def get_actions(self):
         return {
-            0: [0.3, 0.00, 0.0, False, False],  # Coast
-            1: [0.3, 0.75, 0.0, False, False],  # Right
-            2: [0.3, 0.50, 0.0, False, False],  # Right
-            3: [0.3, 0.25, 0.0, False, False],  # Right
-            4: [0.3, -0.75, 0.0, False, False],  # Left
-            5: [0.3, -0.50, 0.0, False, False],  # Left
-            6: [0.3, -0.25, 0.0, False, False],  # Left
+            0: [0.0, 0.00, 0.0, False, False],  # Coast
+            1: [0.0, 0.00, 1.0, False, False],  # Apply Break
+            2: [0.0, 0.75, 0.0, False, False],  # Right
+            3: [0.0, 0.50, 0.0, False, False],  # Right
+            4: [0.0, 0.25, 0.0, False, False],  # Right
+            5: [0.0, -0.75, 0.0, False, False],  # Left
+            6: [0.0, -0.50, 0.0, False, False],  # Left
+            7: [0.0, -0.25, 0.0, False, False],  # Left
+            8: [0.3, 0.00, 0.0, False, False],  # Straight
+            9: [0.3, 0.75, 0.0, False, False],  # Right
+            10: [0.3, 0.50, 0.0, False, False],  # Right
+            11: [0.3, 0.25, 0.0, False, False],  # Right
+            12: [0.3, -0.75, 0.0, False, False],  # Left
+            13: [0.3, -0.50, 0.0, False, False],  # Left
+            14: [0.3, -0.25, 0.0, False, False],  # Left
+            15: [0.6, 0.00, 0.0, False, False],  # Straight
+            16: [0.6, 0.75, 0.0, False, False],  # Right
+            17: [0.6, 0.50, 0.0, False, False],  # Right
+            18: [0.6, 0.25, 0.0, False, False],  # Right
+            19: [0.6, -0.75, 0.0, False, False],  # Left
+            20: [0.6, -0.50, 0.0, False, False],  # Left
+            21: [0.6, -0.25, 0.0, False, False],  # Left
+            22: [1.0, 0.00, 0.0, False, False],  # Straight
+            23: [1.0, 0.75, 0.0, False, False],  # Right
+            24: [1.0, 0.50, 0.0, False, False],  # Right
+            25: [1.0, 0.25, 0.0, False, False],  # Right
+            26: [1.0, -0.75, 0.0, False, False],  # Left
+            27: [1.0, -0.50, 0.0, False, False],  # Left
+            28: [1.0, -0.25, 0.0, False, False],  # Left
         }
 
 
