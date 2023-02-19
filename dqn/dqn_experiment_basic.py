@@ -391,7 +391,7 @@ class DQNExperimentBasic(BaseExperiment):
                 # time.sleep(0.005)
                 # img.close()
 
-                print(depth_camera_data.shape)
+                # print(depth_camera_data.shape)
 
                 assert depth_camera_data is not None
 
@@ -419,11 +419,11 @@ class DQNExperimentBasic(BaseExperiment):
         self.angle_between_truck_and_trailer.append(np.float32(angle_between_truck_and_trailer))
         # self.acceleration.append(np.float32(acceleration))
 
-        print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
-        print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
+        # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
+        # print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
         print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
-        print(f"forward_velocity:{np.float32(forward_velocity)}")
-        print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
+        # print(f"forward_velocity:{np.float32(forward_velocity)}")
+        # print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
         # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
         # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         # print(f"acceleration:{np.float32(acceleration)}")
