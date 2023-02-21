@@ -160,6 +160,40 @@ def plot_points(previous_position, current_position, next_position, current_wayp
     plt.show()
 
 
+def plot_route(route,last_waypoint_index=-1,truck_transform=-1,number_of_waypoints_ahead_to_calculate_with=-1):
+    x_route = []
+    y_route = []
+    for point in route:
+        # print(f"X: {point.location.x} Y:{point.location.y}")
+        x_route.append(point.location.x)
+        y_route.append(point.location.y)
+
+    x_min = min(x_route)
+    x_max = max(x_route)
+
+    y_min = min(y_route)
+    y_max = max(y_route)
+    buffer = 10
+
+    # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
+    plt.plot([x_route.pop(0)], y_route.pop(0), 'bo')
+    plt.plot(x_route, y_route, 'y^')
+    plt.plot([route[0].location.x], [route[0].location.y], 'ro', label='Starting waypoint')
+    if last_waypoint_index != -1:
+        plt.plot([route[last_waypoint_index - 1].location.x],
+                 [route[last_waypoint_index - 1].location.y], 'ro', label='Previous Waypoint')
+    if truck_transform != -1:
+        plt.plot([truck_transform.location.x], [truck_transform.location.y], 'gs', label='Current Vehicle Location')
+    if last_waypoint_index != -1 and number_of_waypoints_ahead_to_calculate_with != -1:
+        plt.plot([route[last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x],
+                 [route[last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y], 'bo',
+                 label=f"{number_of_waypoints_ahead_to_calculate_with} waypoints ahead")
+    plt.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
+    # plt.axis([0, 1, 0, 1])
+    # plt.title(f'{angle_to_center_of_lane_degrees * 180}')
+    plt.gca().invert_yaxis()
+    plt.legend(loc='upper center')
+    plt.show()
 
 # TO CHEKC
 

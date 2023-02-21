@@ -20,7 +20,10 @@ from rllib_integration.RouteGeneration.global_route_planner import GlobalRoutePl
 from rllib_integration.sensors.sensor_interface import SensorInterface
 from rllib_integration.sensors.factory import SensorFactory
 from rllib_integration.helper import join_dicts
-from rllib_integration.GetStartStopLocation import get_entry_exit_spawn_point_indices
+from rllib_integration.GetStartStopLocation import get_entry_exit_spawn_point_indices, \
+    get_entry_exit_spawn_point_indices_2_lane
+
+from rllib_integration.TestingWayPointUpdater import plot_route
 
 BASE_CORE_CONFIG = {
     # "host": 'localhost',  # Client host
@@ -349,8 +352,63 @@ class CarlaCore:
         else:
             return -1
 
-    def set_route(self,failed_entry_spawn_locations):
-        self.entry_spawn_point_index, self.exit_spawn_point_index = get_entry_exit_spawn_point_indices(failed_entry_spawn_locations)
+    def set_route(self,failed_entry_spawn_locations,debug):
+        if debug:
+            roundabout_idx = 0
+            route_idx = 0
+            exit_idx = 0
+            while True:
+                entry_idx, exit_idx, roundabout_idx, route_idx, exit_idx = get_entry_exit_spawn_point_indices_2_lane(
+                    failed_entry_spawn_locations,run_through_all=True, roundabout_idx=roundabout_idx,route_idx=route_idx,exit_idx=exit_idx)
+
+                entry_spawn_point = self.map.get_spawn_points()[entry_idx]
+                exit_spawn_point = self.map.get_spawn_points()[exit_idx]
+
+                # # Specify more than one starting point so the RL doesn't always start from the same position
+                # spawn_point_no = random.choice([33, 28, 27, 17, 14, 11, 10, 5])
+                # spawn_points = [self.map.get_spawn_points()[spawn_point_no]]
+
+                # Obtaining the route information
+                start_waypoint = self.map.get_waypoint(entry_spawn_point.location)
+                end_waypoint = self.map.get_waypoint(exit_spawn_point.location)
+
+                start_location = start_waypoint.transform.location
+                end_location = end_waypoint.transform.location
+
+                sampling_resolution = 2
+                global_planner = GlobalRoutePlanner(self.map, sampling_resolution)
+
+                route_waypoints = global_planner.trace_route(start_location, end_location)
+                self.last_waypoint_index = 0
+                self.route.clear()
+                last_x = -1
+                last_y = -1
+
+                for route_waypoint in route_waypoints:
+
+                    # Some waypoint may be duplicated
+                    # Checking and ignoring duplicated points
+                    if last_x == round(route_waypoint[0].transform.location.x, 5) and last_y == round(
+                            route_waypoint[0].transform.location.y, 5):
+                        continue
+
+                    last_x = round(route_waypoint[0].transform.location.x, 5)
+                    last_y = round(route_waypoint[0].transform.location.y, 5)
+
+                    # self.route.append(carla.Transform(
+                    #     carla.Location(self.normalise_map_location(route_waypoint[0].transform.location.x, 'x'),
+                    #                    self.normalise_map_location(route_waypoint[0].transform.location.y, 'y'),
+                    #                    0),
+                    #     carla.Rotation(0, 0, 0)))
+
+                    self.route.append(route_waypoint[0].transform)
+
+                plot_route(route=self.route)
+
+
+
+
+        self.entry_spawn_point_index, self.exit_spawn_point_index = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations)
         entry_spawn_point = self.map.get_spawn_points()[self.entry_spawn_point_index]
         exit_spawn_point = self.map.get_spawn_points()[self.exit_spawn_point_index]
 
@@ -466,7 +524,7 @@ class CarlaCore:
 
         while ((self.hero is None) or (self.hero_trailer is None)) if hero_config["truckTrailerCombo"] else (self.hero is None):
 
-            entry_spawn_point_index, entry_spawn_point = self.set_route(failed_entry_spawn_locations)
+            entry_spawn_point_index, entry_spawn_point = self.set_route(failed_entry_spawn_locations,debug=True)
 
             if hero_config["truckTrailerCombo"]:
                 print("TRAILER PART 4/7")
