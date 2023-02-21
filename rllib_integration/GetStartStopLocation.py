@@ -76,8 +76,11 @@ def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations, run_throug
 
         if len(route[1]) == exit_idx:
             route_idx +=1
+            exit_idx = 0
         if len(roundabout) == route_idx:
             roundabout_idx +=1
+            route_idx = 0
+            exit_idx = 0
         if len(roundabouts) == roundabout_idx:
             raise Exception('FINISHED ALL POINTS')
         return entry, exit, roundabout_idx, route_idx, exit_idx
