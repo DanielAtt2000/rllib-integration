@@ -433,7 +433,7 @@ class DQNExperimentBasic(BaseExperiment):
         #print("Inside Complete Route")
         #print(f"Len(core.route) -2 : {len(core.route) -2 }")
         #print(f"core.last_waypoint_index{core.last_waypoint_index}")
-        if len(core.route) - 15 <= core.last_waypoint_index:
+        if len(core.route) - 5 <= core.last_waypoint_index:
             return True
 
     def min_max_normalisation(self, value, min, max):
