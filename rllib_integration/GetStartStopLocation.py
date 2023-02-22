@@ -1,6 +1,9 @@
 import pandas as pd
 import random
 
+from rllib_integration.RouteGeneration.global_route_planner import GlobalRoutePlanner
+from rllib_integration.TestingWayPointUpdater import plot_all_routes
+
 # [33,28, 27, 17,  14, 11, 10, 5]
 # For Laptop
 #spawn_points = pd.DataFrame(data={'N_IN':[11], 'N_OUT':[32],
@@ -19,29 +22,31 @@ spawn_points = pd.DataFrame(data={'N_IN':[17], 'N_OUT':[10],
                                })
 
 spawn_points_2_lane_roundabout_small = [
-    [18,[38,13]],
-    [84,[12,33,81]],
-    [57,[13,30]],
-    [39,[33,81,37]],
-    [51, [81,37,12]],
-    [11, [30,69]],
-    [42, [37,12,33]],
-    [45, [69,38]],
+    [70, [75,28,35]],
+    [38, [16,7]],
+    [64, [28,35,15]],
+    [17, [7,29]],
+    [66, [35,15,75]],
+    [6, [29,52]],
+    [58, [15,75,28]],
+    [77, [52,16]]
 ]
 
 spawn_points_2_lane_roundabout_large = [
-    [12,[8,51]],
-    [13,[40,73]],
-    [26,[51,21]],
-    [82,[73,11]],
-    [25,[21,8]],
-    [52,[11,40]],
+    [32, [34,4,71]],
+    [86,[10,33]],
+    [40,[4,71,11]],
+    [89,[33,68]],
+    [65,[71,11,34]],
+    [27,[68,25]],
+    [23,[11,34,4]],
+    [24,[25,10]],
 ]
 
-roundabouts = [spawn_points_2_lane_roundabout_small,spawn_points_2_lane_roundabout_large]
+roundabouts = [spawn_points_2_lane_roundabout_large,spawn_points_2_lane_roundabout_small]
 
 
-def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations, run_through_all=False, roundabout_idx=-1, route_idx=-1, exit_idx=-1):
+def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):
     entry_spawn_point_index = -1
     exit_spawn_point_index = -1
 
@@ -66,26 +71,8 @@ def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations, run_throug
     print("------N-----")
     print("W-----|----E")
     print("------S-----")
-    if run_through_all:
-        roundabout = roundabouts[roundabout_idx]
-        route = roundabout[route_idx]
-        entry = route[0]
-        exit = route[1][exit_idx]
 
-        exit_idx += 1
-
-        if len(route[1]) == exit_idx:
-            route_idx +=1
-            exit_idx = 0
-        if len(roundabout) == route_idx:
-            roundabout_idx +=1
-            route_idx = 0
-            exit_idx = 0
-        if len(roundabouts) == roundabout_idx:
-            raise Exception('FINISHED ALL POINTS')
-        return entry, exit, roundabout_idx, route_idx, exit_idx
-    else:
-        return entry_spawn_point_index, exit_spawn_point_index
+    return entry_spawn_point_index, exit_spawn_point_index
 
 
 
@@ -130,6 +117,67 @@ def get_entry_exit_spawn_point_indices(failed_spawn_locations,debug=False):
     print("W-----|----E")
     print("------S-----")
     return entry_spawn_point_index, exit_spawn_point_index
+
+
+def visualise_all_routes(map):
+    all_routes = []
+
+    for roundabout in roundabouts:
+        for entry in roundabout:
+            for exit in entry[1]:
+                entry_spawn_point = map.get_spawn_points()[entry[0]]
+                exit_spawn_point = map.get_spawn_points()[exit]
+
+                print(f"from {entry[0]} to {exit}")
+
+                # # Specify more than one starting point so the RL doesn't always start from the same position
+                # spawn_point_no = random.choice([33, 28, 27, 17, 14, 11, 10, 5])
+                # spawn_points = [self.map.get_spawn_points()[spawn_point_no]]
+
+                # Obtaining the route information
+
+                start_waypoint = map.get_waypoint(entry_spawn_point.location)
+                end_waypoint = map.get_waypoint(exit_spawn_point.location)
+
+                start_location = start_waypoint.transform.location
+                end_location = end_waypoint.transform.location
+
+                sampling_resolution = 2
+                global_planner = GlobalRoutePlanner(map, sampling_resolution)
+
+                try:
+                    route_waypoints = global_planner.trace_route(start_location, end_location)
+
+                except:
+                    print(f"-----from {entry[0]} to {exit}")
+                    continue
+                route = []
+                last_x = -1
+                last_y = -1
+
+                for route_waypoint in route_waypoints:
+
+                    # Some waypoint may be duplicated
+                    # Checking and ignoring duplicated points
+                    if last_x == round(route_waypoint[0].transform.location.x, 5) and last_y == round(
+                            route_waypoint[0].transform.location.y, 5):
+                        continue
+
+                    last_x = round(route_waypoint[0].transform.location.x, 5)
+                    last_y = round(route_waypoint[0].transform.location.y, 5)
+
+                    # self.route.append(carla.Transform(
+                    #     carla.Location(self.normalise_map_location(route_waypoint[0].transform.location.x, 'x'),
+                    #                    self.normalise_map_location(route_waypoint[0].transform.location.y, 'y'),
+                    #                    0),
+                    #     carla.Rotation(0, 0, 0)))
+
+                    route.append(route_waypoint[0].transform)
+
+                all_routes.append(route)
+
+    plot_all_routes(all_routes=all_routes)
+
 
 
 # for _ in range(1000):

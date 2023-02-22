@@ -195,6 +195,66 @@ def plot_route(route,last_waypoint_index=-1,truck_transform=-1,number_of_waypoin
     plt.legend(loc='upper center')
     plt.show()
 
+
+def plot_all_routes(all_routes=-1):
+    x_routes = []
+    y_routes = []
+    for route in all_routes:
+        temp_x_route = []
+        temp_y_route = []
+        for point in route:
+            # print(f"X: {point.location.x} Y:{point.location.y}")
+            temp_x_route.append(point.location.x)
+            temp_y_route.append(point.location.y)
+        x_routes.append(temp_x_route)
+        y_routes.append(temp_y_route)
+
+    def minimum(temp_list):
+        min = 1000000
+        for item in temp_list:
+            for element in item:
+                if element < min:
+                    min = element
+
+        return min
+
+    def maxiumum(temp_list):
+        max = -1000000
+        for item in temp_list:
+            for element in item:
+                if element > max:
+                    max = element
+
+        return max
+    x_min = minimum(x_routes)
+    x_max = maxiumum(x_routes)
+
+    y_min = minimum(y_routes)
+    y_max = maxiumum(y_routes)
+    buffer = 10
+
+    # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
+    idx = 0
+    idx_2 = 0
+    for x_route, y_route in zip(x_routes,y_routes):
+        idx_2 = 0
+        for x_route_2,y_route_2 in zip(x_routes,y_routes):
+            if idx_2 != idx:
+                plt.plot(x_route_2, y_route_2, 'go')
+            idx_2 +=1
+
+        plt.plot([x_route.pop(0)], y_route.pop(0), 'bo')
+        plt.plot(x_route, y_route, 'y^')
+        plt.plot([x_route[0]], [y_route[0]], 'ro', label='Starting waypoint')
+        plt.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
+        # plt.axis([0, 1, 0, 1])
+        # plt.title(f'{angle_to_center_of_lane_degrees * 180}')
+        plt.gca().invert_yaxis()
+        plt.legend(loc='upper center')
+        plt.show()
+
+        idx +=1
+
 # TO CHEKC
 
 # x_pos 5 y_pos 5
