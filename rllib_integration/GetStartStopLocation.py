@@ -43,7 +43,8 @@ spawn_points_2_lane_roundabout_large = [
     [24,[25,10]],
 ]
 
-roundabouts = [spawn_points_2_lane_roundabout_large,spawn_points_2_lane_roundabout_small]
+# roundabouts = [spawn_points_2_lane_roundabout_large,spawn_points_2_lane_roundabout_small]
+roundabouts = [spawn_points_2_lane_roundabout_small]
 
 
 def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):

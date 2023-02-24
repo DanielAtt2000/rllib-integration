@@ -13,10 +13,10 @@ import numpy as np
 from gym.spaces import Box, Discrete, Dict, Tuple
 import warnings
 import carla
-import os
+import os, time
 import time
 from rllib_integration.GetAngle import calculate_angle_with_center_of_lane, angle_between
-from rllib_integration.TestingWayPointUpdater import plot_points
+from rllib_integration.TestingWayPointUpdater import plot_points, plot_route
 from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
 from PIL import Image
@@ -42,7 +42,7 @@ class SACExperimentBasic(BaseExperiment):
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
         self.visualiseRoute = False
-        self.visualiseImage = False
+        self.visualiseImage = True
         self.counterThreshold = 10
         self.last_hyp_distance_to_next_waypoint = 0
 
@@ -58,10 +58,12 @@ class SACExperimentBasic(BaseExperiment):
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
         # self.acceleration = []
-        self.no_of_collisions = []
+        self.truck_collisions = []
+        self.trailer_collisions =[]
 
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
+        self.episode_times = []
 
         from git import Repo
         repo = Repo('.')
@@ -112,8 +114,10 @@ class SACExperimentBasic(BaseExperiment):
         # self.save_to_file(f"{self.directory}/forward_velocity_x", self.forward_velocity_x)
         # self.save_to_file(f"{self.directory}/forward_velocity_z", self.forward_velocity_z)
         # self.save_to_file(f"{self.directory}/acceleration", self.acceleration)
-        self.save_to_file(f"{self.directory}/route", self.vehicle_path)
-        self.save_to_file(f"{self.directory}/path", self.temp_route)
+        self.save_to_file(f"{self.directory}/route", self.temp_route)
+        self.save_to_file(f"{self.directory}/path", self.vehicle_path)
+        self.save_to_file(f"{self.directory}/truck_collisions", self.truck_collisions)
+        self.save_to_file(f"{self.directory}/trailer_collisions", self.trailer_collisions)
 
         # Saving LIDAR point count
         # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
@@ -146,6 +150,8 @@ class SACExperimentBasic(BaseExperiment):
         self.vehicle_path = []
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
+        self.truck_collisions = []
+        self.trailer_collisions =[]
         # self.acceleration = []
 
 
@@ -163,22 +169,52 @@ class SACExperimentBasic(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
-        image_space = Box(
+        image_space = Dict(
+            {"values": Box(
                 low=np.array([0,0,-math.pi,-math.pi,-math.pi]),
                 high=np.array([100,100,math.pi,math.pi,math.pi]),
-                dtype=np.float32,
+                dtype=np.float32
+            ),
+            "depth_camera": Box(
+                low=0,
+                high=255,
+                shape=(84, 84, 3),
+                dtype=np.float32
             )
+            })
         return image_space
 
     def get_actions(self):
         return {
-            0: [0.3, 0.00, 0.0, False, False],  # Coast
-            1: [0.3, 0.75, 0.0, False, False],  # Right
-            2: [0.3, 0.50, 0.0, False, False],  # Right
-            3: [0.3, 0.25, 0.0, False, False],  # Right
-            4: [0.3, -0.75, 0.0, False, False],  # Left
-            5: [0.3, -0.50, 0.0, False, False],  # Left
-            6: [0.3, -0.25, 0.0, False, False],  # Left
+            0: [0.0, 0.00, 0.0, False, False],  # Coast
+            1: [0.0, 0.00, 1.0, False, False],  # Apply Break
+            2: [0.0, 0.75, 0.0, False, False],  # Right
+            3: [0.0, 0.50, 0.0, False, False],  # Right
+            4: [0.0, 0.25, 0.0, False, False],  # Right
+            5: [0.0, -0.75, 0.0, False, False],  # Left
+            6: [0.0, -0.50, 0.0, False, False],  # Left
+            7: [0.0, -0.25, 0.0, False, False],  # Left
+            8: [0.3, 0.00, 0.0, False, False],  # Straight
+            9: [0.3, 0.75, 0.0, False, False],  # Right
+            10: [0.3, 0.50, 0.0, False, False],  # Right
+            11: [0.3, 0.25, 0.0, False, False],  # Right
+            12: [0.3, -0.75, 0.0, False, False],  # Left
+            13: [0.3, -0.50, 0.0, False, False],  # Left
+            14: [0.3, -0.25, 0.0, False, False],  # Left
+            15: [0.6, 0.00, 0.0, False, False],  # Straight
+            16: [0.6, 0.75, 0.0, False, False],  # Right
+            17: [0.6, 0.50, 0.0, False, False],  # Right
+            18: [0.6, 0.25, 0.0, False, False],  # Right
+            19: [0.6, -0.75, 0.0, False, False],  # Left
+            20: [0.6, -0.50, 0.0, False, False],  # Left
+            21: [0.6, -0.25, 0.0, False, False],  # Left
+            22: [1.0, 0.00, 0.0, False, False],  # Straight
+            23: [1.0, 0.75, 0.0, False, False],  # Right
+            24: [1.0, 0.50, 0.0, False, False],  # Right
+            25: [1.0, 0.25, 0.0, False, False],  # Right
+            26: [1.0, -0.75, 0.0, False, False],  # Left
+            27: [1.0, -0.50, 0.0, False, False],  # Left
+            28: [1.0, -0.25, 0.0, False, False],  # Left
         }
 
 
@@ -266,11 +302,12 @@ class SACExperimentBasic(BaseExperiment):
         hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
 
         bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
-
-        angle_between_truck_and_trailer = angle_between(waypoint_forward_vector=truck_transform.get_forward_vector(),vehicle_forward_vector=trailer_transform.get_forward_vector())
-
+        if core.config["truckTrailerCombo"]:
+            angle_between_truck_and_trailer = angle_between(waypoint_forward_vector=truck_transform.get_forward_vector(),vehicle_forward_vector=trailer_transform.get_forward_vector())
+        else:
+            angle_between_truck_and_trailer = 0
         self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
-        self.temp_route.append(core.route)
+        self.temp_route = core.route_points
 
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
         # forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
@@ -286,34 +323,7 @@ class SACExperimentBasic(BaseExperiment):
 
 
         if self.visualiseRoute and self.counter > self.counterThreshold:
-            def plot_route():
-                x_route = []
-                y_route = []
-                for point in core.route:
-                    # print(f"X: {point.location.x} Y:{point.location.y}")
-                    x_route.append(point.location.x)
-                    y_route.append(point.location.y)
-
-                x_min = min(x_route)
-                x_max = max(x_route)
-
-                y_min = min(y_route)
-                y_max = max(y_route)
-                buffer = 10
-
-                # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
-                plt.plot([x_route.pop(0)],y_route.pop(0),'bo')
-                plt.plot(x_route, y_route,'y^')
-                plt.plot([core.route[core.last_waypoint_index-1].location.x], [core.route[core.last_waypoint_index-1].location.y], 'ro',label='Previous Waypoint')
-                plt.plot([truck_transform.location.x], [truck_transform.location.y], 'gs',label='Current Vehicle Location')
-                plt.plot([core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location.x], [core.route[core.last_waypoint_index+number_of_waypoints_ahead_to_calculate_with].location.y], 'bo', label=f"{number_of_waypoints_ahead_to_calculate_with} waypoints ahead")
-                plt.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
-                # plt.axis([0, 1, 0, 1])
-                plt.title(f'{angle_to_center_of_lane_degrees*180}')
-                plt.gca().invert_yaxis()
-                plt.legend(loc='upper center')
-                plt.show()
-
+            plot_route(route=core.route, last_waypoint_index=core.last_waypoint_index, truck_transform=truck_transform, number_of_waypoints_ahead_to_calculate_with=number_of_waypoints_ahead_to_calculate_with)
 
             print(f"previous_position={core.route[core.last_waypoint_index-1].location}")
             print(f"current_position={truck_transform.location}")
@@ -331,20 +341,37 @@ class SACExperimentBasic(BaseExperiment):
                         in_front_of_waypoint=in_front_of_waypoint,
                         angle=angle_to_center_of_lane_degrees)
 
-            plot_route()
 
         self.counter +=1
-
+        depth_camera_data = None
         for sensor in sensor_data:
             if sensor == 'collision_truck':
                 # TODO change to only take collision with road
 
                 self.last_no_of_collisions_truck = len(sensor_data[sensor][1])
-                print(f'COLLISIONS TRUCK {sensor_data[sensor]}')
+                self.truck_collisions.append(str(sensor_data[sensor][1][0]))
+                print(f'COLLISIONS TRUCK {sensor_data[sensor][1][0]}')
 
             elif sensor == "collision_trailer":
                 self.last_no_of_collisions_trailer = len(sensor_data[sensor][1])
-                print(f'COLLISIONS TRAILER {sensor_data[sensor]}')
+                self.trailer_collisions.append(str(sensor_data[sensor][1][0]))
+                print(f'COLLISIONS TRAILER {sensor_data[sensor][1][0]}')
+
+            elif sensor == "depth_camera_truck":
+                depth_camera_data = sensor_data['depth_camera_truck'][1]
+                #
+                # img = Image.fromarray(depth_camera_data, None)
+                # img.show()
+                # time.sleep(0.005)
+                # img.close()
+
+                # print(depth_camera_data.shape)
+
+                assert depth_camera_data is not None
+
+        if self.visualiseImage and self.counter > self.counterThreshold:
+            plt.imshow(depth_camera_data, interpolation='nearest')
+            plt.show()
 
         observations = [
             np.float32(forward_velocity),
@@ -366,16 +393,16 @@ class SACExperimentBasic(BaseExperiment):
         self.angle_between_truck_and_trailer.append(np.float32(angle_between_truck_and_trailer))
         # self.acceleration.append(np.float32(acceleration))
 
-        print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
-        print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
+        # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
+        # print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
         print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
-        print(f"forward_velocity:{np.float32(forward_velocity)}")
-        print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
+        # print(f"forward_velocity:{np.float32(forward_velocity)}")
+        # print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
         # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
         # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         # print(f"acceleration:{np.float32(acceleration)}")
 
-        return observations, {}
+        return {"values":observations,"depth_camera":depth_camera_data}, {}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -408,7 +435,7 @@ class SACExperimentBasic(BaseExperiment):
         #print("Inside Complete Route")
         #print(f"Len(core.route) -2 : {len(core.route) -2 }")
         #print(f"core.last_waypoint_index{core.last_waypoint_index}")
-        if len(core.route) - 22 <= core.last_waypoint_index:
+        if len(core.route) - 5 <= core.last_waypoint_index:
             return True
 
     def min_max_normalisation(self, value, min, max):
@@ -455,9 +482,9 @@ class SACExperimentBasic(BaseExperiment):
 
         reward = 0
 
-        hyp_distance_to_next_waypoint = observation[1]
+        hyp_distance_to_next_waypoint = observation["values"][1]
 
-        print(hyp_distance_to_next_waypoint)
+        print(f"Hyp distance in rewards {hyp_distance_to_next_waypoint}")
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
             reward =+ hyp_reward*100

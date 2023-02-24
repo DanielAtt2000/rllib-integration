@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
@@ -6,9 +8,16 @@ import pickle
 import pandas as pd
 import numpy as np
 
+def save_to_pickle(filename, data):
+    filename = filename + '.pickle'
+    with open(f'{os.path.join(directory, filename)}', 'wb') as handle:
+        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+def open_pickle(filename):
+    with open(filename, 'rb') as handle:
+        return pickle.load(handle)
 
-directory = 'data_3f0f680fa1d_good_truck_4exits'
+directory = 'data_185fdd2fba3'
 df= pd.DataFrame()
 df_done = pd.DataFrame()
 string= '_beforeNormalisation'
@@ -31,38 +40,101 @@ def plot_route(route_points_all,truck_points_all):
 
     x_truck = []
     y_truck = []
-    for route in route_points_all:
-        if "[]\n" in route:
-            continue
-        for route_point in route:
-            # print(f"X: {point.location.x} Y:{point.location.y}")
-            x_route.append(route_point[0])
-            y_route.append(route_point[1])
+    get_from_file = True
+    if get_from_file:
+        x_truck = open_pickle(os.path.join(directory, 'x_truck.pickle'))
+        y_truck = open_pickle(os.path.join(directory, 'y_truck.pickle'))
+        x_route = open_pickle(os.path.join(directory, 'x_route.pickle'))
+        y_route = open_pickle(os.path.join(directory, 'y_route.pickle'))
 
-    for truck_points in truck_points_all:
-        if "[]\n" in truck_points:
-            continue
-        for truck_point in truck_points:
-            x_truck.append(truck_point[0])
-            y_truck.append(truck_point[1])
+    else:
+        for route_id, route in enumerate(route_points_all):
+            if "[]\n" in route:
+                continue
+            temp_x_route = []
+            temp_y_route = []
+            for route_point in route.split('),'):
 
-    x_min = min(x_route)
-    x_max = max(x_route)
+                route_point = route_point.replace('[','')
+                route_point = route_point.replace(']','')
+                route_point = route_point.replace('(','')
+                route_point = route_point.replace(')', '')
+                route_point = route_point.replace(' ', '')
+                route_point = route_point.replace('\n', '')
 
-    y_min = min(y_route)
-    y_max = max(y_route)
-    buffer = 10
 
-    # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
-    plt.plot([x_route.pop(0)], y_route.pop(0), 'bo')
-    plt.plot(x_route, y_route, 'y^')
-    plt.plot(x_truck, y_truck, "'gs'")
-    plt.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
-    # plt.axis([0, 1, 0, 1])
-    # plt.title(f'{angle_to_center_of_lane_degrees * 180}')
-    plt.gca().invert_yaxis()
-    plt.legend(loc='upper center')
-    plt.show()
+                points = route_point.split(',')
+
+                temp_x_route.append(float(points[0]))
+                temp_y_route.append(float(points[1]))
+
+            x_route.append(temp_x_route)
+            y_route.append(temp_y_route)
+            print(f"Route {route_id}/{len(route_points_all)} ready")
+
+        for truck_idx, truck_points in enumerate(truck_points_all):
+            if "[]\n" in truck_points:
+                continue
+            temp_x_truck = []
+            temp_y_truck = []
+            for truck_point in truck_points.split('),'):
+
+
+                truck_point = truck_point.replace('[','')
+                truck_point = truck_point.replace(']','')
+                truck_point = truck_point.replace('(','')
+                truck_point = truck_point.replace(')','')
+                truck_point = truck_point.replace('\n','')
+                truck_point = truck_point.replace(' ','')
+
+                truck_point = truck_point.split(',')
+
+                temp_x_truck.append(float(truck_point[0]))
+                temp_y_truck.append(float(truck_point[1]))
+
+            x_truck.append(temp_x_truck)
+            y_truck.append(temp_y_truck)
+            print(f"Truck Path {truck_idx}/{len(truck_points_all)} ready")
+
+        # Removing the first truck position since this is extra when starting
+        x_truck.pop(0)
+        y_truck.pop(0)
+        save_to_pickle(f'x_truck',x_truck)
+        save_to_pickle(f'y_truck',y_truck)
+        save_to_pickle(f'x_route',x_route)
+        save_to_pickle(f'y_route',y_route)
+
+    # Hack to remove
+    temp_x_route = deepcopy(x_route)
+    temp_y_route = deepcopy(y_route)
+
+    for idx in range(len(x_route)):
+
+        # if len(x_truck[idx]) > 0:
+        if idx > 1000:
+            # Hack to remove
+            if idx != 0:
+                x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
+                y_route[idx] = temp_y_route[idx][len(temp_y_route[idx-1]):]
+
+            x_min = min(min(x_route[idx]),min(x_truck[idx]))
+            x_max = max(max(x_route[idx]),max(x_truck[idx]))
+
+            y_min = min(min(y_route[idx]),min(y_truck[idx]))
+            y_max = max(max(y_route[idx]),max(y_truck[idx]))
+            buffer = 10
+
+            # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
+            plt.plot(x_route[idx][0], y_route[idx][0], 'bo',label='Route Starting waypoint')
+            plt.plot(x_truck[idx][0], y_truck[idx][0], 'kd',label='Truck Starting waypoint')
+            plt.plot(x_route[idx][2:], y_route[idx][2:], 'y^')
+            plt.plot(x_truck[idx][2:], y_truck[idx][2:], "ro")
+            plt.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
+            # plt.axis([0, 1, 0, 1])
+            # plt.title(f'{angle_to_center_of_lane_degrees * 180}')
+            plt.gca().invert_yaxis()
+            plt.legend(loc='upper center')
+            plt.show()
 
 
 # for filename in os.listdir(directory):

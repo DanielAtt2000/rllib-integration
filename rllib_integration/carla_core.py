@@ -92,6 +92,7 @@ class CarlaCore:
         self.server_port = 2000
         self.server_port_lines = ''
         self.visualise_all_routes = False
+        self.times_crazy = []
 
         self.route = []
         self.route_points = []
@@ -354,6 +355,7 @@ class CarlaCore:
             return -1
 
     def set_route(self,failed_entry_spawn_locations):
+        self.route_points = []
 
         self.entry_spawn_point_index, self.exit_spawn_point_index = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations)
         entry_spawn_point = self.map.get_spawn_points()[self.entry_spawn_point_index]
@@ -613,6 +615,7 @@ class CarlaCore:
 
     def tick(self, control):
         """Performs one tick of the simulation, moving all actors, and getting the sensor data"""
+        # import time
 
         # Move hero vehicle
         if control is not None:
@@ -624,8 +627,13 @@ class CarlaCore:
         if self.config["enable_rendering"]:
             self.set_spectator_camera_view()
 
-
+        # start = time.time()
         # Return the new sensor data
+        # x = self.get_sensor_data()
+        # stop = time.time()
+        # self.times_crazy.append(stop-start)
+        # print(f'AVERAGE HERE22222222222222 {sum(self.times_crazy)/len(self.times_crazy)}')
+        # return x
         return self.get_sensor_data()
 
     def set_spectator_camera_view(self):
