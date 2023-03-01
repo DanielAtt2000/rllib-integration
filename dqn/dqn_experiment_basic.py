@@ -21,6 +21,7 @@ from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
 from PIL import Image
 
+from rllib_integration.lidar_to_grid_map import generate_ray_casting_grid_map
 
 
 class DQNExperimentBasic(BaseExperiment):
@@ -43,6 +44,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.counter = 0
         self.visualiseRoute = False
         self.visualiseImage = False
+        self.visualiseOccupancyGirdMap = False
         self.counterThreshold = 10
         self.last_hyp_distance_to_next_waypoint = 0
 
@@ -174,11 +176,11 @@ class DQNExperimentBasic(BaseExperiment):
                 high=np.array([100,100,math.pi,math.pi,math.pi]),
                 dtype=np.float32
             ),
-            "depth_camera": Box(
+            "occupancyMap": Box(
                 low=0,
-                high=255,
-                shape=(84, 84, 3),
-                dtype=np.float32
+                high=1,
+                shape=(128, 128,1),
+                dtype=np.float64
             )
             })
         return image_space
@@ -342,6 +344,7 @@ class DQNExperimentBasic(BaseExperiment):
 
         self.counter +=1
         depth_camera_data = None
+        occupancy_map = None
         for sensor in sensor_data:
             if sensor == 'collision_truck':
                 # TODO change to only take collision with road
@@ -366,6 +369,33 @@ class DQNExperimentBasic(BaseExperiment):
                 # print(depth_camera_data.shape)
 
                 assert depth_camera_data is not None
+            elif sensor == "lidar_truck":
+                lidar_points = sensor_data['lidar_truck'][1]
+
+                xy_resolution = 0.5
+                x_output = 128
+                y_output = 128
+
+                ox = lidar_points[0][:]
+                oy = lidar_points[1][:]
+
+                occupancy_map, min_x, max_x, min_y, max_y, xy_resolution = \
+                    generate_ray_casting_grid_map(ox=ox, oy=oy, x_output=x_output, y_output=y_output,
+                                                  xy_resolution=xy_resolution, breshen=True)
+
+                if self.visualiseOccupancyGirdMap and self.counter % 10 == 0:
+                    plt.figure()
+                    xy_res = np.array(occupancy_map).shape
+                    plt.imshow(occupancy_map, cmap="PiYG_r")
+                    # cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
+                    plt.clim(-0.4, 1.4)
+                    plt.gca().set_xticks(np.arange(-.5, xy_res[1], 1), minor=True)
+                    plt.gca().set_yticks(np.arange(-.5, xy_res[0], 1), minor=True)
+                    plt.grid(True, which="minor", color="w", linewidth=0.6, alpha=0.5)
+
+                    plt.show()
+
+                assert occupancy_map is not None
 
         if self.visualiseImage and self.counter > self.counterThreshold:
             plt.imshow(depth_camera_data, interpolation='nearest')
@@ -399,8 +429,9 @@ class DQNExperimentBasic(BaseExperiment):
         # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
         # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         # print(f"acceleration:{np.float32(acceleration)}")
-
-        return {"values":observations,"depth_camera":depth_camera_data}, {}
+        return {"values":observations,
+                "occupancyMap":occupancy_map
+                }, {}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""

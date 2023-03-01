@@ -22,29 +22,45 @@ spawn_points = pd.DataFrame(data={'N_IN':[17], 'N_OUT':[10],
                                })
 
 spawn_points_2_lane_roundabout_small = [
-    [70, [75,28,35]],
-    [38, [16,7]],
-    [64, [28,35,15]],
-    [17, [7,29]],
-    [66, [35,15,75]],
-    [6, [29,52]],
-    [58, [15,75,28]],
-    [77, [52,16]]
+    # [70, [75,28,35]],
+    # [38, [16,7]],
+    # [64, [28,35,15]],
+    # [17, [7,29]],
+    # [66, [35,15,75]],
+    # [6, [29,52]],
+    # [58, [15,75,28]],
+    # [77, [52,16]]
+    [17,[28,98,19]],
+    [44,[75,27]],
+    [95,[98,19,26]],
+    [25,[27,107]],
+    [2,[19,26,28]],
+    [108,[107,18]],
+    [102,[26,28,98]],
+    [77,[18,75]],
 ]
 
 spawn_points_2_lane_roundabout_large = [
-    [32, [34,4,71]],
-    [86,[10,33]],
-    [40,[4,71,11]],
-    [89,[33,68]],
-    [65,[71,11,34]],
-    [27,[68,25]],
-    [23,[11,34,4]],
-    [24,[25,10]],
+    # [32, [34,4,71]],
+    # [86,[10,33]],
+    # [40,[4,71,11]],
+    # [89,[33,68]],
+    # [65,[71,11,34]],
+    # [27,[68,25]],
+    # [23,[11,34,4]],
+    # [24,[25,10]],
+    [118,[84,121,58]],
+    [97,[22,82]],
+    [76,[121,58,74]],
+    [112,[82,9]],
+    [39,[58,74,84]],
+    [41,[9,56]],
+    [111,[74,84,121]],
+    [55,[56,22]],
 ]
 
 # roundabouts = [spawn_points_2_lane_roundabout_large,spawn_points_2_lane_roundabout_small]
-roundabouts = [spawn_points_2_lane_roundabout_small]
+roundabouts = [spawn_points_2_lane_roundabout_small,spawn_points_2_lane_roundabout_large]
 
 
 def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):
@@ -126,10 +142,11 @@ def visualise_all_routes(map):
     for roundabout in roundabouts:
         for entry in roundabout:
             for exit in entry[1]:
+                print(f"from {entry[0]} to {exit}")
                 entry_spawn_point = map.get_spawn_points()[entry[0]]
                 exit_spawn_point = map.get_spawn_points()[exit]
 
-                print(f"from {entry[0]} to {exit}")
+
 
                 # # Specify more than one starting point so the RL doesn't always start from the same position
                 # spawn_point_no = random.choice([33, 28, 27, 17, 14, 11, 10, 5])
