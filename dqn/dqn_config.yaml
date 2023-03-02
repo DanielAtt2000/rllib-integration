@@ -11,7 +11,7 @@ train_batch_size: 32
 num_steps_sampled_before_learning_starts: 10000
 recreate_failed_workers: True
 replay_buffer_config: {
-  capacity: 400000
+  capacity: 350000
 }
 
 horizon: 6500
@@ -37,18 +37,18 @@ target_network_update_freq: 8000
 #}
 
 #hiddens: [256, 512]
-model: {
-#  use_lstm: True,
-  dim: 128,
-  conv_filters: [
-    [16, [5, 5], 2],
-    [32, [5, 5], 2],
-    [64, [5, 5], 2],
-    [128, [5, 5], 2],
-    [256, [5, 5], 2],
-    [516, [4,4], 1],
-  ]
-}
+#model: {
+##  use_lstm: True,
+#  dim: 128,
+#  conv_filters: [
+#    [16, [5, 5], 2],
+#    [32, [5, 5], 2],
+#    [64, [5, 5], 2],
+#    [128, [5, 5], 2],
+#    [256, [5, 5], 2],
+#    [516, [4,4], 1],
+#  ]
+#}
 
 env_config:
   carla:
@@ -64,7 +64,7 @@ env_config:
     resolution_y: 300
     quality_level: "Low"
     enable_map_assets: True
-    enable_rendering: False
+    enable_rendering: True
     show_display: True
     map_buffer : 1.2
     truckTrailerCombo: True

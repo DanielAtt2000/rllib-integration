@@ -37,7 +37,8 @@ spawn_points_2_lane_roundabout_small = [
     [2,[19,26,28]],
     [108,[107,18]],
     [102,[26,28,98]],
-    [77,[18,75]],
+    [77,[75]],
+#     REmoved 77 to 18 --too tight
 ]
 
 spawn_points_2_lane_roundabout_large = [

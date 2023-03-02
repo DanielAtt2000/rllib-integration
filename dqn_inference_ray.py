@@ -27,6 +27,7 @@ EXPERIMENT_CLASS = DQNExperimentBasic
 # /home/daniel/ray_results/carla_rllib/ppo_77e99cc55c/CustomPPOTrainer_CarlaEnv_e71d2_00000_0_2023-01-21_15-14-24/checkpoint_000571
 # /home/daniel/ray_results/carla_rllib/dqn_8138f8582f/CustomDQNTrainer_CarlaEnv_93bce_00000_0_2023-01-30_18-07-29/checkpoint_000750
 # /home/daniel/ray_results/carla_rllib/dqn_ea8eefa922/CustomDQNTrainer_CarlaEnv_16957_00000_0_2023-02-13_23-52-27/checkpoint_000305
+# /home/daniel/ray_results/carla_rllib/dqn_53bd0b14d1/CustomDQNTrainer_CarlaEnv_e07a8_00000_0_2023-03-01_21-08-48/checkpoint_000419
 def parse_config(args):
     """
     Parses the .yaml configuration file into a readable dictionary

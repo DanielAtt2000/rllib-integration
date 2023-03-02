@@ -172,7 +172,7 @@ def generate_ray_casting_grid_map(ox, oy, x_output, y_output,xy_resolution, bres
     # x_w = 120
     # y_w = 120
     # default 0.5 -- [[0.5 for i in range(y_w)] for i in range(x_w)]
-    occupancy_map = np.ones((x_w, y_w,1)) / 2
+    occupancy_map = np.zeros((x_w, y_w,1))
     center_x = int(
         round(-min_x / xy_resolution))  # center x coordinate of the grid map
     center_y = int(
@@ -214,8 +214,9 @@ def generate_ray_casting_grid_map(ox, oy, x_output, y_output,xy_resolution, bres
             occupancy_map[ix + 1][iy + 1] = 1.0  # extend the occupied area
 
     x_diff = int((x_w - x_output)/2)
-    y_diff = int((y_w - y_output)/2)
-    occupancy_map = occupancy_map[y_diff:y_w-y_diff, x_diff:x_w-x_diff,:]
+    y_diff = int((y_w - y_output)/4)
+
+    occupancy_map = occupancy_map[(3*y_diff):y_w-y_diff, x_diff:x_w-x_diff,:]
     return occupancy_map, min_x, max_x, min_y, max_y, xy_resolution
 
 import os
