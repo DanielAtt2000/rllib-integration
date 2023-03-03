@@ -372,7 +372,7 @@ class DQNExperimentBasic(BaseExperiment):
             elif sensor == "lidar_truck":
                 lidar_points = sensor_data['lidar_truck'][1]
 
-                xy_resolution = 0.5
+                xy_resolution = 0.3
                 x_output = 84
                 y_output = 84
 
@@ -382,6 +382,9 @@ class DQNExperimentBasic(BaseExperiment):
                 occupancy_map, min_x, max_x, min_y, max_y, xy_resolution = \
                     generate_ray_casting_grid_map(ox=ox, oy=oy, x_output=x_output, y_output=y_output,
                                                   xy_resolution=xy_resolution, breshen=True)
+                # Inverted the image as a test
+                occupancy_map = occupancy_map[::-1]
+                # print(f"Final image size {occupancy_map.shape}")
 
                 if self.visualiseOccupancyGirdMap and self.counter % 10 == 0:
                     plt.figure()
@@ -392,7 +395,7 @@ class DQNExperimentBasic(BaseExperiment):
                     plt.gca().set_xticks(np.arange(-.5, xy_res[1], 1), minor=True)
                     plt.gca().set_yticks(np.arange(-.5, xy_res[0], 1), minor=True)
                     plt.grid(True, which="minor", color="w", linewidth=0.6, alpha=0.5)
-
+                    # plt.gca().invert_yaxis()
                     plt.show()
 
                 assert occupancy_map is not None
