@@ -113,7 +113,7 @@ def get_checkpoint(name, directory, restore=False, overwrite=False):
     return None
 
 
-def launch_tensorboard(logdir, host="localhost", port="6006"):
+def launch_tensorboard(logdir, host="localhost", port="6007"):
     tb = program.TensorBoard()
     tb.configure(argv=[None, "--logdir", logdir, "--host", host, "--port", port])
     url = tb.launch()
