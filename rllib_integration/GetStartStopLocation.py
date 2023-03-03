@@ -53,11 +53,12 @@ spawn_points_2_lane_roundabout_large = [
     [118,[84,121,58]],
     [97,[22,82]],
     [76,[121,58,74]],
-    [112,[82,9]],
+    [112,[9]],
     [39,[58,74,84]],
     [41,[9,56]],
     [111,[74,84,121]],
     [55,[56,22]],
+#     Removed 112 to 82 too tight
 ]
 
 # roundabouts = [spawn_points_2_lane_roundabout_large,spawn_points_2_lane_roundabout_small]
