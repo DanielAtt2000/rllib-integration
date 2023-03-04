@@ -121,7 +121,7 @@ def main():
         if specific_version:
             args.name = "dqn_1e6ea7f4"
             x = random.randint(0,100)
-            inp = input(f'SPECIFIC NAME APPLIED ENTER {x} to confirm:')
+            inp = input(f'SPECIFIC NAME APPLIED  ENTER {x} to confirm:')
 
             if int(x) == int(inp):
                 run(args)
