@@ -213,10 +213,10 @@ def generate_ray_casting_grid_map(ox, oy, x_output, y_output,xy_resolution, bres
             occupancy_map[ix][iy + 1] = 1.0  # extend the occupied area
             occupancy_map[ix + 1][iy + 1] = 1.0  # extend the occupied area
 
-    x_diff = int((x_w - x_output)/41)
-    y_diff = int((y_w - y_output)/5)
+    x_diff = int((x_w - x_output)/2)
+    y_diff = int((y_w - y_output)/20)
 
-    occupancy_map = occupancy_map[(3*y_diff):y_w-(2*y_diff), (20*x_diff):x_w-(21*x_diff),:]
+    occupancy_map = occupancy_map[(12*y_diff):y_w-(8*y_diff), (x_diff):x_w-(x_diff),:]
     return occupancy_map, min_x, max_x, min_y, max_y, xy_resolution
 
 import os
