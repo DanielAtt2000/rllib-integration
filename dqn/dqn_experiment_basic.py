@@ -44,7 +44,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.counter = 0
         self.visualiseRoute = False
         self.visualiseImage = False
-        self.visualiseOccupancyGirdMap = False
+        self.visualiseOccupancyGirdMap = True
         self.counterThreshold = 10
         self.last_hyp_distance_to_next_waypoint = 0
 
@@ -179,7 +179,7 @@ class DQNExperimentBasic(BaseExperiment):
             "occupancyMap": Box(
                 low=0,
                 high=1,
-                shape=(84, 84,1),
+                shape=(128, 128,1),
                 dtype=np.float64
             )
             })
@@ -373,8 +373,8 @@ class DQNExperimentBasic(BaseExperiment):
                 lidar_points = sensor_data['lidar_truck'][1]
 
                 xy_resolution = 0.3
-                x_output = 84
-                y_output = 84
+                x_output = 128
+                y_output = 128
 
                 ox = lidar_points[0][:]
                 oy = lidar_points[1][:]
