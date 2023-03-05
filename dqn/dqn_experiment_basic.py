@@ -383,7 +383,7 @@ class DQNExperimentBasic(BaseExperiment):
                     generate_ray_casting_grid_map(ox=ox, oy=oy, x_output=x_output, y_output=y_output,
                                                   xy_resolution=xy_resolution, breshen=True)
                 # Inverted the image as a test
-                occupancy_map = occupancy_map[::-1]
+                # occupancy_map = occupancy_map[::-1]
                 # print(f"Final image size {occupancy_map.shape}")
 
                 if self.visualiseOccupancyGirdMap and self.counter % 10 == 0:
