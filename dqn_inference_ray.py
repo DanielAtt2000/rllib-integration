@@ -61,6 +61,12 @@ def main():
     try:
         ray.init()
 
+        previous_routes_files = open('testing_routes.txt', 'w')
+        previous_routes_files.write(f"roundabout_idx:{0}\n")
+        previous_routes_files.write(f"entry_idx:{0}\n")
+        previous_routes_files.write(f"exit_idx:{0}\n")
+        previous_routes_files.close()
+
         # Restore agent
         agent = DQN(env=CarlaEnv, config=args.config)
         agent.restore(args.checkpoint)

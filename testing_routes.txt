@@ -1,0 +1,3 @@
+roundabout_idx:0
+entry_idx:4
+exit_idx:0

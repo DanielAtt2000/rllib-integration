@@ -93,7 +93,61 @@ def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):
 
     return entry_spawn_point_index, exit_spawn_point_index
 
-
+# ONLY TO BE USED FOR TESTING
+# def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):
+#     entry_spawn_point_index = -1
+#     exit_spawn_point_index = -1
+#
+#     previous_routes_files = open('testing_routes.txt','r')
+#
+#     lines = previous_routes_files.readlines()
+#     indices = {}
+#     for line in lines:
+#         if "roundabout_idx" in line:
+#             indices['roundabout_idx'] = int(line.split(':')[1])
+#         if "entry_idx" in line:
+#             indices['entry_idx'] = int(line.split(':')[1])
+#         if "exit_idx" in line:
+#             indices['exit_idx'] = int(line.split(':')[1])
+#
+#     previous_routes_files.close()
+#
+#     entry_spawn_point_index = roundabouts[indices['roundabout_idx']][indices['entry_idx']][0]
+#     exit_spawn_point_index = roundabouts[indices['roundabout_idx']][indices['entry_idx']][1][indices['exit_idx']]
+#
+#     indices['exit_idx'] += 1
+#     print(f"indices['exit_idx']:{indices['exit_idx']}")
+#     print(f"len(roundabouts[indices['roundabout_idx']][indices['entry_idx']][1]):{len(roundabouts[indices['roundabout_idx']][indices['entry_idx']][1])}")
+#
+#
+#     print(f"indices['entry_idx']:{indices['entry_idx']}")
+#     print(f"len(roundabouts[indices['roundabout_idx']][indices['entry_idx']]):{len(roundabouts[indices['roundabout_idx']])}")
+#     if indices['exit_idx'] == len(roundabouts[indices['roundabout_idx']][indices['entry_idx']][1]):
+#         indices['entry_idx'] += 1
+#         indices['exit_idx'] = 0
+#     if indices['entry_idx'] + 1 == len(roundabouts[indices['roundabout_idx']]):
+#         indices['roundabout_idx'] += 1
+#         indices['entry_idx'] = 0
+#         indices['exit_idx'] = 0
+#
+#
+#     previous_routes_files = open('testing_routes.txt', 'w')
+#     previous_routes_files.write(f"roundabout_idx:{indices['roundabout_idx']}\n")
+#     previous_routes_files.write(f"entry_idx:{indices['entry_idx']}\n")
+#     previous_routes_files.write(f"exit_idx:{indices['exit_idx']}\n")
+#     previous_routes_files.close()
+#
+#
+#     if entry_spawn_point_index == -1 or exit_spawn_point_index == -1:
+#         raise Exception('Failed to find spawnable location')
+#
+#     print(spawn_points)
+#     print(f"Starting from {entry_spawn_point_index} to {exit_spawn_point_index}")
+#     print("------N-----")
+#     print("W-----|----E")
+#     print("------S-----")
+#
+#     return entry_spawn_point_index, exit_spawn_point_index
 
 def get_entry_exit_spawn_point_indices(failed_spawn_locations,debug=False):
     entry_spawn_point_index = -1
