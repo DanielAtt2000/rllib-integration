@@ -28,6 +28,8 @@ EXPERIMENT_CLASS = DQNExperimentBasic
 # /home/daniel/ray_results/carla_rllib/dqn_8138f8582f/CustomDQNTrainer_CarlaEnv_93bce_00000_0_2023-01-30_18-07-29/checkpoint_000750
 # /home/daniel/ray_results/carla_rllib/dqn_ea8eefa922/CustomDQNTrainer_CarlaEnv_16957_00000_0_2023-02-13_23-52-27/checkpoint_000305
 # /home/daniel/ray_results/carla_rllib/dqn_53bd0b14d1/CustomDQNTrainer_CarlaEnv_e07a8_00000_0_2023-03-01_21-08-48/checkpoint_000419
+# /home/daniel/ray_results/carla_rllib/good/dqn_00a7d0841e_smallroundaboutOnly_depthCamera/CustomDQNTrainer_CarlaEnv_80d2d_00000_0_2023-02-24_19-31-50/checkpoint_000358
+# /home/daniel/ray_results/carla_rllib/good/dqn_66b0e183bf_truck_lidar_240x320/CustomDQNTrainer_CarlaEnv_5b56a_00000_0_2023-03-05_18-01-24/checkpoint_000260
 def parse_config(args):
     """
     Parses the .yaml configuration file into a readable dictionary
@@ -65,11 +67,14 @@ def main():
 
         # Initalize the CARLA environment
         env = agent.workers.local_worker().env
-        obs = env.reset()
 
         while True:
-            action = agent.compute_single_action(obs)
-            obs, _, _, _ = env.step(action)
+            observation = env.reset()
+            done = False
+
+            while not done:
+                action = agent.compute_single_action(observation)
+                observation, reward, done, info = env.step(action)
 
     except KeyboardInterrupt:
         print("\nshutdown by user")
