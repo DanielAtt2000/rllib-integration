@@ -176,6 +176,12 @@ class DQNExperimentBasic(BaseExperiment):
                 high=np.array([100,100,math.pi,math.pi,math.pi]),
                 dtype=np.float32
             ),
+            # "depth_camera": Box(
+            #     low=0,
+            #     high=255,
+            #     shape=(84, 84, 3),
+            #     dtype=np.float32
+            # )
             # "occupancyMap": Box(
             #     low=0,
             #     high=1,
@@ -434,7 +440,8 @@ class DQNExperimentBasic(BaseExperiment):
         # print(f"acceleration:{np.float32(acceleration)}")
         return {"values":observations,
                 # "occupancyMap":occupancy_map
-                }, {}
+                # "depth_camera":depth_camera_data
+                }, {"occupancy_map":occupancy_map,"depth_camera":depth_camera_data}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -507,7 +514,7 @@ class DQNExperimentBasic(BaseExperiment):
             data = f"ENTRY: {core.entry_spawn_point_index} EXIT: {core.exit_spawn_point_index} - {done_reason} \n"
             self.save_to_file(f"{self.directory}/done",data)
 
-        return bool(output)
+        return bool(output), self.done_collision
 
     def compute_reward(self, observation, core):
         """Computes the reward"""
