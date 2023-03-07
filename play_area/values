@@ -1,0 +1,47 @@
+ FullyConnectedNetwork_as_DQNTorchModel(
+   (_hidden_layers): Sequential(
+     (0): SlimFC(
+       (_model): Sequential(
+         (0): Linear(in_features=5, out_features=256, bias=True)
+         (1): Tanh()
+       )
+     )
+     (1): SlimFC(
+       (_model): Sequential(
+         (0): Linear(in_features=256, out_features=256, bias=True)
+         (1): Tanh()
+       )
+     )
+   )
+   (_value_branch): SlimFC(
+     (_model): Sequential(
+       (0): Linear(in_features=256, out_features=1, bias=True)
+     )
+   )
+   (advantage_module): Sequential(
+     (dueling_A_0): SlimFC(
+       (_model): Sequential(
+         (0): Linear(in_features=256, out_features=256, bias=True)
+         (1): ReLU()
+       )
+     )
+     (A): SlimFC(
+       (_model): Sequential(
+         (0): Linear(in_features=256, out_features=1479, bias=True)
+       )
+     )
+   )
+   (value_module): Sequential(
+     (dueling_V_0): SlimFC(
+       (_model): Sequential(
+         (0): Linear(in_features=256, out_features=256, bias=True)
+         (1): ReLU()
+       )
+     )
+     (V): SlimFC(
+       (_model): Sequential(
+         (0): Linear(in_features=256, out_features=51, bias=True)
+       )
+     )
+   )
+ )
