@@ -99,7 +99,7 @@ class CarlaEnv(gym.Env):
         # self.save_data(f'image_data/lidar/{self.counter}.pkl',info['occupancy_map'])
         # self.save_data(f'image_data/depth/{self.counter}.pkl',info['depth_camera'])
 
-        temp_dataframe = pd.DataFrame({'lidar_image': info['occupancy_map'], 'done_collision': done_collision},index=[0])
+        temp_dataframe = pd.DataFrame({'lidar_image': [info['occupancy_map']], 'done_collision': done_collision},index=[0])
         self.collision_data = pd.concat([self.collision_data,temp_dataframe], ignore_index=True)
 
         self.save_data(f'image_data/collision_data_new.pkl', self.collision_data)
