@@ -12,7 +12,17 @@ def read_data_from_pickle(filename):
         return pickle.load(handle)
 
 
-temp = read_data_from_pickle('collision_data.pkl')
+
+data = read_data_from_pickle('collision_data_2.pkl')
+lidar = read_data_from_pickle('lidar/03072023_175354097293.pkl')
+
+for index, row in data.iterrows():
+    path = f"lidar/{row['filename']}.pkl"
+    row['filename'] = read_data_from_pickle(path)
+
+
+temp = read_data_from_pickle('collision_data_2.pkl')
+print(temp.index[temp['done_collision'] == True].tolist())
 lidar = read_data_from_pickle('lidar/03072023_175354097293.pkl')
 plt.figure()
 xy_res = np.array(lidar).shape

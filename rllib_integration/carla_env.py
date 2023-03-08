@@ -42,13 +42,16 @@ class CarlaEnv(gym.Env):
         # self.all_time = []
 
         def read_data_from_pickle(filename):
-            with open(filename, 'rb') as handle:
-                return pickle.load(handle)
+            try:
+                with open(filename, 'rb') as handle:
+                    return pickle.load(handle)
+            else:
+                return pd.DataFrame(columns = ['lidar_image', 'done_collision'])
 
         self.date_time_format = "%m%d%Y_%H%M%S%f"
         self.counter = datetime.now().strftime(self.date_time_format)
 
-        self.collision_data = read_data_from_pickle("image_data/collision_data.pkl")
+        self.collision_data = read_data_from_pickle("image_data/collision_data_new.pkl")
 
         self.reset()
 
@@ -93,13 +96,13 @@ class CarlaEnv(gym.Env):
         # start = time.time()
         done, done_collision = self.experiment.get_done_status(observation, self.core)
 
-        self.save_data(f'image_data/lidar/{self.counter}.pkl',info['occupancy_map'])
+        # self.save_data(f'image_data/lidar/{self.counter}.pkl',info['occupancy_map'])
         # self.save_data(f'image_data/depth/{self.counter}.pkl',info['depth_camera'])
 
-        temp_dataframe = pd.DataFrame({'filename': self.counter, 'done_collision': done_collision},index=[0])
+        temp_dataframe = pd.DataFrame({'lidar_image': info['occupancy_map'], 'done_collision': done_collision},index=[0])
         self.collision_data = pd.concat([self.collision_data,temp_dataframe], ignore_index=True)
 
-        self.save_data(f'image_data/collision_data.pkl', self.collision_data)
+        self.save_data(f'image_data/collision_data_new.pkl', self.collision_data)
 
         self.counter = datetime.now().strftime(self.date_time_format)
         # stop = time.time()

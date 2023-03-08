@@ -5,7 +5,7 @@ import numpy as np
 # for reading and displaying images
 from skimage.io import imread
 import matplotlib.pyplot as plt
-
+import pickle
 
 # for creating validation set
 from sklearn.model_selection import train_test_split
@@ -20,11 +20,32 @@ from torch.autograd import Variable
 from torch.nn import Linear, ReLU, CrossEntropyLoss, Sequential, Conv2d, MaxPool2d, Module, Softmax, BatchNorm2d, Dropout
 from torch.optim import Adam, SGD
 
-# loading dataset
-train = pd.read_csv('train_LbELtWX/train.csv')
-test = pd.read_csv('test_ScVgIM0/test.csv')
 
-sample_submission = pd.read_csv('sample_submission_I5njJSF.csv')
+def read_data_from_pickle(filename):
+    with open(filename, 'rb') as handle:
+        return pickle.load(handle)
+
+def save_data(self, filename, data):
+    with open(filename, 'wb') as handle:
+        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+
+# # loading dataset
+# train = pd.read_csv('train_LbELtWX/train.csv')
+# test = pd.read_csv('test_ScVgIM0/test.csv')
+#
+# sample_submission = pd.read_csv('sample_submission_I5njJSF.csv')
+
+
+data = read_data_from_pickle('../../image_data/collision_data_2.pkl')
+
+for index, row in data.iterrows():
+    path = f"../../image_data/lidar/{row['filename']}.pkl"
+    row['filename'] = read_data_from_pickle(path)
+    print(index)
+
+save_data('lidar_data.pkl',data)
 
 train.head()
 
