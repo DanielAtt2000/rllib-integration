@@ -45,7 +45,7 @@ class CarlaEnv(gym.Env):
             try:
                 with open(filename, 'rb') as handle:
                     return pickle.load(handle)
-            else:
+            except:
                 return pd.DataFrame(columns = ['lidar_image', 'done_collision'])
 
         self.date_time_format = "%m%d%Y_%H%M%S%f"
