@@ -82,11 +82,11 @@ env_config:
 #          type: "sensor.other.obstacle"
         collision:
           type: "sensor.other.collision"
-        depth_camera:
-          type: "sensor.camera.depth"
-          image_size_x: 84
-          image_size_y: 84
-          transform: '2.3,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
+#        depth_camera:
+#          type: "sensor.camera.depth"
+#          image_size_x: 84
+#          image_size_y: 84
+#          transform: '2.3,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
         lidar:
           type: "sensor.lidar.ray_cast_semantic"
           channels : "32"

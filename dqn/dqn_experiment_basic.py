@@ -441,7 +441,10 @@ class DQNExperimentBasic(BaseExperiment):
         return {"values":observations,
                 # "occupancyMap":occupancy_map
                 # "depth_camera":depth_camera_data
-                }, {"occupancy_map":occupancy_map,"depth_camera":depth_camera_data}
+                }, \
+            {"occupancy_map":occupancy_map,
+            # "depth_camera":depth_camera_data
+             }
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
