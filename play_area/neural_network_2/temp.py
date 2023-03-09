@@ -1,6 +1,17 @@
 import pickle
 import numpy as np
 from matplotlib import pyplot as plt
+
+from torchvision.io import read_image
+
+image = read_image("../../image_data/lidar/03072023_212450443245.pkl.png")
+
+import matplotlib.image as mpimg
+image_path = "../../image_data/lidar/03072023_212450443245.pkl.png"
+image = mpimg.imread(image_path)
+plt.imshow(image)
+plt.show()
+
 def read_data_from_pickle(filename):
     with open(filename, 'rb') as handle:
         print(filename)

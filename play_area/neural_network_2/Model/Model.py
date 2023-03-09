@@ -28,10 +28,6 @@ class Net(Module):
             Flatten(start_dim=1, end_dim=-1)
         )
 
-
-
-
-
     # Defining the forward pass
     def forward(self, x):
         x = self.custom_model_layer(x)

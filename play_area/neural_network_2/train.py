@@ -19,7 +19,9 @@ import torch
 from torch.autograd import Variable
 from torch.nn import Linear, ReLU, CrossEntropyLoss, Sequential, Conv2d, MaxPool2d, Module, Softmax, BatchNorm2d, Dropout
 from torch.optim import Adam, SGD
-
+import torchvision.transforms as transforms
+from play_area.neural_network_2.CustomImageDataset import CustomImageDataset
+from Model.Model import Net
 
 def read_data_from_pickle(filename):
     with open(filename, 'rb') as handle:
@@ -30,20 +32,26 @@ def save_data( filename, data):
     with open(filename, 'wb') as handle:
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+def evaluate(note, actual, predictions):
+    return f"""
+    {note}
+    accuracy_score: {accuracy_score(actual, predictions)}
+    precision_score: {precision_score(actual, predictions)}
+    recall_score: {recall_score(actual, predictions)}
+    f1_score: {f1_score(actual, predictions)}
+    """
 
 def save_to_file(filename, data):
     with open(filename,'w') as f:
         f.write(data)
 
-# # loading dataset
-# train = pd.read_csv('train_LbELtWX/train.csv')
-# test = pd.read_csv('test_ScVgIM0/test.csv')
-#
-# sample_submission = pd.read_csv('sample_submission_I5njJSF.csv')
-no_of_lidar_images = 10000
+
+
+no_of_lidar_images = 100
 lidar_data_filename = f"lidar_data_{no_of_lidar_images}.pkl"
-n_epochs = 1000
+n_epochs = 2
 lr = 0.0005
+batch_size = 2
 
 if not os.path.isfile(lidar_data_filename):
 
@@ -64,70 +72,47 @@ if not os.path.isfile(lidar_data_filename):
 
 else:
     print('Reading data ....')
-    data = read_data_from_pickle(f"lidar_data.pkl")
+    data = read_data_from_pickle(lidar_data_filename)
     print('Data Read')
 
-data.head()
-
-# # loading training images
-# train_img = []
-# for img_name in tqdm(train['id']):
-#     # defining the image path
-#     image_path = 'train_LbELtWX/train/' + str(img_name) + '.png'
-#     # reading the image
-#     img = imread(image_path, as_gray=True)
-#     # normalizing the pixel values
-#     img /= 255.0
-#     # converting the type of pixel to float 32
-#     img = img.astype('float32')
-#     # appending the image into the list
-#     train_img.append(img)
-
-# converting the list to numpy array
-train_x = np.array(data['lidar_image'].values.tolist())
-# defining the target
-train_y = data['done_collision'].values
-print(train_x.shape)
 
 
-# # visualizing images
-# i = 0
-# plt.figure(figsize=(10,10))
-# plt.subplot(221), plt.imshow(train_x[i], cmap='gray')
-# plt.subplot(222), plt.imshow(train_x[i+25], cmap='gray')
-# plt.subplot(223), plt.imshow(train_x[i+50], cmap='gray')
-# plt.subplot(224), plt.imshow(train_x[i+75], cmap='gray')
 
-# create validation set
-train_x, test_x, train_y, test_y = train_test_split(train_x, train_y, test_size = 0.3, shuffle=True, stratify=train_y)
-(train_x.shape, train_y.shape), (test_x.shape, test_y.shape)
+for index, row in data.iterrows():
+    row['filename'] ="03072023_212450443245"
+
+data_x = data['filename']
+data_y = data['done_collision'].astype(int)
 
 
-# converting training images into torch format
-train_x = train_x.reshape(len(train_x), 1, 240, 320)
-train_x  = torch.from_numpy(train_x)
+X_train, X_test, y_train, y_test = train_test_split(data_x, data_y, test_size = 0.3, shuffle=True, stratify=data['done_collision'])
 
-# converting the target into torch format
-train_y = train_y.astype(int);
-train_y = torch.from_numpy(train_y)
+training_data = pd.concat([X_train,y_train],axis=1)
+testing_data = pd.concat([X_test,y_test],axis=1)
 
-# shape of training data
-print(train_x.shape)
-print(train_y.shape)
+training_dataset = CustomImageDataset(annotations_file=training_data,img_dir="../../image_data/lidar/")
+testing_dataset = CustomImageDataset(annotations_file=testing_data,img_dir="../../image_data/lidar/")
 
-# converting validation images into torch format
-test_x = test_x.reshape(len(test_x), 1, 240, 320)
-test_x  = torch.from_numpy(test_x)
+trainLoader = torch.utils.data.DataLoader(training_dataset, batch_size=batch_size,shuffle=True, num_workers=2)
+testLoader = torch.utils.data.DataLoader(testing_dataset, batch_size=1,shuffle=True, num_workers=2)
 
-# converting the target into torch format
-test_y = test_y.astype(int)
-test_y = torch.from_numpy(test_y)
+# dataiter = iter(trainLoader)
+# images, labels = next(dataiter)
+#
+#
+# plt.figure()
+# xy_res = np.array(images).shape
+# plt.imshow(images, cmap="PiYG_r")
+# # cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
+# plt.clim(-0.4, 1.4)
+# plt.gca().set_xticks(np.arange(-.5, xy_res[1], 1), minor=True)
+# plt.gca().set_yticks(np.arange(-.5, xy_res[0], 1), minor=True)
+# plt.grid(True, which="minor", color="w", linewidth=0.6, alpha=0.5)
+# # plt.gca().invert_yaxis()
+# plt.show()
 
-# shape of validation data
-print(test_x.shape)
-print(test_y.shape)
 
-from Model.Model import Net
+
 # defining the model
 model = Net()
 # defining the optimizer
@@ -140,118 +125,49 @@ criterion = criterion.cuda()
 
 
 print(model)
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+print(device)
+for epoch in range(n_epochs):  # loop over the dataset multiple times
 
+    running_loss = 0.0
+    for i, data in enumerate(trainLoader, 0):
+        # get the inputs; data is a list of [inputs, labels]
+        inputs, labels = data[0].type(torch.cuda.FloatTensor).to(device), data[1].to(device)
 
-def train(epoch):
-    model.train()
-    tr_loss = 0
-    # getting the training set
-    x_train, y_train = Variable(train_x), Variable(train_y)
-    x_train = x_train.type(torch.cuda.FloatTensor).cuda()
+        # zero the parameter gradients
+        optimizer.zero_grad()
 
-    y_train = y_train.cuda()
+        # forward + backward + optimize
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
 
-    # # getting the validation set
-    # x_val, y_val = Variable(val_x), Variable(val_y)
-    # converting the data into GPU format
+        # print statistics
+        running_loss += loss.item()
 
+        print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}')
+        running_loss = 0.0
 
-        # x_val = x_val.cuda()
-        # y_val = y_val.cuda()
+print('Finished Training')
 
-    # clearing the Gradients of the model parameters
-    optimizer.zero_grad()
-
-    # prediction for training and validation set
-    output_train = model(x_train)
-    # output_val = model(x_val)
-
-    # computing the training and validation loss
-    loss_train = criterion(output_train, y_train)
-    # loss_val = criterion(output_val, y_val)
-    train_losses.append(loss_train)
-    # val_losses.append(loss_val)
-
-    # computing the updated weights of all the model parameters
-    loss_train.backward()
-    optimizer.step()
-    tr_loss = loss_train.item()
-    print(f"Epoch:{epoch}")
-    if epoch % 2 == 0:
-        # printing the validation loss
-        print('Epoch : ', epoch + 1, '\t', 'loss :', tr_loss)
-
-
-# defining the number of epochs
-n_epochs = n_epochs
-# empty list to store training losses
-train_losses = []
-# # empty list to store validation losses
-# val_losses = []
-# training the model
-for epoch in range(n_epochs):
-    train(epoch)
-
-#
-# # plotting the training and validation loss
-# plt.plot(train_losses, label='Training loss')
-# # plt.plot(val_losses, label='Validation loss')
-# plt.legend()
-# plt.show()
-#
-# prediction for training set
+test_predictions = []
+true_test_values = []
+# since we're not training, we don't need to calculate the gradients for our outputs
 with torch.no_grad():
-    output = model(train_x.type(torch.cuda.FloatTensor).cuda())
+    for data in testLoader:
+        images, labels = data[0].type(torch.cuda.FloatTensor).to(device), data[1].to(device)
+        # calculate outputs by running images through the network
+        outputs = model(images)
+        # the class with the highest energy is what we choose as prediction
+        softmax = torch.exp(outputs.data).cpu()
+        prob = list(softmax.numpy())
+        pred = np.argmax(prob, axis=1)
 
-softmax = torch.exp(output).cpu()
-prob = list(softmax.numpy())
-train_predictions = np.argmax(prob, axis=1)
-
-
-def evaluate(note, actual, predictions):
-    return f"""
-    {note}
-    accuracy_score: {accuracy_score(actual, predictions)}
-    precision_score: {precision_score(actual, predictions)}
-    recall_score: {recall_score(actual, predictions)}
-    f1_score: {f1_score(actual, predictions)}
-    """
+        test_predictions.append(pred)
+        true_test_values.append(labels.cpu().numpy())
 
 
-
-# accuracy on training set
-training_pred_output = evaluate("Training",train_y,train_predictions)
+testing_pred_output = evaluate("Training", true_test_values, test_predictions)
+save_to_file(f"{lidar_data_filename}_{n_epochs}_{lr}_{batch_size}",testing_pred_output)
 print(training_pred_output)
-
-
-# # TESTING SET
-# generating predictions for test set
-with torch.no_grad():
-    output = model(test_x.type(torch.cuda.FloatTensor).cuda())
-
-softmax = torch.exp(output).cpu()
-prob = list(softmax.numpy())
-test_predictions = np.argmax(prob, axis=1)
-
-testing_pred_output = evaluate("Testing",test_y,test_predictions)
-print(testing_pred_output)
-save_to_file(f"{lidar_data_filename}_{n_epochs}_{lr}",training_pred_output + '\n'+ testing_pred_output )
-
-# # replacing the label with prediction
-# sample_submission['label'] = predictions
-# sample_submission.head()
-#
-# # saving the file
-# sample_submission.to_csv('submission.csv', index=False)
-
-
-# # prediction for validation set
-# with torch.no_grad():
-#     output = model(val_x.cuda())
-#
-# softmax = torch.exp(output).cpu()
-# prob = list(softmax.numpy())
-# predictions = np.argmax(prob, axis=1)
-#
-# # accuracy on validation set
-# accuracy_score(val_y, predictions)
