@@ -81,7 +81,7 @@ def main():
         # Initalize the CARLA environment
         env = agent.workers.local_worker().env
 
-        results_file = open(f'{remote.refs[repo.active_branch.name].commit}_{args.checkpoint}.csv', mode='w')
+        results_file = open(f'inference_results/{remote.refs[repo.active_branch.name].commit}_{args.checkpoint}.csv', mode='w')
         employee_writer = csv.writer(results_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         employee_writer.writerow(['route','timesteps','collision_truck','collision_trailer','timeout','completed'])
