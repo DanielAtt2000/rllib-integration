@@ -31,17 +31,24 @@ def save_data( filename, data):
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
+def save_to_file(filename, data):
+    with open(filename,'w') as f:
+        f.write(data)
 
 # # loading dataset
 # train = pd.read_csv('train_LbELtWX/train.csv')
 # test = pd.read_csv('test_ScVgIM0/test.csv')
 #
 # sample_submission = pd.read_csv('sample_submission_I5njJSF.csv')
+no_of_lidar_images = 10000
+lidar_data_filename = f"lidar_data_{no_of_lidar_images}.pkl"
+n_epochs = 1000
+lr = 0.0005
 
-if not os.path.isfile("lidar_data.pkl"):
+if not os.path.isfile(lidar_data_filename):
 
     data = read_data_from_pickle('../../image_data/collision_data_2.pkl')
-    data = data.loc[:10]
+    data = data.loc[:no_of_lidar_images]
     data['lidar_image'] = data.loc[:, 'filename']
 
 
@@ -53,7 +60,7 @@ if not os.path.isfile("lidar_data.pkl"):
     #     print(index)
 
     print('Saving File ....')
-    save_data('lidar_data.pkl',data)
+    save_data(lidar_data_filename,data)
 
 else:
     print('Reading data ....')
@@ -124,7 +131,7 @@ from Model.Model import Net
 # defining the model
 model = Net()
 # defining the optimizer
-optimizer = Adam(model.parameters(), lr=0.07)
+optimizer = Adam(model.parameters(), lr=lr)
 # defining the loss function
 criterion = CrossEntropyLoss()
 # checking if GPU is available
@@ -176,7 +183,7 @@ def train(epoch):
 
 
 # defining the number of epochs
-n_epochs = 25
+n_epochs = n_epochs
 # empty list to store training losses
 train_losses = []
 # # empty list to store validation losses
@@ -200,18 +207,24 @@ softmax = torch.exp(output).cpu()
 prob = list(softmax.numpy())
 train_predictions = np.argmax(prob, axis=1)
 
+
+def evaluate(note, actual, predictions):
+    return f"""
+    {note}
+    accuracy_score: {accuracy_score(actual, predictions)}
+    precision_score: {precision_score(actual, predictions)}
+    recall_score: {recall_score(actual, predictions)}
+    f1_score: {f1_score(actual, predictions)}
+    """
+
+
+
 # accuracy on training set
-print("TRAINING")
-print(f"accuracy_score training set {accuracy_score(train_y, train_predictions)}")
-print(f"precision_score training set {precision_score(train_y, train_predictions)}")
-print(f"recall_score training set {recall_score(train_y, train_predictions)}")
-print(f"f1_score training set {f1_score(train_y, train_predictions)}")
-print("TRAINING")
+training_pred_output = evaluate("Training",train_y,train_predictions)
+print(training_pred_output)
 
 
 # # TESTING SET
-
-
 # generating predictions for test set
 with torch.no_grad():
     output = model(test_x.type(torch.cuda.FloatTensor).cuda())
@@ -220,13 +233,9 @@ softmax = torch.exp(output).cpu()
 prob = list(softmax.numpy())
 test_predictions = np.argmax(prob, axis=1)
 
-print("TESTING")
-print(f"accuracy_score testing set {accuracy_score(test_y, test_predictions)}")
-print(f"precision_score testing set {precision_score(test_y, test_predictions)}")
-print(f"recall_score testing set {recall_score(test_y, test_predictions)}")
-print(f"f1_score testing set {f1_score(test_y, test_predictions)}")
-print("TESTING")
-
+testing_pred_output = evaluate("Testing",test_y,test_predictions)
+print(testing_pred_output)
+save_to_file(f"{lidar_data_filename}_{n_epochs}_{lr}",training_pred_output + '\n'+ testing_pred_output )
 
 # # replacing the label with prediction
 # sample_submission['label'] = predictions
