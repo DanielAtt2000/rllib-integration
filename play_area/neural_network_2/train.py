@@ -143,7 +143,7 @@ def train(epoch):
     x_train = x_train.cuda()
 
     y_train = y_train.cuda()
-    y_train = y_train.float()
+
     # # getting the validation set
     # x_val, y_val = Variable(val_x), Variable(val_y)
     # converting the data into GPU format
