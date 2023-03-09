@@ -182,12 +182,12 @@ class DQNExperimentBasic(BaseExperiment):
             #     shape=(84, 84, 3),
             #     dtype=np.float32
             # )
-            # "occupancyMap": Box(
-            #     low=0,
-            #     high=1,
-            #     shape=(240, 320,1),
-            #     dtype=np.float64
-            # )
+            "occupancyMap": Box(
+                low=0,
+                high=1,
+                shape=(240, 320,1),
+                dtype=np.float64
+            )
             })
         return image_space
 
@@ -439,10 +439,11 @@ class DQNExperimentBasic(BaseExperiment):
         # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         # print(f"acceleration:{np.float32(acceleration)}")
         return {"values":observations,
-                # "occupancyMap":occupancy_map
+                "occupancyMap":occupancy_map
                 # "depth_camera":depth_camera_data
                 }, \
-            {"occupancy_map":occupancy_map,
+            {
+                # "occupancy_map":occupancy_map,
             # "depth_camera":depth_camera_data
              }
 
