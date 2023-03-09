@@ -96,7 +96,8 @@ class CarlaEnv(gym.Env):
         # start = time.time()
         done, done_collision = self.experiment.get_done_status(observation, self.core)
 
-        self.save_data(f'image_data/lidar/{self.counter}.pkl',info['occupancy_map'])
+        cv2.imwrite(f'image_data/lidar/{self.counter}.png',info['occupancy_map'])
+
         # self.save_data(f'image_data/depth/{self.counter}.pkl',info['depth_camera'])
 
         temp_dataframe = pd.DataFrame({'filename': self.counter, 'done_collision': done_collision},index=[0])
