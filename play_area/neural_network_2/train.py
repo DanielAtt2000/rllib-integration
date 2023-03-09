@@ -25,7 +25,7 @@ def read_data_from_pickle(filename):
     with open(filename, 'rb') as handle:
         return pickle.load(handle)
 
-def save_data(self, filename, data):
+def save_data( filename, data):
     with open(filename, 'wb') as handle:
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 

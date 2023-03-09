@@ -13,7 +13,7 @@ def read_data_from_pickle(filename):
 
 
 
-data = read_data_from_pickle('collision_data_new.pkl')
+data = read_data_from_pickle('collision_data.pkl')
 lidar = read_data_from_pickle('lidar/03072023_175354097293.pkl')
 
 for index, row in data.iterrows():
