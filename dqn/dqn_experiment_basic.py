@@ -543,7 +543,7 @@ class DQNExperimentBasic(BaseExperiment):
         if self.done_falling:
             reward += -1000
             print('====> REWARD Done falling')
-        if self.done_collision:
+        if self.done_collision_truck or self.done_collision_trailer:
             print("====> REWARD Done collision")
             reward += -1000
         if self.done_time_idle:
