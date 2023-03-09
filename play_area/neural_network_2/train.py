@@ -11,7 +11,7 @@ import pickle
 from sklearn.model_selection import train_test_split
 import os
 # for evaluating the model
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score
 from tqdm import tqdm
 
 # PyTorch libraries and modules
@@ -140,7 +140,7 @@ def train(epoch):
     tr_loss = 0
     # getting the training set
     x_train, y_train = Variable(train_x), Variable(train_y)
-    x_train = x_train.cuda()
+    x_train = x_train.type(torch.cuda.FloatTensor).cuda()
 
     y_train = y_train.cuda()
 
@@ -185,43 +185,55 @@ train_losses = []
 for epoch in range(n_epochs):
     train(epoch)
 
-
-# plotting the training and validation loss
-plt.plot(train_losses, label='Training loss')
-# plt.plot(val_losses, label='Validation loss')
-plt.legend()
-plt.show()
-
+#
+# # plotting the training and validation loss
+# plt.plot(train_losses, label='Training loss')
+# # plt.plot(val_losses, label='Validation loss')
+# plt.legend()
+# plt.show()
+#
 # prediction for training set
 with torch.no_grad():
-    output = model(train_x.cuda())
+    output = model(train_x.type(torch.cuda.FloatTensor).cuda())
 
 softmax = torch.exp(output).cpu()
 prob = list(softmax.numpy())
-predictions = np.argmax(prob, axis=1)
+train_predictions = np.argmax(prob, axis=1)
 
 # accuracy on training set
-print(f"Accuracy Score training set {accuracy_score(train_y, predictions)}")
+print("TRAINING")
+print(f"accuracy_score training set {accuracy_score(train_y, train_predictions)}")
+print(f"precision_score training set {precision_score(train_y, train_predictions)}")
+print(f"recall_score training set {recall_score(train_y, train_predictions)}")
+print(f"f1_score training set {f1_score(train_y, train_predictions)}")
+print("TRAINING")
 
 
-
-# TESTING SET
+# # TESTING SET
 
 
 # generating predictions for test set
 with torch.no_grad():
-    output = model(test_x.cuda())
+    output = model(test_x.type(torch.cuda.FloatTensor).cuda())
 
 softmax = torch.exp(output).cpu()
 prob = list(softmax.numpy())
-predictions = np.argmax(prob, axis=1)
+test_predictions = np.argmax(prob, axis=1)
 
-# replacing the label with prediction
-sample_submission['label'] = predictions
-sample_submission.head()
+print("TESTING")
+print(f"accuracy_score testing set {accuracy_score(test_y, test_predictions)}")
+print(f"precision_score testing set {precision_score(test_y, test_predictions)}")
+print(f"recall_score testing set {recall_score(test_y, test_predictions)}")
+print(f"f1_score testing set {f1_score(test_y, test_predictions)}")
+print("TESTING")
 
-# saving the file
-sample_submission.to_csv('submission.csv', index=False)
+
+# # replacing the label with prediction
+# sample_submission['label'] = predictions
+# sample_submission.head()
+#
+# # saving the file
+# sample_submission.to_csv('submission.csv', index=False)
 
 
 # # prediction for validation set
