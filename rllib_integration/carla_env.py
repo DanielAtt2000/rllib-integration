@@ -110,7 +110,7 @@ class CarlaEnv(gym.Env):
 
         # self.save_data(f'image_data/depth/{self.counter}.pkl',info['depth_camera'])
 
-        temp_dataframe = pd.DataFrame({'filename': self.counter, 'done_collision': done_collision},index=[0])
+        temp_dataframe = pd.DataFrame({'filename': self.counter, 'done_collision': (self.done_collision_truck or self.done_collision_trailer)},index=[0])
         self.collision_data = pd.concat([self.collision_data,temp_dataframe], ignore_index=True)
 
         self.save_data(f'image_data/{self.collision_data_file_name}.pkl', self.collision_data)
