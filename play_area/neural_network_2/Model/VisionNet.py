@@ -243,6 +243,8 @@ class VisionNetwork(TorchModelV2, nn.Module):
         # Permuate b/c data comes in as [B, dim, dim, channels]:
         self._features = self._features.permute(0, 3, 1, 2)
         conv_out = self._convs(self._features)
+
+
         # Store features to save forward pass when getting value_function out.
         if not self._value_branch_separate:
             self._features = conv_out

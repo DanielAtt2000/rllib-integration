@@ -34,6 +34,5 @@ class Net(Module):
 
     # Defining the forward pass
     def forward(self, x):
-        print(f"HERE{x.shape}")
         x = self.custom_model_layer(x)
         return x
