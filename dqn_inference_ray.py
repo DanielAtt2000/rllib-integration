@@ -18,7 +18,8 @@ from rllib_integration.carla_env import CarlaEnv
 from rllib_integration.carla_core import kill_all_servers
 
 from dqn.dqn_experiment_basic import DQNExperimentBasic
-
+import csv
+from git import Repo
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
 EXPERIMENT_CLASS = DQNExperimentBasic
 
@@ -67,6 +68,12 @@ def main():
         previous_routes_files.write(f"exit_idx:{0}\n")
         previous_routes_files.close()
 
+
+        repo = Repo('.')
+        remote = repo.remote('origin')
+        remote.fetch()
+
+
         # Restore agent
         agent = DQN(env=CarlaEnv, config=args.config)
         agent.restore(args.checkpoint)
@@ -74,13 +81,31 @@ def main():
         # Initalize the CARLA environment
         env = agent.workers.local_worker().env
 
+        results_file = open(f'{remote.refs[repo.active_branch.name].commit}_{args.checkpoint}.csv', mode='w')
+        employee_writer = csv.writer(results_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+        employee_writer.writerow(['route','timesteps','collision_truck','collision_trailer','timeout','completed'])
+
+
         while True:
             observation = env.reset()
             done = False
-
+            counter = 0
             while not done:
                 action = agent.compute_single_action(observation)
                 observation, reward, done, info = env.step(action)
+                counter +=1
+
+            # ['route', 'timesteps', 'collision_truck', 'collision_trailer', 'timeout', 'completed']
+            employee_writer.writerow([f'{env.env_start_spawn_point}|{env.env_stop_spawn_point}', counter, env.done_collision_truck,env.done_collision_trailer,env.done_time,env.done_arrived])
+
+            # Resetting Variables
+            env.done_collision_truck = False
+            env.done_collision_trailer = False
+            env.done_time = False
+            env.done_arrived = False
+            env.env_start_spawn_point = -1
+            env.env_stop_spawn_point = -1
 
     except KeyboardInterrupt:
         print("\nshutdown by user")

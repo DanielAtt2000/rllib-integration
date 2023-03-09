@@ -91,7 +91,8 @@ class DQNExperimentBasic(BaseExperiment):
         self.done_time_idle = False
         self.done_falling = False
         self.done_time_episode = False
-        self.done_collision = False
+        self.done_collision_truck = False
+        self.done_collision_trailer = False
         self.done_arrived = False
         self.custom_done_arrived = False
 
@@ -496,10 +497,11 @@ class DQNExperimentBasic(BaseExperiment):
         self.time_episode += 1
         self.done_time_episode = self.max_time_episode < self.time_episode
         self.done_falling = hero.get_location().z < -0.5
-        self.done_collision = (self.last_no_of_collisions_truck > 0) or (self.last_no_of_collisions_trailer > 0)
+        self.done_collision_truck = (self.last_no_of_collisions_truck > 0)
+        self.done_collision_trailer = (self.last_no_of_collisions_trailer > 0)
         self.done_arrived = self.completed_route(core)
 
-        output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision or self.done_arrived
+        output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision_truck or self.done_collision_trailer or self.done_arrived
         self.custom_done_arrived = self.done_arrived
 
         done_reason = ""
@@ -509,8 +511,10 @@ class DQNExperimentBasic(BaseExperiment):
             done_reason += "done_falling"
         if self.done_time_episode:
             done_reason += "done_time_episode"
-        if self.done_collision:
-            done_reason += "done_collision"
+        if self.done_collision_truck:
+            done_reason += "done_collision_truck"
+        if self.done_collision_trailer:
+            done_reason += "done_collision_trailer"
         if self.done_arrived:
             done_reason += "done_arrived"
 
@@ -518,7 +522,7 @@ class DQNExperimentBasic(BaseExperiment):
             data = f"ENTRY: {core.entry_spawn_point_index} EXIT: {core.exit_spawn_point_index} - {done_reason} \n"
             self.save_to_file(f"{self.directory}/done",data)
 
-        return bool(output), self.done_collision
+        return bool(output), self.done_collision_truck, self.done_collision_trailer, (self.done_time_idle or self.done_time_episode), self.done_arrived
 
     def compute_reward(self, observation, core):
         """Computes the reward"""

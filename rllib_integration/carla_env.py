@@ -34,6 +34,12 @@ class CarlaEnv(gym.Env):
         self.core = CarlaCore(self.config['carla'])
         self.core.setup_experiment(self.experiment.config)
         self.core.set_map_normalisation()
+        self.done_collision_truck = False
+        self.done_collision_trailer = False
+        self.done_time = False
+        self.done_arrived = False
+        self.env_start_spawn_point = -1
+        self.env_stop_spawn_point = -1
         # self.compute_action_time = []
         # self.tick_time = []
         # self.get_observation_time = []
@@ -74,6 +80,10 @@ class CarlaEnv(gym.Env):
     def step(self, action):
         """Computes one tick of the environment in order to return the new observation,
         as well as the rewards"""
+        self.env_start_spawn_point = self.core.entry_spawn_point_index
+        self.env_stop_spawn_point =  self.core.exit_spawn_point_index
+
+
         # start_main = time.time()
         # start = time.time()
         control = self.experiment.compute_action(action)
@@ -94,7 +104,7 @@ class CarlaEnv(gym.Env):
         # self.get_observation_time.append(time_taken)
         #
         # start = time.time()
-        done, done_collision = self.experiment.get_done_status(observation, self.core)
+        done, self.done_collision_truck, self.done_collision_trailer, self.done_time, self.done_arrived = self.experiment.get_done_status(observation, self.core)
 
         cv2.imwrite(f'image_data/lidar/inner/{self.counter}.png',observation['occupancyMap'])
 
