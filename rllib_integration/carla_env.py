@@ -10,7 +10,7 @@
 from __future__ import print_function
 
 import pickle
-
+import cv2
 import gym
 from datetime import datetime
 import pandas as pd
