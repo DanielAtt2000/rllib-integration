@@ -481,6 +481,8 @@ class DQNExperimentBasic(BaseExperiment):
         #print(f"core.last_waypoint_index{core.last_waypoint_index}")
         if len(core.route) - 5 <= core.last_waypoint_index:
             return True
+        else:
+            return False
 
     def min_max_normalisation(self, value, min, max):
         return (value - min) / (max -min)

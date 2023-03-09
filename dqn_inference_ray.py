@@ -81,7 +81,7 @@ def main():
         # Initalize the CARLA environment
         env = agent.workers.local_worker().env
 
-        results_file = open(f'inference_results/{remote.refs[repo.active_branch.name].commit}_{args.checkpoint}.csv', mode='w')
+        results_file = open(f'inference_results/{str(remote.refs[repo.active_branch.name].commit)[:11]}_{args.checkpoint.replace("/","_")}.csv', mode='w')
         employee_writer = csv.writer(results_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         employee_writer.writerow(['route','timesteps','collision_truck','collision_trailer','timeout','completed'])
@@ -98,7 +98,7 @@ def main():
 
             # ['route', 'timesteps', 'collision_truck', 'collision_trailer', 'timeout', 'completed']
             employee_writer.writerow([f'{env.env_start_spawn_point}|{env.env_stop_spawn_point}', counter, env.done_collision_truck,env.done_collision_trailer,env.done_time,env.done_arrived])
-
+            results_file.flush()
             # Resetting Variables
             env.done_collision_truck = False
             env.done_collision_trailer = False
