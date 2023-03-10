@@ -1,5 +1,6 @@
 import pickle
 import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt
 
 from torchvision.io import read_image
@@ -21,6 +22,8 @@ def save_data( filename, data):
     with open(filename, 'wb') as handle:
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+
+# save_data('../../image_data/collision_data_inner_roundabout.pkl',pd.DataFrame(columns = ['filename', 'done_collision']))
 collision_data = read_data_from_pickle('../../image_data/collision_data_inner_roundabout.pkl')
 
 
