@@ -49,46 +49,27 @@ def save_to_file(filename, data):
 
 
 no_of_lidar_images = 100
-lidar_data_filename = f"lidar_data_{no_of_lidar_images}.pkl"
-N_EPOCHS = 2
+lidar_data_filename = f"../../image_data/collision_data.pkl"
+N_EPOCHS = 300
 LR = 0.0005
 BATCH_SIZE = 64
+data = read_data_from_pickle(lidar_data_filename)
 
-# if not os.path.isfile(lidar_data_filename):
-#
-#     data = read_data_from_pickle('../../image_data/collision_data_inner_roundabout.pkl')
-#     data = data.loc[:no_of_lidar_images]
-#     data['lidar_image'] = data.loc[:, 'filename']
-#
-#
-#     data['lidar_image'] = data['lidar_image'].apply(lambda x: read_data_from_pickle(f"../../image_data/lidar/{x}.pkl") )
-#     # for index, row in data.iterrows():
-#     #     path = f"../../image_data/lidar/{row['filename']}.pkl"
-#     #     row['image'] = read_data_from_pickle(path)
-#     #
-#     #     print(index)
-#
-#     print('Saving File ....')
-#     save_data(lidar_data_filename,data)
-#
-# else:
-#     print('Reading data ....')
-#     data = read_data_from_pickle(lidar_data_filename)
-#     print('Data Read')
+not_done_indices = data.index[data['done_collision'] == False].tolist()
+not_done_indices = not_done_indices[:3*int(len(not_done_indices)/4)]
 
-
-data = read_data_from_pickle('../../image_data/collision_data.pkl')
-
+data = data.drop(not_done_indices)
 
 data_x = data['filename']
 data_y = data['done_collision'].astype(int)
 
 
+
 X_train, X_test, y_train, y_test = train_test_split(data_x, data_y, test_size = 0.3, shuffle=True, stratify=data['done_collision'])
 
 
-print(f"Y_train Counts {y_train.value_counts()}"))
-print(f"Y_test Counts {y_test.value_counts()}"))
+print(f"Y_train Counts \n{y_train.value_counts()}")
+print(f"Y_test Counts \n{y_test.value_counts()}")
 
 
 training_data = pd.concat([X_train,y_train],axis=1)
@@ -100,20 +81,19 @@ testing_dataset = CustomImageDataset(annotations_file=testing_data,img_dir="../.
 trainLoader = torch.utils.data.DataLoader(training_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
 testLoader = torch.utils.data.DataLoader(testing_dataset, batch_size=1,shuffle=True, num_workers=2)
 
-dataiter = iter(trainLoader)
-images, labels = next(dataiter)
-
-
-plt.figure()
-xy_res = np.array(images[0][0]).shape
-plt.imshow(images[0][0], cmap="PiYG_r")
-# cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
-plt.clim(-0.4, 1.4)
-plt.gca().set_xticks(np.arange(-.5, xy_res[1], 1), minor=True)
-plt.gca().set_yticks(np.arange(-.5, xy_res[0], 1), minor=True)
-plt.grid(True, which="minor", color="w", linewidth=0.6, alpha=0.5)
-# plt.gca().invert_yaxis()
-plt.show()
+# dataiter = iter(trainLoader)
+# images, labels = next(dataiter)
+#
+# plt.figure()
+# xy_res = np.array(images[0][0]).shape
+# plt.imshow(images[0][0], cmap="PiYG_r")
+# # cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
+# plt.clim(-0.4, 1.4)
+# plt.gca().set_xticks(np.arange(-.5, xy_res[1], 1), minor=True)
+# plt.gca().set_yticks(np.arange(-.5, xy_res[0], 1), minor=True)
+# plt.grid(True, which="minor", color="w", linewidth=0.6, alpha=0.5)
+# # plt.gca().invert_yaxis()
+# plt.show()
 
 
 
