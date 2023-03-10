@@ -53,15 +53,56 @@ lidar_data_filename = f"../../image_data/collision_data.pkl"
 N_EPOCHS = 300
 LR = 0.0005
 BATCH_SIZE = 64
+custom_message = "withImagesTwoBeforeDone"
+output_filename = f"model_results/{custom_message}_{lidar_data_filename.split('/')[-1]}_N_EPOCHS{N_EPOCHS}_LR{LR}_BATCH_SIZE{BATCH_SIZE}"
 data = read_data_from_pickle(lidar_data_filename)
 
-not_done_indices = data.index[data['done_collision'] == False].tolist()
-not_done_indices = not_done_indices[:3*int(len(not_done_indices)/4)]
+under_sample = False
+false_image_before_true = True
 
-data = data.drop(not_done_indices)
+if under_sample:
+    not_done_indices = data.index[data['done_collision'] == False].tolist()
+    not_done_indices = not_done_indices[:299*int(len(not_done_indices)/300)]
+
+    data = data.drop(not_done_indices)
+elif false_image_before_true:
+    done_indices = data.index[data['done_collision'] == True].tolist()
+    temp_list = []
+    for index in done_indices:
+        temp_list.append(index)
+        temp_list.append(index-1)
+
+    data = data.iloc[temp_list]
+
+
+
+
+
 
 data_x = data['filename']
 data_y = data['done_collision'].astype(int)
+
+print(data[:6])
+from PIL import Image
+
+for idx in range(0,len(data_x),2):
+    f, axarr = plt.subplots(2)
+    axarr[1].imshow( Image.open(f"../../image_data/lidar/{data.iloc[idx]['filename']}.png"),cmap="PiYG_r")
+    axarr[0].imshow( Image.open(f"../../image_data/lidar/{data.iloc[idx+1]['filename']}.png"),cmap="PiYG_r")
+    print(data_y.iloc[idx+1])
+    print(data_y.iloc[idx])
+    print("---------")
+    # plt.figure()
+    # xy_res = np.array(data.iloc[idx]).shape
+    # plt.imshow(images[0][0], cmap="PiYG_r")
+    # cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
+    # plt.clim(-0.4, 1.4)
+    # plt.gca().set_xticks(np.arange(-.5, xy_res[1], 1), minor=True)
+    # plt.gca().set_yticks(np.arange(-.5, xy_res[0], 1), minor=True)
+    plt.grid(True, which="minor", color="w", linewidth=0.6, alpha=0.5)
+    # plt.gca().invert_yaxis()
+    plt.show()
+
 
 
 
@@ -84,16 +125,23 @@ testLoader = torch.utils.data.DataLoader(testing_dataset, batch_size=1,shuffle=T
 # dataiter = iter(trainLoader)
 # images, labels = next(dataiter)
 #
-# plt.figure()
-# xy_res = np.array(images[0][0]).shape
-# plt.imshow(images[0][0], cmap="PiYG_r")
-# # cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
-# plt.clim(-0.4, 1.4)
-# plt.gca().set_xticks(np.arange(-.5, xy_res[1], 1), minor=True)
-# plt.gca().set_yticks(np.arange(-.5, xy_res[0], 1), minor=True)
-# plt.grid(True, which="minor", color="w", linewidth=0.6, alpha=0.5)
-# # plt.gca().invert_yaxis()
-# plt.show()
+# for idx in range(len(images)):
+#     f, axarr = plt.subplots(2,2)
+#     axarr[0, 0].imshow(images[idx][0],cmap="PiYG_r")
+#     axarr[0, 1].imshow(images[idx+1][0],cmap="PiYG_r")
+#     print(labels[idx])
+#     print(labels[idx+1])
+#     # plt.figure()
+#     xy_res = np.array(images[idx][0]).shape
+#     # plt.imshow(images[0][0], cmap="PiYG_r")
+#     # cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
+#     # plt.clim(-0.4, 1.4)
+#     plt.gca().set_xticks(np.arange(-.5, xy_res[1], 1), minor=True)
+#     plt.gca().set_yticks(np.arange(-.5, xy_res[0], 1), minor=True)
+#     plt.grid(True, which="minor", color="w", linewidth=0.6, alpha=0.5)
+#     # plt.gca().invert_yaxis()
+#     plt.show()
+
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 print(device)
 
@@ -109,11 +157,17 @@ model = model.to(device)
 criterion = criterion.to(device)
 
 
+H = {
+	"train_loss": [],
+	"train_acc": [],
+}
+
 print(model)
+trainSteps = len(trainLoader.dataset) // BATCH_SIZE
 
-totalLoss = []
 for epoch in range(N_EPOCHS):  # loop over the dataset multiple times
-
+    trainCorrect = 0
+    totalTrainLoss = 0
     running_loss = 0.0
     for i, data in enumerate(trainLoader, 0):
         # get the inputs; data is a list of [inputs, labels]
@@ -130,10 +184,22 @@ for epoch in range(N_EPOCHS):  # loop over the dataset multiple times
 
         # print statistics
         running_loss += loss.item()
-        totalLoss.append(running_loss)
+        totalTrainLoss += loss
+        trainCorrect += (outputs.argmax(1) == labels).type(
+            torch.float).sum().item()
+
         if i % 10== 9:  # print every 2000 mini-batches
             print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 10:.3f}')
             running_loss = 0.0
+
+    avgTrainLoss = totalTrainLoss / trainSteps
+    trainCorrect = trainCorrect / len(trainLoader.dataset)
+
+    H["train_acc"].append(trainCorrect)
+    H["train_loss"].append(avgTrainLoss.cpu().detach().numpy())
+    print("[INFO] EPOCH: {}/{}".format(epoch + 1, N_EPOCHS))
+    print("Train loss: {:.6f}, Train accuracy: {:.4f}".format(
+        avgTrainLoss, trainCorrect))
 
 
 print('Finished Training')
@@ -141,14 +207,15 @@ print('Finished Training')
 # plot the training loss and accuracy
 plt.style.use("ggplot")
 plt.figure()
-plt.plot(totalLoss,label="train_loss")
+plt.plot(H["train_loss"], label="train_loss")
+plt.plot(H["train_acc"], label="train_acc")
 plt.title("Training Loss on Dataset")
 plt.xlabel("Per batch")
 plt.ylabel("Loss")
 plt.legend(loc="lower left")
-plt.savefig(f"{lidar_data_filename}_{N_EPOCHS}_{LR}_{BATCH_SIZE}.png")
+plt.savefig(f"{output_filename}.png")
 # serialize the model to disk
-torch.save(model, f"{lidar_data_filename}_{N_EPOCHS}_{LR}_{BATCH_SIZE}.model")
+torch.save(model, f"{output_filename}.model")
 
 
 test_predictions = []
@@ -179,5 +246,5 @@ with torch.no_grad():
 print(f'Softmax  {softmax_list}')
 print(f"Confusion Matrix {confusion_matrix(true_test_values,test_predictions)}")
 testing_pred_output = evaluate("Testing", true_test_values, test_predictions)
-save_to_file(f"{lidar_data_filename}_{N_EPOCHS}_{LR}_{BATCH_SIZE}", testing_pred_output + '\n\n' + str(softmax_list))
+save_to_file(f"{output_filename}.results", testing_pred_output + '\n\n' + str(softmax_list) + '\n\n' + str(confusion_matrix(true_test_values,test_predictions)))
 print(testing_pred_output)

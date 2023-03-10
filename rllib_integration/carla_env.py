@@ -48,11 +48,12 @@ class CarlaEnv(gym.Env):
         # self.all_time = []
 
         def read_data_from_pickle(filename):
-            try:
-                with open(filename, 'rb') as handle:
-                    return pickle.load(handle)
-            except:
-                return pd.DataFrame(columns = ['filename', 'done_collision'])
+            with open(filename, 'rb') as handle:
+                return pickle.load(handle)
+            # try:
+            #
+            # except:
+            #     return pd.DataFrame(columns = ['filename', 'done_collision'])
 
         self.date_time_format = "%m%d%Y_%H%M%S%f"
         self.counter = datetime.now().strftime(self.date_time_format)
