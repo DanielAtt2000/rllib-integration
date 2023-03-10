@@ -188,7 +188,7 @@ def plot_route(route,last_waypoint_index=-1,truck_transform=-1,number_of_waypoin
         plt.plot([route[last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x],
                  [route[last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y], 'bo',
                  label=f"{number_of_waypoints_ahead_to_calculate_with} waypoints ahead")
-    plt.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
+    plt.axis([0, 250, 0 , 250 ])
     # plt.axis([0, 1, 0, 1])
     # plt.title(f'{angle_to_center_of_lane_degrees * 180}')
     plt.gca().invert_yaxis()

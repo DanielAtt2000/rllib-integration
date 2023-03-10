@@ -107,16 +107,18 @@ class CarlaEnv(gym.Env):
         # start = time.time()
         done, self.done_collision_truck, self.done_collision_trailer, self.done_time, self.done_arrived = self.experiment.get_done_status(observation, self.core)
 
-        cv2.imwrite(f'image_data/lidar/inner/{self.counter}.png',observation['occupancyMap'])
+        save = False
+        if save:
+            cv2.imwrite(f'image_data/lidar/inner/{self.counter}.png',observation['occupancyMap'])
 
-        # self.save_data(f'image_data/depth/{self.counter}.pkl',info['depth_camera'])
+            # self.save_data(f'image_data/depth/{self.counter}.pkl',info['depth_camera'])
 
-        temp_dataframe = pd.DataFrame({'filename': self.counter,'values':[observation['values']], 'done_collision': (self.done_collision_truck or self.done_collision_trailer)},index=[0])
-        self.collision_data = pd.concat([self.collision_data,temp_dataframe], ignore_index=True)
+            temp_dataframe = pd.DataFrame({'filename': self.counter,'values':[observation['values']], 'done_collision': (self.done_collision_truck or self.done_collision_trailer)},index=[0])
+            self.collision_data = pd.concat([self.collision_data,temp_dataframe], ignore_index=True)
 
-        self.save_data(f'image_data/{self.collision_data_file_name}.pkl', self.collision_data)
+            self.save_data(f'image_data/{self.collision_data_file_name}.pkl', self.collision_data)
 
-        self.counter = datetime.now().strftime(self.date_time_format)
+            self.counter = datetime.now().strftime(self.date_time_format)
         # stop = time.time()
         # time_taken = stop - start
         # self.get_done_status_time.append(time_taken)
