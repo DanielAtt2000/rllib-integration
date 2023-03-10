@@ -1,6 +1,6 @@
 
 from torch.nn import Linear, ReLU, CrossEntropyLoss, Sequential, Conv2d, MaxPool2d, Module, Softmax, BatchNorm2d, Dropout, ZeroPad2d,Flatten
-from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
+from ray.rllib.models.torch.visionnet import VisionNetwork
 
 class Net(Module):
     def __init__(self):
@@ -21,7 +21,7 @@ class Net(Module):
 
             ),
             Sequential(
-            Conv2d(32, 256, kernel_size=(9, 9), stride=(1, 1)),
+            Conv2d(32, 2, kernel_size=(9, 9), stride=(1, 1)),
             ReLU(),
             ),
 

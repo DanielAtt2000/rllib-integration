@@ -3,14 +3,14 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from torchvision.io import read_image
-
-image = read_image("../../image_data/lidar/03072023_212450443245.pkl.png")
-
-import matplotlib.image as mpimg
-image_path = "../../image_data/lidar/03072023_212450443245.pkl.png"
-image = mpimg.imread(image_path)
-plt.imshow(image)
-plt.show()
+#
+# image = rea("../../image_data/collision_data_inner_roundabout.pkl.pkl")
+#
+# import matplotlib.image as mpimg
+# image_path = "../../image_data/lidar/03072023_212450443245.pkl.png"
+# image = mpimg.imread(image_path)
+# plt.imshow(image)
+# plt.show()
 
 def read_data_from_pickle(filename):
     with open(filename, 'rb') as handle:
@@ -21,7 +21,7 @@ def save_data( filename, data):
     with open(filename, 'wb') as handle:
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-collision_data = read_data_from_pickle('../../image_data/collision_data.pkl')
+collision_data = read_data_from_pickle('../../image_data/collision_data_inner_roundabout.pkl')
 
 
 collision_true = collision_data.loc[collision_data['done_collision'] == True]
