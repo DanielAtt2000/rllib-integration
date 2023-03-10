@@ -21,7 +21,7 @@ from torch.autograd import Variable
 from torch.nn import Linear, ReLU, CrossEntropyLoss, Sequential, Conv2d, MaxPool2d, Module, Softmax, BatchNorm2d, Dropout
 from torch.optim import Adam, SGD
 import torchvision.transforms as transforms
-from play_area.neural_network_2.CustomImageDataset import CustomImageDataset
+from CustomImageDataset import CustomImageDataset
 from Model.Model import Net
 
 def read_data_from_pickle(filename):
