@@ -94,7 +94,8 @@ testLoader = torch.utils.data.DataLoader(testing_dataset, batch_size=1,shuffle=T
 # plt.grid(True, which="minor", color="w", linewidth=0.6, alpha=0.5)
 # # plt.gca().invert_yaxis()
 # plt.show()
-
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+print(device)
 
 
 # defining the model
@@ -104,13 +105,12 @@ optimizer = Adam(model.parameters(), lr=LR)
 # defining the loss function
 criterion = CrossEntropyLoss()
 # checking if GPU is available
-model = model.cuda()
-criterion = criterion.cuda()
+model = model.to(device)
+criterion = criterion.to(device)
 
 
 print(model)
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-print(device)
+
 totalLoss = []
 for epoch in range(N_EPOCHS):  # loop over the dataset multiple times
 
