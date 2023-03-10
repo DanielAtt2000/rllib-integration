@@ -42,7 +42,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.max_lidar_values = -100000
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
-        self.visualiseRoute = True
+        self.visualiseRoute = False
         self.visualiseImage = False
         self.visualiseOccupancyGirdMap = False
         self.counterThreshold = 10
