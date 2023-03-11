@@ -183,12 +183,12 @@ class DQNExperimentBasic(BaseExperiment):
                 high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi]),
                 dtype=np.float32
             ),
-            # "depth_camera": Box(
-            #     low=0,
-            #     high=255,
-            #     shape=(84, 84, 3),
-            #     dtype=np.float32
-            # )
+            "depth_camera": Box(
+                low=0,
+                high=255,
+                shape=(84, 84, 3),
+                dtype=np.float32
+            )
             # "occupancyMap": Box(
             #     low=0,
             #     high=1,
@@ -460,7 +460,7 @@ class DQNExperimentBasic(BaseExperiment):
         # print(f"acceleration:{np.float32(acceleration)}")
         return {"values":observations,
                 # "occupancyMap":occupancy_map
-                # "depth_camera":depth_camera_data
+                "depth_camera":depth_camera_data
                 }, \
             {
                 # "occupancy_map":occupancy_map,
