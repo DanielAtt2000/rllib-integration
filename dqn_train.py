@@ -113,13 +113,13 @@ def main():
                        host="localhost")
 
     specific_version = False
-    check_commit = False
+    check_commit = True
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())
 
         if specific_version:
-            args.name = "dqn_180b156650"
+            args.name = ""
             x = random.randint(0,100)
             inp = input(f'SPECIFIC NAME APPLIED  ENTER {x} to confirm:')
 
