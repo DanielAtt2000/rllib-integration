@@ -9,7 +9,7 @@ rollout_fragment_length: 4
 #timesteps_per_iteration: 20000
 train_batch_size: 32
 num_steps_sampled_before_learning_starts: 10000
-recreate_failed_workers: False
+recreate_failed_workers: True
 replay_buffer_config: {
   capacity: 300000
 }
