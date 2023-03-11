@@ -106,7 +106,7 @@ def main():
     args = argparser.parse_args()
     args.config = parse_config(args)
 
-    path = os.path.join(args.directory, args.name + '_' + str(commit_hash()) + "values_only")
+    path = os.path.join(args.directory, args.name + '_' + str(commit_hash()))
 
 
     launch_tensorboard(logdir= path,
