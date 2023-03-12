@@ -22,7 +22,7 @@ from rllib_integration.helper import post_process_image
 from PIL import Image
 
 from rllib_integration.lidar_to_grid_map import generate_ray_casting_grid_map
-
+import collections
 
 class DQNExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
@@ -44,7 +44,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.counter = 0
         self.visualiseRoute = False
         self.visualiseImage = False
-        self.visualiseOccupancyGirdMap = False
+        self.visualiseOccupancyGirdMap = True
         self.counterThreshold = 10
         self.last_hyp_distance_to_next_waypoint = 0
 
@@ -69,6 +69,17 @@ class DQNExperimentBasic(BaseExperiment):
 
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
+
+        self.occupancy_map_x = 128
+        self.occupancy_map_y = 128
+        self.max_amount_of_occupancy_maps = 11
+
+
+
+        self.occupancy_maps = collections.deque(maxlen=self.max_amount_of_occupancy_maps)
+
+        for i in range(self.max_amount_of_occupancy_maps):
+            self.occupancy_maps.append(np.zeros((self.occupancy_map_y,self.occupancy_map_x,1)))
 
         from git import Repo
         repo = Repo('.')
@@ -99,6 +110,9 @@ class DQNExperimentBasic(BaseExperiment):
         self.done_collision_trailer = False
         self.done_arrived = False
         self.custom_done_arrived = False
+
+        for i in range(self.max_amount_of_occupancy_maps):
+            self.occupancy_maps.append(np.zeros((self.occupancy_map_y, self.occupancy_map_x,1)))
 
         # hero variables
         self.last_location = None
@@ -189,18 +203,30 @@ class DQNExperimentBasic(BaseExperiment):
                 high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi]),
                 dtype=np.float32
             ),
-            "depth_camera": Box(
-                low=0,
-                high=255,
-                shape=(84, 84, 3),
-                dtype=np.float32
-            )
-            # "occupancyMap": Box(
+            # "depth_camera": Box(
             #     low=0,
-            #     high=1,
-            #     shape=(240, 320,1),
-            #     dtype=np.float64
-            # )
+            #     high=256,
+            #     shape=(84, 84, 3),
+            #     dtype=np.float32
+            # ),
+            "occupancyMap_now": Box(
+                low=0,
+                high=1,
+                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+                dtype=np.float64
+            ),
+            "occupancyMap_05": Box(
+                low=0,
+                high=1,
+                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+                dtype=np.float64
+            ),
+            "occupancyMap_1": Box(
+                low=0,
+                high=1,
+                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+                dtype=np.float64
+            )
             })
         return image_space
 
@@ -319,6 +345,19 @@ class DQNExperimentBasic(BaseExperiment):
         else:
             pass
 
+        # number_of_waypoints_to_plot_on_lidar = 10
+        # location_from_waypoint_to_vehicle_relative = np.empty([2,number_of_waypoints_to_plot_on_lidar])
+        #
+        # for i in range(number_of_waypoints_to_plot_on_lidar):
+        #     x_dist = core.route[core.last_waypoint_index + i].location.x - (truck_transform.location.x + 2)
+        #     y_dist = core.route[core.last_waypoint_index + i].location.y - (truck_transform.location.y + 0.21)
+        #
+        #     location_from_waypoint_to_vehicle_relative[0][i] = x_dist
+        #     location_from_waypoint_to_vehicle_relative[1][i] = y_dist
+        #
+        #
+        # print(f"UP HERE{location_from_waypoint_to_vehicle_relative}")
+
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
         y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y - truck_transform.location.y)
         hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
@@ -376,12 +415,16 @@ class DQNExperimentBasic(BaseExperiment):
                         angle=angle_to_center_of_lane_degrees)
 
 
-        self.counter +=1
+
         depth_camera_data = None
-        occupancy_map = None
+        current_occupancy_map = None
         for sensor in sensor_data:
             if sensor == 'collision_truck':
                 # TODO change to only take collision with road
+                # TO CHECK BY CHECKING LIDAR OUTPUT WHEN IN COMPLETE TURN
+                # MAYBE I WOULD ABSTAIN FROM REMOVING IT BECAUSE YOU ARE STILL pushing the truck to the limit
+
+                # static.sidewalk
 
                 self.last_no_of_collisions_truck = len(sensor_data[sensor][1])
                 self.truck_collisions.append(str(sensor_data[sensor][1][0]))
@@ -405,34 +448,64 @@ class DQNExperimentBasic(BaseExperiment):
                 assert depth_camera_data is not None
             elif sensor == "lidar_truck":
                 lidar_points = sensor_data['lidar_truck'][1]
+                # print(lidar_points.shape)
+                # print(f"BEFORE {lidar_points[0][len(lidar_points) - 20]}-{lidar_points[1][len(lidar_points) - 20]}")
+                # print(f"BEFORE {lidar_points[0][len(lidar_points) - 19]}-{lidar_points[1][len(lidar_points) - 19]}")
+                # print(f"BEFORE {lidar_points[0][len(lidar_points) - 18]}-{lidar_points[1][len(lidar_points) - 18]}")
+                # print(f"BEFORE {lidar_points[0][len(lidar_points) - 17]}-{lidar_points[1][len(lidar_points) - 17]}")
+                #
+                # lidar_points = np.append(lidar_points, location_from_waypoint_to_vehicle_relative,axis=1)
+                #
+                # print(f"AFTER {lidar_points[0][len(lidar_points) - 1]}-{lidar_points[1][len(lidar_points) - 1]}")
+                # print(f"AFTER {lidar_points[0][len(lidar_points) - 2]}-{lidar_points[1][len(lidar_points) - 2]}")
+                # print(f"AFTER {lidar_points[0][len(lidar_points) - 3]}-{lidar_points[1][len(lidar_points) - 3]}")
+                # print(f"AFTER {lidar_points[0][len(lidar_points) - 4]}-{lidar_points[1][len(lidar_points) - 4]}")
 
                 xy_resolution = 0.2
-                x_output = 320
-                y_output = 240
 
                 ox = lidar_points[0][:]
                 oy = lidar_points[1][:]
 
-                occupancy_map, min_x, max_x, min_y, max_y, xy_resolution = \
-                    generate_ray_casting_grid_map(ox=ox, oy=oy, x_output=x_output, y_output=y_output,
+                current_occupancy_map, min_x, max_x, min_y, max_y, xy_resolution = \
+                    generate_ray_casting_grid_map(ox=ox, oy=oy, x_output=self.occupancy_map_x, y_output=self.occupancy_map_y,
                                                   xy_resolution=xy_resolution, breshen=True)
                 # Inverted the image as a test
                 # occupancy_map = occupancy_map[::-1]
                 # print(f"Final image size {occupancy_map.shape}")
+                # print(f"HER1{current_occupancy_map.shape}")
 
-                if self.visualiseOccupancyGirdMap and self.counter % 10 == 0:
-                    plt.figure()
-                    xy_res = np.array(occupancy_map).shape
-                    plt.imshow(occupancy_map, cmap="PiYG_r")
-                    # cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
-                    plt.clim(-0.4, 1.4)
-                    plt.gca().set_xticks(np.arange(-.5, xy_res[1], 1), minor=True)
-                    plt.gca().set_yticks(np.arange(-.5, xy_res[0], 1), minor=True)
-                    plt.grid(True, which="minor", color="w", linewidth=0.6, alpha=0.5)
-                    # plt.gca().invert_yaxis()
-                    plt.show()
+                self.occupancy_maps.append(current_occupancy_map)
 
-                assert occupancy_map is not None
+                if self.visualiseOccupancyGirdMap and self.counter > self.counterThreshold:
+                    multiple_lidars = True
+                    if multiple_lidars:
+                        # plt.figure()
+                        f, axarr = plt.subplots(1, 3)
+                        axarr[0].imshow(self.occupancy_maps[0])
+                        axarr[1].imshow(self.occupancy_maps[5])
+                        axarr[2].imshow(self.occupancy_maps[10])
+                        xy_res = np.array(current_occupancy_map).shape
+                        # plt.imshow(occupancy_map, cmap="PiYG_r")
+                        # cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
+                        # plt.clim(-0.4, 1.4)
+                        # plt.gca().set_xticks(np.arange(-.5, xy_res[1], 1), minor=True)
+                        # plt.gca().set_yticks(np.arange(-.5, xy_res[0], 1), minor=True)
+                        # plt.grid(True, which="minor", color="w", linewidth=0.6, alpha=0.5)
+                        # plt.gca().invert_yaxis()
+                        plt.show()
+                    else:
+                        plt.figure()
+                        xy_res = np.array(current_occupancy_map).shape
+                        plt.imshow(occupancy_map, cmap="PiYG_r")
+                        # cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
+                        plt.clim(-0.4, 1.4)
+                        plt.gca().set_xticks(np.arange(-.5, xy_res[1], 1), minor=True)
+                        plt.gca().set_yticks(np.arange(-.5, xy_res[0], 1), minor=True)
+                        plt.grid(True, which="minor", color="w", linewidth=0.6, alpha=0.5)
+                        # plt.gca().invert_yaxis()
+                        plt.show()
+
+                assert current_occupancy_map is not None
 
         if self.visualiseImage and self.counter > self.counterThreshold:
             plt.imshow(depth_camera_data, interpolation='nearest')
@@ -478,9 +551,13 @@ class DQNExperimentBasic(BaseExperiment):
         # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
         # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         # print(f"acceleration:{np.float32(acceleration)}")
+
+        self.counter += 1
         return {"values":observations,
-                # "occupancyMap":occupancy_map
-                "depth_camera":depth_camera_data
+                "occupancyMap_now":self.occupancy_maps[0] ,
+                "occupancyMap_05": self.occupancy_maps[5],
+                "occupancyMap_1": self.occupancy_maps[10]
+                # "depth_camera":depth_camera_data
                 }, \
             {
                 # "occupancy_map":occupancy_map,

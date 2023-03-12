@@ -184,6 +184,7 @@ class CarlaCore:
                 time.sleep(3)
 
             try:
+                print(f"Trying to set up client {i+1} time")
                 self.client.set_timeout(self.config["timeout"])
                 self.world = self.client.get_world()
 
