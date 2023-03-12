@@ -177,7 +177,6 @@ class CarlaCore:
             try:
                 kill_all_servers()
                 self.client = carla.Client(self.config["host"], self.server_port)
-                return
 
             except Exception as e:
                 print(" FAILED TO CONNECT TO CLIENT: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
@@ -194,6 +193,7 @@ class CarlaCore:
                 settings.fixed_delta_seconds = self.config["timestep"]
                 self.world.apply_settings(settings)
                 self.world.tick()
+                return
 
             except Exception as e:
                 print(" FAILED TO STEP UP CLIENT: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
