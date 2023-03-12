@@ -175,6 +175,7 @@ class CarlaCore:
 
         for i in range(self.config["retries_on_error"]):
             try:
+                kill_all_servers()
                 self.client = carla.Client(self.config["host"], self.server_port)
                 self.client.set_timeout(self.config["timeout"])
                 self.world = self.client.get_world()
