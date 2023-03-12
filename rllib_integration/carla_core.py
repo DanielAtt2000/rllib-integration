@@ -177,6 +177,13 @@ class CarlaCore:
             try:
                 kill_all_servers()
                 self.client = carla.Client(self.config["host"], self.server_port)
+                return
+
+            except Exception as e:
+                print(" FAILED TO CONNECT TO CLIENT: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
+                time.sleep(3)
+
+            try:
                 self.client.set_timeout(self.config["timeout"])
                 self.world = self.client.get_world()
 
@@ -187,10 +194,8 @@ class CarlaCore:
                 self.world.apply_settings(settings)
                 self.world.tick()
 
-                return
-
             except Exception as e:
-                print(" Waiting for server to be ready: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
+                print(" FAILED TO STEP UP CLIENT: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
                 time.sleep(3)
 
         raise Exception("Cannot connect to server. Try increasing 'timeout' or 'retries_on_error' at the carla configuration")
