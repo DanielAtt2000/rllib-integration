@@ -460,10 +460,10 @@ class DQNExperimentBasic(BaseExperiment):
                     multiple_lidars = True
                     if multiple_lidars:
                         # plt.figure()
-                        f, axarr = plt.subplots(1, 3)
+                        f, axarr = plt.subplots(1, 2)
                         axarr[0].imshow(self.occupancy_maps[0])
                         # axarr[1].imshow(self.occupancy_maps[5])
-                        axarr[2].imshow(self.occupancy_maps[10])
+                        axarr[1].imshow(self.occupancy_maps[10])
                         xy_res = np.array(current_occupancy_map).shape
                         # plt.imshow(occupancy_map, cmap="PiYG_r")
                         # cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
