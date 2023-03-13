@@ -457,7 +457,7 @@ class DQNExperimentBasic(BaseExperiment):
                 self.occupancy_maps.append(current_occupancy_map)
                 print("APPENDED TO COCC"+ str(self.counter))
 
-                if self.visualiseOccupancyGirdMap and self.counter > self.counterThreshold:
+                if self.visualiseOccupancyGirdMap:
                     multiple_lidars = True
                     if multiple_lidars:
                         # plt.figure()
