@@ -623,15 +623,16 @@ class DQNExperimentBasic(BaseExperiment):
         forward_velocity = observation["values"][0]
         hyp_distance_to_next_waypoint = observation["values"][1]
 
-        if forward_velocity > 0.03:
-            print(f"Hyp distance in rewards {hyp_distance_to_next_waypoint}")
-            if self.last_hyp_distance_to_next_waypoint != 0:
-                hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-                reward =+ hyp_reward*100
-                print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward}")
 
-            self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
-        else:
+        print(f"Hyp distance in rewards {hyp_distance_to_next_waypoint}")
+        if self.last_hyp_distance_to_next_waypoint != 0:
+            hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
+            reward =+ hyp_reward*100
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward}")
+
+        self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
+
+        if forward_velocity < 0.03:
             # Negative reward for no velocity
             reward += -10
 
