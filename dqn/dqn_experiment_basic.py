@@ -45,7 +45,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.counter = 0
         self.visualiseRoute = False
         self.visualiseImage = False
-        self.visualiseOccupancyGirdMap = True
+        self.visualiseOccupancyGirdMap = False
         self.counterThreshold = 10
         self.last_hyp_distance_to_next_waypoint = 0
 

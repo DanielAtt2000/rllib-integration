@@ -59,37 +59,52 @@ class DQNCallbacks(DefaultCallbacks):
 
 
         # Proportional Reward
+        collision_reward_proportional_to_length = 0
+        done_reward_proportional_to_length = 0
+        both_reward_proportional_to_length = 0
+
+        done_without_reward_proportional_to_length = 0
+        collision_without_reward_proportional_to_length = 0
+        both_without_reward_proportional_to_length = 0
+
+
         reward_proportional_to_length = episode.user_data["reward_proportional_to_length"]
         if len(reward_proportional_to_length) > 0:
             if reward_proportional_to_length[-1] > 9500:
                 # Done Episode
                 done_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"])
                 done_without_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"][:-1])
+
+                episode.custom_metrics["done_reward_proportional_to_length"] = done_reward_proportional_to_length
+                episode.custom_metrics[
+                    "done_without_reward_proportional_to_length"] = done_without_reward_proportional_to_length
+
             elif reward_proportional_to_length[-1] < -700:
                 # Collision episode
                 collision_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"])
                 collision_without_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"][:-1])
+
+                episode.custom_metrics[
+                    "collision_reward_proportional_to_length"] = collision_reward_proportional_to_length
+                episode.custom_metrics[
+                    "collision_without_reward_proportional_to_length"] = collision_without_reward_proportional_to_length
             else:
                 print_error_message(reward_proportional_to_length[-1])
 
             both_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"])
             both_without_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"][:-1])
-        else:
-            collision_reward_proportional_to_length = 0
-            done_reward_proportional_to_length = 0
-            both_reward_proportional_to_length = 0
 
-            done_without_reward_proportional_to_length = 0
-            collision_without_reward_proportional_to_length = 0
-            both_without_reward_proportional_to_length = 0
+            episode.custom_metrics["both_reward_proportional_to_length"] = both_reward_proportional_to_length
+            episode.custom_metrics[
+                "both_without_reward_proportional_to_length"] = both_without_reward_proportional_to_length
 
-        episode.custom_metrics["collision_reward_proportional_to_length"] = collision_reward_proportional_to_length
-        episode.custom_metrics["done_reward_proportional_to_length"] = done_reward_proportional_to_length
-        episode.custom_metrics["both_reward_proportional_to_length"] = both_reward_proportional_to_length
 
-        episode.custom_metrics["collision_without_reward_proportional_to_length"] = collision_without_reward_proportional_to_length
-        episode.custom_metrics["done_without_reward_proportional_to_length"] = done_without_reward_proportional_to_length
-        episode.custom_metrics["both_without_reward_proportional_to_length"] = both_without_reward_proportional_to_length
+
+
+
+
+
+
 
 def print_error_message(reward):
     print("---------------------------------------------------------------------------------")
