@@ -37,6 +37,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.custom_done_arrived = False
         self.last_action = None
         self.lidar_points_count = []
+        self.reward_metric = 0
 
         self.min_lidar_values = 1000000
         self.max_lidar_values = -100000
@@ -44,7 +45,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.counter = 0
         self.visualiseRoute = False
         self.visualiseImage = False
-        self.visualiseOccupancyGirdMap = False
+        self.visualiseOccupancyGirdMap = True
         self.counterThreshold = 10
         self.last_hyp_distance_to_next_waypoint = 0
 
@@ -108,6 +109,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.done_collision_trailer = False
         self.done_arrived = False
         self.custom_done_arrived = False
+        self.reward_metric = 0
 
         for i in range(self.max_amount_of_occupancy_maps):
             self.occupancy_maps.append(np.zeros((self.occupancy_map_y, self.occupancy_map_x,1)))
@@ -209,7 +211,7 @@ class DQNExperimentBasic(BaseExperiment):
                 shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
                 dtype=np.float64
             ),
-            "occupancyMap_1": Box(
+            "occupancyMap_05": Box(
                 low=0,
                 high=1,
                 shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
@@ -462,8 +464,8 @@ class DQNExperimentBasic(BaseExperiment):
                         # plt.figure()
                         f, axarr = plt.subplots(1, 2)
                         axarr[0].imshow(self.occupancy_maps[0])
-                        # axarr[1].imshow(self.occupancy_maps[5])
-                        axarr[1].imshow(self.occupancy_maps[10])
+                        axarr[1].imshow(self.occupancy_maps[5])
+                        # axarr[1].imshow(self.occupancy_maps[10])
                         xy_res = np.array(current_occupancy_map).shape
                         # plt.imshow(occupancy_map, cmap="PiYG_r")
                         # cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
@@ -529,7 +531,8 @@ class DQNExperimentBasic(BaseExperiment):
         self.counter += 1
         return {"values":observations,
                 "occupancyMap_now":self.occupancy_maps[0] ,
-                "occupancyMap_1": self.occupancy_maps[10]
+                "occupancyMap_05":self.occupancy_maps[5] ,
+                # "occupancyMap_1": self.occupancy_maps[10]
                 # "depth_camera":depth_camera_data
                 }, \
             {
@@ -623,18 +626,45 @@ class DQNExperimentBasic(BaseExperiment):
         forward_velocity = observation["values"][0]
         hyp_distance_to_next_waypoint = observation["values"][1]
 
+        bearing_to_waypoint = observation["values"][4]
+        bearing_to_ahead_waypoints_ahead = observation["values"][5]
+        angle_between_truck_and_trailer = observation["values"][6]
 
-        print(f"Hyp distance in rewards {hyp_distance_to_next_waypoint}")
-        if self.last_hyp_distance_to_next_waypoint != 0:
-            hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            reward =+ hyp_reward*100
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward}")
 
-        self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
+        self.last_forward_velocity = forward_velocity
 
-        if forward_velocity < 0.03:
+        # print(f"Hyp distance in rewards {hyp_distance_to_next_waypoint}")
+        # if self.last_hyp_distance_to_next_waypoint != 0:
+        #     hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
+        #     reward =+ hyp_reward*100
+        #     print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward}")
+        #
+        # self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
+
+
+
+        if bearing_to_waypoint == 0:
+            reward += 50
+        else:
+            print(f"REWARD bearing_to_waypoint {abs(1/bearing_to_waypoint)}")
+            reward += abs(1/bearing_to_waypoint)
+
+        if bearing_to_ahead_waypoints_ahead == 0:
+            reward += 50
+        else:
+            print(f"REWARD bearing_to_ahead_waypoints_ahead {abs(1 / bearing_to_ahead_waypoints_ahead)}")
+            reward += abs(1 / bearing_to_ahead_waypoints_ahead)
+
+        if angle_between_truck_and_trailer == 0:
+            reward += 50
+        else:
+            print(f"REWARD angle_between_truck_and_trailer {abs(1 / angle_between_truck_and_trailer)}")
+            reward += abs(1 / angle_between_truck_and_trailer)
+
+        if forward_velocity < 0.01:
             # Negative reward for no velocity
-            reward += -10
+            print('REWARD -10 for velocity')
+            reward += -100
 
 
         if self.done_falling:
@@ -653,5 +683,6 @@ class DQNExperimentBasic(BaseExperiment):
             print("====> REWARD Done arrived")
             reward += 10000
 
+        self.reward_metric = reward
         print(f"Reward: {reward}")
         return reward

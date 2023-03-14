@@ -16,6 +16,7 @@ class DQNCallbacks(DefaultCallbacks):
         episode.user_data["angle_with_center"] = []
         episode.user_data["forward_velocity"] = []
         episode.user_data["custom_done_arrived"] = -1
+        episode.user_data["reward_proportional_to_length"] = []
 
     def on_episode_step(self, worker, base_env, episode, **kwargs):
         # Angle with center
@@ -26,6 +27,11 @@ class DQNCallbacks(DefaultCallbacks):
         # Forward Velocity
         last_forward_velocity = worker.env.experiment.last_forward_velocity
         episode.user_data["forward_velocity"].append(last_forward_velocity)
+
+        # Reward Proportional to length
+        reward = worker.env.experiment.reward_metric
+        episode.user_data["reward_proportional_to_length"].append(reward)
+
     def on_episode_end(self, worker, base_env, policies, episode, **kwargs):
         last_angle_with_center = episode.user_data["angle_with_center"]
         if len(last_angle_with_center) > 0:
@@ -50,3 +56,48 @@ class DQNCallbacks(DefaultCallbacks):
 
         else:
             episode.custom_metrics["custom_done_arrived"] = -2
+
+
+        # Proportional Reward
+        reward_proportional_to_length = episode.user_data["reward_proportional_to_length"]
+        if len(reward_proportional_to_length) > 0:
+            if reward_proportional_to_length[-1] > 9500:
+                # Done Episode
+                done_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"])
+                done_without_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"][:-1])
+            elif reward_proportional_to_length[-1] < -700:
+                # Collision episode
+                collision_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"])
+                collision_without_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"][:-1])
+            else:
+                print_error_message(reward_proportional_to_length[-1])
+
+            both_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"])
+            both_without_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"][:-1])
+        else:
+            collision_reward_proportional_to_length = 0
+            done_reward_proportional_to_length = 0
+            both_reward_proportional_to_length = 0
+
+            done_without_reward_proportional_to_length = 0
+            collision_without_reward_proportional_to_length = 0
+            both_without_reward_proportional_to_length = 0
+
+        episode.custom_metrics["collision_reward_proportional_to_length"] = collision_reward_proportional_to_length
+        episode.custom_metrics["done_reward_proportional_to_length"] = done_reward_proportional_to_length
+        episode.custom_metrics["both_reward_proportional_to_length"] = both_reward_proportional_to_length
+
+        episode.custom_metrics["collision_without_reward_proportional_to_length"] = collision_without_reward_proportional_to_length
+        episode.custom_metrics["done_without_reward_proportional_to_length"] = done_without_reward_proportional_to_length
+        episode.custom_metrics["both_without_reward_proportional_to_length"] = both_without_reward_proportional_to_length
+
+def print_error_message(reward):
+    print("---------------------------------------------------------------------------------")
+    print("---------------------------------------------------------------------------------")
+    print("---------------------------------------------------------------------------------")
+    print("THIS CANT BE TRUE")
+    print(f"Last value was {reward} ")
+    print("---------------------------------------------------------------------------------")
+    print("---------------------------------------------------------------------------------")
+    print("---------------------------------------------------------------------------------")
+    print("---------------------------------------------------------------------------------")
