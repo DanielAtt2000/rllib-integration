@@ -187,7 +187,7 @@ class Lidar(CarlaSensor):
         points = np.reshape(points, (int(points.shape[0] / 4), 4))
         return points
 
-
+# import pickle
 class SemanticLidar(CarlaSensor):
     def __init__(self, name, attributes, interface, parent):
         super().__init__(name, attributes, interface, parent)
@@ -205,7 +205,23 @@ class SemanticLidar(CarlaSensor):
         points = points[usable_indices]
 
         # ObjIdxFloat = points['ObjIdx'].astype('float32')
-        ObjTagFloat = points['ObjTag'].astype('float32')
+        # ObjTagFloat = points['ObjTag'].astype('float32')
+
+        # points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],points['ObjIdx'], points['ObjTag']])
+        #
+        # def read_data_from_pickle(filename):
+        #     with open(filename, 'rb') as handle:
+        #         print(filename)
+        #         return pickle.load(handle)
+        #
+        # data_points = read_data_from_pickle('waypoints2.pkl')
+        #
+        # b = np.zeros([4, 10])
+        # arr = np.append(data_points, b, axis=0)
+        #
+        # points = np.append(points, arr,axis=1)
+        #
+        # points = points.T
 
         # points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],points['ObjIdx'], points['ObjTag']]).T
         # points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],ObjIdxFloat, ObjTagFloat]).T

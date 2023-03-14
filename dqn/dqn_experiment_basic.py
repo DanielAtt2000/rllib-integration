@@ -96,6 +96,34 @@ class DQNExperimentBasic(BaseExperiment):
         counts.write(str('\n'))
         counts.close()
 
+    # Rotation matrix function
+    def rotate_matrix(self, x, y, angle, x_shift=0, y_shift=0, units="DEGREES"):
+        """
+        Rotates a point in the xy-plane counterclockwise through an angle about the origin
+        https://en.wikipedia.org/wiki/Rotation_matrix
+        :param x: x coordinate
+        :param y: y coordinate
+        :param x_shift: x-axis shift from origin (0, 0)
+        :param y_shift: y-axis shift from origin (0, 0)
+        :param angle: The rotation angle in degrees
+        :param units: DEGREES (default) or RADIANS
+        :return: Tuple of rotated x and y
+        """
+
+        # Shift to origin (0,0)
+        x = x - x_shift
+        y = y - y_shift
+
+        # Convert degrees to radians
+        if units == "DEGREES":
+            angle = math.radians(angle)
+
+        # Rotation matrix multiplication to get rotated x & y
+        xr = (x * math.cos(angle)) - (y * math.sin(angle)) + x_shift
+        yr = (x * math.sin(angle)) + (y * math.cos(angle)) + y_shift
+
+        return xr, yr
+
     def reset(self):
         """Called at the beginning and each time the simulation is reset"""
 
@@ -334,18 +362,29 @@ class DQNExperimentBasic(BaseExperiment):
         else:
             pass
 
-        # number_of_waypoints_to_plot_on_lidar = 10
-        # location_from_waypoint_to_vehicle_relative = np.empty([2,number_of_waypoints_to_plot_on_lidar])
-        #
-        # for i in range(number_of_waypoints_to_plot_on_lidar):
-        #     x_dist = core.route[core.last_waypoint_index + i].location.x - (truck_transform.location.x + 2)
-        #     y_dist = core.route[core.last_waypoint_index + i].location.y - (truck_transform.location.y + 0.21)
-        #
-        #     location_from_waypoint_to_vehicle_relative[0][i] = x_dist
-        #     location_from_waypoint_to_vehicle_relative[1][i] = y_dist
-        #
-        #
+        number_of_waypoints_to_plot_on_lidar = 20
+        location_from_waypoint_to_vehicle_relative = np.empty([2,number_of_waypoints_to_plot_on_lidar])
+
+        for i in range(0,number_of_waypoints_to_plot_on_lidar,2):
+            x_dist = core.route[core.last_waypoint_index + i].location.x - (truck_transform.location.x + 2)
+            y_dist = core.route[core.last_waypoint_index + i].location.y - (truck_transform.location.y + 0.10)
+
+            xr, yr = self.rotate_matrix(x_dist,y_dist,360-truck_transform.rotation.yaw,0,0,units="DEGREES")
+
+
+            location_from_waypoint_to_vehicle_relative[0][i] = xr
+            location_from_waypoint_to_vehicle_relative[1][i] = yr
+            location_from_waypoint_to_vehicle_relative[0][i+1] = xr + 0.1
+            location_from_waypoint_to_vehicle_relative[1][i+1] = yr + 0.1
+
+
         # print(f"UP HERE{location_from_waypoint_to_vehicle_relative}")
+        # import pickle
+        # def save_data(filename, data):
+        #     with open(filename, 'wb') as handle:
+        #         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        #
+        # save_data('waypoints2.pkl',location_from_waypoint_to_vehicle_relative)
 
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
         y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y - truck_transform.location.y)
@@ -436,7 +475,7 @@ class DQNExperimentBasic(BaseExperiment):
                 # print(f"BEFORE {lidar_points[0][len(lidar_points) - 18]}-{lidar_points[1][len(lidar_points) - 18]}")
                 # print(f"BEFORE {lidar_points[0][len(lidar_points) - 17]}-{lidar_points[1][len(lidar_points) - 17]}")
                 #
-                # lidar_points = np.append(lidar_points, location_from_waypoint_to_vehicle_relative,axis=1)
+                lidar_points = np.append(lidar_points, location_from_waypoint_to_vehicle_relative,axis=1)
                 #
                 # print(f"AFTER {lidar_points[0][len(lidar_points) - 1]}-{lidar_points[1][len(lidar_points) - 1]}")
                 # print(f"AFTER {lidar_points[0][len(lidar_points) - 2]}-{lidar_points[1][len(lidar_points) - 2]}")
@@ -458,7 +497,7 @@ class DQNExperimentBasic(BaseExperiment):
 
                 self.occupancy_maps.append(current_occupancy_map)
 
-                if self.visualiseOccupancyGirdMap:
+                if self.visualiseOccupancyGirdMap and self.counter % 10 == 0 :
                     multiple_lidars = True
                     if multiple_lidars:
                         # plt.figure()
@@ -655,15 +694,9 @@ class DQNExperimentBasic(BaseExperiment):
             print(f"REWARD bearing_to_ahead_waypoints_ahead {abs(1 / bearing_to_ahead_waypoints_ahead)}")
             reward += abs(1 / bearing_to_ahead_waypoints_ahead)
 
-        if angle_between_truck_and_trailer == 0:
-            reward += 50
-        else:
-            print(f"REWARD angle_between_truck_and_trailer {abs(1 / angle_between_truck_and_trailer)}")
-            reward += abs(1 / angle_between_truck_and_trailer)
-
         if forward_velocity < 0.01:
             # Negative reward for no velocity
-            print('REWARD -10 for velocity')
+            print('REWARD -100 for velocity')
             reward += -100
 
 
