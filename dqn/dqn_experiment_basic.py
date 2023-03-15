@@ -233,18 +233,18 @@ class DQNExperimentBasic(BaseExperiment):
             #     shape=(84, 84, 3),
             #     dtype=np.float32
             # ),
-            # "occupancyMap_now": Box(
-            #     low=0,
-            #     high=1,
-            #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
-            #     dtype=np.float64
-            # ),
-            # "occupancyMap_05": Box(
-            #     low=0,
-            #     high=1,
-            #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
-            #     dtype=np.float64
-            # )
+            "occupancyMap_now": Box(
+                low=0,
+                high=1,
+                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+                dtype=np.float64
+            ),
+            "occupancyMap_05": Box(
+                low=0,
+                high=1,
+                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+                dtype=np.float64
+            )
             })
         return image_space
 
@@ -571,8 +571,8 @@ class DQNExperimentBasic(BaseExperiment):
 
         self.counter += 1
         return {"values":observations,
-                # "occupancyMap_now":self.occupancy_maps[0] ,
-                # "occupancyMap_05":self.occupancy_maps[5] ,
+                "occupancyMap_now":self.occupancy_maps[0] ,
+                "occupancyMap_05":self.occupancy_maps[5] ,
                 # "occupancyMap_1": self.occupancy_maps[10]
                 # "depth_camera":depth_camera_data
                 }, \
@@ -674,49 +674,49 @@ class DQNExperimentBasic(BaseExperiment):
 
         self.last_forward_velocity = forward_velocity
 
-        # print(f"Hyp distance in rewards {hyp_distance_to_next_waypoint}")
-        # if self.last_hyp_distance_to_next_waypoint != 0:
-        #     hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-        #     reward =+ hyp_reward*100
-        #     print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward}")
-        #
-        # self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
+        print(f"Hyp distance in rewards {hyp_distance_to_next_waypoint}")
+        if self.last_hyp_distance_to_next_waypoint != 0:
+            hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
+            reward = reward + hyp_reward*100
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward}")
+
+        self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
 
 
 
-        if bearing_to_waypoint == 0:
-            reward += 50
-        else:
-            print(f"REWARD bearing_to_waypoint {abs(1/bearing_to_waypoint)}")
-            reward += abs(1/bearing_to_waypoint)
+        # if bearing_to_waypoint == 0:
+        #     reward += 50
+        # else:
+        #     print(f"REWARD bearing_to_waypoint {abs(1/bearing_to_waypoint)}")
+        #     reward += abs(1/bearing_to_waypoint)
 
         if bearing_to_ahead_waypoints_ahead == 0:
-            reward += 50
+            reward = reward + 50
         else:
             print(f"REWARD bearing_to_ahead_waypoints_ahead {abs(1 / bearing_to_ahead_waypoints_ahead)}")
-            reward += abs(1 / bearing_to_ahead_waypoints_ahead)
+            reward = reward + abs(1 / bearing_to_ahead_waypoints_ahead)
 
         if forward_velocity < 0.01:
             # Negative reward for no velocity
             print('REWARD -100 for velocity')
-            reward += -100
+            reward = reward + -100
 
 
         if self.done_falling:
-            reward += -1000
+            reward = reward + -1000
             print('====> REWARD Done falling')
         if self.done_collision_truck or self.done_collision_trailer:
             print("====> REWARD Done collision")
-            reward += -1000
+            reward = reward + -1000
         if self.done_time_idle:
             print("====> REWARD Done idle")
-            reward += -1000
+            reward = reward + -1000
         if self.done_time_episode:
             print("====> REWARD Done max time")
-            reward += -1000
+            reward = reward + -1000
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward += 10000
+            reward = reward + 10000
 
         self.reward_metric = reward
         print(f"Reward: {reward}")
