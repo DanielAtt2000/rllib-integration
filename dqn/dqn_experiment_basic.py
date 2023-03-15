@@ -233,18 +233,18 @@ class DQNExperimentBasic(BaseExperiment):
             #     shape=(84, 84, 3),
             #     dtype=np.float32
             # ),
-            "occupancyMap_now": Box(
-                low=0,
-                high=1,
-                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
-                dtype=np.float64
-            ),
-            "occupancyMap_05": Box(
-                low=0,
-                high=1,
-                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
-                dtype=np.float64
-            )
+            # "occupancyMap_now": Box(
+            #     low=0,
+            #     high=1,
+            #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+            #     dtype=np.float64
+            # ),
+            # "occupancyMap_05": Box(
+            #     low=0,
+            #     high=1,
+            #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+            #     dtype=np.float64
+            # )
             })
         return image_space
 
@@ -363,20 +363,22 @@ class DQNExperimentBasic(BaseExperiment):
             pass
 
         number_of_waypoints_to_plot_on_lidar = 20
-        location_from_waypoint_to_vehicle_relative = np.empty([2,number_of_waypoints_to_plot_on_lidar])
+        location_from_waypoint_to_vehicle_relative = np.zeros([2,number_of_waypoints_to_plot_on_lidar])
 
         for i in range(0,number_of_waypoints_to_plot_on_lidar,2):
-            x_dist = core.route[core.last_waypoint_index + i].location.x - (truck_transform.location.x + 2)
-            y_dist = core.route[core.last_waypoint_index + i].location.y - (truck_transform.location.y + 0.10)
+            try:
+                x_dist = core.route[core.last_waypoint_index + i].location.x - (truck_transform.location.x + 2)
+                y_dist = core.route[core.last_waypoint_index + i].location.y - (truck_transform.location.y + 0.10)
 
-            xr, yr = self.rotate_matrix(x_dist,y_dist,360-truck_transform.rotation.yaw,0,0,units="DEGREES")
+                xr, yr = self.rotate_matrix(x_dist,y_dist,360-truck_transform.rotation.yaw,0,0,units="DEGREES")
 
 
-            location_from_waypoint_to_vehicle_relative[0][i] = xr
-            location_from_waypoint_to_vehicle_relative[1][i] = yr
-            location_from_waypoint_to_vehicle_relative[0][i+1] = xr + 0.1
-            location_from_waypoint_to_vehicle_relative[1][i+1] = yr + 0.1
-
+                location_from_waypoint_to_vehicle_relative[0][i] = xr
+                location_from_waypoint_to_vehicle_relative[1][i] = yr
+                location_from_waypoint_to_vehicle_relative[0][i+1] = xr + 0.1
+                location_from_waypoint_to_vehicle_relative[1][i+1] = yr + 0.1
+            except Exception as e:
+                print("At end of route, nothing major wrong")
 
         # print(f"UP HERE{location_from_waypoint_to_vehicle_relative}")
         # import pickle
@@ -569,8 +571,8 @@ class DQNExperimentBasic(BaseExperiment):
 
         self.counter += 1
         return {"values":observations,
-                "occupancyMap_now":self.occupancy_maps[0] ,
-                "occupancyMap_05":self.occupancy_maps[5] ,
+                # "occupancyMap_now":self.occupancy_maps[0] ,
+                # "occupancyMap_05":self.occupancy_maps[5] ,
                 # "occupancyMap_1": self.occupancy_maps[10]
                 # "depth_camera":depth_camera_data
                 }, \

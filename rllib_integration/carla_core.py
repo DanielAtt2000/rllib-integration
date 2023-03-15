@@ -12,7 +12,7 @@ import signal
 import time
 import psutil
 import logging
-
+import socket
 import datetime
 import carla
 
@@ -197,6 +197,29 @@ class CarlaCore:
 
             except Exception as e:
                 print(" FAILED TO STEP UP CLIENT: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
+                time.sleep(3)
+
+            try:
+                # Create a socket instance
+                socketObject = socket.socket()
+
+                # Using the socket connect to a server...in this case localhost
+                socketObject.connect((self.config["host"], int(self.config["programPort"])))
+                print("Connected to server")
+                # Send a message to the web server to supply a page as given by Host param of GET request
+                HTTPMessage = "restart"
+                bytes = str.encode(HTTPMessage)
+                socketObject.sendall(bytes)
+
+                # Receive the data
+                while (True):
+                    data = socketObject.recv(1024)
+                    print(data)
+                    break
+
+                socketObject.close()
+            except Exception as e:
+                print(f"Failed to restart carla,{e}")
                 time.sleep(3)
 
         raise Exception("Cannot connect to server. Try increasing 'timeout' or 'retries_on_error' at the carla configuration")
