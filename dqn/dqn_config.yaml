@@ -14,6 +14,7 @@ replay_buffer_config: {
   capacity: 300000
 }
 
+
 horizon: 6500
 #double_q: True
 #dueling: True
