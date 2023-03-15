@@ -678,7 +678,7 @@ class DQNExperimentBasic(BaseExperiment):
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
             reward = reward + hyp_reward*100
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward}")
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward*100}")
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
 
@@ -691,10 +691,12 @@ class DQNExperimentBasic(BaseExperiment):
         #     reward += abs(1/bearing_to_waypoint)
 
         if bearing_to_ahead_waypoints_ahead == 0:
-            reward = reward + 50
+            reward = reward + 30
         else:
             print(f"REWARD bearing_to_ahead_waypoints_ahead {abs(1 / bearing_to_ahead_waypoints_ahead)}")
-            reward = reward + abs(1 / bearing_to_ahead_waypoints_ahead)
+            reward_bearing_to_ahead_waypoints_ahead = abs(1 / bearing_to_ahead_waypoints_ahead)
+            reward_bearing_to_ahead_waypoints_ahead = np.clip(reward_bearing_to_ahead_waypoints_ahead,0,30)
+            reward = reward + reward_bearing_to_ahead_waypoints_ahead
 
         if forward_velocity < 0.01:
             # Negative reward for no velocity
