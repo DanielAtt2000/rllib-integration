@@ -693,9 +693,10 @@ class DQNExperimentBasic(BaseExperiment):
         if bearing_to_ahead_waypoints_ahead == 0:
             reward = reward + 30
         else:
-            print(f"REWARD bearing_to_ahead_waypoints_ahead {abs(1 / bearing_to_ahead_waypoints_ahead)}")
             reward_bearing_to_ahead_waypoints_ahead = abs(1 / bearing_to_ahead_waypoints_ahead)
             reward_bearing_to_ahead_waypoints_ahead = np.clip(reward_bearing_to_ahead_waypoints_ahead,0,30)
+            print(f"REWARD bearing_to_ahead_waypoints_ahead {reward_bearing_to_ahead_waypoints_ahead}")
+
             reward = reward + reward_bearing_to_ahead_waypoints_ahead
 
         if forward_velocity < 0.01:
