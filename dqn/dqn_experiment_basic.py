@@ -65,6 +65,7 @@ class DQNExperimentBasic(BaseExperiment):
         # self.acceleration = []
         self.truck_collisions = []
         self.trailer_collisions =[]
+        self.entry_idx = -1
 
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
@@ -168,6 +169,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.save_to_file(f"{self.directory}/path", self.vehicle_path)
         self.save_to_file(f"{self.directory}/truck_collisions", self.truck_collisions)
         self.save_to_file(f"{self.directory}/trailer_collisions", self.trailer_collisions)
+        self.entry_idx = -1
 
         # Saving LIDAR point count
         # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
@@ -244,6 +246,12 @@ class DQNExperimentBasic(BaseExperiment):
                 high=1,
                 shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
                 dtype=np.float64
+            ),
+            "occupancyMap_1": Box(
+                low=0,
+                high=1,
+                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+                dtype=np.float64
             )
             })
         return image_space
@@ -279,13 +287,13 @@ class DQNExperimentBasic(BaseExperiment):
             26: [0.6, -0.75, 0.0, False, False],  # Left
             27: [0.6, -0.50, 0.0, False, False],  # Left
             28: [0.6, -0.25, 0.0, False, False],  # Left
-            29: [1.0, 0.00, 0.0, False, False],  # Straight
-            30: [1.0, 0.75, 0.0, False, False],  # Right
-            31: [1.0, 0.50, 0.0, False, False],  # Right
-            32: [1.0, 0.25, 0.0, False, False],  # Right
-            33: [1.0, -0.75, 0.0, False, False],  # Left
-            34: [1.0, -0.50, 0.0, False, False],  # Left
-            35: [1.0, -0.25, 0.0, False, False],  # Left
+            # 29: [1.0, 0.00, 0.0, False, False],  # Straight
+            # 30: [1.0, 0.75, 0.0, False, False],  # Right
+            # 31: [1.0, 0.50, 0.0, False, False],  # Right
+            # 32: [1.0, 0.25, 0.0, False, False],  # Right
+            # 33: [1.0, -0.75, 0.0, False, False],  # Left
+            # 34: [1.0, -0.50, 0.0, False, False],  # Left
+            # 35: [1.0, -0.25, 0.0, False, False],  # Left
         }
 
 
@@ -348,6 +356,8 @@ class DQNExperimentBasic(BaseExperiment):
             # Position
             # angle
             # collision
+
+        self.entry_idx = core.entry_spawn_point_index
 
         number_of_waypoints_ahead_to_calculate_with = 0
         ahead_waypoints = 10
@@ -580,7 +590,7 @@ class DQNExperimentBasic(BaseExperiment):
         return {"values":observations,
                 "occupancyMap_now":self.occupancy_maps[0] ,
                 "occupancyMap_05":self.occupancy_maps[5] ,
-                # "occupancyMap_1": self.occupancy_maps[10]
+                "occupancyMap_1": self.occupancy_maps[10]
                 # "depth_camera":depth_camera_data
                 }, \
             {

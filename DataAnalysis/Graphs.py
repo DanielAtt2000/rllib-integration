@@ -17,7 +17,7 @@ def open_pickle(filename):
     with open(filename, 'rb') as handle:
         return pickle.load(handle)
 
-directory = 'data_185fdd2fba3'
+directory = 'data_53b9a7ee095'
 df= pd.DataFrame()
 df_done = pd.DataFrame()
 string= '_beforeNormalisation'
@@ -137,38 +137,38 @@ def plot_route(route_points_all,truck_points_all):
             plt.show()
 
 
-# for filename in os.listdir(directory):
-#     if "forward_velocity_z" not in filename:
-#         if "done" in filename:
-#             x= sns.catplot(df_done,x="output",y="points")
-#             print("------------------------------")
-#             print("DONE DATA")
-#             print(df_done.output.value_counts())
-#             print("------------------------------")
-#
-#             # x = sns.swarmplot(df_done,x="output",y="points")
-#             # sns.scatterplot(data)
-#             plt.show()
-#             x.savefig(os.path.join(directory, filename + string + '.png'))
-#         elif "route" in filename or "path" in filename:
-#             continue
-#         else:
-#             file = os.path.join(directory, filename)
-#             # checking if it is a file
-#             print(file)
-#             if os.path.isfile(file) and file.endswith('.pkl'):
-#                 # plt.xlabel(filename)
-#                 # sns.distplot(data)
-#                 x = sns.displot(df[filename + string])
-#                 # sns.pointplot(x=df['forward_velocity.pkl'],y=df['forward_velocity_x.pkl'])
-#                 # sns.scatterplot(data)
-#                 plt.show()
-#                 x.savefig(os.path.join(directory, filename + string + '.png'))
+for filename in os.listdir(directory):
+    if "forward_velocity_z" not in filename:
+        if "done" in filename:
+            x= sns.catplot(df_done,x="output",y="points")
+            print("------------------------------")
+            print("DONE DATA")
+            print(df_done.output.value_counts())
+            print("------------------------------")
+
+            # x = sns.swarmplot(df_done,x="output",y="points")
+            # sns.scatterplot(data)
+            plt.show()
+            x.savefig(os.path.join(directory, filename + string + '.png'))
+        elif "route" in filename or "path" in filename:
+            continue
+        else:
+            file = os.path.join(directory, filename)
+            # checking if it is a file
+            print(file)
+            if os.path.isfile(file) and file.endswith('.pkl'):
+                # plt.xlabel(filename)
+                # sns.distplot(data)
+                x = sns.displot(df[filename + string])
+                # sns.pointplot(x=df['forward_velocity.pkl'],y=df['forward_velocity_x.pkl'])
+                # sns.scatterplot(data)
+                plt.show()
+                x.savefig(os.path.join(directory, filename + string + '.png'))
 
 
 
 
-plot_route(df["route.pkl" + string],df["path.pkl" + string])
+# plot_route(df["route.pkl" + string],df["path.pkl" + string])
 
 # y_dist_to_waypoints 0-> 0.023
 # x_dist_to_waypoints

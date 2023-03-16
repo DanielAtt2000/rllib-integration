@@ -35,6 +35,7 @@ EXPERIMENT_CLASS = DQNExperimentBasic
 # /home/daniel/ray_results/carla_rllib/good/dqn_8847e01844_2_lidar_images_84x84/CustomDQNTrainer_CarlaEnv_97af5_00000_0_2023-03-13_22-39-54/checkpoint_000313
 # /home/daniel/ray_results/carla_rllib/good/dqn_8847e01844_2_lidar_images_84x84/CustomDQNTrainer_CarlaEnv_97af5_00000_0_2023-03-13_22-39-54/checkpoint_000205
 # /home/daniel/ray_results/carla_rllib/good/dqn_6f31211ee7_2_lidar_images_with_hypreward_+angle_reward/CustomDQNTrainer_CarlaEnv_9f625_00000_0_2023-03-15_22-59-13/checkpoint_000250
+# /home/daniel/ray_results/carla_rllib/dqn_53b9a7ee09/CustomDQNTrainer_CarlaEnv_8a877_00000_0_2023-03-16_08-52-46/checkpoint_000549
 def parse_config(args):
     """
     Parses the .yaml configuration file into a readable dictionary

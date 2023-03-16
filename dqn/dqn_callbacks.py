@@ -9,7 +9,7 @@
 import numpy as np
 
 from ray.rllib.algorithms.callbacks import DefaultCallbacks
-
+from rllib_integration.GetStartStopLocation import spawn_points_2_lane_roundabout_easy,spawn_points_2_lane_roundabout_difficult
 
 class DQNCallbacks(DefaultCallbacks):
     def on_episode_start(self, worker, base_env, policies, episode, **kwargs):
@@ -17,6 +17,8 @@ class DQNCallbacks(DefaultCallbacks):
         episode.user_data["forward_velocity"] = []
         episode.user_data["custom_done_arrived"] = -1
         episode.user_data["reward_proportional_to_length"] = []
+        episode.user_data["total_reward"] = []
+        episode.user_data["entry_idx"] = -1
 
     def on_episode_step(self, worker, base_env, episode, **kwargs):
         # Angle with center
@@ -31,6 +33,12 @@ class DQNCallbacks(DefaultCallbacks):
         # Reward Proportional to length
         reward = worker.env.experiment.reward_metric
         episode.user_data["reward_proportional_to_length"].append(reward)
+
+        # Total Reward
+        episode.user_data["total_reward"].append(reward)
+
+        # Entry Idx
+        episode.user_data["entry_idx"] = worker.env.experiment.entry_idx
 
     def on_episode_end(self, worker, base_env, policies, episode, **kwargs):
         last_angle_with_center = episode.user_data["angle_with_center"]
@@ -99,9 +107,37 @@ class DQNCallbacks(DefaultCallbacks):
                 "both_without_reward_proportional_to_length"] = both_without_reward_proportional_to_length
 
 
+        # Reward per roundabout
+        found = False
+        easy = False
+        for entry_easy in spawn_points_2_lane_roundabout_easy:
+            entry_idx = entry_easy[0]
+            if episode.user_data["entry_idx"] == entry_idx:
+                episode.custom_metrics["easy_episode_reward"] = np.sum(episode.user_data["total_reward"])
+                found = True
+                easy = True
+                break
 
+        if not found:
+            for entry_difficult in spawn_points_2_lane_roundabout_difficult:
+                entry_idx = entry_difficult[0]
+                if episode.user_data["entry_idx"] == entry_idx:
+                    episode.custom_metrics["difficult_episode_reward"] = np.sum(episode.user_data["total_reward"])
+                    easy = False
+                    break
 
+        if easy:
+            if not worker.env.experiment.custom_done_arrived:
+                episode.custom_metrics["easy_custom_done_arrived"] = 0
 
+            elif worker.env.experiment.custom_done_arrived:
+                episode.custom_metrics["easy_custom_done_arrived"] = 1
+        else:
+            if not worker.env.experiment.custom_done_arrived:
+                episode.custom_metrics["hard_custom_done_arrived"] = 0
+
+            elif worker.env.experiment.custom_done_arrived:
+                episode.custom_metrics["hard_custom_done_arrived"] = 1
 
 
 
