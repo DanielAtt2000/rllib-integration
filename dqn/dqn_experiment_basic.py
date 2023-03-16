@@ -258,27 +258,34 @@ class DQNExperimentBasic(BaseExperiment):
             5: [0.0, -0.75, 0.0, False, False],  # Left
             6: [0.0, -0.50, 0.0, False, False],  # Left
             7: [0.0, -0.25, 0.0, False, False],  # Left
-            8: [0.3, 0.00, 0.0, False, False],  # Straight
-            9: [0.3, 0.75, 0.0, False, False],  # Right
-            10: [0.3, 0.50, 0.0, False, False],  # Right
-            11: [0.3, 0.25, 0.0, False, False],  # Right
-            12: [0.3, -0.75, 0.0, False, False],  # Left
-            13: [0.3, -0.50, 0.0, False, False],  # Left
-            14: [0.3, -0.25, 0.0, False, False],  # Left
-            15: [0.6, 0.00, 0.0, False, False],  # Straight
-            16: [0.6, 0.75, 0.0, False, False],  # Right
-            17: [0.6, 0.50, 0.0, False, False],  # Right
-            18: [0.6, 0.25, 0.0, False, False],  # Right
-            19: [0.6, -0.75, 0.0, False, False],  # Left
-            20: [0.6, -0.50, 0.0, False, False],  # Left
-            21: [0.6, -0.25, 0.0, False, False],  # Left
-            22: [1.0, 0.00, 0.0, False, False],  # Straight
-            23: [1.0, 0.75, 0.0, False, False],  # Right
-            24: [1.0, 0.50, 0.0, False, False],  # Right
-            25: [1.0, 0.25, 0.0, False, False],  # Right
-            26: [1.0, -0.75, 0.0, False, False],  # Left
-            27: [1.0, -0.50, 0.0, False, False],  # Left
-            28: [1.0, -0.25, 0.0, False, False],  # Left
+            8: [0.15, 0.00, 0.0, False, False],  # Straight
+            9: [0.15, 0.75, 0.0, False, False],  # Right
+            10: [0.15, 0.50, 0.0, False, False],  # Right
+            11: [0.15, 0.25, 0.0, False, False],  # Right
+            12: [0.15, -0.75, 0.0, False, False],  # Left
+            13: [0.15, -0.50, 0.0, False, False],  # Left
+            14: [0.15, -0.25, 0.0, False, False],  # Left
+            15: [0.3, 0.00, 0.0, False, False],  # Straight
+            16: [0.3, 0.75, 0.0, False, False],  # Right
+            17: [0.3, 0.50, 0.0, False, False],  # Right
+            18: [0.3, 0.25, 0.0, False, False],  # Right
+            19: [0.3, -0.75, 0.0, False, False],  # Left
+            20: [0.3, -0.50, 0.0, False, False],  # Left
+            21: [0.3, -0.25, 0.0, False, False],  # Left
+            22: [0.6, 0.00, 0.0, False, False],  # Straight
+            23: [0.6, 0.75, 0.0, False, False],  # Right
+            24: [0.6, 0.50, 0.0, False, False],  # Right
+            25: [0.6, 0.25, 0.0, False, False],  # Right
+            26: [0.6, -0.75, 0.0, False, False],  # Left
+            27: [0.6, -0.50, 0.0, False, False],  # Left
+            28: [0.6, -0.25, 0.0, False, False],  # Left
+            29: [1.0, 0.00, 0.0, False, False],  # Straight
+            30: [1.0, 0.75, 0.0, False, False],  # Right
+            31: [1.0, 0.50, 0.0, False, False],  # Right
+            32: [1.0, 0.25, 0.0, False, False],  # Right
+            33: [1.0, -0.75, 0.0, False, False],  # Left
+            34: [1.0, -0.50, 0.0, False, False],  # Left
+            35: [1.0, -0.25, 0.0, False, False],  # Left
         }
 
 
@@ -690,16 +697,16 @@ class DQNExperimentBasic(BaseExperiment):
         #     print(f"REWARD bearing_to_waypoint {abs(1/bearing_to_waypoint)}")
         #     reward += abs(1/bearing_to_waypoint)
 
-        if bearing_to_ahead_waypoints_ahead == 0:
-            reward = reward + 30
-        else:
-            reward_bearing_to_ahead_waypoints_ahead = abs(1 / bearing_to_ahead_waypoints_ahead)
-            reward_bearing_to_ahead_waypoints_ahead = np.clip(reward_bearing_to_ahead_waypoints_ahead,0,30)
-            print(f"REWARD bearing_to_ahead_waypoints_ahead {reward_bearing_to_ahead_waypoints_ahead}")
+        # if bearing_to_ahead_waypoints_ahead == 0:
+        #     reward = reward + 30
+        # else:
+        #     reward_bearing_to_ahead_waypoints_ahead = abs(1 / bearing_to_ahead_waypoints_ahead)
+        #     reward_bearing_to_ahead_waypoints_ahead = np.clip(reward_bearing_to_ahead_waypoints_ahead,0,30)
+        #     print(f"REWARD bearing_to_ahead_waypoints_ahead {reward_bearing_to_ahead_waypoints_ahead}")
+        #
+        #     reward = reward + reward_bearing_to_ahead_waypoints_ahead
 
-            reward = reward + reward_bearing_to_ahead_waypoints_ahead
-
-        if forward_velocity < 0.01:
+        if forward_velocity < 0.02:
             # Negative reward for no velocity
             print('REWARD -100 for velocity')
             reward = reward + -100
