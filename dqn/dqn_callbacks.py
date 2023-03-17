@@ -136,10 +136,10 @@ class DQNCallbacks(DefaultCallbacks):
                 episode.custom_metrics["easy_custom_done_arrived"] = 1
         else:
             if not worker.env.experiment.custom_done_arrived:
-                episode.custom_metrics["hard_custom_done_arrived"] = 0
+                episode.custom_metrics["difficult_custom_done_arrived"] = 0
 
             elif worker.env.experiment.custom_done_arrived:
-                episode.custom_metrics["hard_custom_done_arrived"] = 1
+                episode.custom_metrics["difficult_custom_done_arrived"] = 1
 
 
 
