@@ -34,7 +34,7 @@ replay_buffer_config:
 store_buffer_in_checkpoints: False
 num_steps_sampled_before_learning_starts: 10000
 train_batch_size: 64
-#min_sample_timesteps_per_iteration: 4
+min_sample_timesteps_per_iteration: 4
 # Paper uses 20k random timesteps, which is not exactly the same, but
 # seems to work nevertheless. We use 100k here for the longer Atari
 # runs (DQN style: filling up the buffer a bit before learning).
