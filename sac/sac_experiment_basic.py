@@ -35,7 +35,7 @@ class SACExperimentBasic(BaseExperiment):
         self.last_angle_with_center = 0
         self.last_forward_velocity = 0
         self.custom_done_arrived = False
-        self.last_action = None
+        self.last_action = [0,0,0]
         self.lidar_points_count = []
         self.reward_metric = 0
 
@@ -176,7 +176,7 @@ class SACExperimentBasic(BaseExperiment):
         self.save_to_file(f"{self.directory}/trailer_collisions", self.trailer_collisions)
         self.entry_idx = -1
         self.exit_idx = -1
-        self.last_action = None
+        self.last_action = [0,0,0]
 
         # Saving LIDAR point count
         # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
@@ -234,8 +234,8 @@ class SACExperimentBasic(BaseExperiment):
         """
         image_space = Dict(
             {"values": Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1]),
+                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,-1,0]),
+                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1]),
                 dtype=np.float32
             ),
             # "depth_camera": Box(
@@ -339,7 +339,7 @@ class SACExperimentBasic(BaseExperiment):
         # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
         print(f"----------------------------------->{action_msg}")
 
-        self.last_action = action
+        self.last_action = action_control
 
 
         return action
@@ -598,10 +598,6 @@ class SACExperimentBasic(BaseExperiment):
                            ]
 
         observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
-
-        print("OBSERVATIONS HERE")
-        print(observations)
-        print("OBSERVATIONS HERE")
 
         self.forward_velocity.append(np.float32(forward_velocity))
         # self.forward_velocity_x.append(np.float32(forward_velocity_x))

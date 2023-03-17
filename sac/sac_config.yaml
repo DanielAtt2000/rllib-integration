@@ -34,7 +34,13 @@ num_cpus_per_worker: 11
 #}
 
 replay_buffer_config: {
-  capacity: 500000
+    “_enable_replay_buffer_api”: True,
+    “type”: “MultiAgentPrioritizedReplayBuffer”,
+    “capacity”: 200000,
+    “prioritized_replay_alpha”: 0.6,
+    “prioritized_replay_beta”: 0.4,
+    “prioritized_replay_eps”: 1e-6,
+    “replay_sequence_length”: 1
 }
 
 store_buffer_in_checkpoints: False
@@ -93,15 +99,15 @@ env_config:
     enable_rendering: True
     show_display: True
     map_buffer : 1.2
-    truckTrailerCombo: False
+    truckTrailerCombo: True
 
 
   experiment:
     hero:
-      truckTrailerCombo: False
-#      blueprintTruck: "DAFxf"
-      blueprintTruck: "vehicle.audi.a2"
-      blueprintTrailer: "trailer"
+      truckTrailerCombo: True
+      blueprintTruck: "vehicle.daf.dafxf"
+#      blueprintTruck: "vehicle.audi.a2"
+      blueprintTrailer: "vehicle.trailer.trailer"
       lidar_max_points : 3000
       sensors:
 #        obstacle:
@@ -147,7 +153,7 @@ env_config:
 
       tm_hybrid_mode: True
 #    town: "Town03_Opt"
-    town: '4round'
+    town: 'doubleRoundabout37'
     others:
       framestack: 1
       max_time_idle: 600
