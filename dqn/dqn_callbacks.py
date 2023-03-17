@@ -39,6 +39,7 @@ class DQNCallbacks(DefaultCallbacks):
 
         # Entry Idx
         episode.user_data["entry_idx"] = worker.env.experiment.entry_idx
+        episode.user_data["exit_idx"] = worker.env.experiment.exit_idx
 
     def on_episode_end(self, worker, base_env, policies, episode, **kwargs):
         last_angle_with_center = episode.user_data["angle_with_center"]
@@ -113,18 +114,19 @@ class DQNCallbacks(DefaultCallbacks):
         for entry_easy in spawn_points_2_lane_roundabout_easy:
             entry_idx = entry_easy[0]
             if episode.user_data["entry_idx"] == entry_idx:
-                episode.custom_metrics["easy_episode_reward"] = np.sum(episode.user_data["total_reward"])
-                found = True
-                easy = True
-                break
+                if episode.user_data["exit_idx"] in entry_easy[1]:
+                    episode.custom_metrics["easy_episode_reward"] = np.sum(episode.user_data["total_reward"])
+                    found = True
+                    easy = True
+                    break
 
         if not found:
             for entry_difficult in spawn_points_2_lane_roundabout_difficult:
                 entry_idx = entry_difficult[0]
                 if episode.user_data["entry_idx"] == entry_idx:
-                    episode.custom_metrics["difficult_episode_reward"] = np.sum(episode.user_data["total_reward"])
-                    easy = False
-                    break
+                    if episode.user_data["exit_idx"] in entry_difficult[1]:
+                        episode.custom_metrics["difficult_episode_reward"] = np.sum(episode.user_data["total_reward"])
+                        break
 
         if easy:
             if not worker.env.experiment.custom_done_arrived:

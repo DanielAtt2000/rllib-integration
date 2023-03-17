@@ -53,8 +53,10 @@ class DQNExperimentBasic(BaseExperiment):
         self.y_dist_to_waypoint = []
         self.angle_to_center_of_lane_degrees = []
         self.angle_to_center_of_lane_degrees_ahead_waypoints = []
+        self.angle_to_center_of_lane_degrees_ahead_waypoints_2 = []
         self.bearing_to_waypoint = []
         self.bearing_to_ahead_waypoints_ahead = []
+        self.bearing_to_ahead_waypoints_ahead_2 = []
         self.angle_between_truck_and_trailer = []
         self.forward_velocity = []
         # self.forward_velocity_x = []
@@ -66,6 +68,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.truck_collisions = []
         self.trailer_collisions =[]
         self.entry_idx = -1
+        self.exit_idx = -1
 
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
@@ -158,8 +161,10 @@ class DQNExperimentBasic(BaseExperiment):
         self.save_to_file(f"{self.directory}/hyp_distance_to_next_waypoint", self.hyp_distance_to_next_waypoint)
         self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees", self.angle_to_center_of_lane_degrees)
         self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_ahead_waypoints", self.angle_to_center_of_lane_degrees_ahead_waypoints)
+        self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_ahead_waypoints_2", self.angle_to_center_of_lane_degrees_ahead_waypoints_2)
         self.save_to_file(f"{self.directory}/bearing", self.bearing_to_waypoint)
         self.save_to_file(f"{self.directory}/bearing_ahead_ahead", self.bearing_to_ahead_waypoints_ahead)
+        self.save_to_file(f"{self.directory}/bearing_ahead_ahead_2", self.bearing_to_ahead_waypoints_ahead_2)
         self.save_to_file(f"{self.directory}/angle_between_truck_and_trailer", self.angle_between_truck_and_trailer)
         self.save_to_file(f"{self.directory}/forward_velocity", self.forward_velocity)
         # self.save_to_file(f"{self.directory}/forward_velocity_x", self.forward_velocity_x)
@@ -170,6 +175,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.save_to_file(f"{self.directory}/truck_collisions", self.truck_collisions)
         self.save_to_file(f"{self.directory}/trailer_collisions", self.trailer_collisions)
         self.entry_idx = -1
+        self.exit_idx = -1
 
         # Saving LIDAR point count
         # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
@@ -195,8 +201,10 @@ class DQNExperimentBasic(BaseExperiment):
         self.y_dist_to_waypoint = []
         self.angle_to_center_of_lane_degrees = []
         self.angle_to_center_of_lane_degrees_ahead_waypoints = []
+        self.angle_to_center_of_lane_degrees_ahead_waypoints_2 = []
         self.bearing_to_waypoint = []
         self.bearing_to_ahead_waypoints_ahead = []
+        self.bearing_to_ahead_waypoints_ahead_2 = []
         self.angle_between_truck_and_trailer = []
         self.forward_velocity = []
         # self.forward_velocity_x = []
@@ -225,8 +233,8 @@ class DQNExperimentBasic(BaseExperiment):
         """
         image_space = Dict(
             {"values": Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi]),
+                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi]),
+                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi]),
                 dtype=np.float32
             ),
             # "depth_camera": Box(
@@ -280,13 +288,13 @@ class DQNExperimentBasic(BaseExperiment):
             19: [0.3, -0.75, 0.0, False, False],  # Left
             20: [0.3, -0.50, 0.0, False, False],  # Left
             21: [0.3, -0.25, 0.0, False, False],  # Left
-            22: [0.6, 0.00, 0.0, False, False],  # Straight
-            23: [0.6, 0.75, 0.0, False, False],  # Right
-            24: [0.6, 0.50, 0.0, False, False],  # Right
-            25: [0.6, 0.25, 0.0, False, False],  # Right
-            26: [0.6, -0.75, 0.0, False, False],  # Left
-            27: [0.6, -0.50, 0.0, False, False],  # Left
-            28: [0.6, -0.25, 0.0, False, False],  # Left
+            22: [0.7, 0.00, 0.0, False, False],  # Straight
+            23: [0.7, 0.75, 0.0, False, False],  # Right
+            24: [0.7, 0.50, 0.0, False, False],  # Right
+            25: [0.7, 0.25, 0.0, False, False],  # Right
+            26: [0.7, -0.75, 0.0, False, False],  # Left
+            27: [0.7, -0.50, 0.0, False, False],  # Left
+            28: [0.7, -0.25, 0.0, False, False],  # Left
             # 29: [1.0, 0.00, 0.0, False, False],  # Straight
             # 30: [1.0, 0.75, 0.0, False, False],  # Right
             # 31: [1.0, 0.50, 0.0, False, False],  # Right
@@ -312,16 +320,16 @@ class DQNExperimentBasic(BaseExperiment):
         action_msg = ""
 
         if action_control[0] != 0:
-            action_msg += " Forward "
+            action_msg += f" {action_control[0]} Forward "
 
         if action_control[1] < 0:
-            action_msg += " Left "
+            action_msg += f"{action_control[1]} Left "
 
         if action_control[1] > 0:
-            action_msg += " Right "
+            action_msg += f"{action_control[1]} Right "
 
         if action_control[2] != 0:
-            action_msg += " Break "
+            action_msg += f"{action_control[2]} Break "
 
         if action_msg == "":
             action_msg += " Coast "
@@ -358,9 +366,11 @@ class DQNExperimentBasic(BaseExperiment):
             # collision
 
         self.entry_idx = core.entry_spawn_point_index
+        self.exit_idx = core.exit_spawn_point_index
 
         number_of_waypoints_ahead_to_calculate_with = 0
         ahead_waypoints = 10
+        ahead_waypoints_2 = 20
 
         # Getting truck location
         truck_transform = core.hero.get_transform()
@@ -411,7 +421,19 @@ class DQNExperimentBasic(BaseExperiment):
 
         bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
 
-        bearing_to_ahead_waypoints_ahead = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
+        try:
+            bearing_to_ahead_waypoints_ahead = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
+
+        except Exception as e:
+            print(e)
+            bearing_to_ahead_waypoints_ahead = 0
+
+        try:
+            bearing_to_ahead_waypoints_ahead_2 = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints_2].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
+        except Exception as e:
+            print(e)
+            bearing_to_ahead_waypoints_ahead_2 = 0
+
 
         angle_between_truck_and_trailer = angle_between(waypoint_forward_vector=truck_transform.get_forward_vector(),vehicle_forward_vector=trailer_transform.get_forward_vector())
 
@@ -434,6 +456,14 @@ class DQNExperimentBasic(BaseExperiment):
             previous_position=core.route[core.last_waypoint_index-1].location,
             current_position=truck_transform.location,
             next_position=core.route[core.last_waypoint_index + ahead_waypoints].location)
+        try:
+            angle_to_center_of_lane_degrees_ahead_waypoints_2 = calculate_angle_with_center_of_lane(
+                previous_position=core.route[core.last_waypoint_index-1].location,
+                current_position=truck_transform.location,
+                next_position=core.route[core.last_waypoint_index + ahead_waypoints_2].location)
+        except Exception as e:
+            print(e)
+            angle_to_center_of_lane_degrees_ahead_waypoints_2 = 0
 
         if self.visualiseRoute and self.counter > self.counterThreshold:
             plot_route(route=core.route, last_waypoint_index=core.last_waypoint_index, truck_transform=truck_transform, number_of_waypoints_ahead_to_calculate_with=5)
@@ -558,8 +588,10 @@ class DQNExperimentBasic(BaseExperiment):
             np.float32(hyp_distance_to_next_waypoint),
             np.float32(angle_to_center_of_lane_degrees),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints),
+            np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2),
             np.float32(bearing_to_waypoint),
             np.float32(bearing_to_ahead_waypoints_ahead),
+            np.float32(bearing_to_ahead_waypoints_ahead_2),
             np.float32(angle_between_truck_and_trailer),
             # np.float32(acceleration)
                            ]
@@ -570,15 +602,19 @@ class DQNExperimentBasic(BaseExperiment):
         self.hyp_distance_to_next_waypoint.append(np.float32(hyp_distance_to_next_waypoint))
         self.angle_to_center_of_lane_degrees.append(np.float32(angle_to_center_of_lane_degrees))
         self.angle_to_center_of_lane_degrees_ahead_waypoints.append(np.float32(angle_to_center_of_lane_degrees_ahead_waypoints))
+        self.angle_to_center_of_lane_degrees_ahead_waypoints_2.append(np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2))
         self.bearing_to_waypoint.append(np.float32(bearing_to_waypoint))
         self.bearing_to_ahead_waypoints_ahead.append(np.float32(bearing_to_ahead_waypoints_ahead))
+        self.bearing_to_ahead_waypoints_ahead_2.append(np.float32(bearing_to_ahead_waypoints_ahead_2))
         self.angle_between_truck_and_trailer.append(np.float32(angle_between_truck_and_trailer))
         # self.acceleration.append(np.float32(acceleration))
         #
         # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
         # print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
+        # print(f"angle_to_center_of_lane_degrees_ahead_waypoints_2:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2)}")
         # print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
         # print(f"bearing_to_ahead_waypoints_ahead:{np.float32(bearing_to_ahead_waypoints_ahead)}")
+        # print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
         # print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
         # # print(f"forward_velocity:{np.float32(forward_velocity)}")
         # print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
@@ -629,7 +665,7 @@ class DQNExperimentBasic(BaseExperiment):
         #print("Inside Complete Route")
         #print(f"Len(core.route) -2 : {len(core.route) -2 }")
         #print(f"core.last_waypoint_index{core.last_waypoint_index}")
-        if len(core.route) - 15 <= core.last_waypoint_index:
+        if len(core.route) - 20 <= core.last_waypoint_index:
             return True
         else:
             return False
@@ -716,7 +752,7 @@ class DQNExperimentBasic(BaseExperiment):
         #
         #     reward = reward + reward_bearing_to_ahead_waypoints_ahead
 
-        if forward_velocity < 0.02:
+        if forward_velocity < 0.03:
             # Negative reward for no velocity
             print('REWARD -100 for velocity')
             reward = reward + -100

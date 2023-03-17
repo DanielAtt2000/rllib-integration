@@ -66,7 +66,7 @@ env_config:
     resolution_y: 300
     quality_level: "Low"
     enable_map_assets: True
-    enable_rendering: True
+    enable_rendering: False
     show_display: True
     map_buffer : 1.2
     truckTrailerCombo: True
