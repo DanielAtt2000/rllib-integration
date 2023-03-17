@@ -17,7 +17,7 @@ def open_pickle(filename):
     with open(filename, 'rb') as handle:
         return pickle.load(handle)
 
-directory = 'data_53b9a7ee095'
+directory = 'data_0402b71f7bf'
 df= pd.DataFrame()
 df_done = pd.DataFrame()
 string= '_beforeNormalisation'
@@ -140,10 +140,12 @@ def plot_route(route_points_all,truck_points_all):
 for filename in os.listdir(directory):
     if "forward_velocity_z" not in filename:
         if "done" in filename:
+
             x= sns.catplot(df_done,x="output",y="points")
             print("------------------------------")
             print("DONE DATA")
             print(df_done.output.value_counts())
+            print(df_done.points.value_counts())
             print("------------------------------")
 
             # x = sns.swarmplot(df_done,x="output",y="points")

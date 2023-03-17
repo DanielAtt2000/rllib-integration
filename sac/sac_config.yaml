@@ -4,6 +4,7 @@ num_gpus: 1
 num_cpus_per_worker: 11
 framework: torch
 gamma: 0.99
+twin_q: True
 q_model_config:
     hidden_activation: relu
     hidden_layer_sizes: [512]
@@ -21,7 +22,7 @@ n_step: 1
 rollout_fragment_length: 1
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
-  capacity: 300000
+  capacity: 100000
   # How many steps of the model to sample before learning starts.
   # If True prioritized replay buffer will be used.
   prioritized_replay_alpha: 0.6
@@ -38,7 +39,12 @@ optimization:
     critic_learning_rate: 0.0003
     entropy_learning_rate: 0.0003
 
-
+"exploration_config": {
+  "type": "EpsilonGreedy",
+  "initial_epsilon": 1.0,
+   "final_epsilon": 0.01,
+   "epsilon_timesteps": 300000
+}
 #num_workers: 1
 #num_gpus: 1
 ##num_gpus_per_worker: 1

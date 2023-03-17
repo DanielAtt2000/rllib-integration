@@ -244,24 +244,24 @@ class SACExperimentBasic(BaseExperiment):
             #     shape=(84, 84, 3),
             #     dtype=np.float32
             # ),
-            # "occupancyMap_now": Box(
-            #     low=0,
-            #     high=1,
-            #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
-            #     dtype=np.float64
-            # ),
+            "occupancyMap_now": Box(
+                low=0,
+                high=1,
+                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+                dtype=np.float64
+            ),
             # "occupancyMap_05": Box(
             #     low=0,
             #     high=1,
             #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
             #     dtype=np.float64
             # ),
-            # "occupancyMap_1": Box(
-            #     low=0,
-            #     high=1,
-            #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
-            #     dtype=np.float64
-            # )
+            "occupancyMap_1": Box(
+                low=0,
+                high=1,
+                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+                dtype=np.float64
+            )
             })
         return image_space
 
@@ -627,9 +627,9 @@ class SACExperimentBasic(BaseExperiment):
 
         self.counter += 1
         return {"values":observations,
-                # "occupancyMap_now":self.occupancy_maps[0] ,
+                "occupancyMap_now":self.occupancy_maps[0] ,
                 # "occupancyMap_05":self.occupancy_maps[5] ,
-                # "occupancyMap_1": self.occupancy_maps[10]
+                "occupancyMap_1": self.occupancy_maps[10]
                 # "depth_camera":depth_camera_data
                 }, \
             {
