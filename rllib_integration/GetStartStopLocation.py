@@ -37,7 +37,7 @@ spawn_points_2_lane_roundabout_small = [
     [2,[19,26,28]],
     [108,[107,18]],
     [102,[26,28,98]],
-    [77,[18,75]],
+    [77,[75]],
 #     REmoved 77 to 18 --too tight
 ]
 
@@ -105,8 +105,8 @@ spawn_points_2_lane_roundabout_difficult = [
 ]
 
 
-# roundabouts = [spawn_points_2_lane_roundabout_large,spawn_points_2_lane_roundabout_small]
-roundabouts = [spawn_points_2_lane_roundabout_difficult,spawn_points_2_lane_roundabout_easy]
+roundabouts = [spawn_points_2_lane_roundabout_small]
+# roundabouts = [spawn_points_2_lane_roundabout_difficult,spawn_points_2_lane_roundabout_easy]
 
 
 def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):

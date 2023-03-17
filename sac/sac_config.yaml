@@ -3,13 +3,13 @@
 
 framework: "torch"
 num_workers: 1
-
 gamma: 0.99
 lr: 0.0001
-train_batch_size: 16
-rollout_fragment_length: 16
-
+train_batch_size: 64
+rollout_fragment_length: 64
+recreate_failed_workers: True
 clip_rewards: False
+clip_actions: False
 
 
 horizon: 6500
@@ -26,12 +26,12 @@ num_gpus: 1
 num_cpus_per_worker: 11
 
 
-"exploration_config": {
-   "type": "EpsilonGreedy",
-   "initial_epsilon": 1.0,
-   "final_epsilon": 0.02,
-   "epsilon_timesteps": 200000
-}
+#"exploration_config": {
+#   "type": "EpsilonGreedy",
+#   "initial_epsilon": 1.0,
+#   "final_epsilon": 0.02,
+#   "epsilon_timesteps": 200000
+#}
 
 replay_buffer_config: {
   capacity: 500000
@@ -80,6 +80,7 @@ env_config:
     host: "192.168.1.113"
 #    host: "172.17.0.1"
 #   host: "127.0.0.1"
+    programPort: "5418"
     timeout: 30.0
     # IF YOU ARE GOING TO CHANGE THE TIMESTEP CHANGE rotation_frequency of LIDAR
     timestep: 0.1 # IMP IMP
@@ -107,11 +108,11 @@ env_config:
 #          type: "sensor.other.obstacle"
         collision:
           type: "sensor.other.collision"
-        depth_camera:
-          type: "sensor.camera.depth"
-          image_size_x: 84
-          image_size_y: 84
-          transform: '0.0,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
+#        depth_camera:
+#          type: "sensor.camera.depth"
+#          image_size_x: 84
+#          image_size_y: 84
+#          transform: '0.0,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
 #       lidar:
 #          type: "sensor.lidar.ray_cast_semantic"
 #          channels : "32"
