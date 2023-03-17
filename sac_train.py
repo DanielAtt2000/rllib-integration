@@ -5,7 +5,7 @@
 #
 # This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
-"""DQN Algorithm. Tested with CARLA.
+"""SAC Algorithm. Tested with CARLA.
 You can visualize experiment results in ~/ray_results using TensorBoard.
 """
 from __future__ import print_function
@@ -42,7 +42,7 @@ def run(args):
                  name=args.name,
                  local_dir=args.directory,
                  # stop={"perf/ram_util_percent": 85.0},
-                 checkpoint_freq=1,
+                 checkpoint_freq=3,
                  # checkpoint_at_end=True,
                  restore=get_checkpoint(args.name, args.directory, args.restore, args.overwrite),
                  config=args.config,
@@ -95,7 +95,7 @@ def main():
                            help="Flag to overwrite a specific directory (warning: all content of the folder will be lost.)")
     argparser.add_argument("--tboff",
                            action="store_true",
-                           default=True,
+                           default=False,
                            help="Flag to deactivate Tensorboard")
     argparser.add_argument("--auto",
                            action="store_true",
@@ -119,9 +119,9 @@ def main():
         args.name = args.name + '_' + str(commit_hash())
 
         if specific_version:
-            args.name = "sac_7ba3a56f81"
+            args.name = ""
             x = random.randint(0,100)
-            inp = input(f'SPECIFIC NAME APPLIED ENTER {x} to confirm:')
+            inp = input(f'SPECIFIC NAME APPLIED  ENTER {x} to confirm:')
 
             if int(x) == int(inp):
                 run(args)
