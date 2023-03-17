@@ -11,6 +11,9 @@ q_model_config:
 policy_model_config:
     hidden_activation: relu
     hidden_layer_sizes: [512]
+
+
+recreate_failed_workers: True
 # Do hard syncs.
 # Soft-syncs seem to work less reliably for discrete action spaces.
 tau: 1.0
@@ -19,7 +22,7 @@ target_network_update_freq: 8000
 target_entropy: auto
 clip_rewards: False
 n_step: 1
-rollout_fragment_length: 1
+rollout_fragment_length: 4
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
   capacity: 100000
