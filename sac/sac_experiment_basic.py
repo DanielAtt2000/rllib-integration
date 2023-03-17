@@ -6,7 +6,7 @@
 # This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
 import matplotlib.pyplot as plt
-
+from git import Repo
 
 import math
 import numpy as np
@@ -84,7 +84,7 @@ class SACExperimentBasic(BaseExperiment):
         for i in range(self.max_amount_of_occupancy_maps):
             self.occupancy_maps.append(np.zeros((self.occupancy_map_y,self.occupancy_map_x,1)))
 
-        from git import Repo
+
         repo = Repo('.')
         remote = repo.remote('origin')
         remote.fetch()

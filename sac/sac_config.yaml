@@ -1,49 +1,42 @@
-# To see the complete list of configurable parameters see:
-# https://github.com/ray-project/ray/blob/master/rllib/agents/trainer.py
-
-framework: "torch"
-num_workers: 1
+# Works for both torch and tf.
+framework: torch
 gamma: 0.99
-lr: 0.0001
+q_model_config:
+    hidden_activation: relu
+    hidden_layer_sizes: [512]
+policy_model_config:
+    hidden_activation: relu
+    hidden_layer_sizes: [512]
+# Do hard syncs.
+# Soft-syncs seem to work less reliably for discrete action spaces.
+tau: 1.0
+target_network_update_freq: 8000
+# auto = 0.98 * -log(1/|A|)
+target_entropy: auto
+clip_rewards: 1.0
+n_step: 1
+rollout_fragment_length: 1
+replay_buffer_config:
+  type: MultiAgentPrioritizedReplayBuffer
+  capacity: 1000000
+  # How many steps of the model to sample before learning starts.
+  # If True prioritized replay buffer will be used.
+  prioritized_replay_alpha: 0.6
+  prioritized_replay_beta: 0.4
+  prioritized_replay_eps: 1e-6
+num_steps_sampled_before_learning_starts: 100000
 train_batch_size: 64
-rollout_fragment_length: 64
-recreate_failed_workers: True
-clip_rewards: False
-clip_actions: False
-
-
-horizon: 6500
-log_level: "INFO"
-twin_q: True
-
-
-#num_rollout_workers: 5
-#num_envs_per_worker: 5
-#rollout_fragment_length: auto
-
+min_sample_timesteps_per_iteration: 4
+# Paper uses 20k random timesteps, which is not exactly the same, but
+# seems to work nevertheless. We use 100k here for the longer Atari
+# runs (DQN style: filling up the buffer a bit before learning).
+optimization:
+    actor_learning_rate: 0.0003
+    critic_learning_rate: 0.0003
+    entropy_learning_rate: 0.0003
+num_workers: 0
 num_gpus: 1
-#num_gpus_per_worker: 1
-num_cpus_per_worker: 11
-
-
-#"exploration_config": {
-#   "type": "EpsilonGreedy",
-#   "initial_epsilon": 1.0,
-#   "final_epsilon": 0.02,
-#   "epsilon_timesteps": 200000
-#}
-
-replay_buffer_config: {
-    “_enable_replay_buffer_api”: True,
-    “type”: “MultiAgentPrioritizedReplayBuffer”,
-    “capacity”: 200000,
-    “prioritized_replay_alpha”: 0.6,
-    “prioritized_replay_beta”: 0.4,
-    “prioritized_replay_eps”: 1e-6,
-    “replay_sequence_length”: 1
-}
-
-store_buffer_in_checkpoints: False
+metrics_num_episodes_for_smoothing: 5
 
 #num_workers: 1
 #num_gpus: 1
