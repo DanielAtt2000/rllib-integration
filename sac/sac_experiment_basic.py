@@ -45,7 +45,7 @@ class SACExperimentBasic(BaseExperiment):
         self.counter = 0
         self.visualiseRoute = False
         self.visualiseImage = False
-        self.visualiseOccupancyGirdMap = False
+        self.visualiseOccupancyGirdMap = True
         self.counterThreshold = 10
         self.last_hyp_distance_to_next_waypoint = 0
 
@@ -553,7 +553,7 @@ class SACExperimentBasic(BaseExperiment):
                         # plt.figure()
                         f, axarr = plt.subplots(1, 2)
                         axarr[0].imshow(self.occupancy_maps[0])
-                        axarr[1].imshow(self.occupancy_maps[5])
+                        axarr[1].imshow(self.occupancy_maps[10])
                         # axarr[1].imshow(self.occupancy_maps[10])
                         xy_res = np.array(current_occupancy_map).shape
                         # plt.imshow(occupancy_map, cmap="PiYG_r")
