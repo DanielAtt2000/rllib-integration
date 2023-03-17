@@ -425,13 +425,13 @@ class DQNExperimentBasic(BaseExperiment):
             bearing_to_ahead_waypoints_ahead = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
 
         except Exception as e:
-            print(e)
+            print(f"ERROR HERE1 {e}")
             bearing_to_ahead_waypoints_ahead = 0
 
         try:
             bearing_to_ahead_waypoints_ahead_2 = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints_2].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
         except Exception as e:
-            print(e)
+            print(f"ERROR HERE2 {e}")
             bearing_to_ahead_waypoints_ahead_2 = 0
 
 
@@ -462,7 +462,7 @@ class DQNExperimentBasic(BaseExperiment):
                 current_position=truck_transform.location,
                 next_position=core.route[core.last_waypoint_index + ahead_waypoints_2].location)
         except Exception as e:
-            print(e)
+            print(f"ERROR HERE3 {e}")
             angle_to_center_of_lane_degrees_ahead_waypoints_2 = 0
 
         if self.visualiseRoute and self.counter > self.counterThreshold:
