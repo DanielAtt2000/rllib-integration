@@ -272,15 +272,24 @@ class SACExperimentBasic(BaseExperiment):
         return {
             0: [0.0, 0.00, 0.0, False, False],  # Coast
             1: [0.0, 0.00, 1.0, False, False],  # Apply Break
-            2: [0.3, 0.00, 0.0, False, False],  # Straight
-            3: [0.3, 0.20, 0.0, False, False],  # Right
-            4: [0.3, 0.40, 0.0, False, False],  # Right
-            5: [0.3, 0.60, 0.0, False, False],  # Left
-            6: [0.3, 0.80, 0.0, False, False],  # Left
-            7: [0.3, -0.20, 0.0, False, False],  # Left
-            8: [0.3, -0.40, 0.0, False, False],  # Straight
-            9: [0.3, -0.60, 0.0, False, False],  # Right
-            10: [0.3, -0.80, 0.0, False, False],  # Right
+            2: [0.15, 0.00, 0.0, False, False],  # Straight
+            3: [0.15, 0.20, 0.0, False, False],  # Right
+            4: [0.15, 0.40, 0.0, False, False],  # Right
+            5: [0.15, 0.60, 0.0, False, False],  # Left
+            6: [0.15, 0.80, 0.0, False, False],  # Left
+            7: [0.15, -0.20, 0.0, False, False],  # Left
+            8: [0.15, -0.40, 0.0, False, False],  # Straight
+            9: [0.15, -0.60, 0.0, False, False],  # Right
+            10: [0.15, -0.80, 0.0, False, False],  # Right
+            11: [0.3, 0.00, 0.0, False, False],  # Straight
+            12: [0.3, 0.20, 0.0, False, False],  # Right
+            13: [0.3, 0.40, 0.0, False, False],  # Right
+            14: [0.3, 0.60, 0.0, False, False],  # Left
+            15: [0.3, 0.80, 0.0, False, False],  # Left
+            16: [0.3, -0.20, 0.0, False, False],  # Left
+            17: [0.3, -0.40, 0.0, False, False],  # Straight
+            18: [0.3, -0.60, 0.0, False, False],  # Right
+            19: [0.3, -0.80, 0.0, False, False],  # Right
             # 11: [0.15, 0.25, 0.0, False, False],  # Right
             # 12: [0.15, -0.75, 0.0, False, False],  # Left
             # 13: [0.15, -0.50, 0.0, False, False],  # Left
