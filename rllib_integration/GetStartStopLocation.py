@@ -1,6 +1,7 @@
 import pandas as pd
 import random
 
+from rllib_integration.Circle import get_radii
 from rllib_integration.RouteGeneration.global_route_planner import GlobalRoutePlanner
 from rllib_integration.TestingWayPointUpdater import plot_all_routes
 
@@ -310,6 +311,9 @@ def visualise_all_routes(map):
 
                     route.append(route_waypoint[0].transform)
 
+
+                print(f"length of route {len(route)}")
+                print(f"Radii: {get_radii(route,5)}")
                 all_routes.append(route)
 
     plot_all_routes(all_routes=all_routes)

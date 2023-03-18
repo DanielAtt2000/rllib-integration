@@ -6,7 +6,7 @@
 # This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
 import matplotlib.pyplot as plt
-
+from git import Repo
 
 import math
 import numpy as np
@@ -19,6 +19,7 @@ from rllib_integration.GetAngle import calculate_angle_with_center_of_lane, angl
 from rllib_integration.TestingWayPointUpdater import plot_points, plot_route
 from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
+from rllib_integration.Circle import get_radii
 from PIL import Image
 
 from rllib_integration.lidar_to_grid_map import generate_ray_casting_grid_map
@@ -76,6 +77,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.occupancy_map_x = 84
         self.occupancy_map_y = 84
         self.max_amount_of_occupancy_maps = 11
+        self.radii = []
 
 
 
@@ -84,7 +86,7 @@ class DQNExperimentBasic(BaseExperiment):
         for i in range(self.max_amount_of_occupancy_maps):
             self.occupancy_maps.append(np.zeros((self.occupancy_map_y,self.occupancy_map_x,1)))
 
-        from git import Repo
+
         repo = Repo('.')
         remote = repo.remote('origin')
         remote.fetch()
@@ -142,6 +144,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.done_arrived = False
         self.custom_done_arrived = False
         self.reward_metric = 0
+        self.radii = []
 
         for i in range(self.max_amount_of_occupancy_maps):
             self.occupancy_maps.append(np.zeros((self.occupancy_map_y, self.occupancy_map_x,1)))
@@ -233,8 +236,8 @@ class DQNExperimentBasic(BaseExperiment):
         """
         image_space = Dict(
             {"values": Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi]),
+                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0]),
+                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,100,100,100,100,100,100]),
                 dtype=np.float32
             ),
             # "depth_camera": Box(
@@ -364,6 +367,8 @@ class DQNExperimentBasic(BaseExperiment):
             # Position
             # angle
             # collision
+
+        self.radii = get_radii(core.route[core.last_waypoint_index:],5)
 
         self.entry_idx = core.entry_spawn_point_index
         self.exit_idx = core.exit_spawn_point_index
@@ -595,6 +600,7 @@ class DQNExperimentBasic(BaseExperiment):
             np.float32(angle_between_truck_and_trailer),
             # np.float32(acceleration)
                            ]
+        observations.extend(self.radii)
 
         self.forward_velocity.append(np.float32(forward_velocity))
         # self.forward_velocity_x.append(np.float32(forward_velocity_x))
