@@ -15,7 +15,6 @@ gamma: 0.99
 train_batch_size: 64
 optimizer: "Adam"
 horizon: 6500
-target_network_update_freq: 8000
 
 "exploration_config": {
   "type": "EpsilonGreedy",
