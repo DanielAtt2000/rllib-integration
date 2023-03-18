@@ -12,7 +12,7 @@ import os
 from ray.rllib.algorithms.a3c import A3C
 
 
-class CustomA3CTrainer(A3c):
+class CustomA3CTrainer(A3C):
     """
     Modified version of DQNTrainer with the added functionality of saving the torch model for later inference
     """
