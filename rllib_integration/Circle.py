@@ -49,7 +49,7 @@ def get_radii(remaining_waypoints_on_route,no_of_points_to_calculate_chord):
         perpendicular_bisectors.append(Vector(x_coof=x_coof, c_coof=c,y_coof=y_coof,x_0=x_0,y_0=y_0,x_1=x_1,y_1=y_1))
 
     max_radius_value = 1
-    length_of_output_array = 6
+    length_of_output_array = 10
     for i in range(0,len(perpendicular_bisectors)-1):
         # For vertical lines
         if perpendicular_bisectors[i].y_coof == 0 and perpendicular_bisectors[i+1].y_coof == 0:
@@ -97,4 +97,4 @@ def get_radii(remaining_waypoints_on_route,no_of_points_to_calculate_chord):
         for i in range(length_of_output_array-len(radii)):
             radii.append(max_radius_value)
 
-    return radii[0:6]
+    return radii[0:length_of_output_array]

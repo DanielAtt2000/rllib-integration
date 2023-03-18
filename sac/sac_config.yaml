@@ -7,10 +7,10 @@ gamma: 0.99
 twin_q: True
 q_model_config:
     hidden_activation: relu
-    hidden_layer_sizes: [512]
+    hidden_layer_sizes: [128,256,512]
 policy_model_config:
     hidden_activation: relu
-    hidden_layer_sizes: [512]
+    hidden_layer_sizes: [128,256,512]
 
 
 recreate_failed_workers: True
@@ -25,7 +25,7 @@ n_step: 1
 rollout_fragment_length: 1
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
-  capacity: 300000
+  capacity: 1000000
   # How many steps of the model to sample before learning starts.
   # If True prioritized replay buffer will be used.
   prioritized_replay_alpha: 0.6
@@ -47,7 +47,7 @@ optimization:
   "type": "EpsilonGreedy",
   "initial_epsilon": 1.0,
    "final_epsilon": 0.01,
-   "epsilon_timesteps": 300000
+   "epsilon_timesteps": 500000
 }
 #num_workers: 1
 #num_gpus: 1
