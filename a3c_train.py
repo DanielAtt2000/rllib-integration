@@ -5,7 +5,7 @@
 #
 # This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
-"""SAC Algorithm. Tested with CARLA.
+"""A3C Algorithm. Tested with CARLA.
 You can visualize experiment results in ~/ray_results using TensorBoard.
 """
 from __future__ import print_function
@@ -68,7 +68,7 @@ def parse_config(args):
         config = yaml.load(f, Loader=yaml.FullLoader)
         config["env"] = CarlaEnv
         config["env_config"]["experiment"]["type"] = EXPERIMENT_CLASS
-        config["callbacks"] = SACCallbacks
+        config["callbacks"] = A3CCallbacks
 
     return config
 
@@ -83,8 +83,8 @@ def main():
                            help="Specified directory to save results (default: ~/ray_results/carla_rllib")
     argparser.add_argument("-n", "--name",
                            metavar="N",
-                           default="sac_example",
-                           help="Name of the experiment (default: sac_example)")
+                           default="a3c_example",
+                           help="Name of the experiment (default: a3c_example)")
     argparser.add_argument("--restore",
                            action="store_true",
                            default=False,
