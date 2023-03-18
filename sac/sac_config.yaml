@@ -25,7 +25,7 @@ n_step: 1
 rollout_fragment_length: 1
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
-  capacity: 1000000
+  capacity: 400000
   # How many steps of the model to sample before learning starts.
   # If True prioritized replay buffer will be used.
   prioritized_replay_alpha: 0.6
