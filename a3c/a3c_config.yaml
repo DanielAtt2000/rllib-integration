@@ -7,7 +7,6 @@ num_gpus: 1
 num_cpus_per_worker: 11
 rollout_fragment_length: 4
 #timesteps_per_iteration: 20000
-num_steps_sampled_before_learning_starts: 10000
 recreate_failed_workers: True
 
 
