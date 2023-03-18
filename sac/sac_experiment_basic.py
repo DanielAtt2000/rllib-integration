@@ -19,6 +19,7 @@ from rllib_integration.GetAngle import calculate_angle_with_center_of_lane, angl
 from rllib_integration.TestingWayPointUpdater import plot_points, plot_route
 from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
+from rllib_integration.Circle import get_radii
 from PIL import Image
 
 from rllib_integration.lidar_to_grid_map import generate_ray_casting_grid_map
@@ -76,6 +77,7 @@ class SACExperimentBasic(BaseExperiment):
         self.occupancy_map_x = 84
         self.occupancy_map_y = 84
         self.max_amount_of_occupancy_maps = 11
+        self.radii = []
 
 
 
@@ -142,6 +144,7 @@ class SACExperimentBasic(BaseExperiment):
         self.done_arrived = False
         self.custom_done_arrived = False
         self.reward_metric = 0
+        self.radii = []
 
         for i in range(self.max_amount_of_occupancy_maps):
             self.occupancy_maps.append(np.zeros((self.occupancy_map_y, self.occupancy_map_x,1)))
@@ -234,8 +237,8 @@ class SACExperimentBasic(BaseExperiment):
         """
         image_space = Dict(
             {"values": Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,-1,0]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1]),
+                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,-1,0,0,0,0,0,0,0]),
+                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             ),
             # "depth_camera": Box(
@@ -244,24 +247,24 @@ class SACExperimentBasic(BaseExperiment):
             #     shape=(84, 84, 3),
             #     dtype=np.float32
             # ),
-            "occupancyMap_now": Box(
-                low=0,
-                high=1,
-                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
-                dtype=np.float64
-            ),
+            # "occupancyMap_now": Box(
+            #     low=0,
+            #     high=1,
+            #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+            #     dtype=np.float64
+            # ),
             # "occupancyMap_05": Box(
             #     low=0,
             #     high=1,
             #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
             #     dtype=np.float64
             # ),
-            "occupancyMap_1": Box(
-                low=0,
-                high=1,
-                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
-                dtype=np.float64
-            )
+            # "occupancyMap_1": Box(
+            #     low=0,
+            #     high=1,
+            #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+            #     dtype=np.float64
+            # )
             })
         return image_space
 
@@ -365,6 +368,8 @@ class SACExperimentBasic(BaseExperiment):
             # Position
             # angle
             # collision
+
+        self.radii = get_radii(core.route[core.last_waypoint_index:],5)
 
         self.entry_idx = core.entry_spawn_point_index
         self.exit_idx = core.exit_spawn_point_index
@@ -599,6 +604,10 @@ class SACExperimentBasic(BaseExperiment):
 
         observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
+        observations.extend(self.radii)
+
+        print(f"Radii {self.radii}")
+
         self.forward_velocity.append(np.float32(forward_velocity))
         # self.forward_velocity_x.append(np.float32(forward_velocity_x))
         # self.forward_velocity_z.append(np.float32(forward_velocity_z))
@@ -627,9 +636,9 @@ class SACExperimentBasic(BaseExperiment):
 
         self.counter += 1
         return {"values":observations,
-                "occupancyMap_now":self.occupancy_maps[0] ,
+                # "occupancyMap_now":self.occupancy_maps[0] ,
                 # "occupancyMap_05":self.occupancy_maps[5] ,
-                "occupancyMap_1": self.occupancy_maps[10]
+                # "occupancyMap_1": self.occupancy_maps[10]
                 # "depth_camera":depth_camera_data
                 }, \
             {
