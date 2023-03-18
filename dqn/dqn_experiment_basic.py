@@ -602,6 +602,8 @@ class DQNExperimentBasic(BaseExperiment):
                            ]
         observations.extend(self.radii)
 
+        print(f"Radii {self.radii}")
+
         self.forward_velocity.append(np.float32(forward_velocity))
         # self.forward_velocity_x.append(np.float32(forward_velocity_x))
         # self.forward_velocity_z.append(np.float32(forward_velocity_z))
