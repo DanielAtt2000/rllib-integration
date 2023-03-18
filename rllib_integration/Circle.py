@@ -88,10 +88,10 @@ def get_radii(remaining_waypoints_on_route,no_of_points_to_calculate_chord):
                 y_center = perpendicular_bisectors[i].x_coof*x_center + perpendicular_bisectors[i].c_coof
 
 
-        r_0 = math.sqrt((x_center-perpendicular_bisectors[i].x_0)**2+(y_center-perpendicular_bisectors[i].y_0)**2)
-        r_1 = math.sqrt((x_center-perpendicular_bisectors[i+1].x_1)**2+(y_center-perpendicular_bisectors[i+1].y_1)**2)
+        r_0 = math.sqrt((x_center-perpendicular_bisectors[i].x_0)**2+(y_center-perpendicular_bisectors[i].y_0)**2)/100
+        r_1 = math.sqrt((x_center-perpendicular_bisectors[i+1].x_1)**2+(y_center-perpendicular_bisectors[i+1].y_1)**2)/100
 
-        radii.append(np.clip((r_0+r_1)/2,0,max_radius_value)/100)
+        radii.append(np.clip((r_0+r_1)/2,0,max_radius_value))
 
     if len(radii) < length_of_output_array:
         for i in range(length_of_output_array-len(radii)):
