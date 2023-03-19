@@ -36,7 +36,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.last_angle_with_center = 0
         self.last_forward_velocity = 0
         self.custom_done_arrived = False
-        self.last_action = None
+        self.last_action = [0,0,0]
         self.lidar_points_count = []
         self.reward_metric = 0
 
@@ -46,7 +46,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.counter = 0
         self.visualiseRoute = False
         self.visualiseImage = False
-        self.visualiseOccupancyGirdMap = False
+        self.visualiseOccupancyGirdMap = True
         self.counterThreshold = 10
         self.last_hyp_distance_to_next_waypoint = 0
 
@@ -179,6 +179,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.save_to_file(f"{self.directory}/trailer_collisions", self.trailer_collisions)
         self.entry_idx = -1
         self.exit_idx = -1
+        self.last_action = [0,0,0]
 
         # Saving LIDAR point count
         # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
@@ -236,8 +237,8 @@ class DQNExperimentBasic(BaseExperiment):
         """
         image_space = Dict(
             {"values": Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1]),
+                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,-1,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             ),
             # "depth_camera": Box(
@@ -246,18 +247,18 @@ class DQNExperimentBasic(BaseExperiment):
             #     shape=(84, 84, 3),
             #     dtype=np.float32
             # ),
-            # "occupancyMap_now": Box(
-            #     low=0,
-            #     high=1,
-            #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
-            #     dtype=np.float64
-            # ),
-            # "occupancyMap_05": Box(
-            #     low=0,
-            #     high=1,
-            #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
-            #     dtype=np.float64
-            # ),
+            "occupancyMap_now": Box(
+                low=0,
+                high=1,
+                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+                dtype=np.float64
+            ),
+            "occupancyMap_05": Box(
+                low=0,
+                high=1,
+                shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
+                dtype=np.float64
+            ),
             # "occupancyMap_1": Box(
             #     low=0,
             #     high=1,
@@ -341,7 +342,7 @@ class DQNExperimentBasic(BaseExperiment):
         # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
         print(f"----------------------------------->{action_msg}")
 
-        self.last_action = action
+        self.last_action = action_control
 
 
         return action
@@ -600,6 +601,9 @@ class DQNExperimentBasic(BaseExperiment):
             np.float32(angle_between_truck_and_trailer),
             # np.float32(acceleration)
                            ]
+
+        observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
+
         observations.extend(self.radii)
 
         print(f"Radii {self.radii}")
@@ -632,8 +636,8 @@ class DQNExperimentBasic(BaseExperiment):
 
         self.counter += 1
         return {"values":observations,
-                # "occupancyMap_now":self.occupancy_maps[0] ,
-                # "occupancyMap_05":self.occupancy_maps[5] ,
+                "occupancyMap_now":self.occupancy_maps[0] ,
+                "occupancyMap_05":self.occupancy_maps[5] ,
                 # "occupancyMap_1": self.occupancy_maps[10]
                 # "depth_camera":depth_camera_data
                 }, \
@@ -760,7 +764,7 @@ class DQNExperimentBasic(BaseExperiment):
         #
         #     reward = reward + reward_bearing_to_ahead_waypoints_ahead
 
-        if forward_velocity < 0.03:
+        if forward_velocity < 0.75:
             # Negative reward for no velocity
             print('REWARD -100 for velocity')
             reward = reward + -100
