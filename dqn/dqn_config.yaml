@@ -29,7 +29,7 @@ double_q: true
 dueling: true
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
-  capacity: 300000
+  capacity: 150000
   # How many steps of the model to sample before learning starts.
   # If True prioritized replay buffer will be used.
   prioritized_replay_alpha: 0.6
