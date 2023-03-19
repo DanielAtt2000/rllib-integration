@@ -74,8 +74,8 @@ class DQNExperimentBasic(BaseExperiment):
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
 
-        self.occupancy_map_x = 84
-        self.occupancy_map_y = 84
+        self.occupancy_map_x = 128
+        self.occupancy_map_y = 128
         self.max_amount_of_occupancy_maps = 11
         self.radii = []
 
