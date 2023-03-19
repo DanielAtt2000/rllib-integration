@@ -14,7 +14,7 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-directory = '../data/data_0402b71f7bf'
+directory = '../data/data_03e88cffd34'
 
 assert no_changes == True and log == False
 
