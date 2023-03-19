@@ -41,6 +41,7 @@ min_sample_timesteps_per_iteration: 10000
 
 model: {
 #  use_lstm: True,
+  grayscale: True,
   dim: 128,
   conv_filters: [
     [16, [5, 5], 2],
