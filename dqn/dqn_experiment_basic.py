@@ -537,7 +537,7 @@ class DQNExperimentBasic(BaseExperiment):
                 # print(f"AFTER {lidar_points[0][len(lidar_points) - 3]}-{lidar_points[1][len(lidar_points) - 3]}")
                 # print(f"AFTER {lidar_points[0][len(lidar_points) - 4]}-{lidar_points[1][len(lidar_points) - 4]}")
 
-                xy_resolution = 0.4
+                xy_resolution = 0.2
 
                 ox = lidar_points[0][:]
                 oy = lidar_points[1][:]
