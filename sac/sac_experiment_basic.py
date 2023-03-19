@@ -278,20 +278,20 @@ class SACExperimentBasic(BaseExperiment):
             5: [0.0, -0.75, 0.0, False, False],  # Left
             6: [0.0, -0.50, 0.0, False, False],  # Left
             7: [0.0, -0.25, 0.0, False, False],  # Left
-            8: [0.15, 0.00, 0.0, False, False],  # Straight
-            9: [0.15, 0.75, 0.0, False, False],  # Right
-            10: [0.15, 0.50, 0.0, False, False],  # Right
-            11: [0.15, 0.25, 0.0, False, False],  # Right
-            12: [0.15, -0.75, 0.0, False, False],  # Left
-            13: [0.15, -0.50, 0.0, False, False],  # Left
-            14: [0.15, -0.25, 0.0, False, False],  # Left
-            15: [0.3, 0.00, 0.0, False, False],  # Straight
-            16: [0.3, 0.75, 0.0, False, False],  # Right
-            17: [0.3, 0.50, 0.0, False, False],  # Right
-            18: [0.3, 0.25, 0.0, False, False],  # Right
-            19: [0.3, -0.75, 0.0, False, False],  # Left
-            20: [0.3, -0.50, 0.0, False, False],  # Left
-            21: [0.3, -0.25, 0.0, False, False],  # Left
+            8: [0.2, 0.00, 0.0, False, False],  # Straight
+            9: [0.2, 0.75, 0.0, False, False],  # Right
+            10: [0.2, 0.50, 0.0, False, False],  # Right
+            11: [0.2, 0.25, 0.0, False, False],  # Right
+            12: [0.2, -0.75, 0.0, False, False],  # Left
+            13: [0.2, -0.50, 0.0, False, False],  # Left
+            14: [0.2, -0.25, 0.0, False, False],  # Left
+            15: [0.4, 0.00, 0.0, False, False],  # Straight
+            16: [0.4, 0.75, 0.0, False, False],  # Right
+            17: [0.4, 0.50, 0.0, False, False],  # Right
+            18: [0.4, 0.25, 0.0, False, False],  # Right
+            19: [0.4, -0.75, 0.0, False, False],  # Left
+            20: [0.4, -0.50, 0.0, False, False],  # Left
+            21: [0.4, -0.25, 0.0, False, False],  # Left
             22: [0.7, 0.00, 0.0, False, False],  # Straight
             23: [0.7, 0.75, 0.0, False, False],  # Right
             24: [0.7, 0.50, 0.0, False, False],  # Right
