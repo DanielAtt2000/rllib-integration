@@ -782,7 +782,7 @@ class SACExperimentBasic(BaseExperiment):
         #
         #     reward = reward + reward_bearing_to_ahead_waypoints_ahead
 
-        if forward_velocity < 0.03:
+        if forward_velocity < 0.04:
             # Negative reward for no velocity
             print('REWARD -100 for velocity')
             reward = reward + -100
