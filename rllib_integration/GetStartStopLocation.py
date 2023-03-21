@@ -131,6 +131,7 @@ roundabouts = [spawn_points_2_lane_roundabout_small]
 def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):
     entry_spawn_point_index = -1
     exit_spawn_point_index = -1
+    random.seed(5455)
 
 
     while entry_spawn_point_index in failed_spawn_locations:
