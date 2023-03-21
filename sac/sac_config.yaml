@@ -35,19 +35,20 @@ store_buffer_in_checkpoints: False
 num_steps_sampled_before_learning_starts: 10000
 train_batch_size: 64
 min_sample_timesteps_per_iteration: 4
+lr:  0.001
 # Paper uses 20k random timesteps, which is not exactly the same, but
 # seems to work nevertheless. We use 100k here for the longer Atari
 # runs (DQN style: filling up the buffer a bit before learning).
 optimization:
-    actor_learning_rate: 0.0003
-    critic_learning_rate: 0.0003
-    entropy_learning_rate: 0.0003
+    actor_learning_rate: 0.001
+    critic_learning_rate: 0.001
+    entropy_learning_rate: 0.001
 
 "exploration_config": {
-  "type": "EpsilonGreedy",
-  "initial_epsilon": 1.0,
-   "final_epsilon": 0.01,
-   "epsilon_timesteps": 500000
+  "type": "Curiosity",
+#  "initial_epsilon": 1.0,
+#   "final_epsilon": 0.01,
+#   "epsilon_timesteps": 400000
 }
 #num_workers: 1
 #num_gpus: 1
