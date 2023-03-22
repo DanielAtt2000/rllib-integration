@@ -49,14 +49,6 @@ def run(args):
                  # queue_trials=True,
                  resume=False,
                  reuse_actors=True,
-                 stop={"training_iteration": 100},
-                 scheduler = ASHAScheduler(
-                    metric="difficult_custom_done_arrived_mean",
-                    mode="mean",
-                    max_t=100,
-                    grace_period=10,
-                    reduction_factor=2)
-                )
 
     finally:
         kill_all_servers()
@@ -119,7 +111,7 @@ def main():
                        host="localhost")
 
     specific_version = False
-    check_commit = False
+    check_commit = True
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())
