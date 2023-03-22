@@ -28,7 +28,6 @@ from rllib_integration.helper import get_checkpoint, launch_tensorboard
 from sac.sac_experiment_basic import SACExperimentBasic
 from sac.sac_callbacks import SACCallbacks
 from sac.sac_trainer import CustomSACTrainer
-from tune.schedulers import ASHAScheduler
 
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
 EXPERIMENT_CLASS = SACExperimentBasic
