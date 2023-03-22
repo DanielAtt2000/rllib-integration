@@ -49,6 +49,7 @@ def run(args):
                  # queue_trials=True,
                  resume=False,
                  reuse_actors=True,
+                 )
 
     finally:
         kill_all_servers()
