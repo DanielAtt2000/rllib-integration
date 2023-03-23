@@ -17,12 +17,12 @@ recreate_failed_workers: True
 # Do hard syncs.
 # Soft-syncs seem to work less reliably for discrete action spaces.
 tau: 1.0
-target_network_update_freq: 8000
+#target_network_update_freq: 8000
 # auto = 0.98 * -log(1/|A|)
 target_entropy: auto
 clip_rewards: False
 n_step: 1
-rollout_fragment_length: 1
+#rollout_fragment_length: 1
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
   capacity: 400000
@@ -32,9 +32,9 @@ replay_buffer_config:
   prioritized_replay_beta: 0.4
   prioritized_replay_eps: 0.000001
 store_buffer_in_checkpoints: False
-num_steps_sampled_before_learning_starts: 10000
+#num_steps_sampled_before_learning_starts: 10000
 train_batch_size: 64
-min_sample_timesteps_per_iteration: 4
+#min_sample_timesteps_per_iteration: 4
 lr:  0.00005
 # Paper uses 20k random timesteps, which is not exactly the same, but
 # seems to work nevertheless. We use 100k here for the longer Atari
