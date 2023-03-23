@@ -7,6 +7,7 @@ def check_with_user(check_commit):
     verify_num = random.randint(0,100)
     print('=========================================')
     print(verify_num)
+    print('§§§§§§§§§ Is the reset program on ? §§§§§§§')
     print('Any observations in Rewards were checked?')
     print('Using the latest version of the experiment?')
     print('=========================================')
