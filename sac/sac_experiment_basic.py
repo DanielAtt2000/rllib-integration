@@ -235,12 +235,8 @@ class SACExperimentBasic(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
-        image_space = Dict(
-            {"values": Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,-1,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1]),
-                dtype=np.float32
-            ),
+        # image_space = Dict(
+        #     {"values":
             # "depth_camera": Box(
             #     low=0,
             #     high=256,
@@ -265,8 +261,12 @@ class SACExperimentBasic(BaseExperiment):
             #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
             #     dtype=np.float64
             # )
-            })
-        return image_space
+            # })
+        return Box(
+                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,-1,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                dtype=np.float32
+            )
 
     def get_actions(self):
         return {
@@ -653,16 +653,7 @@ class SACExperimentBasic(BaseExperiment):
         # print(f"acceleration:{np.float32(acceleration)}")
 
         self.counter += 1
-        return {"values":observations,
-                # "occupancyMap_now":self.occupancy_maps[0] ,
-                # "occupancyMap_05":self.occupancy_maps[5] ,
-                # "occupancyMap_1": self.occupancy_maps[10]
-                # "depth_camera":depth_camera_data
-                }, \
-            {
-                # "occupancy_map":occupancy_map,
-            # "depth_camera":depth_camera_data
-             }
+        return observations,{}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -747,12 +738,12 @@ class SACExperimentBasic(BaseExperiment):
 
         reward = 0
 
-        forward_velocity = observation["values"][0]
-        hyp_distance_to_next_waypoint = observation["values"][1]
+        forward_velocity = observation[0]
+        hyp_distance_to_next_waypoint = observation[1]
 
-        bearing_to_waypoint = observation["values"][4]
-        bearing_to_ahead_waypoints_ahead = observation["values"][5]
-        angle_between_truck_and_trailer = observation["values"][6]
+        # bearing_to_waypoint = observation["values"][4]
+        # bearing_to_ahead_waypoints_ahead = observation["values"][5]
+        # angle_between_truck_and_trailer = observation["values"][6]
 
 
         self.last_forward_velocity = forward_velocity
