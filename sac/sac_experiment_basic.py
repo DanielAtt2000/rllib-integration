@@ -235,6 +235,7 @@ class SACExperimentBasic(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
+        # test
         # image_space = Dict(
         #     {"values":
             # "depth_camera": Box(
