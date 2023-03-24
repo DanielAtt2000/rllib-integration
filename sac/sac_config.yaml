@@ -7,10 +7,10 @@ gamma: 0.99
 twin_q: True
 q_model_config:
     hidden_activation: relu
-    hidden_layer_sizes: [256,512]
+    hidden_layer_sizes: [128,256,512,1024]
 policy_model_config:
     hidden_activation: relu
-    hidden_layer_sizes: [256,512]
+    hidden_layer_sizes: [128,256,512,1024]
 
 
 recreate_failed_workers: True
