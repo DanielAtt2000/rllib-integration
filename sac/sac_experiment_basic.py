@@ -646,7 +646,7 @@ class SACExperimentBasic(BaseExperiment):
         # print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
         # print(f"bearing_to_ahead_waypoints_ahead:{np.float32(bearing_to_ahead_waypoints_ahead)}")
         # print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
-        # print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
+        print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
         print(f"forward_velocity:{np.float32(forward_velocity)}")
         # print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
         # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
@@ -741,6 +741,8 @@ class SACExperimentBasic(BaseExperiment):
 
         forward_velocity = observation[0]
         hyp_distance_to_next_waypoint = observation[1]
+        print(f"in rewards forward_velocity {forward_velocity}")
+        print(f"in rewards hyp_distance_to_next_waypoint {hyp_distance_to_next_waypoint}")
 
         # bearing_to_waypoint = observation["values"][4]
         # bearing_to_ahead_waypoints_ahead = observation["values"][5]
