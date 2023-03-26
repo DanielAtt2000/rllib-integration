@@ -21,7 +21,7 @@ target_network_update_freq: 8000
 # auto = 0.98 * -log(1/|A|)
 target_entropy: auto
 clip_rewards: False
-n_step: 1
+n_step: 20
 #rollout_fragment_length: 1
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
