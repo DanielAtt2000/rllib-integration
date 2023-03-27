@@ -21,7 +21,7 @@ target_network_update_freq: 8000
 # auto = 0.98 * -log(1/|A|)
 target_entropy: auto
 clip_rewards: False
-n_step: 20
+n_step: 1
 #rollout_fragment_length: 1
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
@@ -42,12 +42,13 @@ optimization:
     actor_learning_rate: 0.00005
     critic_learning_rate: 0.00005
     entropy_learning_rate: 0.00005
-
+#normalize_actions: False
 "exploration_config": {
-  "type": "EpsilonGreedy",
-  "initial_epsilon": 1.0,
-  "final_epsilon": 0.01,
-  "epsilon_timesteps": 500000
+  "type": "StochasticSampling",
+#  "sub_exploration": "EpsilonGreedy"
+#  "initial_epsilon": 1.0,
+#  "final_epsilon": 0.01,
+#  "epsilon_timesteps": 500000
 }
 #num_workers: 1
 #num_gpus: 1
