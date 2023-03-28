@@ -42,13 +42,12 @@ optimization:
     actor_learning_rate: 0.00005
     critic_learning_rate: 0.00005
     entropy_learning_rate: 0.00005
-#normalize_actions: False
+normalize_actions: False
 "exploration_config": {
-  "type": "StochasticSampling",
-#  "sub_exploration": "EpsilonGreedy"
-#  "initial_epsilon": 1.0,
-#  "final_epsilon": 0.01,
-#  "epsilon_timesteps": 500000
+  "type": "EpsilonGreedy",
+  "initial_epsilon": 1.0,
+  "final_epsilon": 0.01,
+  "epsilon_timesteps": 500000
 }
 #num_workers: 1
 #num_gpus: 1
