@@ -32,8 +32,9 @@ from dqn.dqn_trainer import CustomDQNTrainer
 
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
 EXPERIMENT_CLASS = DQNExperimentBasic
-
-
+from ray.tune.schedulers import AsyncHyperBandScheduler
+from ray.tune.search.hyperopt import HyperOptSearch
+from hyperopt import hp
 def run(args):
     try:
         os.environ['RAY_DISABLE_MEMORY_MONITOR'] = '1'
@@ -112,7 +113,7 @@ def main():
     launch_tensorboard(logdir= path,
                        host="localhost")
 
-    specific_version = True
+    specific_version = False
     check_commit = False
 
     if check_with_user(check_commit):
