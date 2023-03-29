@@ -46,7 +46,7 @@ def run(args):
 
 
         # Stop when we've either reached 100 training iterations or reward=300
-        # stopping_criteria = {"training_iteration": 1, "episode_reward_mean": 300}
+        stopping_criteria = {"training_iteration": 60}
 
         # initial_params = [
         #     {"lr": 1, "height": 2, "activation": "relu"},
@@ -208,7 +208,7 @@ def run(args):
                 }
 
             },
-            # run_config=air.RunConfig(stop=stopping_criteria),
+            run_config=air.RunConfig(stop=stopping_criteria),
         )
         results = tuner.fit()
 
