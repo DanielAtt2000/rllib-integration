@@ -1,0 +1,181 @@
+ 'env_task_fn': None
+ 'render_env': False
+ 'clip_rewards': None
+ 'normalize_actions': False
+ 'clip_actions': False'
+ disable_env_checking': False
+ 'is_atari': False
+ 'auto_wrap_old_gym_envs': True
+ 'num_envs_per_worker': 1
+'sample_collector': <class 'ray.rllib.evaluation.collectors.simple_list_collector.SimpleListCollector'>
+'sample_async': False
+'enable_connectors': True
+'rollout_fragment_length': 4
+'batch_mode': 'truncate_episodes'
+'remote_worker_envs': False
+'remote_env_batch_wait_ms': 0
+'validate_workers_after_construction': True
+'ignore_worker_failures': False
+'recreate_failed_workers': True
+'restart_failed_sub_environments': False
+'num_consecutive_worker_failures_tolerance': 100
+'preprocessor_pref': 'deepmind'
+'observation_filter': 'NoFilter'
+'synchronize_filters': True
+'compress_observations': False
+'enable_tf1_exec_eagerly': False
+'sampler_perf_stats_ema_coef': None
+'worker_health_probe_timeout_s': 60
+'worker_restore_timeout_s': 1800
+'gamma': 0.99
+'lr': 6.25e-05
+'train_batch_size': 32
+'model': {'_disable_preprocessor_api': False
+'_disable_action_flattening': False
+'fcnet_hiddens': [256
+256]
+'fcnet_activation': 'tanh'
+'conv_filters': None
+'conv_activation': 'relu'
+'post_fcnet_hiddens': []
+'post_fcnet_activation': 'relu'
+'free_log_std': False
+'no_final_linear': False
+'vf_share_layers': True
+'use_lstm': False
+'max_seq_len': 20
+'lstm_cell_size': 256
+'lstm_use_prev_action': False
+'lstm_use_prev_reward': False
+'_time_major': False
+'use_attention': False
+'attention_num_transformer_units': 1
+'attention_dim': 64
+'attention_num_heads': 1
+'attention_head_dim': 32
+'attention_memory_inference': 50
+'attention_memory_training': 50
+'attention_position_wise_mlp_dim': 32
+'attention_init_gru_gate_bias': 2.0
+'attention_use_n_prev_actions': 0
+'attention_use_n_prev_rewards': 0
+'framestack': True
+'dim': 84
+'grayscale': False
+'zero_mean': True
+'custom_model': None
+'custom_model_config': {}
+'custom_action_dist': None
+'custom_preprocessor': None
+'lstm_use_prev_action_reward': -1
+'_use_default_native_models': -1}
+'optimizer': {}
+'max_requests_in_flight_per_sampler_worker': 2
+'rl_trainer_class': None
+'_enable_rl_trainer_api': False
+'_rl_trainer_hps': RLTrainerHPs()
+'explore': True
+'exploration_config': {'type': 'EpsilonGreedy'
+'initial_epsilon': 1.0
+'final_epsilon': 0.01
+'epsilon_timesteps': 500000}
+'policies': {'default_policy': <ray.rllib.policy.policy.PolicySpec object at 0x7f01f8292280>}
+'policy_states_are_swappable': False
+'input_config': {}
+'actions_in_input_normalized': False
+'postprocess_inputs': False
+'shuffle_buffer_size': 0
+'output': None
+'output_config': {}
+'output_compress_columns': ['obs'
+'new_obs']
+'output_max_file_size': 67108864
+'offline_sampling': False
+'evaluation_interval': None
+'evaluation_duration': 10
+'evaluation_duration_unit': 'episodes'
+'evaluation_sample_timeout_s': 180.0
+'evaluation_parallel_to_training': False
+'evaluation_config': {'explore': False}
+'off_policy_estimation_methods': {}
+'ope_split_batch_by_episode': True
+'evaluation_num_workers': 0
+'always_attach_evaluation_results': False
+'enable_async_evaluation': False
+'in_evaluation': False
+'sync_filters_on_rollout_workers_timeout_s': 60.0
+'keep_per_episode_custom_metrics': False
+'metrics_episode_collection_timeout_s': 60.0
+'metrics_num_episodes_for_smoothing': 100
+'min_time_s_per_iteration': None
+'min_train_timesteps_per_iteration': 0
+'min_sample_timesteps_per_iteration': 10000
+'export_native_model_files': False
+'checkpoint_trainable_policies_only': False
+'logger_creator': None
+'logger_config': None
+'log_level': 'WARN'
+'log_sys_usage': True
+'fake_sampler': False
+'seed': None
+'worker_cls': None
+'rl_module_class': None
+'_enable_rl_module_api': False
+'_tf_policy_handles_more_than_one_loss': False
+'_disable_preprocessor_api': False
+'_disable_action_flattening': False
+'_disable_execution_plan_api': True
+'simple_optimizer': False
+'replay_sequence_length': None
+'horizon': 6500
+'soft_horizon': -1
+'no_done_at_end': -1
+'target_network_update_freq': 8000
+'replay_buffer_config': {'type': <class 'ray.rllib.utils.replay_buffers.multi_agent_prioritized_replay_buffer.MultiAgentPrioritizedReplayBuffer'>
+'prioritized_replay': -1
+'capacity': 400000
+'prioritized_replay_alpha': 0.6
+'prioritized_replay_beta': 0.4
+'prioritized_replay_eps': 1e-06
+'replay_sequence_length': 1
+'worker_side_prioritization': False}
+'num_steps_sampled_before_learning_starts': 1000
+'store_buffer_in_checkpoints': False
+'lr_schedule': None
+'adam_epsilon': 0.00015
+'grad_clip': 40
+'tau': 1.0
+'num_atoms': 51
+'v_min': -10.0
+'v_max': 10.0
+'noisy': False
+'sigma0': 0.5
+'dueling': True
+'hiddens': [256]
+'double_q': True
+'n_step': 1
+'before_learn_on_batch': None
+'training_intensity': None
+'td_error_loss_fn': 'huber'
+'categorical_distribution_temperature': 1.0
+'__stdout_file__': None
+'__stderr_file__': None
+'input': 'sampler'
+'multiagent': {'policies': {'default_policy': (None
+None
+None
+None)}
+'policy_mapping_fn': <function AlgorithmConfig.__init__.<locals>.<lambda> at 0x7f01f828e550>
+'policies_to_train': None
+'policy_map_capacity': 100
+'policy_map_cache': -1
+'count_steps_by': 'env_steps'
+'observation_fn': None}
+'callbacks': <class 'dqn.dqn_callbacks.DQNCallbacks'>
+'create_env_on_driver': False
+'custom_eval_function': None
+'framework': 'torch'
+'num_cpus_for_driver': 1
+'num_workers': 1}
+Result logdir: /home/daniel/ray_results/CustomDQNTrainer_2023-03-29_13-31-32
+Number of trials: 1/1 (1 RUNNING)

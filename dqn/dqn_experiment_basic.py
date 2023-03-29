@@ -10,7 +10,8 @@ from git import Repo
 
 import math
 import numpy as np
-from gym.spaces import Box, Discrete, Dict, Tuple
+from gymnasium.spaces import Discrete, Box
+# from gym.spaces import Box, Discrete, Dict, Tuple
 import warnings
 import carla
 import os
@@ -74,8 +75,8 @@ class DQNExperimentBasic(BaseExperiment):
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
 
-        self.occupancy_map_x = 128
-        self.occupancy_map_y = 128
+        self.occupancy_map_x = 84
+        self.occupancy_map_y = 84
         self.max_amount_of_occupancy_maps = 11
         self.radii = []
 
@@ -235,12 +236,9 @@ class DQNExperimentBasic(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
-        image_space = Dict(
-            {"values": Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,-1,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1]),
-                dtype=np.float32
-            ),
+        # test
+        # image_space = Dict(
+        #     {"values":
             # "depth_camera": Box(
             #     low=0,
             #     high=256,
@@ -265,8 +263,12 @@ class DQNExperimentBasic(BaseExperiment):
             #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
             #     dtype=np.float64
             # )
-            })
-        return image_space
+            # })
+        return Box(
+                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,-1,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                dtype=np.float32
+            )
 
     def get_actions(self):
         return {
@@ -299,6 +301,24 @@ class DQNExperimentBasic(BaseExperiment):
             26: [0.7, -0.75, 0.0, False, False],  # Left
             27: [0.7, -0.50, 0.0, False, False],  # Left
             28: [0.7, -0.25, 0.0, False, False],  # Left
+            # 11: [0.15, 0.25, 0.0, False, False],  # Right
+            # 12: [0.15, -0.75, 0.0, False, False],  # Left
+            # 13: [0.15, -0.50, 0.0, False, False],  # Left
+            # 14: [0.15, -0.25, 0.0, False, False],  # Left
+            # 15: [0.3, 0.00, 0.0, False, False],  # Straight
+            # 16: [0.3, 0.75, 0.0, False, False],  # Right
+            # 17: [0.3, 0.50, 0.0, False, False],  # Right
+            # 18: [0.3, 0.25, 0.0, False, False],  # Right
+            # 19: [0.3, -0.75, 0.0, False, False],  # Left
+            # 20: [0.3, -0.50, 0.0, False, False],  # Left
+            # 21: [0.3, -0.25, 0.0, False, False],  # Left
+            # 22: [0.7, 0.00, 0.0, False, False],  # Straight
+            # 23: [0.7, 0.75, 0.0, False, False],  # Right
+            # 24: [0.7, 0.50, 0.0, False, False],  # Right
+            # 25: [0.7, 0.25, 0.0, False, False],  # Right
+            # 26: [0.7, -0.75, 0.0, False, False],  # Left
+            # 27: [0.7, -0.50, 0.0, False, False],  # Left
+            # 28: [0.7, -0.25, 0.0, False, False],  # Left
             # 29: [1.0, 0.00, 0.0, False, False],  # Straight
             # 30: [1.0, 0.75, 0.0, False, False],  # Right
             # 31: [1.0, 0.50, 0.0, False, False],  # Right
@@ -424,6 +444,7 @@ class DQNExperimentBasic(BaseExperiment):
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
         y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y - truck_transform.location.y)
         hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
+        hyp_distance_to_next_waypoint = np.clip(hyp_distance_to_next_waypoint,0,100)
 
         bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
 
@@ -558,7 +579,7 @@ class DQNExperimentBasic(BaseExperiment):
                         # plt.figure()
                         f, axarr = plt.subplots(1, 2)
                         axarr[0].imshow(self.occupancy_maps[0])
-                        axarr[1].imshow(self.occupancy_maps[5])
+                        axarr[1].imshow(self.occupancy_maps[10])
                         # axarr[1].imshow(self.occupancy_maps[10])
                         xy_res = np.array(current_occupancy_map).shape
                         # plt.imshow(occupancy_map, cmap="PiYG_r")
@@ -628,23 +649,14 @@ class DQNExperimentBasic(BaseExperiment):
         # print(f"bearing_to_ahead_waypoints_ahead:{np.float32(bearing_to_ahead_waypoints_ahead)}")
         # print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
         # print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
-        # # print(f"forward_velocity:{np.float32(forward_velocity)}")
+        # print(f"forward_velocity:{np.float32(forward_velocity)}")
         # print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
         # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
         # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         # print(f"acceleration:{np.float32(acceleration)}")
 
         self.counter += 1
-        return {"values":observations,
-                # "occupancyMap_now":self.occupancy_maps[0] ,
-                # "occupancyMap_05":self.occupancy_maps[5] ,
-                # "occupancyMap_1": self.occupancy_maps[10]
-                # "depth_camera":depth_camera_data
-                }, \
-            {
-                # "occupancy_map":occupancy_map,
-            # "depth_camera":depth_camera_data
-             }
+        return observations,{}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -729,12 +741,14 @@ class DQNExperimentBasic(BaseExperiment):
 
         reward = 0
 
-        forward_velocity = observation["values"][0]
-        hyp_distance_to_next_waypoint = observation["values"][1]
+        forward_velocity = observation[0]
+        hyp_distance_to_next_waypoint = observation[1]
+        # print(f"in rewards forward_velocity {forward_velocity}")
+        # print(f"in rewards hyp_distance_to_next_waypoint {hyp_distance_to_next_waypoint}")
 
-        bearing_to_waypoint = observation["values"][4]
-        bearing_to_ahead_waypoints_ahead = observation["values"][5]
-        angle_between_truck_and_trailer = observation["values"][6]
+        # bearing_to_waypoint = observation["values"][4]
+        # bearing_to_ahead_waypoints_ahead = observation["values"][5]
+        # angle_between_truck_and_trailer = observation["values"][6]
 
 
         self.last_forward_velocity = forward_velocity

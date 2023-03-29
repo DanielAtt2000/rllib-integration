@@ -5,17 +5,21 @@ num_workers: 1
 num_gpus: 1
 #num_gpus_per_worker: 1
 num_cpus_per_worker: 11
-rollout_fragment_length: 4
+recreate_failed_workers: True
 #timesteps_per_iteration: 20000
+horizon: 6500
+
+
+rollout_fragment_length: 4
+target_network_update_freq: 8000
+normalize_actions: False
+
+# "batch_mode": "complete_episodes"
 train_batch_size: 32
 num_steps_sampled_before_learning_starts: 10000
-recreate_failed_workers: True
-
-horizon: 6500
 n_step: 1
 num_atoms: 51
 noisy: False
-# "batch_mode": "complete_episodes"
 gamma: 0.99
 "exploration_config": {
   "type": "EpsilonGreedy",
@@ -23,13 +27,9 @@ gamma: 0.99
    "final_epsilon": 0.01,
    "epsilon_timesteps": 500000
 }
-target_network_update_freq: 8000
-
-double_q: true
-dueling: true
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
-  capacity: 150000
+  capacity: 400000
   # How many steps of the model to sample before learning starts.
   # If True prioritized replay buffer will be used.
   prioritized_replay_alpha: 0.6
@@ -38,6 +38,11 @@ replay_buffer_config:
 lr: .0000625
 adam_epsilon: .00015
 min_sample_timesteps_per_iteration: 10000
+
+
+
+double_q: true
+dueling: true
 
 #model: {
 ##  use_lstm: True,
