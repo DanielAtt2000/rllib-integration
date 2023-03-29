@@ -71,6 +71,8 @@ def run(args):
             ),
 
             param_space={
+                 "name": args.name,
+                 "local_dir":args.directory,
                 # To see the complete list of configurable parameters see:
                 # https://github.com/ray-project/ray/blob/master/rllib/agents/trainer.py
                 "framework": "torch",
