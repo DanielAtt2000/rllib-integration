@@ -219,6 +219,10 @@ def run(args):
         best_result = results.get_best_result()
         print("Best hyperparameters found were: ", results.get_best_result().config)
 
+        df = results.get_dataframe()
+        print(df)
+
+
         print("\nBest performing trial's final reported metrics:\n")
 
         metrics_to_print = [
@@ -228,7 +232,7 @@ def run(args):
             "episode_len_mean",
         ]
         pprint.pprint({k: v for k, v in best_result.metrics.items() if k in metrics_to_print})
-
+        print(df.to_markdown())
         # tune.run(CustomDQNTrainer,
         #          name=args.name,
         #          local_dir=args.directory,
