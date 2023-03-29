@@ -118,7 +118,7 @@ def run(args):
                     "prioritized_replay_eps": 0.000001 ,
 
                 },
-                "hiddens": [128,256,512],
+                "hiddens": [128,256,512,1024],
                 "lr": tune.choice([0.005, 0.0005, 0.00005,0.000005]),
                 # "adam_epsilon": .00015,
                 "min_sample_timesteps_per_iteration": 10000,
