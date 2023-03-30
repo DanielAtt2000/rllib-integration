@@ -67,8 +67,9 @@ def run(args):
                 mode="max",
                 search_alg = algo,
                 scheduler=sch,
-                num_samples=1,
+                num_samples=15,
             ),
+
 
             param_space={
                  "name": args.name,
@@ -121,7 +122,7 @@ def run(args):
                 "model": {
                     "fcnet_hiddens":[128,256,512,1024]
                 },
-                "lr": tune.choice([0.005, 0.0005, 0.00005,0.000005]),
+                "lr": tune.choice([0.0005, 0.00005,0.000005]),
                 # "adam_epsilon": .00015,
                 "min_sample_timesteps_per_iteration": 10000,
                 "num_steps_sampled_before_learning_starts": 10000,
@@ -213,7 +214,11 @@ def run(args):
                 }
 
             },
-            run_config=air.RunConfig(stop=stopping_criteria),
+            run_config=air.RunConfig(
+                 name=args.name,
+                 local_dir=args.directory,
+                stop=stopping_criteria,
+                checkpoint_config=air.CheckpointConfig(checkpoint_frequency=1)),
         )
         results = tuner.fit()
 
