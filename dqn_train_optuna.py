@@ -70,7 +70,6 @@ def run(args):
                 scheduler=sch,
                 num_samples=15,
             ),
-            max_failures=-1,
             param_space={
                  "name": args.name,
                  "local_dir":args.directory,
