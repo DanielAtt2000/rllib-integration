@@ -68,9 +68,9 @@ def run(args):
                 search_alg = algo,
                 scheduler=sch,
                 num_samples=15,
+                max_failures=-1,
             ),
-
-
+            max_failures=-1,
             param_space={
                  "name": args.name,
                  "local_dir":args.directory,
@@ -218,6 +218,7 @@ def run(args):
                  name=args.name,
                  local_dir=args.directory,
                 stop=stopping_criteria,
+                max_failures=-1,
                 checkpoint_config=air.CheckpointConfig(checkpoint_frequency=1)),
         )
         results = tuner.fit()
