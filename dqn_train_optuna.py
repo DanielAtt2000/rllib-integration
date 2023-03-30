@@ -68,7 +68,6 @@ def run(args):
                 search_alg = algo,
                 scheduler=sch,
                 num_samples=15,
-                max_failures=-1,
             ),
             max_failures=-1,
             param_space={
