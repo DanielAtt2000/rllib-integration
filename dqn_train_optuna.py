@@ -240,6 +240,10 @@ def run(args):
             "episode_len_mean",
         ]
         pprint.pprint({k: v for k, v in best_result.metrics.items() if k in metrics_to_print})
+
+        file = open("results_dataframes/" + args.name + '_' + str(commit_hash()) + '.md','w')
+        file.write(df.to_markdown())
+        file.close()
         print(df.to_markdown())
         # tune.run(CustomDQNTrainer,
         #          name=args.name,
