@@ -217,8 +217,8 @@ def run(args):
                  name=args.name,
                  local_dir=args.directory,
                 stop=stopping_criteria,
-                checkpoint_config=air.CheckpointConfig(checkpoint_frequency=1)),
-                failure_config=FailureConfig( max_failures=-1)
+                checkpoint_config=air.CheckpointConfig(checkpoint_frequency=1),
+                failure_config=FailureConfig( max_failures=-1)),
         )
         results = tuner.fit()
 
