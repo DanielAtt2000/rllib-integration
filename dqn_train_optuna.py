@@ -21,6 +21,7 @@ import numpy as np
 import gymnasium as gym
 import math
 
+from ray.air import FailureConfig
 from ray.tune.search import ConcurrencyLimiter
 from ray.tune.search.optuna import OptunaSearch
 
@@ -218,6 +219,7 @@ def run(args):
                  local_dir=args.directory,
                 stop=stopping_criteria,
                 checkpoint_config=air.CheckpointConfig(checkpoint_frequency=1)),
+                failure_config=FailureConfig( max_failures=-1)
         )
         results = tuner.fit()
 
