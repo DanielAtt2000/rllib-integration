@@ -113,7 +113,7 @@ def run(args):
                     "capacity": 400000,
                     # How many steps of the model to sample before learning starts.
                     # If True prioritized replay buffer will be used.
-                    "prioritized_replay" : tune.choice([True, False]),
+                    # "prioritized_replay" : tune.choice([True, False]),
                     "prioritized_replay_alpha": 0.6,
                     "prioritized_replay_beta": 0.4,
                     "prioritized_replay_eps": 0.000001 ,
