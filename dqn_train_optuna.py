@@ -69,6 +69,7 @@ def run(args):
                 search_alg = algo,
                 scheduler=sch,
                 num_samples=15,
+                reuse_actors=True,
             ),
             param_space={
                  "name": args.name,

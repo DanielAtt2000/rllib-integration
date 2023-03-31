@@ -185,14 +185,21 @@ class CarlaCore:
             try:
                 print(f"Trying to set up client {i+1} time")
                 self.client.set_timeout(self.config["timeout"])
+                time.sleep(0.2)
                 self.world = self.client.get_world()
-
+                time.sleep(0.2)
                 settings = self.world.get_settings()
+                time.sleep(0.2)
                 settings.no_rendering_mode = not self.config["enable_rendering"]
+                time.sleep(0.2)
                 settings.synchronous_mode = True
+                time.sleep(0.2)
                 settings.fixed_delta_seconds = self.config["timestep"]
+                time.sleep(0.2)
                 self.world.apply_settings(settings)
+                time.sleep(0.5)
                 self.world.tick()
+                time.sleep(0.5)
                 return
 
             except Exception as e:
