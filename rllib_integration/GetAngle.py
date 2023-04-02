@@ -1,4 +1,6 @@
 import math
+import warnings
+
 
 def calculate_angle_with_center_of_lane(previous_position, current_position, next_position):
     Vl_x = current_position.x - previous_position.x
@@ -10,7 +12,11 @@ def calculate_angle_with_center_of_lane(previous_position, current_position, nex
     enumerator = (Vl_x * Vj_x) + (Vl_y * Vj_y)
     denominator = math.sqrt(math.pow(Vl_x, 2) + math.pow(Vl_y, 2)) * math.sqrt(math.pow(Vj_x, 2) + math.pow(Vj_y, 2))
 
-    angle_rad = math.acos(enumerator / denominator)
+    temp = enumerator / denominator
+    if temp > 1 or temp < -1:
+        temp = np.clip(temp,-1,1)
+        warnings.warn(f'WARNING value of {temp} clipped to {np.clip(temp,-1,1)} ')
+    angle_rad = math.acos(temp)
     # angle_deg = angle_rad* 180/math.pi
 
     #

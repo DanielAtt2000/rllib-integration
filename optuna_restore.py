@@ -1,5 +1,5 @@
 from ray.tune import Tuner
-path = "/home/daniel/ray_results/carla_rllib/dqn_7c96af36cf"
+path = "/home/daniel/ray_results/carla_rllib/dqn_2da119f7bc"
 
 tuner = Tuner.restore(
     path=path,
@@ -28,7 +28,15 @@ metrics_to_print = [
 ]
 pprint.pprint({k: v for k, v in best_result.metrics.items() if k in metrics_to_print})
 
-file = open("results_dataframes/" + path.split('/')[-1] + '.md','w')
+from datetime import datetime
+
+# datetime object containing current date and time
+now = datetime.now()
+
+# dd/mm/YY H:M:S
+dt_string = now.strftime("%d%m%Y_%H%M%S")
+
+file = open("results_dataframes/" + path.split('/')[-1] + '_' + str(dt_string) + '.md','w')
 file.write(df.to_markdown())
 file.close()
 print(df.to_markdown())

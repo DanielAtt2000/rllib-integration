@@ -18,7 +18,7 @@ import yaml
 import ray
 from ray import tune, air
 import numpy as np
-import gymnasium as gym
+import gym
 import math
 
 from ray.air import FailureConfig
@@ -54,24 +54,40 @@ def run(args):
         #     {"width": 4, "height": 2, "activation": "relu"},
         # ]
 
-        algo = OptunaSearch()
-        algo = ConcurrencyLimiter(algo,max_concurrent=1)
 
-        sch = AsyncHyperBandScheduler(
-            # metric = "episode_reward_mean", mode="max"
-        )
 
-        tuner = tune.Tuner(
-            CustomDQNTrainer,
-            tune_config=tune.TuneConfig(
-                metric="episode_reward_mean",
-                mode="max",
-                search_alg = algo,
-                scheduler=sch,
-                num_samples=15,
-                reuse_actors=True,
-            ),
-            param_space={
+        # sch = AsyncHyperBandScheduler(
+        #     # metric = "episode_reward_mean", mode="max"
+        # )
+
+        def define_by_run_func(trial):
+            """Define-by-run function to create the search space.
+
+            Ensure no actual computation takes place here. That should go into
+            the trainable passed to ``Tuner()`` (in this example, that's
+            ``objective``).
+
+            For more information, see https://optuna.readthedocs.io/en/stable\
+            /tutorial/10_key_features/002_configurations.html
+
+            This function should either return None or a dict with constant values.
+            """
+
+            lr = trial.suggest_categorical("lr", [0.0005, 0.00005,0.000005])
+            train_batch_size = trial.suggest_categorical("train_batch_size", [32,64,128])
+            noisy = trial.suggest_categorical("noisy", [True, False])
+            num_atoms = trial.suggest_categorical("num_atoms", [5, 15,25])
+            n_step = trial.suggest_int("n_step", 1,11)
+
+            while lr == 0.000005 and train_batch_size == 32 and noisy == True and n_step == 2 and num_atoms == 15:
+                lr = trial.suggest_categorical("lr", [0.0005, 0.00005, 0.000005])
+                train_batch_size = trial.suggest_categorical("train_batch_size", [32, 64, 128])
+                noisy = trial.suggest_categorical("noisy", [True, False])
+                num_atoms = trial.suggest_categorical("num_atoms", [5, 15, 25])
+                n_step = trial.suggest_int("n_step", 1, 11)
+
+            # Return all constants in a dictionary.
+            return {
                  "name": args.name,
                  "local_dir":args.directory,
                 # To see the complete list of configurable parameters see:
@@ -96,11 +112,8 @@ def run(args):
                 "normalize_actions": False,
 
                 # "batch_mode": "complete_episodes"
-                "train_batch_size": tune.choice([32, 64,128]),
                 # "num_steps_sampled_before_learning_starts": 10000,
-                "n_step": tune.randint(1,11),
-                "num_atoms": tune.choice([5,15,25]),
-                "noisy": tune.choice([True, False]),
+
                 "gamma": 0.99,
                 "exploration_config": {
                   "type": "EpsilonGreedy",
@@ -122,7 +135,7 @@ def run(args):
                 "model": {
                     "fcnet_hiddens":[128,256,512,1024]
                 },
-                "lr": tune.choice([0.0005, 0.00005,0.000005]),
+
                 # "adam_epsilon": .00015,
                 "min_sample_timesteps_per_iteration": 10000,
                 "num_steps_sampled_before_learning_starts": 10000,
@@ -213,7 +226,21 @@ def run(args):
 
                 }
 
-            },
+            }
+
+        algo = OptunaSearch(space=define_by_run_func,metric="episode_reward_mean",
+                mode="max", )
+        algo = ConcurrencyLimiter(algo, max_concurrent=1)
+
+        tuner = tune.Tuner(
+            CustomDQNTrainer,
+            tune_config=tune.TuneConfig(
+
+                search_alg = algo,
+                # scheduler=sch,
+                num_samples=15,
+                reuse_actors=True,
+            ),
             run_config=air.RunConfig(
                  name=args.name,
                  local_dir=args.directory,
@@ -241,8 +268,15 @@ def run(args):
             "episode_len_mean",
         ]
         pprint.pprint({k: v for k, v in best_result.metrics.items() if k in metrics_to_print})
+        from datetime import datetime
 
-        file = open("results_dataframes/" + args.name + '_' + str(commit_hash()) + '.md','w')
+        # datetime object containing current date and time
+        now = datetime.now()
+
+        # dd/mm/YY H:M:S
+        dt_string = now.strftime("%d%m%Y_%H%M%S")
+
+        file = open("results_dataframes/" + args.name + '_' + str(commit_hash()) +'_' + str(dt_string) + '.md','w')
         file.write(df.to_markdown())
         file.close()
         print(df.to_markdown())

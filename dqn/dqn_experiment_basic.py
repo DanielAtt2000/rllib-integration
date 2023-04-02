@@ -10,7 +10,7 @@ from git import Repo
 
 import math
 import numpy as np
-from gymnasium.spaces import Discrete, Box
+from gym.spaces import Discrete, Box
 # from gym.spaces import Box, Discrete, Dict, Tuple
 import warnings
 import carla

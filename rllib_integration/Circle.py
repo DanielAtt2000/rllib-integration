@@ -1,5 +1,9 @@
 import math
 import numpy as np
+
+from rllib_integration.GetAngle import calculate_angle_with_center_of_lane
+from carla import Location
+
 class Vector():
     def __init__(self,x_coof, c_coof,y_coof, x_0, y_0, x_1,y_1):
         self.x_coof = x_coof
@@ -91,7 +95,18 @@ def get_radii(remaining_waypoints_on_route,no_of_points_to_calculate_chord):
         r_0 = math.sqrt((x_center-perpendicular_bisectors[i].x_0)**2+(y_center-perpendicular_bisectors[i].y_0)**2)/100
         r_1 = math.sqrt((x_center-perpendicular_bisectors[i+1].x_1)**2+(y_center-perpendicular_bisectors[i+1].y_1)**2)/100
 
-        radii.append(np.clip((r_0+r_1)/2,0,max_radius_value))
+        angle_between_starting_ending_point = calculate_angle_with_center_of_lane(
+            previous_position=Location(x=perpendicular_bisectors[i].x_0,y=perpendicular_bisectors[i].y_0,z=0),
+            current_position=Location(x=perpendicular_bisectors[i].x_1,y=perpendicular_bisectors[i].y_1,z=0),
+            next_position=Location(x=perpendicular_bisectors[i+1].x_1,y=perpendicular_bisectors[i+1].y_1,z=0))
+
+        sign = 1
+        if angle_between_starting_ending_point < 0:
+            sign = -1
+
+        riadus = np.clip((r_0 + r_1) / 2, 0, max_radius_value)
+
+        radii.append(sign * riadus)
 
     if len(radii) < length_of_output_array:
         for i in range(length_of_output_array-len(radii)):
