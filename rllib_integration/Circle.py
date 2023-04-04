@@ -105,6 +105,7 @@ def get_radii(remaining_waypoints_on_route,no_of_points_to_calculate_chord):
             sign = -1
 
         riadus = np.clip((r_0 + r_1) / 2, 0, max_radius_value)
+        riadus = 1-riadus
 
         radii.append(sign * riadus)
 
