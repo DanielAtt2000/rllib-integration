@@ -105,9 +105,10 @@ def get_radii(remaining_waypoints_on_route,no_of_points_to_calculate_chord):
             sign = -1
 
         riadus = np.clip((r_0 + r_1) / 2, 0, max_radius_value)
-        riadus = 1-riadus
+        #riadus = 1-riadus
 
-        radii.append(sign * riadus)
+        # radii.append(sign * riadus)
+        radii.append(riadus)
 
     if len(radii) < length_of_output_array:
         for i in range(length_of_output_array-len(radii)):
