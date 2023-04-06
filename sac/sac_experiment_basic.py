@@ -736,7 +736,7 @@ class SACExperimentBasic(BaseExperiment):
 
     def compute_reward(self, observation, core):
         """Computes the reward"""
-
+        # est
         reward = 0
 
         forward_velocity = observation[0]
