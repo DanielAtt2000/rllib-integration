@@ -744,7 +744,7 @@ class SACExperimentBasic(BaseExperiment):
         # print(f"in rewards forward_velocity {forward_velocity}")
         # print(f"in rewards hyp_distance_to_next_waypoint {hyp_distance_to_next_waypoint}")
 
-        bearing_to_waypoint = observation[5]
+        #bearing_to_waypoint = observation[5]
         # bearing_to_ahead_waypoints_ahead = observation["values"][5]
         # angle_between_truck_and_trailer = observation["values"][6]
 
@@ -761,11 +761,11 @@ class SACExperimentBasic(BaseExperiment):
 
 
 
-        if bearing_to_waypoint == 0:
-             reward = reward+ 50
-        else:
-            print(f"REWARD bearing_to_waypoint {abs(1/bearing_to_waypoint)}")
-            reward = reward+ abs(1/bearing_to_waypoint)
+        # if bearing_to_waypoint == 0:
+        #      reward = reward+ 50
+        # else:
+        #     print(f"REWARD bearing_to_waypoint {abs(1/bearing_to_waypoint)}")
+        #     reward = reward+ abs(1/bearing_to_waypoint)
 
         # if bearing_to_ahead_waypoints_ahead == 0:
         #     reward = reward + 30
