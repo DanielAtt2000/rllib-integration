@@ -264,8 +264,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,-1,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             )
 
@@ -621,7 +621,7 @@ class SACExperimentBasic(BaseExperiment):
             # np.float32(acceleration)
                            ]
 
-        observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
+        # observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
         observations.extend(self.radii)
 
