@@ -91,7 +91,7 @@ class SACExperimentBasic(BaseExperiment):
         repo = Repo('.')
         remote = repo.remote('origin')
         remote.fetch()
-        self.directory = f"data/data_{str(repo.head.commit)[:11]}"
+        self.directory = f"/home/daniel/data-rllib-integration/data/data_{str(repo.head.commit)[:11]}"
 
         if not os.path.exists(self.directory):
             os.mkdir(self.directory)
@@ -267,8 +267,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,-1,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,-1]),
+                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0]),
                 dtype=np.float32
             )
 
@@ -465,7 +465,7 @@ class SACExperimentBasic(BaseExperiment):
 
         angle_between_truck_and_trailer = angle_between(waypoint_forward_vector=truck_transform.get_forward_vector(),vehicle_forward_vector=trailer_transform.get_forward_vector())
 
-        trailer_bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=trailer_transform.get_forward_vector())
+        # trailer_bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=trailer_transform.get_forward_vector())
 
 
         self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
@@ -547,8 +547,27 @@ class SACExperimentBasic(BaseExperiment):
                 # print(depth_camera_data.shape)
 
                 assert depth_camera_data is not None
-            elif sensor == "lidar_truck":
-                lidar_points = sensor_data['lidar_truck'][1]
+            elif sensor == "lidar_trailer_trailer":
+                max_lidar_point = 0
+                min_lidar_point = 0
+
+                lidar_points = sensor_data['lidar_trailer_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer"]["range"])
+
+                if len(lidar_points[1]) == 0:
+                    max_lidar_point = 1
+                    min_lidar_point = -1
+                else:
+                    max_lidar_point = max(lidar_points[1])/lidar_range
+                    min_lidar_point = min(lidar_points[1])/lidar_range
+
+                    if max_lidar_point < 0:
+                        max_lidar_point = 1
+
+                    if min_lidar_point > 0:
+                        min_lidar_point = -1
+            elif sensor == "lidar_truck_truck":
+                lidar_points = sensor_data['lidar_truck_truck'][1]
                 # print(lidar_points.shape)
                 # print(f"BEFORE {lidar_points[0][len(lidar_points) - 20]}-{lidar_points[1][len(lidar_points) - 20]}")
                 # print(f"BEFORE {lidar_points[0][len(lidar_points) - 19]}-{lidar_points[1][len(lidar_points) - 19]}")
@@ -624,7 +643,9 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(bearing_to_ahead_waypoints_ahead),
             np.float32(bearing_to_ahead_waypoints_ahead_2),
             np.float32(angle_between_truck_and_trailer),
-            np.float32(trailer_bearing_to_waypoint),
+            np.float32(max_lidar_point),
+            np.float32(min_lidar_point),
+            # np.float32(trailer_bearing_to_waypoint),
             # np.float32(acceleration)
                            ]
 
@@ -657,7 +678,7 @@ class SACExperimentBasic(BaseExperiment):
         # print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
         # print(f"forward_velocity:{np.float32(forward_velocity)}")
         print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
-        print(f"trailer_bearing_to_waypoint:{np.float32(trailer_bearing_to_waypoint)}")
+        # print(f"trailer_bearing_to_waypoint:{np.float32(trailer_bearing_to_waypoint)}")
         # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
         # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         # print(f"acceleration:{np.float32(acceleration)}")

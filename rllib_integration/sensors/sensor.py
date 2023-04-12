@@ -201,11 +201,20 @@ class SemanticLidar(CarlaSensor):
             ('x', np.float32), ('y', np.float32), ('z', np.float32),
             ('CosAngle', np.float32), ('ObjIdx', np.uint32), ('ObjTag', np.uint32)]))
 
-        usable_indices = np.where((points['ObjTag'] == 10) | (points['ObjTag'] == 8))
+        usable_indices = np.where(((points['ObjTag'] == 8) & (points['x'] > -1.5) & (points['x'] < 1.5 )))
+        # usable_indices = np.where((points['ObjTag'] == 10 |points['ObjTag'] == 8) & (points['x'] > -4) & (points['x'] < 4 ))
+        # usable_indices_2 = np.where((points['x'] > -1) & (points['x'] < 1 ))
+        # indices = np.concatenate((usable_indices,usable_indices_2),axis=1)
         points = points[usable_indices]
 
+        # For visualisation enable the below
         # ObjIdxFloat = points['ObjIdx'].astype('float32')
         # ObjTagFloat = points['ObjTag'].astype('float32')
+        # points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],ObjTagFloat]).T
+
+        # else
+        points = np.array([points['x'],points['y']])
+
 
         # points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],points['ObjIdx'], points['ObjTag']])
         #
@@ -224,12 +233,9 @@ class SemanticLidar(CarlaSensor):
         # points = points.T
 
         # points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],points['ObjIdx'], points['ObjTag']]).T
-        # points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],ObjIdxFloat, ObjTagFloat]).T
-        points = np.array([points['x'],points['y']])
-
-
 
         # points = np.reshape(points, (int(points.shape[0] / 6), 6))
+
         return points
 
 # ==================================================================================================

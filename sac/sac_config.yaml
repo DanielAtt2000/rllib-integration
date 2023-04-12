@@ -123,7 +123,7 @@ env_config:
 #          image_size_x: 84
 #          image_size_y: 84
 #          transform: '0.0,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
-#        lidar:
+#        lidar_truck:
 #          type: "sensor.lidar.ray_cast_semantic"
 #          channels : "32"
 #          range : "50.0"
@@ -134,6 +134,17 @@ env_config:
 #          horizontal_fov : '360.0'
 #          sensor_tick : '0'
 #          transform : '2,0.21,8,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
+        lidar_trailer:
+          type: "sensor.lidar.ray_cast_semantic"
+          channels : "32"
+          range : "17.0"
+          points_per_second : "9000"
+          rotation_frequency : "10" #  IMP THIS IS 1 / delta (timestep)
+          upper_fov : '0.0'
+          lower_fov : '-70.0'
+          horizontal_fov : '360.0'
+          sensor_tick : '0'
+          transform : '-10,0,8,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
 #        semantic_camera:
 #          type: "sensor.camera.semantic_segmentation"
 #          transform: '0.0,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
