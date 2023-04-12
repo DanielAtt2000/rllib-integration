@@ -36,7 +36,7 @@ EXPERIMENT_CLASS = SACExperimentBasic
 def run(args):
     try:
         os.environ['RAY_DISABLE_MEMORY_MONITOR'] = '1'
-        ray.init( num_gpus=1,include_dashboard=True,_temp_dir="/home/daniel/rllib-integration/ray_logs")
+        ray.init( num_gpus=1,include_dashboard=True,_temp_dir="/home/daniel/data-rllib-integration/ray_logs")
         tune.run(CustomSACTrainer,
                  name=args.name,
                  local_dir=args.directory,
@@ -111,7 +111,7 @@ def main():
                        host="localhost")
 
     specific_version = False
-    check_commit = True
+    check_commit = False
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())
