@@ -636,16 +636,16 @@ class SACExperimentBasic(BaseExperiment):
 
 
                     if greater_0_indices[0].size != 0:
-                        max_point = min(angle_45_relevant_lidar_x_points[greater_0_indices]**2 + angle_45_relevant_lidar_y_points[greater_0_indices]**2)
-                        truck_45_lidar_point = math.sqrt(max_point) / lidar_range
+                        min_point = min(angle_45_relevant_lidar_x_points[greater_0_indices]**2 + angle_45_relevant_lidar_y_points[greater_0_indices]**2)
+                        truck_45_lidar_point = math.sqrt(min_point) / lidar_range
                     else:
                         truck_45_lidar_point = 1
 
                     if smaller_0_indices[0].size != 0:
-                        max_point = min(
+                        min_point = min(
                             angle_45_relevant_lidar_x_points[smaller_0_indices] ** 2 + angle_45_relevant_lidar_y_points[
                                 smaller_0_indices] ** 2)
-                        truck_neg_45_lidar_point = math.sqrt(max_point) / lidar_range
+                        truck_neg_45_lidar_point = math.sqrt(min_point) / lidar_range
                     else:
                         truck_neg_45_lidar_point = 1
 
