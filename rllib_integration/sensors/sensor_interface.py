@@ -107,7 +107,7 @@ class SensorInterface(object):
             while len(data_dict.keys()) < len(self._sensors.keys()):
                 sensor_data = self._data_buffers.get(True, self._queue_timeout)
 
-                if self.counter > 20 and sensor_data[0] == 'lidar' and self.visualiseLIDAR:
+                if self.counter > 20 and 'lidar' in sensor_data[0] and self.visualiseLIDAR:
                     data = sensor_data[2]
                     # print(f"Number of LIDAR points {len(data)}")
 

@@ -562,6 +562,7 @@ class CarlaCore:
         for name, attributes in hero_config["sensors"].items():
             if name != 'lidar_trailer':
                 sensor_truck = SensorFactory.spawn(name, attributes, self.sensor_interface_truck, self.hero)
+                time.sleep(0.2)
             if hero_config["truckTrailerCombo"] and (name == 'collision' or name == 'lidar_trailer'):
                 print("TRAILER PART 7/7")
                 time.sleep(0.3)

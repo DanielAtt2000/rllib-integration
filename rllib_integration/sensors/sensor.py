@@ -201,8 +201,16 @@ class SemanticLidar(CarlaSensor):
             ('x', np.float32), ('y', np.float32), ('z', np.float32),
             ('CosAngle', np.float32), ('ObjIdx', np.uint32), ('ObjTag', np.uint32)]))
 
-        usable_indices = np.where(((points['ObjTag'] == 8) & (points['x'] > -1.5) & (points['x'] < 1.5 )))
-        # usable_indices = np.where((points['ObjTag'] == 10 |points['ObjTag'] == 8) & (points['x'] > -4) & (points['x'] < 4 ))
+        # usable_indices = np.where((points['ObjTag'] == 10 | points['ObjTag'] == 8) & (abs(points['x']) - abs(points['y']) <= 0.01))
+
+        usable_indices = np.where((points['ObjTag'] == 8))
+        # usable_indices = np.where((points['ObjTag'] == 8)& (points['x'] > 0) & (np.absolute(np.absolute(points['x']) - np.absolute(points['y'])) <= 2 ))
+        #
+        # temp = np.absolute(points['x']) - np.absolute(points['y'])
+        #
+        # print(temp)
+        # usable_indices = np.where(temp <= 0.0001)
+        # print(points)
         # usable_indices_2 = np.where((points['x'] > -1) & (points['x'] < 1 ))
         # indices = np.concatenate((usable_indices,usable_indices_2),axis=1)
         points = points[usable_indices]
