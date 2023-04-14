@@ -267,8 +267,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
+                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             )
 
@@ -762,10 +762,10 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(hyp_distance_to_next_waypoint),
             np.float32(angle_to_center_of_lane_degrees),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints),
-            np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2),
+            # np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2),
             np.float32(bearing_to_waypoint),
             np.float32(bearing_to_ahead_waypoints_ahead),
-            np.float32(bearing_to_ahead_waypoints_ahead_2),
+            # np.float32(bearing_to_ahead_waypoints_ahead_2),
             np.float32(angle_between_truck_and_trailer),
             np.float32(trailer_90_lidar_point),
             np.float32(trailer_neg_90_lidar_point),
@@ -778,7 +778,7 @@ class SACExperimentBasic(BaseExperiment):
             # np.float32(acceleration)
                            ]
 
-        observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
+        # observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
         observations.extend(self.radii)
 
