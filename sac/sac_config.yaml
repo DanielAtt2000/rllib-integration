@@ -6,11 +6,11 @@ framework: torch
 gamma: 0.99
 twin_q: True
 q_model_config:
-    hidden_activation: tanh
-    hidden_layer_sizes: [128,256,512,512,1024]
+    fcnet_activation: relu
+    fcnet_hiddens: [128,256,512,512,1024]
 policy_model_config:
-    hidden_activation: tanh
-    hidden_layer_sizes: [128,256,512,512,1024]
+    fcnet_activation: relu
+    fcnet_hiddens: [128,256,512,512,1024]
 
 
 recreate_failed_workers: True
