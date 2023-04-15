@@ -267,8 +267,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
+                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
                 dtype=np.float32
             )
 
@@ -276,33 +276,41 @@ class SACExperimentBasic(BaseExperiment):
         return {
             0: [0.0, 0.00, 0.0, False, False],  # Coast
             1: [0.0, 0.00, 1.0, False, False],  # Apply Break
-            2: [0.0, 0.75, 0.0, False, False],  # Right
-            3: [0.0, 0.50, 0.0, False, False],  # Right
-            4: [0.0, 0.25, 0.0, False, False],  # Right
-            5: [0.0, -0.75, 0.0, False, False],  # Left
-            6: [0.0, -0.50, 0.0, False, False],  # Left
-            7: [0.0, -0.25, 0.0, False, False],  # Left
-            8: [0.15, 0.00, 0.0, False, False],  # Straight
-            9: [0.15, 0.75, 0.0, False, False],  # Right
-            10: [0.15, 0.50, 0.0, False, False],  # Right
-            11: [0.15, 0.25, 0.0, False, False],  # Right
-            12: [0.15, -0.75, 0.0, False, False],  # Left
-            13: [0.15, -0.50, 0.0, False, False],  # Left
-            14: [0.15, -0.25, 0.0, False, False],  # Left
-            15: [0.3, 0.00, 0.0, False, False],  # Straight
-            16: [0.3, 0.75, 0.0, False, False],  # Right
-            17: [0.3, 0.50, 0.0, False, False],  # Right
-            18: [0.3, 0.25, 0.0, False, False],  # Right
-            19: [0.3, -0.75, 0.0, False, False],  # Left
-            20: [0.3, -0.50, 0.0, False, False],  # Left
-            21: [0.3, -0.25, 0.0, False, False],  # Left
-            22: [0.7, 0.00, 0.0, False, False],  # Straight
-            23: [0.7, 0.75, 0.0, False, False],  # Right
-            24: [0.7, 0.50, 0.0, False, False],  # Right
-            25: [0.7, 0.25, 0.0, False, False],  # Right
-            26: [0.7, -0.75, 0.0, False, False],  # Left
-            27: [0.7, -0.50, 0.0, False, False],  # Left
-            28: [0.7, -0.25, 0.0, False, False],  # Left
+            2: [0.0, 0.80, 0.0, False, False],  # Right
+            3: [0.0, 0.60, 0.0, False, False],  # Right
+            4: [0.0, 0.40, 0.0, False, False],  # Right
+            5: [0.0, 0.20, 0.0, False, False],  # Right
+            6: [0.0, -0.80, 0.0, False, False],  # Left
+            7: [0.0, -0.60, 0.0, False, False],  # Left
+            8: [0.0, -0.40, 0.0, False, False],  # Left
+            9: [0.0, -0.20, 0.0, False, False],  # Left
+            10: [0.15, 0.00, 0.0, False, False],  # Straight
+            11: [0.15, 0.80, 0.0, False, False],  # Right
+            12: [0.15, 0.60, 0.0, False, False],  # Right
+            13: [0.15, 0.40, 0.0, False, False],  # Right
+            14: [0.15, 0.20, 0.0, False, False],  # Right
+            15: [0.15, -0.80, 0.0, False, False],  # Left
+            16: [0.15, -0.60, 0.0, False, False],  # Left
+            17: [0.15, -0.40, 0.0, False, False],  # Left
+            18: [0.15, -0.20, 0.0, False, False],  # Left
+            19: [0.3, 0.00, 0.0, False, False],  # Straight
+            20: [0.3, 0.80, 0.0, False, False],  # Right
+            21: [0.3, 0.60, 0.0, False, False],  # Right
+            22: [0.3, 0.40, 0.0, False, False],  # Right
+            23: [0.3, 0.20, 0.0, False, False],  # Right
+            24: [0.3, -0.80, 0.0, False, False],  # Left
+            25: [0.3, -0.60, 0.0, False, False],  # Left
+            26: [0.3, -0.40, 0.0, False, False],  # Left
+            27: [0.3, -0.20, 0.0, False, False],  # Left
+            28: [0.7, 0.00, 0.0, False, False],  # Straight
+            29: [0.7, 0.80, 0.0, False, False],  # Right
+            30: [0.7, 0.60, 0.0, False, False],  # Right
+            31: [0.7, 0.40, 0.0, False, False],  # Right
+            32: [0.7, 0.20, 0.0, False, False],  # Right
+            33: [0.7, -0.80, 0.0, False, False],  # Left
+            34: [0.7, -0.60, 0.0, False, False],  # Left
+            35: [0.7, -0.40, 0.0, False, False],  # Left
+            36: [0.7, -0.20, 0.0, False, False],  # Left
             # 11: [0.15, 0.25, 0.0, False, False],  # Right
             # 12: [0.15, -0.75, 0.0, False, False],  # Left
             # 13: [0.15, -0.50, 0.0, False, False],  # Left
@@ -762,10 +770,10 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(hyp_distance_to_next_waypoint),
             np.float32(angle_to_center_of_lane_degrees),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints),
-            # np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2),
+            np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2),
             np.float32(bearing_to_waypoint),
             np.float32(bearing_to_ahead_waypoints_ahead),
-            # np.float32(bearing_to_ahead_waypoints_ahead_2),
+            np.float32(bearing_to_ahead_waypoints_ahead_2),
             np.float32(angle_between_truck_and_trailer),
             np.float32(trailer_90_lidar_point),
             np.float32(trailer_neg_90_lidar_point),
@@ -778,7 +786,7 @@ class SACExperimentBasic(BaseExperiment):
             # np.float32(acceleration)
                            ]
 
-        # observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
+        observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
         observations.extend(self.radii)
 
