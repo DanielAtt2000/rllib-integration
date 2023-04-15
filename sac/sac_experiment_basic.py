@@ -303,14 +303,14 @@ class SACExperimentBasic(BaseExperiment):
             26: [0.3, -0.40, 0.0, False, False],  # Left
             27: [0.3, -0.20, 0.0, False, False],  # Left
             28: [0.7, 0.00, 0.0, False, False],  # Straight
-            29: [0.7, 0.80, 0.0, False, False],  # Right
-            30: [0.7, 0.60, 0.0, False, False],  # Right
-            31: [0.7, 0.40, 0.0, False, False],  # Right
-            32: [0.7, 0.20, 0.0, False, False],  # Right
-            33: [0.7, -0.80, 0.0, False, False],  # Left
-            34: [0.7, -0.60, 0.0, False, False],  # Left
-            35: [0.7, -0.40, 0.0, False, False],  # Left
-            36: [0.7, -0.20, 0.0, False, False],  # Left
+            # 29: [0.7, 0.80, 0.0, False, False],  # Right
+            # 30: [0.7, 0.60, 0.0, False, False],  # Right
+            # 31: [0.7, 0.40, 0.0, False, False],  # Right
+            # 32: [0.7, 0.20, 0.0, False, False],  # Right
+            # 33: [0.7, -0.80, 0.0, False, False],  # Left
+            # 34: [0.7, -0.60, 0.0, False, False],  # Left
+            # 35: [0.7, -0.40, 0.0, False, False],  # Left
+            # 36: [0.7, -0.20, 0.0, False, False],  # Left
             # 11: [0.15, 0.25, 0.0, False, False],  # Right
             # 12: [0.15, -0.75, 0.0, False, False],  # Left
             # 13: [0.15, -0.50, 0.0, False, False],  # Left
