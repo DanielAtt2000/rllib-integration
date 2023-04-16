@@ -279,61 +279,30 @@ class SACExperimentBasic(BaseExperiment):
             2: [0.0, 0.75, 0.0, False, False],  # Right
             3: [0.0, 0.50, 0.0, False, False],  # Right
             4: [0.0, 0.25, 0.0, False, False],  # Right
-            6: [0.0, -0.75, 0.0, False, False],  # Left
-            7: [0.0, -0.50, 0.0, False, False],  # Left
-            8: [0.0, -0.25, 0.0, False, False],  # Left
-            10: [0.15, 0.00, 0.0, False, False],  # Straight
-            11: [0.15, 0.75, 0.0, False, False],  # Right
-            12: [0.15, 0.50, 0.0, False, False],  # Right
-            13: [0.15, 0.25, 0.0, False, False],  # Right
-            # 14: [0.15, 0.20, 0.0, False, False],  # Right
-            # 15: [0.15, -0.80, 0.0, False, False],  # Left
-            # 16: [0.15, -0.60, 0.0, False, False],  # Left
-            # 17: [0.15, -0.40, 0.0, False, False],  # Left
-            # 18: [0.15, -0.20, 0.0, False, False],  # Left
-            # 19: [0.3, 0.00, 0.0, False, False],  # Straight
-            # 20: [0.3, 0.80, 0.0, False, False],  # Right
-            # 21: [0.3, 0.60, 0.0, False, False],  # Right
-            # 22: [0.3, 0.40, 0.0, False, False],  # Right
-            # 23: [0.3, 0.20, 0.0, False, False],  # Right
-            # 24: [0.3, -0.80, 0.0, False, False],  # Left
-            # 25: [0.3, -0.60, 0.0, False, False],  # Left
-            # 26: [0.3, -0.40, 0.0, False, False],  # Left
-            # 27: [0.3, -0.20, 0.0, False, False],  # Left
-            # 28: [0.7, 0.00, 0.0, False, False],  # Straight
-            # 29: [0.7, 0.80, 0.0, False, False],  # Right
-            # 30: [0.7, 0.60, 0.0, False, False],  # Right
-            # 31: [0.7, 0.40, 0.0, False, False],  # Right
-            # 32: [0.7, 0.20, 0.0, False, False],  # Right
-            # 33: [0.7, -0.80, 0.0, False, False],  # Left
-            # 34: [0.7, -0.60, 0.0, False, False],  # Left
-            # 35: [0.7, -0.40, 0.0, False, False],  # Left
-            # 36: [0.7, -0.20, 0.0, False, False],  # Left
-            14: [0.15, 0.25, 0.0, False, False],  # Right
-            15: [0.15, -0.75, 0.0, False, False],  # Left
-            16: [0.15, -0.50, 0.0, False, False],  # Left
-            17: [0.15, -0.25, 0.0, False, False],  # Left
-            18: [0.3, 0.00, 0.0, False, False],  # Straight
-            19: [0.3, 0.75, 0.0, False, False],  # Right
-            20: [0.3, 0.50, 0.0, False, False],  # Right
-            21: [0.3, 0.25, 0.0, False, False],  # Right
-            22: [0.3, -0.75, 0.0, False, False],  # Left
-            23: [0.3, -0.50, 0.0, False, False],  # Left
-            24: [0.3, -0.25, 0.0, False, False],  # Left
-            25: [0.7, 0.00, 0.0, False, False],  # Straight
-            26: [0.7, 0.75, 0.0, False, False],  # Right
-            27: [0.7, 0.50, 0.0, False, False],  # Right
-            28: [0.7, 0.25, 0.0, False, False],  # Right
-            29: [0.7, -0.75, 0.0, False, False],  # Left
-            30: [0.7, -0.50, 0.0, False, False],  # Left
-            31: [0.7, -0.25, 0.0, False, False],  # Left
-            # 29: [1.0, 0.00, 0.0, False, False],  # Straight
-            # 30: [1.0, 0.75, 0.0, False, False],  # Right
-            # 31: [1.0, 0.50, 0.0, False, False],  # Right
-            # 32: [1.0, 0.25, 0.0, False, False],  # Right
-            # 33: [1.0, -0.75, 0.0, False, False],  # Left
-            # 34: [1.0, -0.50, 0.0, False, False],  # Left
-            # 35: [1.0, -0.25, 0.0, False, False],  # Left
+            5: [0.0, -0.75, 0.0, False, False],  # Left
+            6: [0.0, -0.50, 0.0, False, False],  # Left
+            7: [0.0, -0.25, 0.0, False, False],  # Left
+            8: [0.15, 0.00, 0.0, False, False],  # Straight
+            9: [0.15, 0.75, 0.0, False, False],  # Right
+            10: [0.15, 0.50, 0.0, False, False],  # Right
+            11: [0.15, 0.25, 0.0, False, False],  # Right
+            12: [0.15, -0.75, 0.0, False, False],  # Left
+            13: [0.15, -0.50, 0.0, False, False],  # Left
+            14: [0.15, -0.25, 0.0, False, False],  # Left
+            15: [0.3, 0.00, 0.0, False, False],  # Straight
+            16: [0.3, 0.75, 0.0, False, False],  # Right
+            17: [0.3, 0.50, 0.0, False, False],  # Right
+            18: [0.3, 0.25, 0.0, False, False],  # Right
+            19: [0.3, -0.75, 0.0, False, False],  # Left
+            20: [0.3, -0.50, 0.0, False, False],  # Left
+            21: [0.3, -0.25, 0.0, False, False],  # Left
+            22: [0.7, 0.00, 0.0, False, False],  # Straight
+            23: [0.7, 0.75, 0.0, False, False],  # Right
+            24: [0.7, 0.50, 0.0, False, False],  # Right
+            25: [0.7, 0.25, 0.0, False, False],  # Right
+            26: [0.7, -0.75, 0.0, False, False],  # Left
+            27: [0.7, -0.50, 0.0, False, False],  # Left
+            28: [0.7, -0.25, 0.0, False, False],  # Left
         }
 
 
