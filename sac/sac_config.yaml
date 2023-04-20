@@ -5,19 +5,22 @@ num_cpus_per_worker: 11
 framework: torch
 gamma: 0.99
 twin_q: True
+# these probably do nothing
 q_model_config:
-    fcnet_activation: relu
-    fcnet_hiddens: [256,256]
+    hidden_activation: relu
+    hidden_layer_sizes: [128,256,512,1024]
 policy_model_config:
-    fcnet_activation: relu
-    fcnet_hiddens: [256,256]
+    hidden_activation: relu
+    hidden_layer_sizes: [128,256,512,1024]
 
 
 recreate_failed_workers: True
 # Do hard syncs.
 # Soft-syncs seem to work less reliably for discrete action spaces.
-tau: 1.0
+tau: 0.005
+lr: 0.00001
 target_network_update_freq: 8000
+initial_alpha: 0.2
 # auto = 0.98 * -log(1/|A|)
 target_entropy: auto
 clip_rewards: False
@@ -33,15 +36,15 @@ replay_buffer_config:
   prioritized_replay_eps: 0.000001
 store_buffer_in_checkpoints: False
 num_steps_sampled_before_learning_starts: 10000
-train_batch_size: 256
+train_batch_size: 64
 min_sample_timesteps_per_iteration: 4
 # Paper uses 20k random timesteps, which is not exactly the same, but
 # seems to work nevertheless. We use 100k here for the longer Atari
 # runs (DQN style: filling up the buffer a bit before learning).
-optimization:
-    actor_learning_rate: 0.00005
-    critic_learning_rate: 0.00005
-    entropy_learning_rate: 0.00005
+#optimization:
+#    actor_learning_rate: 0.00005
+#    critic_learning_rate: 0.00005
+#    entropy_learning_rate: 0.00005
 
 "exploration_config": {
   "type": "EpsilonGreedy",
