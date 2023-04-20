@@ -231,7 +231,7 @@ class SACExperimentBasic(BaseExperiment):
 
     def get_min_lidar_point(self,lidar_points, lidar_range) :
         if len(lidar_points) != 0:
-            return min(lidar_points)/lidar_range
+            return np.clip(min(lidar_points)/lidar_range,0,1)
         else:
             return 1
 
