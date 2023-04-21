@@ -49,6 +49,10 @@ class SACExperimentBasic(BaseExperiment):
         self.visualiseOccupancyGirdMap = False
         self.counterThreshold = 10
         self.last_hyp_distance_to_next_waypoint = 0
+        self.last_hyp_distance_to_next_plus_1_waypoint = 0
+
+        self.last_hyp_distance_to_next_waypoint_line = 0
+        self.last_hyp_distance_to_next_plus_1_waypoint_line = 0
 
         self.x_dist_to_waypoint = []
         self.y_dist_to_waypoint = []
@@ -162,6 +166,12 @@ class SACExperimentBasic(BaseExperiment):
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
 
+        self.last_hyp_distance_to_next_waypoint = 0
+        self.last_hyp_distance_to_next_plus_1_waypoint = 0
+
+        self.last_hyp_distance_to_next_waypoint_line = 0
+        self.last_hyp_distance_to_next_plus_1_waypoint_line = 0
+
         # self.save_to_file(f"{self.directory}/hyp_distance_to_next_waypoint", self.hyp_distance_to_next_waypoint)
         # self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees", self.angle_to_center_of_lane_degrees)
         # self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_ahead_waypoints", self.angle_to_center_of_lane_degrees_ahead_waypoints)
@@ -273,8 +283,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
+                low=np.array([0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
+                high=np.array([100,100,10,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
                 dtype=np.float32
             )
 
@@ -383,6 +393,8 @@ class SACExperimentBasic(BaseExperiment):
 
         # Getting truck location
         truck_transform = core.hero.get_transform()
+        truck_forward_vector = truck_transform.get_forward_vector()
+
 
         if core.config["truckTrailerCombo"]:
             # Getting trailer location
@@ -394,27 +406,31 @@ class SACExperimentBasic(BaseExperiment):
         if in_front_of_waypoint == 0 or in_front_of_waypoint == 1:
             core.last_waypoint_index += 1
             self.last_hyp_distance_to_next_waypoint = 0
+            self.last_hyp_distance_to_next_waypoint_line = 0
             print('Passed Waypoint <------------')
         else:
             pass
 
-        number_of_waypoints_to_plot_on_lidar = 20
-        location_from_waypoint_to_vehicle_relative = np.zeros([2,number_of_waypoints_to_plot_on_lidar])
+        lidar = False
 
-        for i in range(0,number_of_waypoints_to_plot_on_lidar,2):
-            try:
-                x_dist = core.route[core.last_waypoint_index + i].location.x - (truck_transform.location.x + 2)
-                y_dist = core.route[core.last_waypoint_index + i].location.y - (truck_transform.location.y + 0.10)
+        if lidar:
+            number_of_waypoints_to_plot_on_lidar = 20
+            location_from_waypoint_to_vehicle_relative = np.zeros([2, number_of_waypoints_to_plot_on_lidar])
 
-                xr, yr = self.rotate_matrix(x_dist,y_dist,360-truck_transform.rotation.yaw,0,0,units="DEGREES")
+            for i in range(0,number_of_waypoints_to_plot_on_lidar,2):
+                try:
+                    x_dist = core.route[core.last_waypoint_index + i].location.x - (truck_transform.location.x + 2)
+                    y_dist = core.route[core.last_waypoint_index + i].location.y - (truck_transform.location.y + 0.10)
+
+                    xr, yr = self.rotate_matrix(x_dist,y_dist,360-truck_transform.rotation.yaw,0,0,units="DEGREES")
 
 
-                location_from_waypoint_to_vehicle_relative[0][i] = xr
-                location_from_waypoint_to_vehicle_relative[1][i] = yr
-                location_from_waypoint_to_vehicle_relative[0][i+1] = xr + 0.1
-                location_from_waypoint_to_vehicle_relative[1][i+1] = yr + 0.1
-            except Exception as e:
-                print("At end of route, nothing major wrong")
+                    location_from_waypoint_to_vehicle_relative[0][i] = xr
+                    location_from_waypoint_to_vehicle_relative[1][i] = yr
+                    location_from_waypoint_to_vehicle_relative[0][i+1] = xr + 0.1
+                    location_from_waypoint_to_vehicle_relative[1][i+1] = yr + 0.1
+                except Exception as e:
+                    print("At end of route, nothing major wrong")
 
         # print(f"UP HERE{location_from_waypoint_to_vehicle_relative}")
         # import pickle
@@ -424,33 +440,44 @@ class SACExperimentBasic(BaseExperiment):
         #
         # save_data('waypoints2.pkl',location_from_waypoint_to_vehicle_relative)
 
+        hyp_distance_to_next_waypoint_line = core.get_distance_to_waypoint_line(truck_transform=truck_transform,truck_forward_vector=truck_forward_vector,waypoint_plus_current=0)
+        hyp_distance_to_next_plus_1_waypoint_line = core.get_distance_to_waypoint_line(truck_transform=truck_transform,truck_forward_vector=truck_forward_vector,waypoint_plus_current=1)
+
+        # Hyp distance to next waypoint
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
         y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y - truck_transform.location.y)
         hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
 
-        bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
+        # Hyp distance to next waypoint +1
+        x_dist_to_next_waypoint = abs(core.route[
+                                          core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with + 1].location.x - truck_transform.location.x)
+        y_dist_to_next_waypoint = abs(core.route[
+                                          core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with + 1].location.y - truck_transform.location.y)
+        hyp_distance_to_next_plus_1_waypoint = math.sqrt(
+            (x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
+
+        bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=truck_forward_vector)
 
         try:
-            bearing_to_ahead_waypoints_ahead = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
+            bearing_to_ahead_waypoints_ahead = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints].get_forward_vector(),vehicle_forward_vector=truck_forward_vector)
 
         except Exception as e:
             print(f"ERROR HERE1 {e}")
             bearing_to_ahead_waypoints_ahead = 0
 
         try:
-            bearing_to_ahead_waypoints_ahead_2 = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints_2].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
+            bearing_to_ahead_waypoints_ahead_2 = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints_2].get_forward_vector(),vehicle_forward_vector=truck_forward_vector)
         except Exception as e:
             print(f"ERROR HERE2 {e}")
             bearing_to_ahead_waypoints_ahead_2 = 0
 
 
-        angle_between_truck_and_trailer = angle_between(waypoint_forward_vector=truck_transform.get_forward_vector(),vehicle_forward_vector=trailer_transform.get_forward_vector())
+        angle_between_truck_and_trailer = angle_between(waypoint_forward_vector=truck_forward_vector,vehicle_forward_vector=trailer_transform.get_forward_vector())
 
         # trailer_bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=trailer_transform.get_forward_vector())
 
 
-        self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
-        self.temp_route = core.route_points
+
 
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
         # forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
@@ -572,149 +599,6 @@ class SACExperimentBasic(BaseExperiment):
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_right"]["range"])
                 truck_front_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
-            # elif sensor == "lidar_trailer_trailer_@":
-            #     trailer_90_lidar_point = 0
-            #     trailer_neg_90_lidar_point = 0
-            #
-            #     lidar_points = sensor_data['lidar_trailer_trailer'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer"]["range"])
-            #
-            #     horizontal_indices = np.where((lidar_points[0] > -1.5) & (lidar_points[0] < 1.5))
-            #     horizontal_relevant_lidar_y_points = lidar_points[1][horizontal_indices]
-            #
-            #     if len(horizontal_relevant_lidar_y_points) == 0:
-            #         trailer_90_lidar_point = 1
-            #         trailer_neg_90_lidar_point = 1
-            #     else:
-            #         greater_0_indices = np.where(horizontal_relevant_lidar_y_points > 0)
-            #         smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
-            #
-            #
-            #         if greater_0_indices[0].size != 0:
-            #             trailer_90_lidar_point = abs(min(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
-            #         else:
-            #             trailer_90_lidar_point = 1
-            #
-            #         if smaller_0_indices[0].size != 0:
-            #             trailer_neg_90_lidar_point = abs(min(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
-            #         else:
-            #             trailer_neg_90_lidar_point = 1
-            #
-            #         if trailer_90_lidar_point < 0:
-            #             trailer_90_lidar_point = 1
-            #
-            #         if trailer_neg_90_lidar_point < 0:
-            #             trailer_neg_90_lidar_point = 1
-            #
-            #
-            #     # if len(lidar_points[1]) == 0:
-            #     #     trailer_90_lidar_point = 1
-            #     #     trailer_neg_90_lidar_point = -1
-            #     # else:
-            #     #     left_indices = np.where(lidar_points[1] < 0)
-            #     #     right_indices = np.where(lidar_points[1] > 0)
-            #     #
-            #     #     trailer_90_lidar_point = max(lidar_points[right_indices][1])/lidar_range
-            #     #     trailer_neg_90_lidar_point = min(lidar_points[left_indices][1]) / lidar_range
-            #     #
-            #     #     if trailer_90_lidar_point < 0:
-            #     #         trailer_90_lidar_point = 1
-            #     #
-            #     #     if trailer_neg_90_lidar_point > 0:
-            #     #         trailer_neg_90_lidar_point = -1
-            # elif sensor == "lidar_truck_side_truck":
-            #     truck_90_lidar_point = 0
-            #     truck_neg_90_lidar_point = 0
-            #     truck_45_lidar_point = 0
-            #     truck_neg_45_lidar_point = 0
-            #     truck_0_lidar_point = 0
-            #
-            #     lidar_points = sensor_data['lidar_truck_side_truck'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_side"]["range"])
-            #
-            #     horizontal_indices = np.where((lidar_points[0] > -1.5) & (lidar_points[0] < 1.5 ))
-            #     horizontal_relevant_lidar_y_points = lidar_points[1][horizontal_indices]
-            #
-            #     vertical_indices = np.where((lidar_points[1] > -1.5) & (lidar_points[1] < 1.5))
-            #     vertical_relevant_lidar_x_points = lidar_points[0][vertical_indices]
-            #
-            #     angle_45_indices = np.where((lidar_points[0] > 0) & (np.absolute(np.absolute(lidar_points[0]) - np.absolute(lidar_points[1])) <= 1.5))
-            #     angle_45_relevant_lidar_x_points = lidar_points[0][angle_45_indices]
-            #     angle_45_relevant_lidar_y_points = lidar_points[1][angle_45_indices]
-            #
-            #     # print(f"lidar opints {lidar_points}")
-            #     # print(f"horizontal_indices {horizontal_indices}")
-            #     # print(f"horizontal_relevant_lidar_y_points {horizontal_relevant_lidar_y_points}")
-            #     # print(f"vertical_indices {vertical_indices}")
-            #     # print(f"vertical_relevant_lidar_x_points {vertical_relevant_lidar_x_points}")
-            #     # print(f"angle_45_indices {angle_45_indices}")
-            #     # print(f"angle_45_relevant_lidar_x_points{angle_45_relevant_lidar_x_points}")
-            #     # print(f"angle_45_relevant_lidar_y_points{angle_45_relevant_lidar_y_points}")
-            #
-            #     if len(angle_45_relevant_lidar_x_points) == 0:
-            #         truck_45_lidar_point = 1
-            #         truck_neg_45_lidar_point = 1
-            #     else:
-            #
-            #         greater_0_indices = np.where(angle_45_relevant_lidar_x_points > 0)
-            #         smaller_0_indices = np.where(angle_45_relevant_lidar_x_points < 0)
-            #
-            #
-            #         if greater_0_indices[0].size != 0:
-            #             min_point = min(angle_45_relevant_lidar_x_points[greater_0_indices]**2 + angle_45_relevant_lidar_y_points[greater_0_indices]**2)
-            #             truck_45_lidar_point = math.sqrt(min_point) / lidar_range
-            #         else:
-            #             truck_45_lidar_point = 1
-            #
-            #         if smaller_0_indices[0].size != 0:
-            #             min_point = min(
-            #                 angle_45_relevant_lidar_x_points[smaller_0_indices] ** 2 + angle_45_relevant_lidar_y_points[
-            #                     smaller_0_indices] ** 2)
-            #             truck_neg_45_lidar_point = math.sqrt(min_point) / lidar_range
-            #         else:
-            #             truck_neg_45_lidar_point = 1
-            #
-            #         if truck_45_lidar_point < 0:
-            #             truck_45_lidar_point = 1
-            #
-            #         if truck_neg_45_lidar_point < 0:
-            #             truck_neg_45_lidar_point = 1
-            #
-            #
-            #     if len(horizontal_relevant_lidar_y_points) == 0:
-            #         truck_90_lidar_point = 1
-            #         truck_neg_90_lidar_point = 1
-            #     else:
-            #         greater_0_indices = np.where(horizontal_relevant_lidar_y_points > 0)
-            #         smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
-            #
-            #
-            #         if greater_0_indices[0].size != 0:
-            #             truck_90_lidar_point = abs(min(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
-            #         else:
-            #             truck_90_lidar_point = 1
-            #
-            #         if smaller_0_indices[0].size != 0:
-            #             truck_neg_90_lidar_point = abs(min(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
-            #         else:
-            #             truck_neg_90_lidar_point = 1
-            #
-            #         if truck_90_lidar_point < 0:
-            #             truck_90_lidar_point = 1
-            #
-            #         if truck_neg_90_lidar_point < 0:
-            #             truck_neg_90_lidar_point = 1
-            #
-            #     if len(vertical_relevant_lidar_x_points) == 0:
-            #         truck_0_lidar_point = 1
-            #     else:
-            #         truck_0_lidar_point = abs(min(vertical_relevant_lidar_x_points) / lidar_range)
-            #
-            #         if truck_0_lidar_point < 0:
-            #             truck_0_lidar_point = 1
-            #
-            #     print(f"truck_0_lidar_point{truck_0_lidar_point}")
-
             elif sensor == "lidar_truck_truck":
                 lidar_points = sensor_data['lidar_truck_truck'][1]
                 # print(lidar_points.shape)
@@ -785,6 +669,7 @@ class SACExperimentBasic(BaseExperiment):
             # np.float32(forward_velocity_x),
             # np.float32(forward_velocity_z),
             np.float32(hyp_distance_to_next_waypoint),
+            np.float32(hyp_distance_to_next_waypoint_line),
             np.float32(angle_to_center_of_lane_degrees),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2),
@@ -807,17 +692,17 @@ class SACExperimentBasic(BaseExperiment):
 
         observations.extend(self.radii)
 
-        print(f"Radii {self.radii}")
+        # print(f"Radii {self.radii}")
 
 
         #
-        print(f"trailer RIGHT\t\t{round(trailer_right,2)}")
-        print(f"trailer LEFT \t\t{round(trailer_left,2)}")
-        print(f"truck FRONT \t\t{round(truck_center,2)}")
-        print(f"truck LEFT \t\t{round(truck_left,2)}")
-        print(f"truck RIGHT \t\t{round(truck_right,2)}")
-        print(f"truck RIGHT 45\t\t{round(truck_front_right,2)}")
-        print(f"truck LEFT 45 \t\t{round(truck_front_left,2)}")
+        # print(f"trailer RIGHT\t\t{round(trailer_right,2)}")
+        # print(f"trailer LEFT \t\t{round(trailer_left,2)}")
+        # print(f"truck FRONT \t\t{round(truck_center,2)}")
+        # print(f"truck LEFT \t\t{round(truck_left,2)}")
+        # print(f"truck RIGHT \t\t{round(truck_right,2)}")
+        # print(f"truck RIGHT 45\t\t{round(truck_front_right,2)}")
+        # print(f"truck LEFT 45 \t\t{round(truck_front_left,2)}")
         # self.forward_velocity.append(np.float32(forward_velocity))
         # # self.forward_velocity_x.append(np.float32(forward_velocity_x))
         # # self.forward_velocity_z.append(np.float32(forward_velocity_z))
@@ -831,23 +716,28 @@ class SACExperimentBasic(BaseExperiment):
         # self.angle_between_truck_and_trailer.append(np.float32(angle_between_truck_and_trailer))
         # self.trailer_bearing_to_waypoint.append(np.float32(trailer_bearing_to_waypoint))
         # self.acceleration.append(np.float32(acceleration))
+        # self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
+        # self.temp_route = core.route_points
         #
         # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
         # print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
         # print(f"angle_to_center_of_lane_degrees_ahead_waypoints_2:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2)}")
-        print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
+        # print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
         # print(f"bearing_to_ahead_waypoints_ahead:{np.float32(bearing_to_ahead_waypoints_ahead)}")
         # print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
         # print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
         # print(f"forward_velocity:{np.float32(forward_velocity)}")
-        print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
+        # print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
         # print(f"trailer_bearing_to_waypoint:{np.float32(trailer_bearing_to_waypoint)}")
         # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
         # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         # print(f"acceleration:{np.float32(acceleration)}")
 
         self.counter += 1
-        return observations,{}
+        return observations,\
+            {"truck_z_value":truck_transform.location.z,
+             "hyp_distance_to_next_plus_1_waypoint_line":hyp_distance_to_next_plus_1_waypoint_line,
+             "hyp_distance_to_next_plus_1_waypoint":hyp_distance_to_next_plus_1_waypoint}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -927,13 +817,18 @@ class SACExperimentBasic(BaseExperiment):
 
         return bool(output), self.done_collision_truck, self.done_collision_trailer, (self.done_time_idle or self.done_time_episode), self.done_arrived
 
-    def compute_reward(self, observation, core):
+    def compute_reward(self, observation, info, core):
         """Computes the reward"""
         # est
         reward = 0
 
         forward_velocity = observation[0]
         hyp_distance_to_next_waypoint = observation[1]
+        hyp_distance_to_next_waypoint_line = observation[2]
+
+        hyp_distance_to_next_plus_1_waypoint_line = info["hyp_distance_to_next_plus_1_waypoint_line"]
+        hyp_distance_to_next_plus_1_waypoint = info["hyp_distance_to_next_plus_1_waypoint"]
+
         # print(f"in rewards forward_velocity {forward_velocity}")
         # print(f"in rewards hyp_distance_to_next_waypoint {hyp_distance_to_next_waypoint}")
 
@@ -941,16 +836,45 @@ class SACExperimentBasic(BaseExperiment):
         # bearing_to_ahead_waypoints_ahead = observation["values"][5]
         # angle_between_truck_and_trailer = observation["values"][6]
 
-
         self.last_forward_velocity = forward_velocity
 
-        print(f"Hyp distance in rewards {hyp_distance_to_next_waypoint}")
+        # print(f"Hyp distance in rewards {hyp_distance_to_next_waypoint}")
+        # print(f"self.last_hyp_distance_to_next_waypoint {self.last_hyp_distance_to_next_waypoint}")
+        # print(f"self.last_hyp_distance_to_next_plus_1_waypoint {self.last_hyp_distance_to_next_plus_1_waypoint}")
+        # print(f"Hyp distance line in rewards {hyp_distance_to_next_waypoint_line}")
+        # print(f"self.last_hyp_distance_to_next_waypoint_lines {self.last_hyp_distance_to_next_waypoint_line}")
+        # print(f"self.last_hyp_distance_to_next_plus_1_waypoint_line {self.last_hyp_distance_to_next_plus_1_waypoint_line}")
+
+        if self.last_hyp_distance_to_next_plus_1_waypoint == 0:
+            self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_waypoint
+
+        if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
+            self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
+
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward*100
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward*100}")
+            reward = reward + hyp_reward* 10
+            # print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward*10}")
+        else:
+            hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
+            reward = reward + hyp_reward * 10
+            # print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward * 10}")
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
+        self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
+
+
+        if self.last_hyp_distance_to_next_waypoint_line != 0:
+            hyp_reward = self.last_hyp_distance_to_next_waypoint_line - hyp_distance_to_next_waypoint_line
+            reward = reward + hyp_reward* 100
+            # print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward*100}")
+        else:
+            hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint_line - hyp_distance_to_next_waypoint_line
+            reward = reward + hyp_reward * 100
+            # print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward * 100}")
+
+        self.last_hyp_distance_to_next_waypoint_line = hyp_distance_to_next_waypoint_line
+        self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_plus_1_waypoint_line
 
 
 
@@ -989,8 +913,8 @@ class SACExperimentBasic(BaseExperiment):
             reward = reward + -1000
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward = reward + 10000
+            reward = reward + 5000
 
         self.reward_metric = reward
-        print(f"Reward: {reward}")
+        # print(f"Reward: {reward}")
         return reward

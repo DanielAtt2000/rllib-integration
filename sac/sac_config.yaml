@@ -17,10 +17,10 @@ policy_model_config:
 recreate_failed_workers: True
 # Do hard syncs.
 # Soft-syncs seem to work less reliably for discrete action spaces.
-tau: 0.005
-lr: 0.00001
+tau: 1
+#lr: 0.00001
 target_network_update_freq: 8000
-initial_alpha: 0.2
+#initial_alpha: 0.2
 # auto = 0.98 * -log(1/|A|)
 target_entropy: auto
 clip_rewards: False
@@ -41,10 +41,10 @@ min_sample_timesteps_per_iteration: 4
 # Paper uses 20k random timesteps, which is not exactly the same, but
 # seems to work nevertheless. We use 100k here for the longer Atari
 # runs (DQN style: filling up the buffer a bit before learning).
-#optimization:
-#    actor_learning_rate: 0.00005
-#    critic_learning_rate: 0.00005
-#    entropy_learning_rate: 0.00005
+optimization:
+    actor_learning_rate: 0.00005
+    critic_learning_rate: 0.00005
+    entropy_learning_rate: 0.00005
 
 "exploration_config": {
   "type": "EpsilonGreedy",

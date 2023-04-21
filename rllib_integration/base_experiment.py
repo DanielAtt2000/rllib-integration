@@ -80,6 +80,6 @@ class BaseExperiment(object):
         """Returns whether or not the experiment has to end"""
         return NotImplementedError
 
-    def compute_reward(self, observation, core):
+    def compute_reward(self, observation, info, core):
         """Computes the reward"""
         return NotImplementedError

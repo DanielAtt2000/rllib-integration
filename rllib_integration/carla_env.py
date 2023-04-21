@@ -69,7 +69,12 @@ class CarlaEnv(gym.Env):
 
         # Tick once and get the observations
         sensor_data = self.core.tick(None)
-        observation, _ = self.experiment.get_observation(sensor_data, self.core)
+        observation, info = self.experiment.get_observation(sensor_data, self.core)
+
+        while info['truck_z_value'] > 0.1:
+            sensor_data = self.core.tick(None)
+            observation, info = self.experiment.get_observation(sensor_data, self.core)
+
 
         return observation
 
@@ -124,7 +129,7 @@ class CarlaEnv(gym.Env):
         # self.get_done_status_time.append(time_taken)
         #
         # start = time.time()
-        reward = self.experiment.compute_reward(observation, self.core)
+        reward = self.experiment.compute_reward(observation,info, self.core)
         # stop = time.time()
         # time_taken = stop - start
         # self.compute_reward_time.append(time_taken)

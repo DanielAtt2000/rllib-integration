@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import math
 # Copyright (c) 2021 Computer Vision Center (CVC) at the Universitat Autonoma de
 # Barcelona (UAB).
 #
@@ -15,7 +15,9 @@ import logging
 import socket
 import datetime
 import carla
+from matplotlib import pyplot as plt
 
+from rllib_integration.LineIntersection import Point, lineLineIntersection
 from rllib_integration.RouteGeneration.global_route_planner import GlobalRoutePlanner
 from rllib_integration.sensors.sensor_interface import SensorInterface
 from rllib_integration.sensors.factory import SensorFactory
@@ -391,6 +393,125 @@ class CarlaCore:
         else:
             return -1
 
+    def get_distance_to_waypoint_line(self,truck_transform, truck_forward_vector, waypoint_plus_current):
+        # Obtaining two points on the truck forward vector
+        # r = starting point + constant(direction)
+        # r = (a.b) + t (x,y)
+        t = 2
+        truck_point_on_forward_vector_x = truck_transform.location.x + t*truck_forward_vector.x
+        truck_point_on_forward_vector_y = truck_transform.location.y + t*truck_forward_vector.y
+
+        truck_point_0 = Point(x=truck_transform.location.x,y=truck_transform.location.y)
+        truck_point_1 = Point(x=truck_point_on_forward_vector_x,y=truck_point_on_forward_vector_y)
+
+        # Obtaining two points perpendicular to the next waypoint
+        waypoint_right_vector = self.route[self.last_waypoint_index + waypoint_plus_current].get_right_vector()
+        # r = starting point + constant(direction)
+        # r = (a.b) + t (x,y)
+        t = 2
+        waypoint_point_on_right_vector_x = self.route[self.last_waypoint_index + waypoint_plus_current].location.x + t*waypoint_right_vector.x
+        waypoint_point_on_right_vector_y = self.route[self.last_waypoint_index + waypoint_plus_current].location.y + t*waypoint_right_vector.y
+
+        waypoint_point_0 = Point(x=self.route[self.last_waypoint_index + waypoint_plus_current].location.x,y=self.route[self.last_waypoint_index + waypoint_plus_current].location.y)
+        waypoint_point_1 = Point(x=waypoint_point_on_right_vector_x,y=waypoint_point_on_right_vector_y)
+
+        # Finding the intersection point between the truck forward vector and the perpendicular to the waypoint
+        intersection = lineLineIntersection(truck_point_0,truck_point_1,waypoint_point_0,waypoint_point_1)
+
+        if (intersection.x == 10 ** 9 and intersection.y == 10 ** 9):
+            # parallel lines
+            distance_to_point_of_intersection = 10
+        else:
+            distance_to_point_of_intersection = math.sqrt((truck_transform.location.x-intersection.x)**2 + (truck_transform.location.y-intersection.y)**2)
+
+        plot = False
+        if plot:
+            f = plt.figure()
+            f.set_figwidth(6)
+            f.set_figheight(6)
+
+            x_values = [intersection.x, truck_transform.location.x, self.route[self.last_waypoint_index].location.x, self.route[self.last_waypoint_index+1].location.x, self.route[self.last_waypoint_index+2].location.x]
+            y_values = [intersection.y, truck_transform.location.y, self.route[self.last_waypoint_index].location.y, self.route[self.last_waypoint_index+1].location.y, self.route[self.last_waypoint_index+2].location.y]
+            x_min = min(x_values)
+            x_max = max(x_values)
+
+            y_min = min(y_values)
+            y_max = max(y_values)
+            buffer = 3
+            #
+            plt.xlim([x_min - buffer, x_max + buffer])
+            plt.ylim([y_min - buffer, y_max + buffer])
+
+            # print(f"x_pos {current_position.x} y_pos {current_position.y}")
+            # print(f"x_last {previous_position.x} y_last {previous_position.y}")
+            # print(f"x_next {next_position.x} y_next {next_position.y}")
+
+            # plt.plot([intersection.x, next_position.x], [previous_position.y, next_position.y])
+            # plotting the points
+            plt.plot(intersection.x, intersection.y, marker="o", markersize=3, markeredgecolor="red",
+                     markerfacecolor="red", label='Intersection Point')
+            plt.plot(truck_transform.location.x, truck_transform.location.y, marker="o", markersize=3, markeredgecolor="black",
+                     markerfacecolor="black", label='Current truck position')
+            plt.plot(self.route[self.last_waypoint_index].location.x, self.route[self.last_waypoint_index].location.y, marker="o", markersize=3, markeredgecolor="blue",
+                     markerfacecolor="blue", label='Current Waypoint')
+            plt.plot(self.route[self.last_waypoint_index+1].location.x, self.route[self.last_waypoint_index+1].location.y, marker="o", markersize=3, markeredgecolor="green",
+                     markerfacecolor="green", label='Next + 1 Waypoint')
+            plt.plot(self.route[self.last_waypoint_index + 2].location.x,
+                     self.route[self.last_waypoint_index + 2].location.y, marker="o", markersize=3,
+                     markeredgecolor="purple",
+                     markerfacecolor="purple", label='Next + 2  Waypoint')
+            plt.gca().invert_yaxis()
+            # val = update_next_waypoint(current_position.x,current_position.y,previous_position.x,previous_position.y,next_position.x,next_position.y)
+
+            current_waypoint = self.route[self.last_waypoint_index].location
+            next_waypoint = self.route[self.last_waypoint_index+1].location
+            if next_waypoint.x - current_waypoint.x == 0:
+                x = []
+                y = []
+                for a in range(-20, 20):
+                    x.append(a)
+                    y.append(current_waypoint.y)
+                plt.plot(x, y)
+            elif next_waypoint.y - current_waypoint.y == 0:
+                x = []
+                y = []
+                for a in range(-20, 20):
+                    x.append(current_waypoint.x)
+                    y.append(a)
+                plt.plot(x, y)
+
+            else:
+                gradOfPrevToNext = (next_waypoint.y - current_waypoint.y) / (next_waypoint.x - current_waypoint.x)
+                gradOfPerpendicular = -1 / gradOfPrevToNext
+                cOfPerpendicular = current_waypoint.y - gradOfPerpendicular * current_waypoint.x
+                print(f"gradOfPerpendicular {gradOfPerpendicular}")
+                print(f"cOfPerpendicular {cOfPerpendicular}")
+                x = []
+                y = []
+                for a in range(-20, 200):
+                    x.append(a)
+                    y.append(gradOfPerpendicular * a + cOfPerpendicular)
+                plt.plot(x, y, label="Perpendicular")
+            leg = plt.legend(loc='upper right')
+            # if in_front_of_waypoint == 0:
+            #     print('POINT ON LINE')
+            #     plt.title(f"Result = ONLINE - {angle}")
+            # if in_front_of_waypoint == 1:
+            #     plt.title(f"Result = FORWARD - {angle}")
+            # if in_front_of_waypoint == -1:
+            #     plt.title(f"Result = BACKWARD - {angle}")
+            # print('--------------------')
+            #
+            # # naming the x-axis
+            plt.xlabel('x - axis')
+            # naming the y-axis
+            plt.ylabel('y - axis')
+
+            # function to show the plot
+            plt.show()
+
+        return distance_to_point_of_intersection
+
     def set_route(self,failed_entry_spawn_locations):
         self.route_points = []
 
@@ -562,12 +683,11 @@ class CarlaCore:
         for name, attributes in hero_config["sensors"].items():
             if name != 'lidar_trailer':
                 sensor_truck = SensorFactory.spawn(name, attributes, self.sensor_interface_truck, self.hero)
-                time.sleep(0.2)
+                time.sleep(0.05)
             if hero_config["truckTrailerCombo"] and (name == 'collision' or 'lidar_trailer' in name):
                 print("TRAILER PART 7/7")
-                time.sleep(0.2)
+                time.sleep(0.05)
                 sensor_trailer = SensorFactory.spawn(name, attributes, self.sensor_interface_trailer, self.hero_trailer)
-        time.sleep(0.2)
         # Not needed anymore. This tick will happen when calling CarlaCore.tick()
         # self.world.tick()
 
