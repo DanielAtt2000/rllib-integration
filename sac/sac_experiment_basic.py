@@ -353,7 +353,7 @@ class SACExperimentBasic(BaseExperiment):
 
 
         # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
-        print(f"----------------------------------->{action_msg}")
+        # print(f"----------------------------------->{action_msg}")
 
         self.last_action = action_control
 
