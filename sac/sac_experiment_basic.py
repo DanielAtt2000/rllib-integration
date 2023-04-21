@@ -848,16 +848,16 @@ class SACExperimentBasic(BaseExperiment):
         if self.last_hyp_distance_to_next_plus_1_waypoint == 0:
             self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_waypoint
 
-        if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
-            self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
+        # if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
+        #     self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
 
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward* 10
+            reward = reward + hyp_reward* 100
             # print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward*10}")
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward * 10
+            reward = reward + hyp_reward * 100
             # print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward * 10}")
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
@@ -913,7 +913,7 @@ class SACExperimentBasic(BaseExperiment):
             reward = reward + -1000
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward = reward + 5000
+            reward = reward + 10000
 
         self.reward_metric = reward
         # print(f"Reward: {reward}")
