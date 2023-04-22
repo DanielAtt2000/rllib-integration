@@ -7,11 +7,9 @@ gamma: 0.99
 twin_q: True
 # these probably do nothing
 q_model_config:
-    hidden_activation: relu
-    hidden_layer_sizes: [128,256,512,1024]
+    fcnet_hiddens: [256,512]
 policy_model_config:
-    hidden_activation: relu
-    hidden_layer_sizes: [128,256,512,1024]
+    fcnet_hiddens: [256,512]
 
 #temp
 recreate_failed_workers: True
