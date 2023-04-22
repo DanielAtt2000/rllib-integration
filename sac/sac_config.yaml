@@ -13,7 +13,7 @@ policy_model_config:
     hidden_activation: relu
     hidden_layer_sizes: [128,256,512,1024]
 
-
+#temp
 recreate_failed_workers: True
 # Do hard syncs.
 # Soft-syncs seem to work less reliably for discrete action spaces.
