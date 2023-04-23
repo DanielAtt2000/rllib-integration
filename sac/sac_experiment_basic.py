@@ -283,8 +283,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
+                low=np.array([0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
+                high=np.array([100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
                 dtype=np.float32
             )
 
@@ -669,6 +669,7 @@ class SACExperimentBasic(BaseExperiment):
             # np.float32(forward_velocity_x),
             # np.float32(forward_velocity_z),
             np.float32(hyp_distance_to_next_waypoint),
+            np.float32(hyp_distance_to_next_plus_1_waypoint),
             # np.float32(hyp_distance_to_next_waypoint_line),
             np.float32(angle_to_center_of_lane_degrees),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints),
@@ -696,13 +697,13 @@ class SACExperimentBasic(BaseExperiment):
 
 
         #
-        # print(f"trailer RIGHT\t\t{round(trailer_right,2)}")
-        # print(f"trailer LEFT \t\t{round(trailer_left,2)}")
-        # print(f"truck FRONT \t\t{round(truck_center,2)}")
-        # print(f"truck LEFT \t\t{round(truck_left,2)}")
-        # print(f"truck RIGHT \t\t{round(truck_right,2)}")
-        # print(f"truck RIGHT 45\t\t{round(truck_front_right,2)}")
-        # print(f"truck LEFT 45 \t\t{round(truck_front_left,2)}")
+        print(f"trailer RIGHT\t\t{round(trailer_right,2)}")
+        print(f"trailer LEFT \t\t{round(trailer_left,2)}")
+        print(f"truck FRONT \t\t{round(truck_center,2)}")
+        print(f"truck LEFT \t\t{round(truck_left,2)}")
+        print(f"truck RIGHT \t\t{round(truck_right,2)}")
+        print(f"truck RIGHT 45\t\t{round(truck_front_right,2)}")
+        print(f"truck LEFT 45 \t\t{round(truck_front_left,2)}")
         # self.forward_velocity.append(np.float32(forward_velocity))
         # # self.forward_velocity_x.append(np.float32(forward_velocity_x))
         # # self.forward_velocity_z.append(np.float32(forward_velocity_z))
@@ -737,7 +738,8 @@ class SACExperimentBasic(BaseExperiment):
         return observations,\
             {"truck_z_value":truck_transform.location.z,
              # "hyp_distance_to_next_plus_1_waypoint_line":hyp_distance_to_next_plus_1_waypoint_line,
-             "hyp_distance_to_next_plus_1_waypoint":hyp_distance_to_next_plus_1_waypoint}
+             # "hyp_distance_to_next_plus_1_waypoint":hyp_distance_to_next_plus_1_waypoint
+             }
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -824,10 +826,7 @@ class SACExperimentBasic(BaseExperiment):
 
         forward_velocity = observation[0]
         hyp_distance_to_next_waypoint = observation[1]
-        # hyp_distance_to_next_waypoint_line = observation[2]
-
-        # hyp_distance_to_next_plus_1_waypoint_line = info["hyp_distance_to_next_plus_1_waypoint_line"]
-        hyp_distance_to_next_plus_1_waypoint = info["hyp_distance_to_next_plus_1_waypoint"]
+        hyp_distance_to_next_plus_1_waypoint = observation[2]
 
         # print(f"in rewards forward_velocity {forward_velocity}")
         # print(f"in rewards hyp_distance_to_next_waypoint {hyp_distance_to_next_waypoint}")
@@ -845,8 +844,8 @@ class SACExperimentBasic(BaseExperiment):
         # print(f"self.last_hyp_distance_to_next_waypoint_lines {self.last_hyp_distance_to_next_waypoint_line}")
         # print(f"self.last_hyp_distance_to_next_plus_1_waypoint_line {self.last_hyp_distance_to_next_plus_1_waypoint_line}")
 
-        if self.last_hyp_distance_to_next_plus_1_waypoint == 0:
-            self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_waypoint
+        # if self.last_hyp_distance_to_next_plus_1_waypoint == 0:
+        #     self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_waypoint
 
         # if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
         #     self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line

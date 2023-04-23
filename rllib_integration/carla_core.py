@@ -186,13 +186,14 @@ class CarlaCore:
 
             try:
                 print(f"Trying to set up client {i+1} time")
+                file = open('../enable_rendering.txt','r')
                 self.client.set_timeout(self.config["timeout"])
                 time.sleep(0.2)
                 self.world = self.client.get_world()
                 time.sleep(0.2)
                 settings = self.world.get_settings()
                 time.sleep(0.2)
-                settings.no_rendering_mode = not self.config["enable_rendering"]
+                settings.no_rendering_mode = not file.readline()
                 time.sleep(0.2)
                 settings.synchronous_mode = True
                 time.sleep(0.2)
