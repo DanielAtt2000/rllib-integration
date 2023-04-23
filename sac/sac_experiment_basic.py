@@ -768,18 +768,13 @@ class SACExperimentBasic(BaseExperiment):
 
 
         if core.custom_enable_rendering:
-            print(f"trailer_0_left\t\t{round(trailer_0_left,2)}")
-            print(f"trailer_0_right \t\t{round(trailer_0_right,2)}")
-            print(f"trailer_1_left\t\t{round(trailer_1_left, 2)}")
-            print(f"trailer_1_right \t\t{round(trailer_1_right, 2)}")
-            print(f"trailer_2_left\t\t{round(trailer_2_left, 2)}")
-            print(f"trailer_2_right \t\t{round(trailer_2_right, 2)}")
-            print(f"trailer_3_left\t\t{round(trailer_3_left, 2)}")
-            print(f"trailer_3_right \t\t{round(trailer_3_right, 2)}")
-            print(f"trailer_4_left\t\t{round(trailer_4_left, 2)}")
-            print(f"trailer_4_right \t\t{round(trailer_4_right, 2)}")
-            print(f"trailer_5_left\t\t{round(trailer_5_left, 2)}")
-            print(f"trailer_5_right \t\t{round(trailer_5_right, 2)}")
+            print(f"trailer_0 \t\t{round(trailer_0_left,2)}\t\t{round(trailer_0_right,2)}")
+            print(f"trailer_1 \t\t{round(trailer_1_left,2)}\t\t{round(trailer_2_right,2)}")
+            print(f"trailer_2 \t\t{round(trailer_2_left,2)}\t\t{round(trailer_2_right,2)}")
+            print(f"trailer_3 \t\t{round(trailer_3_left,2)}\t\t{round(trailer_3_right,2)}")
+            print(f"trailer_4 \t\t{round(trailer_4_left,2)}\t\t{round(trailer_4_right,2)}")
+            print(f"trailer_5 \t\t{round(trailer_5_left,2)}\t\t{round(trailer_5_right,2)}")
+
 
             print(f"truck FRONT \t\t{round(truck_center,2)}")
             print(f"truck LEFT \t\t{round(truck_left,2)}")
