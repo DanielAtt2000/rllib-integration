@@ -938,12 +938,12 @@ class SACExperimentBasic(BaseExperiment):
 
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward* 70
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 70}") if core.custom_enable_rendering else None
+            reward = reward + hyp_reward* 50
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 50}") if core.custom_enable_rendering else None
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward * 70
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 70}") if core.custom_enable_rendering else None
+            reward = reward + hyp_reward * 50
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 50}") if core.custom_enable_rendering else None
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
         self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
