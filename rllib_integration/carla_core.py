@@ -188,7 +188,7 @@ class CarlaCore:
                 print(f"Trying to set up client {i+1} time")
                 import os
                 print(os.getcwd())
-                file = open('enable_rendering.txt','r')
+                file = open('rllib_integration/enable_rendering.txt','r')
                 self.client.set_timeout(self.config["timeout"])
                 time.sleep(0.2)
                 self.world = self.client.get_world()
