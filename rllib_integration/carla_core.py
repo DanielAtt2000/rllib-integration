@@ -204,7 +204,7 @@ class CarlaCore:
                 time.sleep(0.2)
                 settings = self.world.get_settings()
                 time.sleep(0.2)
-                settings.no_rendering_mode = not self.config["enable_rendering"]
+                settings.no_rendering_mode = not self.custom_enable_rendering
                 time.sleep(0.2)
                 settings.synchronous_mode = True
                 time.sleep(0.2)
