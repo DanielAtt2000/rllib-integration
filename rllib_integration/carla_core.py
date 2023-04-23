@@ -195,7 +195,7 @@ class CarlaCore:
                 time.sleep(0.2)
                 settings = self.world.get_settings()
                 time.sleep(0.2)
-                settings.no_rendering_mode = not file.readline()
+                settings.no_rendering_mode = False if str(file.readline()) == 'False' else True
                 time.sleep(0.2)
                 settings.synchronous_mode = True
                 time.sleep(0.2)
