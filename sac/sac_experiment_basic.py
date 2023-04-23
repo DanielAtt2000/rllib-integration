@@ -995,4 +995,5 @@ class SACExperimentBasic(BaseExperiment):
 
         self.reward_metric = reward
         print(f"FINAL REWARD: {reward}") if core.custom_enable_rendering else None
+        print(f"---------------------------------------------") if core.custom_enable_rendering else None
         return reward
