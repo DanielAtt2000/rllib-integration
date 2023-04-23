@@ -10,6 +10,8 @@ import os
 import random
 import signal
 import time
+
+import numpy as np
 import psutil
 import logging
 import socket
@@ -95,6 +97,7 @@ class CarlaCore:
         self.server_port_lines = ''
         self.visualise_all_routes = False
         self.times_crazy = []
+        self.custom_enable_rendering = False
 
         self.route = []
         self.route_points = []
@@ -189,13 +192,19 @@ class CarlaCore:
                 import os
                 print(os.getcwd())
                 file = open('rllib_integration/enable_rendering.txt','r')
+
+                if str(file.readline()) == 'False':
+                    self.custom_enable_rendering = False
+                else:
+                    self.custom_enable_rendering = True
+
                 self.client.set_timeout(self.config["timeout"])
                 time.sleep(0.2)
                 self.world = self.client.get_world()
                 time.sleep(0.2)
                 settings = self.world.get_settings()
                 time.sleep(0.2)
-                settings.no_rendering_mode = True if str(file.readline()) == 'False' else False
+                settings.no_rendering_mode = not self.config["enable_rendering"]
                 time.sleep(0.2)
                 settings.synchronous_mode = True
                 time.sleep(0.2)
@@ -395,6 +404,46 @@ class CarlaCore:
             return 1
         else:
             return -1
+    def get_perpendicular_distance_between_truck_waypoint_line(self, truck_transform, waypoint_plus_current):
+        # https://www.nagwa.com/en/explainers/939127418581/
+        # D = magnitude(AP x d) / magnitude(d)
+        # d = direction vector of line
+        # A is point on line
+        # P is point from which to calculate
+
+        def magnitude(vector):
+            return math.sqrt(sum(pow(element, 2) for element in vector))
+
+        waypoint_right_vector = self.route[self.last_waypoint_index + waypoint_plus_current].get_right_vector()
+
+        # AP
+        ap_x = truck_transform.location.x - self.route[self.last_waypoint_index + waypoint_plus_current].location.x
+        ap_y = truck_transform.location.y - self.route[self.last_waypoint_index + waypoint_plus_current].location.y
+        ap_z = truck_transform.location.z - self.route[self.last_waypoint_index + waypoint_plus_current].location.z
+
+        AP_vector = [ap_x,ap_y,ap_z]
+
+        d = waypoint_right_vector
+        d_vector = [d.x, d.y,d.z]
+
+        ap_cross_d = np.cross(AP_vector,d_vector)
+
+        magnitude_ap_cross_d = magnitude(ap_cross_d)
+
+        distance = magnitude_ap_cross_d / magnitude(d_vector)
+
+        test = False
+        if test:
+            print(f"waypoint_right_vector {waypoint_right_vector}")
+            print(f"waypoint x {self.route[self.last_waypoint_index + waypoint_plus_current].location.x}")
+            print(f"waypoint y {self.route[self.last_waypoint_index + waypoint_plus_current].location.y}")
+            print(f"waypoint z {self.route[self.last_waypoint_index + waypoint_plus_current].location.z}")
+            print(f"truck x {truck_transform.location.x}")
+            print(f"truck y {truck_transform.location.y}")
+            print(f"truck z {truck_transform.location.z}")
+            print(f"distance {distance}")
+
+        return distance
 
     def get_distance_to_waypoint_line(self,truck_transform, truck_forward_vector, waypoint_plus_current):
         # Obtaining two points on the truck forward vector
@@ -787,7 +836,7 @@ class CarlaCore:
         # Tick once the simulation
         self.world.tick()
         # Move the spectator
-        if self.config["enable_rendering"]:
+        if self.custom_enable_rendering:
             self.set_spectator_camera_view()
 
         # start = time.time()

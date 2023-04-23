@@ -3,6 +3,9 @@ import random
 from git import Repo
 
 def check_with_user(check_commit):
+    if not check_commit:
+        return True
+
     repo = Repo('.')
     verify_num = random.randint(0,100)
     print('=========================================')

@@ -283,8 +283,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
-                high=np.array([100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
+                low=np.array([0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
+                high=np.array([100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
                 dtype=np.float32
             )
 
@@ -440,8 +440,8 @@ class SACExperimentBasic(BaseExperiment):
         #
         # save_data('waypoints2.pkl',location_from_waypoint_to_vehicle_relative)
 
-        # hyp_distance_to_next_waypoint_line = core.get_distance_to_waypoint_line(truck_transform=truck_transform,truck_forward_vector=truck_forward_vector,waypoint_plus_current=0)
-        # hyp_distance_to_next_plus_1_waypoint_line = core.get_distance_to_waypoint_line(truck_transform=truck_transform,truck_forward_vector=truck_forward_vector,waypoint_plus_current=1)
+        hyp_distance_to_next_waypoint_line = core.get_perpendicular_distance_between_truck_waypoint_line(truck_transform=truck_transform,waypoint_plus_current=0)
+        hyp_distance_to_next_plus_1_waypoint_line = core.get_perpendicular_distance_between_truck_waypoint_line(truck_transform=truck_transform,waypoint_plus_current=1)
 
         # Hyp distance to next waypoint
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
@@ -527,8 +527,19 @@ class SACExperimentBasic(BaseExperiment):
 
         depth_camera_data = None
         current_occupancy_map = None
-        trailer_right = 0
-        trailer_left = 0
+        trailer_0_left = 0
+        trailer_0_right = 0
+        trailer_1_left = 0
+        trailer_1_right = 0
+        trailer_2_left = 0
+        trailer_2_right = 0
+        trailer_3_left = 0
+        trailer_3_right = 0
+        trailer_4_left = 0
+        trailer_4_right = 0
+        trailer_5_left = 0
+        trailer_5_right = 0
+
         truck_center = 0
         truck_right = 0
         truck_left= 0
@@ -564,15 +575,65 @@ class SACExperimentBasic(BaseExperiment):
                 # print(depth_camera_data.shape)
 
                 assert depth_camera_data is not None
-            elif sensor == "lidar_trailer_left_trailer":
-                lidar_points = sensor_data['lidar_trailer_left_trailer'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_left"]["range"])
-                trailer_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+            elif sensor == "lidar_trailer_0_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_0_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_left"]["range"])
+                trailer_0_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
 
-            elif sensor == "lidar_trailer_right_trailer":
-                lidar_points = sensor_data['lidar_trailer_right_trailer'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_right"]["range"])
-                trailer_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+            elif sensor == "lidar_trailer_0_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_0_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_right"]["range"])
+                trailer_0_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_1_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_1_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_left"]["range"])
+                trailer_1_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_1_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_1_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_right"]["range"])
+                trailer_1_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_2_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_2_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_2_left"]["range"])
+                trailer_2_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_2_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_2_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_2_right"]["range"])
+                trailer_2_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_3_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_3_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_3_left"]["range"])
+                trailer_3_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_3_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_3_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_3_right"]["range"])
+                trailer_3_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_4_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_4_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_4_left"]["range"])
+                trailer_4_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_4_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_4_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_4_right"]["range"])
+                trailer_4_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_5_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_5_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5_left"]["range"])
+                trailer_5_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_5_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_5_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5_right"]["range"])
+                trailer_5_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
             elif sensor == "lidar_truck_right_truck":
                 lidar_points = sensor_data['lidar_truck_right_truck'][1]
@@ -678,8 +739,18 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(bearing_to_ahead_waypoints_ahead),
             np.float32(bearing_to_ahead_waypoints_ahead_2),
             np.float32(angle_between_truck_and_trailer),
-            np.float32(trailer_right),
-            np.float32(trailer_left),
+            np.float32(trailer_0_left),
+            np.float32(trailer_0_right),
+            np.float32(trailer_1_left),
+            np.float32(trailer_1_right),
+            np.float32(trailer_2_left),
+            np.float32(trailer_2_right),
+            np.float32(trailer_3_left),
+            np.float32(trailer_3_right),
+            np.float32(trailer_4_left),
+            np.float32(trailer_4_right),
+            np.float32(trailer_5_left),
+            np.float32(trailer_5_right),
             np.float32(truck_center),
             np.float32(truck_right),
             np.float32(truck_left),
@@ -696,14 +767,26 @@ class SACExperimentBasic(BaseExperiment):
         # print(f"Radii {self.radii}")
 
 
-        #
-        print(f"trailer RIGHT\t\t{round(trailer_right,2)}")
-        print(f"trailer LEFT \t\t{round(trailer_left,2)}")
-        print(f"truck FRONT \t\t{round(truck_center,2)}")
-        print(f"truck LEFT \t\t{round(truck_left,2)}")
-        print(f"truck RIGHT \t\t{round(truck_right,2)}")
-        print(f"truck RIGHT 45\t\t{round(truck_front_right,2)}")
-        print(f"truck LEFT 45 \t\t{round(truck_front_left,2)}")
+        if core.custom_enable_rendering:
+            print(f"trailer_0_left\t\t{round(trailer_0_left,2)}")
+            print(f"trailer_0_right \t\t{round(trailer_0_right,2)}")
+            print(f"trailer_1_left\t\t{round(trailer_1_left, 2)}")
+            print(f"trailer_1_right \t\t{round(trailer_1_right, 2)}")
+            print(f"trailer_2_left\t\t{round(trailer_2_left, 2)}")
+            print(f"trailer_2_right \t\t{round(trailer_2_right, 2)}")
+            print(f"trailer_3_left\t\t{round(trailer_3_left, 2)}")
+            print(f"trailer_3_right \t\t{round(trailer_3_right, 2)}")
+            print(f"trailer_4_left\t\t{round(trailer_4_left, 2)}")
+            print(f"trailer_4_right \t\t{round(trailer_4_right, 2)}")
+            print(f"trailer_5_left\t\t{round(trailer_5_left, 2)}")
+            print(f"trailer_5_right \t\t{round(trailer_5_right, 2)}")
+
+            print(f"truck FRONT \t\t{round(truck_center,2)}")
+            print(f"truck LEFT \t\t{round(truck_left,2)}")
+            print(f"truck RIGHT \t\t{round(truck_right,2)}")
+            print(f"truck RIGHT 45\t\t{round(truck_front_right,2)}")
+            print(f"truck LEFT 45 \t\t{round(truck_front_left,2)}")
+            time.sleep(0.5)
         # self.forward_velocity.append(np.float32(forward_velocity))
         # # self.forward_velocity_x.append(np.float32(forward_velocity_x))
         # # self.forward_velocity_z.append(np.float32(forward_velocity_z))
@@ -737,8 +820,8 @@ class SACExperimentBasic(BaseExperiment):
         self.counter += 1
         return observations,\
             {"truck_z_value":truck_transform.location.z,
-             # "hyp_distance_to_next_plus_1_waypoint_line":hyp_distance_to_next_plus_1_waypoint_line,
-             # "hyp_distance_to_next_plus_1_waypoint":hyp_distance_to_next_plus_1_waypoint
+             "hyp_distance_to_next_plus_1_waypoint_line":hyp_distance_to_next_plus_1_waypoint_line,
+             "hyp_distance_to_next_waypoint_line":hyp_distance_to_next_waypoint_line
              }
 
     def get_speed(self, hero):
@@ -828,6 +911,9 @@ class SACExperimentBasic(BaseExperiment):
         hyp_distance_to_next_waypoint = observation[1]
         hyp_distance_to_next_plus_1_waypoint = observation[2]
 
+        hyp_distance_to_next_plus_1_waypoint_line = info["hyp_distance_to_next_plus_1_waypoint_line"]
+        hyp_distance_to_next_waypoint_line = info["hyp_distance_to_next_waypoint_line"]
+
         # print(f"in rewards forward_velocity {forward_velocity}")
         # print(f"in rewards hyp_distance_to_next_waypoint {hyp_distance_to_next_waypoint}")
 
@@ -844,36 +930,36 @@ class SACExperimentBasic(BaseExperiment):
         # print(f"self.last_hyp_distance_to_next_waypoint_lines {self.last_hyp_distance_to_next_waypoint_line}")
         # print(f"self.last_hyp_distance_to_next_plus_1_waypoint_line {self.last_hyp_distance_to_next_plus_1_waypoint_line}")
 
-        # if self.last_hyp_distance_to_next_plus_1_waypoint == 0:
-        #     self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_waypoint
+        if self.last_hyp_distance_to_next_plus_1_waypoint == 0:
+            self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_waypoint
 
-        # if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
-        #     self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
+        if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
+            self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
 
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward* 100
-            # print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward*10}")
+            reward = reward + hyp_reward* 70
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 70}") if core.custom_enable_rendering else None
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward * 100
-            # print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward * 10}")
+            reward = reward + hyp_reward * 70
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 70}") if core.custom_enable_rendering else None
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
         self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
 
 
-        # if self.last_hyp_distance_to_next_waypoint_line != 0:
-        #     hyp_reward = self.last_hyp_distance_to_next_waypoint_line - hyp_distance_to_next_waypoint_line
-        #     reward = reward + hyp_reward* 100
-        #     # print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward*100}")
-        # else:
-        #     hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint_line - hyp_distance_to_next_waypoint_line
-        #     reward = reward + hyp_reward * 100
-        #     # print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward * 100}")
-        #
-        # self.last_hyp_distance_to_next_waypoint_line = hyp_distance_to_next_waypoint_line
-        # self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_plus_1_waypoint_line
+        if self.last_hyp_distance_to_next_waypoint_line != 0:
+            hyp_reward = self.last_hyp_distance_to_next_waypoint_line - hyp_distance_to_next_waypoint_line
+            reward = reward + hyp_reward* 100
+            print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward* 100}") if core.custom_enable_rendering else None
+        else:
+            hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint_line - hyp_distance_to_next_waypoint_line
+            reward = reward + hyp_reward * 100
+            print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward* 100}") if core.custom_enable_rendering else None
+
+        self.last_hyp_distance_to_next_waypoint_line = hyp_distance_to_next_waypoint_line
+        self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_plus_1_waypoint_line
 
 
 
@@ -915,5 +1001,5 @@ class SACExperimentBasic(BaseExperiment):
             reward = reward + 10000
 
         self.reward_metric = reward
-        # print(f"Reward: {reward}")
+        print(f"FINAL REWARD: {reward}") if core.custom_enable_rendering else None
         return reward
