@@ -933,33 +933,33 @@ class SACExperimentBasic(BaseExperiment):
         if self.last_hyp_distance_to_next_plus_1_waypoint == 0:
             self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_waypoint
 
-        if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
-            self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
+        # if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
+        #     self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
 
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward* 50
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 50}") if core.custom_enable_rendering else None
+            reward = reward + hyp_reward* 100
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 100}") if core.custom_enable_rendering else None
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward * 50
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 50}") if core.custom_enable_rendering else None
+            reward = reward + hyp_reward * 100
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 100}") if core.custom_enable_rendering else None
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
         self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
 
 
-        if self.last_hyp_distance_to_next_waypoint_line != 0:
-            hyp_reward = self.last_hyp_distance_to_next_waypoint_line - hyp_distance_to_next_waypoint_line
-            reward = reward + hyp_reward* 100
-            print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward* 100}") if core.custom_enable_rendering else None
-        else:
-            hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint_line - hyp_distance_to_next_waypoint_line
-            reward = reward + hyp_reward * 100
-            print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward* 100}") if core.custom_enable_rendering else None
-
-        self.last_hyp_distance_to_next_waypoint_line = hyp_distance_to_next_waypoint_line
-        self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_plus_1_waypoint_line
+        # if self.last_hyp_distance_to_next_waypoint_line != 0:
+        #     hyp_reward = self.last_hyp_distance_to_next_waypoint_line - hyp_distance_to_next_waypoint_line
+        #     reward = reward + hyp_reward* 100
+        #     print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward* 100}") if core.custom_enable_rendering else None
+        # else:
+        #     hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint_line - hyp_distance_to_next_waypoint_line
+        #     reward = reward + hyp_reward * 100
+        #     print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward* 100}") if core.custom_enable_rendering else None
+        #
+        # self.last_hyp_distance_to_next_waypoint_line = hyp_distance_to_next_waypoint_line
+        # self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_plus_1_waypoint_line
 
 
 
