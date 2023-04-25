@@ -71,8 +71,7 @@ class SACExperimentBasic(BaseExperiment):
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
         # self.acceleration = []
-        self.truck_collisions = []
-        self.trailer_collisions =[]
+        self.collisions = []
         self.entry_idx = -1
         self.exit_idx = -1
 
@@ -187,8 +186,7 @@ class SACExperimentBasic(BaseExperiment):
         # # self.save_to_file(f"{self.directory}/acceleration", self.acceleration)
         # self.save_to_file(f"{self.directory}/route", self.temp_route)
         # self.save_to_file(f"{self.directory}/path", self.vehicle_path)
-        # self.save_to_file(f"{self.directory}/truck_collisions", self.truck_collisions)
-        # self.save_to_file(f"{self.directory}/trailer_collisions", self.trailer_collisions)
+        self.save_to_file(f"{self.directory}/collisions", self.collisions)
         self.entry_idx = -1
         self.exit_idx = -1
         self.last_action = [0,0,0]
@@ -229,8 +227,7 @@ class SACExperimentBasic(BaseExperiment):
         self.vehicle_path = []
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
-        self.truck_collisions = []
-        self.trailer_collisions =[]
+        self.collisions = []
         # self.acceleration = []
 
 
@@ -555,12 +552,13 @@ class SACExperimentBasic(BaseExperiment):
                 # static.sidewalk
 
                 self.last_no_of_collisions_truck = len(sensor_data[sensor][1])
-                self.truck_collisions.append(str(sensor_data[sensor][1][0]))
+                self.collisions.append(['truck',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][3])])
+
                 print(f'COLLISIONS TRUCK {sensor_data[sensor][1][0]}')
 
             elif sensor == "collision_trailer":
                 self.last_no_of_collisions_trailer = len(sensor_data[sensor][1])
-                self.trailer_collisions.append(str(sensor_data[sensor][1][0]))
+                self.collisions.append(['trailer',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][3])])
                 print(f'COLLISIONS TRAILER {sensor_data[sensor][1][0]}')
 
             elif sensor == "depth_camera_truck":
@@ -670,9 +668,9 @@ class SACExperimentBasic(BaseExperiment):
                     if truck_center < 0:
                         truck_center = 0
 
-            elif sensor == "lidar_trailer_0_left_trailer":
-                lidar_points = sensor_data['lidar_trailer_0_left_trailer'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_left"]["range"])
+            elif sensor == "lidar_trailer_0_left_3x_trailer":
+                lidar_points = sensor_data['lidar_trailer_0_left_3x_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_left_3x"]["range"])
 
                 # LIDAR GRAPH
                 #           x
@@ -737,9 +735,9 @@ class SACExperimentBasic(BaseExperiment):
                     if trailer_1_left < 0:
                         trailer_1_left = 0
 
-            elif sensor == "lidar_trailer_1_left_trailer":
-                lidar_points = sensor_data['lidar_trailer_1_left_trailer'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_left"]["range"])
+            elif sensor == "lidar_trailer_1_left_3x_trailer":
+                lidar_points = sensor_data['lidar_trailer_1_left_3x_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_left_3x"]["range"])
 
                 # LIDAR GRAPH
                 #           x
@@ -804,9 +802,9 @@ class SACExperimentBasic(BaseExperiment):
                     if trailer_4_left < 0:
                         trailer_4_left = 0
 
-            elif sensor == "lidar_trailer_0_right_trailer":
-                lidar_points = sensor_data['lidar_trailer_0_right_trailer'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_right"]["range"])
+            elif sensor == "lidar_trailer_0_right_3x_trailer":
+                lidar_points = sensor_data['lidar_trailer_0_right_3x_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_right_3x"]["range"])
 
                 # LIDAR GRAPH
                 #           x
@@ -871,9 +869,9 @@ class SACExperimentBasic(BaseExperiment):
                     if trailer_1_right < 0:
                         trailer_1_right = 0
 
-            elif sensor == "lidar_trailer_1_right_trailer":
-                lidar_points = sensor_data['lidar_trailer_1_right_trailer'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_right"]["range"])
+            elif sensor == "lidar_trailer_1_right_3x_trailer":
+                lidar_points = sensor_data['lidar_trailer_1_right_3x_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_right_3x"]["range"])
 
                 # LIDAR GRAPH
                 #           x
@@ -937,6 +935,240 @@ class SACExperimentBasic(BaseExperiment):
 
                     if trailer_4_right < 0:
                         trailer_4_right = 0
+
+            elif sensor == "lidar_trailer_0_trailer":
+                lidar_points = sensor_data[sensor][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0"]["range"])
+
+                # LIDAR GRAPH
+                #           x
+                #           |
+                #           |
+                # ----------+-------- y
+                #           |
+                #           |
+
+                # Left and Right Lidar points
+                horizontal_indices = np.where((lidar_points[0] > -1) & (lidar_points[0] < 1))
+                horizontal_relevant_lidar_y_points = lidar_points[1][horizontal_indices]
+
+                if len(horizontal_relevant_lidar_y_points) == 0:
+                    trailer_0_right = 1
+                    trailer_0_left = 1
+                else:
+                    greater_0_indices = np.where(horizontal_relevant_lidar_y_points > 0)
+                    smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
+
+                    if greater_0_indices[0].size != 0:
+                        trailer_0_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
+                    else:
+                        trailer_0_right = 1
+
+                    if smaller_0_indices[0].size != 0:
+                        trailer_0_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
+                    else:
+                        trailer_0_left = 1
+
+                    if trailer_0_right < 0:
+                        trailer_0_right = 0
+
+                    if trailer_0_left < 0:
+                        trailer_0_left = 0
+
+            elif sensor == "lidar_trailer_1_trailer":
+                lidar_points = sensor_data[sensor][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1"]["range"])
+
+                # LIDAR GRAPH
+                #           x
+                #           |
+                #           |
+                # ----------+-------- y
+                #           |
+                #           |
+
+                # Left and Right Lidar points
+                horizontal_indices = np.where((lidar_points[0] > -1) & (lidar_points[0] < 1))
+                horizontal_relevant_lidar_y_points = lidar_points[1][horizontal_indices]
+
+                if len(horizontal_relevant_lidar_y_points) == 0:
+                    trailer_1_right = 1
+                    trailer_1_left = 1
+                else:
+                    greater_0_indices = np.where(horizontal_relevant_lidar_y_points > 0)
+                    smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
+
+                    if greater_0_indices[0].size != 0:
+                        trailer_1_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
+                    else:
+                        trailer_1_right = 1
+
+                    if smaller_0_indices[0].size != 0:
+                        trailer_1_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
+                    else:
+                        trailer_1_left = 1
+
+                    if trailer_1_right < 0:
+                        trailer_1_right = 0
+
+                    if trailer_1_left < 0:
+                        trailer_1_left = 0
+            elif sensor == "lidar_trailer_2_trailer":
+                lidar_points = sensor_data[sensor][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_2"]["range"])
+
+                # LIDAR GRAPH
+                #           x
+                #           |
+                #           |
+                # ----------+-------- y
+                #           |
+                #           |
+
+                # Left and Right Lidar points
+                horizontal_indices = np.where((lidar_points[0] > -1) & (lidar_points[0] < 1))
+                horizontal_relevant_lidar_y_points = lidar_points[1][horizontal_indices]
+
+                if len(horizontal_relevant_lidar_y_points) == 0:
+                    trailer_2_right = 1
+                    trailer_2_left = 1
+                else:
+                    greater_0_indices = np.where(horizontal_relevant_lidar_y_points > 0)
+                    smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
+
+                    if greater_0_indices[0].size != 0:
+                        trailer_2_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
+                    else:
+                        trailer_2_right = 1
+
+                    if smaller_0_indices[0].size != 0:
+                        trailer_2_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
+                    else:
+                        trailer_2_left = 1
+
+                    if trailer_2_right < 0:
+                        trailer_2_right = 0
+
+                    if trailer_2_left < 0:
+                        trailer_2_left = 0
+            elif sensor == "lidar_trailer_3_trailer":
+                lidar_points = sensor_data[sensor][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_3"]["range"])
+
+                # LIDAR GRAPH
+                #           x
+                #           |
+                #           |
+                # ----------+-------- y
+                #           |
+                #           |
+
+                # Left and Right Lidar points
+                horizontal_indices = np.where((lidar_points[0] > -1) & (lidar_points[0] < 1))
+                horizontal_relevant_lidar_y_points = lidar_points[1][horizontal_indices]
+
+                if len(horizontal_relevant_lidar_y_points) == 0:
+                    trailer_3_right = 1
+                    trailer_3_left = 1
+                else:
+                    greater_0_indices = np.where(horizontal_relevant_lidar_y_points > 0)
+                    smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
+
+                    if greater_0_indices[0].size != 0:
+                        trailer_3_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
+                    else:
+                        trailer_3_right = 1
+
+                    if smaller_0_indices[0].size != 0:
+                        trailer_3_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
+                    else:
+                        trailer_3_left = 1
+
+                    if trailer_3_right < 0:
+                        trailer_3_right = 0
+
+                    if trailer_3_left < 0:
+                        trailer_3_left = 0
+            elif sensor == "lidar_trailer_4_trailer":
+                lidar_points = sensor_data[sensor][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_4"]["range"])
+
+                # LIDAR GRAPH
+                #           x
+                #           |
+                #           |
+                # ----------+-------- y
+                #           |
+                #           |
+
+                # Left and Right Lidar points
+                horizontal_indices = np.where((lidar_points[0] > -1) & (lidar_points[0] < 1))
+                horizontal_relevant_lidar_y_points = lidar_points[1][horizontal_indices]
+
+                if len(horizontal_relevant_lidar_y_points) == 0:
+                    trailer_4_right = 1
+                    trailer_4_left = 1
+                else:
+                    greater_0_indices = np.where(horizontal_relevant_lidar_y_points > 0)
+                    smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
+
+                    if greater_0_indices[0].size != 0:
+                        trailer_4_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
+                    else:
+                        trailer_4_right = 1
+
+                    if smaller_0_indices[0].size != 0:
+                        trailer_4_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
+                    else:
+                        trailer_4_left = 1
+
+                    if trailer_4_right < 0:
+                        trailer_4_right = 0
+
+                    if trailer_4_left < 0:
+                        trailer_4_left = 0
+            elif sensor == "lidar_trailer_5_trailer":
+                lidar_points = sensor_data[sensor][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5"]["range"])
+
+                # LIDAR GRAPH
+                #           x
+                #           |
+                #           |
+                # ----------+-------- y
+                #           |
+                #           |
+
+                # Left and Right Lidar points
+                horizontal_indices = np.where((lidar_points[0] > -1) & (lidar_points[0] < 1))
+                horizontal_relevant_lidar_y_points = lidar_points[1][horizontal_indices]
+
+                if len(horizontal_relevant_lidar_y_points) == 0:
+                    trailer_5_right = 1
+                    trailer_5_left = 1
+                else:
+                    greater_0_indices = np.where(horizontal_relevant_lidar_y_points > 0)
+                    smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
+
+                    if greater_0_indices[0].size != 0:
+                        trailer_5_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
+                    else:
+                        trailer_5_right = 1
+
+                    if smaller_0_indices[0].size != 0:
+                        trailer_5_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
+                    else:
+                        trailer_5_left = 1
+
+                    if trailer_5_right < 0:
+                        trailer_5_right = 0
+
+                    if trailer_5_left < 0:
+                        trailer_5_left = 0
+
+
+
+
 
 
             # elif sensor == "lidar_trailer_0_left_trailer":

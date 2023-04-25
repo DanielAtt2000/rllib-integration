@@ -743,6 +743,61 @@ class CarlaCore:
         # Not needed anymore. This tick will happen when calling CarlaCore.tick()
         # self.world.tick()
 
+        testing = False
+        if testing:
+            def get_value(text, symbol):
+                location_of_symbol = text.find(symbol)
+                end_of_value_comma = text[location_of_symbol:].find(',')
+                end_of_value_bracket = text[location_of_symbol:].find(')')
+
+                if end_of_value_comma < end_of_value_bracket and end_of_value_comma != -1:
+                    end_of_value = end_of_value_comma
+                else:
+                    end_of_value = end_of_value_bracket
+
+                return float(text[location_of_symbol + len(symbol) + 1:location_of_symbol + end_of_value])
+
+            file = open('/home/daniel/data-rllib-integration/data/data_79e528c630a/collisions', 'r')
+            lines = file.readlines()
+            for line in lines:
+                if line != '[]\n':
+                    splits = line.split('\'')
+                    vehicle = splits[1]
+                    actor_transform_text = splits[3]
+                    collision_transform_text = splits[5]
+
+                    x_actor = get_value(actor_transform_text, 'x')
+                    y_actor = get_value(actor_transform_text, 'y')
+                    z_actor = get_value(actor_transform_text, 'z')
+                    pitch_actor = get_value(actor_transform_text, 'pitch')
+                    yaw_actor = get_value(actor_transform_text, 'yaw')
+                    roll_actor = get_value(actor_transform_text, 'roll')
+
+                    actor_transform = carla.Transform(
+                        carla.Location(x_actor-1,
+                                       y_actor-1,
+                                       z_actor),
+                        carla.Rotation(pitch_actor,
+                                       yaw_actor,
+                                       roll_actor))
+
+                    if vehicle == 'truck':
+                        print(actor_transform)
+                        self.hero.set_transform(actor_transform)
+                        self.set_spectator_camera_view()
+
+                        self.world.tick()
+
+                        # spectator = core.world.get_spectator()
+                        # spectator.set_transform(carla.Transform(
+                        #     carla.Location(x_actor-5,
+                        #                    y_actor,
+                        #                    z_actor+10),
+                        #     carla.Rotation(pitch_actor,
+                        #                    yaw_actor,
+                        #                    roll_actor)))
+                        time.sleep(20)
+
         return self.hero
 
     def spawn_npcs(self, n_vehicles, n_walkers):
