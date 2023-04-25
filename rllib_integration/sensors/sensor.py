@@ -318,9 +318,9 @@ class Collision(CarlaSensor):
     def parse(self, sensor_data):
         """Parses the ObstacleDetectionEvent into a list"""
         # sensor_data: [other actor, distance]
-        impulse = sensor_data.normal_impulse
-        impulse_value = math.sqrt(impulse.x ** 2 + impulse.y ** 2 + impulse.z ** 2)
-        return [sensor_data.actor, sensor_data.other_actor, impulse_value,sensor_data.transform]
+        # impulse = sensor_data.normal_impulse
+        # impulse_value = math.sqrt(impulse.x ** 2 + impulse.y ** 2 + impulse.z ** 2)
+        return [sensor_data.actor,sensor_data.transform]
 
 class Obstacle(CarlaSensor):
     def __init__(self, name, attributes, interface, parent):

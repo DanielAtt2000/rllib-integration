@@ -552,13 +552,13 @@ class SACExperimentBasic(BaseExperiment):
                 # static.sidewalk
 
                 self.last_no_of_collisions_truck = len(sensor_data[sensor][1])
-                self.collisions.append(['truck',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][3])])
+                self.collisions.append(['truck',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][1])])
 
                 print(f'COLLISIONS TRUCK {sensor_data[sensor][1][0]}')
 
             elif sensor == "collision_trailer":
                 self.last_no_of_collisions_trailer = len(sensor_data[sensor][1])
-                self.collisions.append(['trailer',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][3])])
+                self.collisions.append(['trailer',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][1])])
                 print(f'COLLISIONS TRAILER {sensor_data[sensor][1][0]}')
 
             elif sensor == "depth_camera_truck":
