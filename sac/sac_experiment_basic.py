@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import datetime
 
 # Copyright (c) 2021 Computer Vision Center (CVC) at the Universitat Autonoma de
 # Barcelona (UAB).
@@ -72,6 +73,7 @@ class SACExperimentBasic(BaseExperiment):
         self.hyp_distance_to_next_waypoint = []
         # self.acceleration = []
         self.collisions = []
+        self.lidar_data = []
         self.entry_idx = -1
         self.exit_idx = -1
 
@@ -186,6 +188,7 @@ class SACExperimentBasic(BaseExperiment):
         # # self.save_to_file(f"{self.directory}/acceleration", self.acceleration)
         # self.save_to_file(f"{self.directory}/route", self.temp_route)
         # self.save_to_file(f"{self.directory}/path", self.vehicle_path)
+        self.save_to_file(f"{self.directory}/lidar_data", self.lidar_data)
         self.save_to_file(f"{self.directory}/collisions", self.collisions)
         self.entry_idx = -1
         self.exit_idx = -1
@@ -228,6 +231,7 @@ class SACExperimentBasic(BaseExperiment):
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
         self.collisions = []
+        self.lidar_data = []
         # self.acceleration = []
 
 
@@ -378,6 +382,8 @@ class SACExperimentBasic(BaseExperiment):
             # Position
             # angle
             # collision
+
+        self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
 
         self.radii = get_radii(core.route[core.last_waypoint_index:],5)
 
@@ -552,13 +558,13 @@ class SACExperimentBasic(BaseExperiment):
                 # static.sidewalk
 
                 self.last_no_of_collisions_truck = len(sensor_data[sensor][1])
-                self.collisions.append(['truck',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][1])])
+                self.collisions.append(['truck',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][1]),self.current_time])
 
                 print(f'COLLISIONS TRUCK {sensor_data[sensor][1][0]}')
 
             elif sensor == "collision_trailer":
                 self.last_no_of_collisions_trailer = len(sensor_data[sensor][1])
-                self.collisions.append(['trailer',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][1])])
+                self.collisions.append(['trailer',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][1]),self.current_time])
                 print(f'COLLISIONS TRAILER {sensor_data[sensor][1][0]}')
 
             elif sensor == "depth_camera_truck":
@@ -1231,30 +1237,30 @@ class SACExperimentBasic(BaseExperiment):
             #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5_right"]["range"])
             #     trailer_5_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
             #
-            # elif sensor == "lidar_truck_right_truck":
-            #     lidar_points = sensor_data['lidar_truck_right_truck'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_right"]["range"])
-            #     truck_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
-            #
-            # elif sensor == "lidar_truck_left_truck":
-            #     lidar_points = sensor_data['lidar_truck_left_truck'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_left"]["range"])
-            #     truck_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
-            #
-            # elif sensor == "lidar_truck_center_truck":
-            #     lidar_points = sensor_data['lidar_truck_center_truck'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_center"]["range"])
-            #     truck_center = self.get_min_lidar_point(lidar_points[0], lidar_range)
-            #
-            # elif sensor == "lidar_truck_front_left_truck":
-            #     lidar_points = sensor_data['lidar_truck_front_left_truck'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_left"]["range"])
-            #     truck_front_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
-            #
-            # elif sensor == "lidar_truck_front_right_truck":
-            #     lidar_points = sensor_data['lidar_truck_front_right_truck'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_right"]["range"])
-            #     truck_front_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+            elif sensor == "lidar_truck_right_truck":
+                lidar_points = sensor_data['lidar_truck_right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_right"]["range"])
+                truck_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_left_truck":
+                lidar_points = sensor_data['lidar_truck_left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_left"]["range"])
+                truck_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_center_truck":
+                lidar_points = sensor_data['lidar_truck_center_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_center"]["range"])
+                truck_center = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_left_truck":
+                lidar_points = sensor_data['lidar_truck_front_left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_left"]["range"])
+                truck_front_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_right_truck":
+                lidar_points = sensor_data['lidar_truck_front_right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_right"]["range"])
+                truck_front_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
             elif sensor == "lidar_truck_truck":
                 lidar_points = sensor_data['lidar_truck_truck'][1]
@@ -1320,6 +1326,26 @@ class SACExperimentBasic(BaseExperiment):
         if self.visualiseImage and self.counter > self.counterThreshold:
             plt.imshow(depth_camera_data, interpolation='nearest')
             plt.show()
+
+        self.lidar_data.append([
+            self.current_time,
+            np.float32(trailer_0_left),
+            np.float32(trailer_0_right),
+            np.float32(trailer_1_left),
+            np.float32(trailer_1_right),
+            np.float32(trailer_2_left),
+            np.float32(trailer_2_right),
+            np.float32(trailer_3_left),
+            np.float32(trailer_3_right),
+            np.float32(trailer_4_left),
+            np.float32(trailer_4_right),
+            np.float32(trailer_5_left),
+            np.float32(trailer_5_right),
+            np.float32(truck_center),
+            np.float32(truck_right),
+            np.float32(truck_left),
+            np.float32(truck_front_right),
+            np.float32(truck_front_left)])
 
         observations = [
             np.float32(forward_velocity),
