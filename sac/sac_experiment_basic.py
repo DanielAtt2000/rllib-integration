@@ -73,7 +73,7 @@ class SACExperimentBasic(BaseExperiment):
         self.hyp_distance_to_next_waypoint = []
         # self.acceleration = []
         self.collisions = []
-        self.lidar_data = []
+        self.lidar_data = collections.deque(maxlen=4)
         self.entry_idx = -1
         self.exit_idx = -1
 
@@ -231,7 +231,7 @@ class SACExperimentBasic(BaseExperiment):
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
         self.collisions = []
-        self.lidar_data = []
+        self.lidar_data = collections.deque(maxlen=4)
         # self.acceleration = []
 
 
@@ -651,12 +651,12 @@ class SACExperimentBasic(BaseExperiment):
 
 
                     if greater_0_indices[0].size != 0:
-                        truck_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
+                        truck_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices])) / lidar_range
                     else:
                         truck_right = 1
 
                     if smaller_0_indices[0].size != 0:
-                        truck_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
+                        truck_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices])) / lidar_range
                     else:
                         truck_left = 1
 
@@ -669,7 +669,7 @@ class SACExperimentBasic(BaseExperiment):
                 if len(vertical_relevant_lidar_x_points) == 0:
                     truck_center = 1
                 else:
-                    truck_center = min(abs(vertical_relevant_lidar_x_points) / lidar_range)
+                    truck_center = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
 
                     if truck_center < 0:
                         truck_center = 0
@@ -736,7 +736,7 @@ class SACExperimentBasic(BaseExperiment):
                 if len(vertical_relevant_lidar_x_points) == 0:
                     trailer_1_left = 1
                 else:
-                    trailer_1_left = min(abs(vertical_relevant_lidar_x_points) / lidar_range)
+                    trailer_1_left = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
 
                     if trailer_1_left < 0:
                         trailer_1_left = 0
@@ -803,7 +803,7 @@ class SACExperimentBasic(BaseExperiment):
                 if len(vertical_relevant_lidar_x_points) == 0:
                     trailer_4_left = 1
                 else:
-                    trailer_4_left = min(abs(vertical_relevant_lidar_x_points) / lidar_range)
+                    trailer_4_left = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
 
                     if trailer_4_left < 0:
                         trailer_4_left = 0
@@ -870,7 +870,7 @@ class SACExperimentBasic(BaseExperiment):
                 if len(vertical_relevant_lidar_x_points) == 0:
                     trailer_1_right = 1
                 else:
-                    trailer_1_right = min(abs(vertical_relevant_lidar_x_points) / lidar_range)
+                    trailer_1_right = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
 
                     if trailer_1_right < 0:
                         trailer_1_right = 0
@@ -937,7 +937,7 @@ class SACExperimentBasic(BaseExperiment):
                 if len(vertical_relevant_lidar_x_points) == 0:
                     trailer_4_right = 1
                 else:
-                    trailer_4_right = min(abs(vertical_relevant_lidar_x_points) / lidar_range)
+                    trailer_4_right = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
 
                     if trailer_4_right < 0:
                         trailer_4_right = 0
@@ -966,12 +966,12 @@ class SACExperimentBasic(BaseExperiment):
                     smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
 
                     if greater_0_indices[0].size != 0:
-                        trailer_0_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
+                        trailer_0_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices])) / lidar_range
                     else:
                         trailer_0_right = 1
 
                     if smaller_0_indices[0].size != 0:
-                        trailer_0_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
+                        trailer_0_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices])) / lidar_range
                     else:
                         trailer_0_left = 1
 
@@ -1005,12 +1005,12 @@ class SACExperimentBasic(BaseExperiment):
                     smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
 
                     if greater_0_indices[0].size != 0:
-                        trailer_1_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
+                        trailer_1_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices])) / lidar_range
                     else:
                         trailer_1_right = 1
 
                     if smaller_0_indices[0].size != 0:
-                        trailer_1_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
+                        trailer_1_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices])) / lidar_range
                     else:
                         trailer_1_left = 1
 
@@ -1043,12 +1043,12 @@ class SACExperimentBasic(BaseExperiment):
                     smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
 
                     if greater_0_indices[0].size != 0:
-                        trailer_2_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
+                        trailer_2_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices])) / lidar_range
                     else:
                         trailer_2_right = 1
 
                     if smaller_0_indices[0].size != 0:
-                        trailer_2_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
+                        trailer_2_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices])) / lidar_range
                     else:
                         trailer_2_left = 1
 
@@ -1081,12 +1081,12 @@ class SACExperimentBasic(BaseExperiment):
                     smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
 
                     if greater_0_indices[0].size != 0:
-                        trailer_3_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
+                        trailer_3_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices])) / lidar_range
                     else:
                         trailer_3_right = 1
 
                     if smaller_0_indices[0].size != 0:
-                        trailer_3_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
+                        trailer_3_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices])) / lidar_range
                     else:
                         trailer_3_left = 1
 
@@ -1119,12 +1119,12 @@ class SACExperimentBasic(BaseExperiment):
                     smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
 
                     if greater_0_indices[0].size != 0:
-                        trailer_4_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
+                        trailer_4_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices])) / lidar_range
                     else:
                         trailer_4_right = 1
 
                     if smaller_0_indices[0].size != 0:
-                        trailer_4_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
+                        trailer_4_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices])) / lidar_range
                     else:
                         trailer_4_left = 1
 
@@ -1157,12 +1157,12 @@ class SACExperimentBasic(BaseExperiment):
                     smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
 
                     if greater_0_indices[0].size != 0:
-                        trailer_5_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices]) / lidar_range)
+                        trailer_5_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices])) / lidar_range
                     else:
                         trailer_5_right = 1
 
                     if smaller_0_indices[0].size != 0:
-                        trailer_5_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices]) / lidar_range)
+                        trailer_5_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices])) / lidar_range
                     else:
                         trailer_5_left = 1
 
@@ -1327,6 +1327,7 @@ class SACExperimentBasic(BaseExperiment):
             plt.imshow(depth_camera_data, interpolation='nearest')
             plt.show()
 
+        # Only saving the last lidar data points
         self.lidar_data.append([
             self.current_time,
             np.float32(trailer_0_left),
@@ -1400,6 +1401,9 @@ class SACExperimentBasic(BaseExperiment):
             print(f"trailer_3 \t\t{round(trailer_3_left,2)}\t\t{round(trailer_3_right,2)}")
             print(f"trailer_4 \t\t{round(trailer_4_left,2)}\t\t{round(trailer_4_right,2)}")
             print(f"trailer_5 \t\t{round(trailer_5_left,2)}\t\t{round(trailer_5_right,2)}")
+
+            print(f"Type of truck_center{type(truck_center)}")
+            print(f"Type of trailer_0_left{type(trailer_0_left)}")
 
             time.sleep(0.5)
         # self.forward_velocity.append(np.float32(forward_velocity))
