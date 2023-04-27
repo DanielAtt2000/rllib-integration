@@ -1177,66 +1177,66 @@ class SACExperimentBasic(BaseExperiment):
 
 
 
-            # elif sensor == "lidar_trailer_0_left_trailer":
-            #     lidar_points = sensor_data['lidar_trailer_0_left_trailer'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_left"]["range"])
-            #     trailer_0_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
-            #
-            # elif sensor == "lidar_trailer_0_right_trailer":
-            #     lidar_points = sensor_data['lidar_trailer_0_right_trailer'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_right"]["range"])
-            #     trailer_0_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
-            #
-            # elif sensor == "lidar_trailer_1_left_trailer":
-            #     lidar_points = sensor_data['lidar_trailer_1_left_trailer'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_left"]["range"])
-            #     trailer_1_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
-            #
-            # elif sensor == "lidar_trailer_1_right_trailer":
-            #     lidar_points = sensor_data['lidar_trailer_1_right_trailer'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_right"]["range"])
-            #     trailer_1_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
-            #
-            # elif sensor == "lidar_trailer_2_left_trailer":
-            #     lidar_points = sensor_data['lidar_trailer_2_left_trailer'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_2_left"]["range"])
-            #     trailer_2_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
-            #
-            # elif sensor == "lidar_trailer_2_right_trailer":
-            #     lidar_points = sensor_data['lidar_trailer_2_right_trailer'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_2_right"]["range"])
-            #     trailer_2_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
-            #
-            # elif sensor == "lidar_trailer_3_left_trailer":
-            #     lidar_points = sensor_data['lidar_trailer_3_left_trailer'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_3_left"]["range"])
-            #     trailer_3_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
-            #
-            # elif sensor == "lidar_trailer_3_right_trailer":
-            #     lidar_points = sensor_data['lidar_trailer_3_right_trailer'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_3_right"]["range"])
-            #     trailer_3_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
-            #
-            # elif sensor == "lidar_trailer_4_left_trailer":
-            #     lidar_points = sensor_data['lidar_trailer_4_left_trailer'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_4_left"]["range"])
-            #     trailer_4_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
-            #
-            # elif sensor == "lidar_trailer_4_right_trailer":
-            #     lidar_points = sensor_data['lidar_trailer_4_right_trailer'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_4_right"]["range"])
-            #     trailer_4_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
-            #
-            # elif sensor == "lidar_trailer_5_left_trailer":
-            #     lidar_points = sensor_data['lidar_trailer_5_left_trailer'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5_left"]["range"])
-            #     trailer_5_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
-            #
-            # elif sensor == "lidar_trailer_5_right_trailer":
-            #     lidar_points = sensor_data['lidar_trailer_5_right_trailer'][1]
-            #     lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5_right"]["range"])
-            #     trailer_5_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
-            #
+            elif sensor == "lidar_trailer_0_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_0_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_left"]["range"])
+                trailer_0_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_0_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_0_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_right"]["range"])
+                trailer_0_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_1_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_1_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_left"]["range"])
+                trailer_1_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_1_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_1_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_right"]["range"])
+                trailer_1_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_2_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_2_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_2_left"]["range"])
+                trailer_2_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_2_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_2_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_2_right"]["range"])
+                trailer_2_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_3_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_3_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_3_left"]["range"])
+                trailer_3_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_3_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_3_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_3_right"]["range"])
+                trailer_3_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_4_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_4_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_4_left"]["range"])
+                trailer_4_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_4_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_4_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_4_right"]["range"])
+                trailer_4_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_5_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_5_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5_left"]["range"])
+                trailer_5_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_5_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_5_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5_right"]["range"])
+                trailer_5_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
             elif sensor == "lidar_truck_right_truck":
                 lidar_points = sensor_data['lidar_truck_right_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_right"]["range"])
