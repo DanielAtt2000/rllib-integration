@@ -262,7 +262,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -273,7 +273,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -284,7 +284,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -295,7 +295,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -306,7 +306,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -317,7 +317,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -328,7 +328,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -339,7 +339,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -350,7 +350,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -361,7 +361,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -372,7 +372,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -383,7 +383,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -394,7 +394,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -405,7 +405,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -416,7 +416,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -427,7 +427,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
@@ -438,7 +438,7 @@ env_config:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
           range: "17.0"
-          points_per_second: "10000"
+          points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
