@@ -76,7 +76,10 @@ def get_actor_blueprints(world, filter, generation):
     except:
         print("   Warning! Actor Generation is not valid. No actor will be spawned.")
         return []
-
+class Vector:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
 class CarlaCore:
     """
@@ -114,6 +117,7 @@ class CarlaCore:
 
         self.entry_spawn_point_index = -1
         self.exit_spawn_point_index = -1
+        self.route_lane = ""
 
         # self.init_server()
         self.connect_client()
@@ -567,7 +571,7 @@ class CarlaCore:
     def set_route(self,failed_entry_spawn_locations):
         self.route_points = []
 
-        self.entry_spawn_point_index, self.exit_spawn_point_index = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations)
+        self.entry_spawn_point_index, self.exit_spawn_point_index, self.route_lane = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations)
         entry_spawn_point = self.map.get_spawn_points()[self.entry_spawn_point_index]
         exit_spawn_point = self.map.get_spawn_points()[self.exit_spawn_point_index]
 
@@ -905,3 +909,143 @@ class CarlaCore:
             return {**sensor_data_truck, **sensor_data_trailer}
         else:
             return sensor_data_truck
+
+    # def dot(self,v, w):
+    #     x, y, z = v
+    #     X, Y, Z = w
+    #     return x * X + y * Y + z * Z
+    #
+    # def length(self,v):
+    #     x, y, z = v
+    #     return math.sqrt(x * x + y * y + z * z)
+    #
+    # def vector(self,b, e):
+    #     x, y, z = b
+    #     X, Y, Z = e
+    #     return (X - x, Y - y, Z - z)
+    #
+    # def unit(self,v):
+    #     x, y, z = v
+    #     mag = self.length(v)
+    #     return (x / mag, y / mag, z / mag)
+    #
+    # def distance(self,p0, p1):
+    #     return self.length(self.vector(p0, p1))
+    #
+    # def scale(self,v, sc):
+    #     x, y, z = v
+    #     return (x * sc, y * sc, z * sc)
+    #
+    # def add(self,v, w):
+    #     x, y, z = v
+    #     X, Y, Z = w
+    #     return (x + X, y + Y, z + Z)
+    #
+    # # Given a line with coordinates 'start' and 'end' and the
+    # # coordinates of a point 'pnt' the proc returns the shortest
+    # # distance from pnt to the line and the coordinates of the
+    # # nearest point on the line.
+    # #
+    # # 1  Convert the line segment to a vector ('line_vec').
+    # # 2  Create a vector connecting start to pnt ('pnt_vec').
+    # # 3  Find the length of the line vector ('line_len').
+    # # 4  Convert line_vec to a unit vector ('line_unitvec').
+    # # 5  Scale pnt_vec by line_len ('pnt_vec_scaled').
+    # # 6  Get the dot product of line_unitvec and pnt_vec_scaled ('t').
+    # # 7  Ensure t is in the range 0 to 1.
+    # # 8  Use t to get the nearest location on the line to the end
+    # #    of vector pnt_vec_scaled ('nearest').
+    # # 9  Calculate the distance from nearest to pnt_vec_scaled.
+    # # 10 Translate nearest back to the start/end line.
+    # # Malcolm Kesson 16 Dec 2012
+    # # https://stackoverflow.com/questions/27161533/find-the-shortest-distance-between-a-point-and-line-segments-not-line
+    # def pnt2line(self,truck_transform,waypoint_plus_current):
+    #     waypoint_right_vector = self.route[self.last_waypoint_index + waypoint_plus_current].get_right_vector()
+    #     if self.route_lane == "left":
+    #         # Truck should be on LEFT lane. free RIGHT lane
+    #         t_left = -1.85
+    #         t_right = 5.55
+    #
+    #     elif self.route_lane == "right":
+    #         # Truck should be on RIGHT lane. free LEFT lane
+    #         t_left = -5.55
+    #         t_right = 1.85
+    #     else:
+    #         raise Exception('NO LANE')
+    #
+    #     left_point_x = self.route[
+    #                        self.last_waypoint_index + waypoint_plus_current].location.x + t_left * waypoint_right_vector.x
+    #     left_point_y = self.route[
+    #                        self.last_waypoint_index + waypoint_plus_current].location.y + t_left * waypoint_right_vector.y
+    #     right_point_x = self.route[
+    #                         self.last_waypoint_index + waypoint_plus_current].location.x + t_right * waypoint_right_vector.x
+    #     right_point_y = self.route[
+    #                         self.last_waypoint_index + waypoint_plus_current].location.y + t_right * waypoint_right_vector.y
+    #
+    #
+    #     start = (left_point_x, left_point_y, 0)
+    #     end = (right_point_x, right_point_y, 0)
+    #     pnt = (truck_transform.location.x, truck_transform.location.y, 0)
+    #
+    #     line_vec = self.vector(start, end)
+    #     pnt_vec = self.vector(start, pnt)
+    #     line_len = self.length(line_vec)
+    #     line_unitvec = self.unit(line_vec)
+    #     pnt_vec_scaled = self.scale(pnt_vec, 1.0 / line_len)
+    #     t = self.dot(line_unitvec, pnt_vec_scaled)
+    #     if t < 0.0:
+    #         t = 0.0
+    #     elif t > 1.0:
+    #         t = 1.0
+    #     nearest = self.scale(line_vec, t)
+    #     dist = self.distance(nearest, pnt_vec)
+    #     nearest = self.add(nearest, start)
+    #     return (dist, nearest)
+
+    # https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+
+
+    def sqr(self,x):
+        return x ** 2
+
+    def dist2(self,v, w):
+        return self.sqr(v.x - w.x) + self.sqr(v.y - w.y)
+
+    def distToSegmentSquared(self,p, v, w):
+        l2 = self.dist2(v, w)
+        if l2 == 0:
+            return self.dist2(p, v)
+        t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2
+        t = max(0, min(1, t))
+
+        return self.dist2(p, Vector(x=v.x + t * (w.x - v.x), y=v.y + t * (w.y - v.y)))
+
+    def distToSegment(self,truck_transform,waypoint_plus_current):
+        p = Vector(x=truck_transform.location.x, y=truck_transform.location.y)
+
+        waypoint_right_vector = self.route[self.last_waypoint_index + waypoint_plus_current].get_right_vector()
+        if self.route_lane == "left":
+            # Truck should be on LEFT lane. free RIGHT lane
+            t_left = -1.85
+            t_right = 5.55
+
+        elif self.route_lane == "right":
+            # Truck should be on RIGHT lane. free LEFT lane
+            t_left = -5.55
+            t_right = 1.85
+        else:
+            raise Exception('NO LANE')
+
+        left_point_x = self.route[
+                           self.last_waypoint_index + waypoint_plus_current].location.x + t_left * waypoint_right_vector.x
+        left_point_y = self.route[
+                           self.last_waypoint_index + waypoint_plus_current].location.y + t_left * waypoint_right_vector.y
+        right_point_x = self.route[
+                            self.last_waypoint_index + waypoint_plus_current].location.x + t_right * waypoint_right_vector.x
+        right_point_y = self.route[
+                            self.last_waypoint_index + waypoint_plus_current].location.y + t_right * waypoint_right_vector.y
+
+
+        v = Vector(x=left_point_x, y=left_point_y)
+        w = Vector(x=right_point_x, y=right_point_y)
+        return math.sqrt(self.distToSegmentSquared(p, v, w))

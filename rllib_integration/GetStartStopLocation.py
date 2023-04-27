@@ -31,32 +31,32 @@ spawn_points_2_lane_roundabout_small = [
     # [6, [29,52]],
     # [58, [15,75,28]],
     # [77, [52,16]]
-    [17,[28]],
-    [17,[98]],
-    [17,[19]],
+    [17,[28],"left"],
+    [17,[98],"left"],
+    [17,[19],"left"],
 
-    [44,[27]],
-    [44,[75]],
+    [44,[27],"right"],
+    [44,[75],"right"],
 
-    [95,[98]],
-    [95,[19]],
-    [95,[26]],
+    [95,[98],"left"],
+    [95,[19],"left"],
+    [95,[26],"left"],
 
-    [25,[27]],
-    [25,[107]],
+    [25,[27],"right"],
+    [25,[107],"right"],
 
-    [2,[19]],
-    [2,[26]],
-    [2,[28]],
+    [2,[19],"left"],
+    [2,[26],"left"],
+    [2,[28],"left"],
 
-    [108,[107]],
-    [108,[18]],
+    [108,[107],"right"],
+    [108,[18],"right"],
 
-    [102,[26]],
-    [102,[28]],
-    [102,[98]],
+    [102,[26],"left"],
+    [102,[28],"left"],
+    [102,[98],"left"],
 
-    [77,[75]],
+    [77,[75],"right"],
 #     REmoved 77 to 18 --too tight
 ]
 
@@ -138,6 +138,7 @@ def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):
         element = random.choice(roundabout_choice)
         entry_spawn_point_index = element[0]
         exit_spawn_point_index = random.choice(element[1])
+        route_lane = element[2]
 
         # Only to test in straight line
         # entry_spawn_point_index = 34
@@ -154,7 +155,7 @@ def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):
     print("W-----|----E")
     print("------S-----")
 
-    return entry_spawn_point_index, exit_spawn_point_index
+    return entry_spawn_point_index, exit_spawn_point_index, route_lane
 
 # ONLY TO BE USED FOR TESTING
 # def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):

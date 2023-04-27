@@ -52,8 +52,8 @@ class SACExperimentBasic(BaseExperiment):
         self.last_hyp_distance_to_next_waypoint = 0
         self.last_hyp_distance_to_next_plus_1_waypoint = 0
 
-        self.last_hyp_distance_to_next_waypoint_line = 0
-        self.last_hyp_distance_to_next_plus_1_waypoint_line = 0
+        self.last_closest_distance_to_next_waypoint_line = 0
+        self.last_closest_distance_to_next_plus_1_waypoint_line = 0
 
         self.x_dist_to_waypoint = []
         self.y_dist_to_waypoint = []
@@ -170,8 +170,8 @@ class SACExperimentBasic(BaseExperiment):
         self.last_hyp_distance_to_next_waypoint = 0
         self.last_hyp_distance_to_next_plus_1_waypoint = 0
 
-        self.last_hyp_distance_to_next_waypoint_line = 0
-        self.last_hyp_distance_to_next_plus_1_waypoint_line = 0
+        self.last_closest_distance_to_next_waypoint_line = 0
+        self.last_closest_distance_to_next_plus_1_waypoint_line = 0
 
         # self.save_to_file(f"{self.directory}/hyp_distance_to_next_waypoint", self.hyp_distance_to_next_waypoint)
         # self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees", self.angle_to_center_of_lane_degrees)
@@ -284,8 +284,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
-                high=np.array([100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
+                high=np.array([100,100,100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
                 dtype=np.float32
             )
 
@@ -409,7 +409,7 @@ class SACExperimentBasic(BaseExperiment):
         if in_front_of_waypoint == 0 or in_front_of_waypoint == 1:
             core.last_waypoint_index += 1
             self.last_hyp_distance_to_next_waypoint = 0
-            self.last_hyp_distance_to_next_waypoint_line = 0
+            self.last_closest_distance_to_next_waypoint_line = 0
             print('Passed Waypoint <------------')
         else:
             pass
@@ -443,8 +443,8 @@ class SACExperimentBasic(BaseExperiment):
         #
         # save_data('waypoints2.pkl',location_from_waypoint_to_vehicle_relative)
 
-        hyp_distance_to_next_waypoint_line = core.get_perpendicular_distance_between_truck_waypoint_line(truck_transform=truck_transform,waypoint_plus_current=0)
-        hyp_distance_to_next_plus_1_waypoint_line = core.get_perpendicular_distance_between_truck_waypoint_line(truck_transform=truck_transform,waypoint_plus_current=1)
+        closest_distance_to_next_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=0)
+        closest_distance_to_next_plus_1_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=1)
 
         # Hyp distance to next waypoint
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
@@ -1354,6 +1354,8 @@ class SACExperimentBasic(BaseExperiment):
             # np.float32(forward_velocity_z),
             np.float32(hyp_distance_to_next_waypoint),
             np.float32(hyp_distance_to_next_plus_1_waypoint),
+            np.float32(closest_distance_to_next_waypoint_line),
+            np.float32(closest_distance_to_next_plus_1_waypoint_line),
             # np.float32(hyp_distance_to_next_waypoint_line),
             np.float32(angle_to_center_of_lane_degrees),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints),
@@ -1438,10 +1440,7 @@ class SACExperimentBasic(BaseExperiment):
 
         self.counter += 1
         return observations,\
-            {"truck_z_value":truck_transform.location.z,
-             "hyp_distance_to_next_plus_1_waypoint_line":hyp_distance_to_next_plus_1_waypoint_line,
-             "hyp_distance_to_next_waypoint_line":hyp_distance_to_next_waypoint_line
-             }
+            {"truck_z_value":truck_transform.location.z }
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -1529,9 +1528,8 @@ class SACExperimentBasic(BaseExperiment):
         forward_velocity = observation[0]
         hyp_distance_to_next_waypoint = observation[1]
         hyp_distance_to_next_plus_1_waypoint = observation[2]
-
-        hyp_distance_to_next_plus_1_waypoint_line = info["hyp_distance_to_next_plus_1_waypoint_line"]
-        hyp_distance_to_next_waypoint_line = info["hyp_distance_to_next_waypoint_line"]
+        closest_distance_to_next_waypoint_line = observation[3]
+        closest_distance_to_next_plus_1_waypoint_line = observation[4]
 
         # print(f"in rewards forward_velocity {forward_velocity}")
         # print(f"in rewards hyp_distance_to_next_waypoint {hyp_distance_to_next_waypoint}")
@@ -1557,28 +1555,28 @@ class SACExperimentBasic(BaseExperiment):
 
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward* 100
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 100}") if core.custom_enable_rendering else None
+            reward = reward + hyp_reward* 60
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 60}") if core.custom_enable_rendering else None
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward * 100
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 100}") if core.custom_enable_rendering else None
+            reward = reward + hyp_reward * 60
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 60}") if core.custom_enable_rendering else None
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
         self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
 
 
-        # if self.last_hyp_distance_to_next_waypoint_line != 0:
-        #     hyp_reward = self.last_hyp_distance_to_next_waypoint_line - hyp_distance_to_next_waypoint_line
-        #     reward = reward + hyp_reward* 100
-        #     print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward* 100}") if core.custom_enable_rendering else None
-        # else:
-        #     hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint_line - hyp_distance_to_next_waypoint_line
-        #     reward = reward + hyp_reward * 100
-        #     print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward* 100}") if core.custom_enable_rendering else None
-        #
-        # self.last_hyp_distance_to_next_waypoint_line = hyp_distance_to_next_waypoint_line
-        # self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_plus_1_waypoint_line
+        if self.last_closest_distance_to_next_waypoint_line != 0:
+            hyp_reward = self.last_closest_distance_to_next_waypoint_line - closest_distance_to_next_waypoint_line
+            reward = reward + hyp_reward* 100
+            print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward* 100}") if core.custom_enable_rendering else None
+        else:
+            hyp_reward = self.last_closest_distance_to_next_plus_1_waypoint_line - closest_distance_to_next_waypoint_line
+            reward = reward + hyp_reward * 100
+            print(f"REWARD hyp_distance_to_next_waypoint_line = {hyp_reward* 100}") if core.custom_enable_rendering else None
+
+        self.last_closest_distance_to_next_waypoint_line = closest_distance_to_next_waypoint_line
+        self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
 
 
 
