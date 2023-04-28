@@ -1389,7 +1389,7 @@ class SACExperimentBasic(BaseExperiment):
 
         observations.extend(self.radii)
 
-        # print(f"Radii {self.radii}")
+        print(f"Radii {self.radii}")
 
 
         if core.custom_enable_rendering:
@@ -1403,10 +1403,21 @@ class SACExperimentBasic(BaseExperiment):
             print(f"trailer_3 \t\t{round(trailer_3_left,2)}\t\t{round(trailer_3_right,2)}")
             print(f"trailer_4 \t\t{round(trailer_4_left,2)}\t\t{round(trailer_4_right,2)}")
             print(f"trailer_5 \t\t{round(trailer_5_left,2)}\t\t{round(trailer_5_right,2)}")
-
-            print(f"Type of truck_center{type(truck_center)}")
-            print(f"Type of trailer_0_left{type(trailer_0_left)}")
-
+            print('')
+            print(f"forward_velocity:{np.float32(forward_velocity)}")
+            print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
+            print(f"hyp_distance_to_next_plus_1_waypoint:{np.float32(hyp_distance_to_next_plus_1_waypoint)}")
+            print(f"closest_distance_to_next_waypoint_line:{np.float32(closest_distance_to_next_waypoint_line)}")
+            print(f"closest_distance_to_next_plus_1_waypoint_line:{np.float32(closest_distance_to_next_plus_1_waypoint_line)}")
+            print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
+            print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
+            print(f"angle_to_center_of_lane_degrees_ahead_waypoints_2:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2)}")
+            print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
+            print(f"bearing_to_ahead_waypoints_ahead:{np.float32(bearing_to_ahead_waypoints_ahead)}")
+            print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
+            print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
+            print('')
+            print('')
             time.sleep(0.5)
         # self.forward_velocity.append(np.float32(forward_velocity))
         # # self.forward_velocity_x.append(np.float32(forward_velocity_x))
@@ -1431,7 +1442,7 @@ class SACExperimentBasic(BaseExperiment):
         # print(f"bearing_to_ahead_waypoints_ahead:{np.float32(bearing_to_ahead_waypoints_ahead)}")
         # print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
         # print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
-        # print(f"forward_velocity:{np.float32(forward_velocity)}")
+
         # print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
         # print(f"trailer_bearing_to_waypoint:{np.float32(trailer_bearing_to_waypoint)}")
         # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
