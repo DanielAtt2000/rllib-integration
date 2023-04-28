@@ -1389,10 +1389,11 @@ class SACExperimentBasic(BaseExperiment):
 
         observations.extend(self.radii)
 
-        print(f"Radii {self.radii}")
+
 
 
         if core.custom_enable_rendering:
+            print(f"Radii {self.radii}")
             print(f"truck FRONT \t\t\t{round(truck_center, 2)}")
             print(f"truck 45 \t\t{round(truck_front_left,2)}\t\t{round(truck_front_right,2)}")
             print(f"truck sides \t\t{round(truck_left, 2)}\t\t{round(truck_right, 2)}")
