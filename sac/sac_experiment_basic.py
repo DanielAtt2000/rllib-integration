@@ -85,6 +85,7 @@ class SACExperimentBasic(BaseExperiment):
         self.max_amount_of_occupancy_maps = 11
         self.radii = []
 
+        self.custom_enable_rendering = False
 
 
         self.occupancy_maps = collections.deque(maxlen=self.max_amount_of_occupancy_maps)
@@ -291,35 +292,44 @@ class SACExperimentBasic(BaseExperiment):
 
     def get_actions(self):
         return {
-            0: [0.0, 0.00, 0.0, False, False],  # Coast
-            1: [0.0, 0.00, 1.0, False, False],  # Apply Break
-            2: [0.0, 0.75, 0.0, False, False],  # Right
-            3: [0.0, 0.50, 0.0, False, False],  # Right
-            4: [0.0, 0.25, 0.0, False, False],  # Right
-            5: [0.0, -0.75, 0.0, False, False],  # Left
-            6: [0.0, -0.50, 0.0, False, False],  # Left
-            7: [0.0, -0.25, 0.0, False, False],  # Left
-            8: [0.15, 0.00, 0.0, False, False],  # Straight
-            9: [0.15, 0.75, 0.0, False, False],  # Right
-            10: [0.15, 0.50, 0.0, False, False],  # Right
-            11: [0.15, 0.25, 0.0, False, False],  # Right
-            12: [0.15, -0.75, 0.0, False, False],  # Left
-            13: [0.15, -0.50, 0.0, False, False],  # Left
-            14: [0.15, -0.25, 0.0, False, False],  # Left
-            15: [0.3, 0.00, 0.0, False, False],  # Straight
-            16: [0.3, 0.75, 0.0, False, False],  # Right
-            17: [0.3, 0.50, 0.0, False, False],  # Right
-            18: [0.3, 0.25, 0.0, False, False],  # Right
-            19: [0.3, -0.75, 0.0, False, False],  # Left
-            20: [0.3, -0.50, 0.0, False, False],  # Left
-            21: [0.3, -0.25, 0.0, False, False],  # Left
-            22: [0.7, 0.00, 0.0, False, False],  # Straight
-            23: [0.7, 0.75, 0.0, False, False],  # Right
-            24: [0.7, 0.50, 0.0, False, False],  # Right
-            25: [0.7, 0.25, 0.0, False, False],  # Right
-            26: [0.7, -0.75, 0.0, False, False],  # Left
-            27: [0.7, -0.50, 0.0, False, False],  # Left
-            28: [0.7, -0.25, 0.0, False, False],  # Left
+            0: [0.3, 0.00, 0.0, False, False],  # Straight
+            1: [0.3, 0.80, 0.0, False, False],  # Right
+            2: [0.3, 0.60, 0.0, False, False],  # Right
+            3: [0.3, 0.40, 0.0, False, False],  # Right
+            4: [0.3, 0.20, 0.0, False, False],  # Right
+            5: [0.3, -0.80, 0.0, False, False],  # Left
+            6: [0.3, -0.60, 0.0, False, False],  # Left
+            7: [0.3, -0.40, 0.0, False, False],  # Left
+            8: [0.3, -0.20, 0.0, False, False],  # Left
+            # 0: [0.0, 0.00, 0.0, False, False],  # Coast
+            # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
+            # 2: [0.0, 0.75, 0.0, False, False],  # Right
+            # 3: [0.0, 0.50, 0.0, False, False],  # Right
+            # 4: [0.0, 0.25, 0.0, False, False],  # Right
+            # 5: [0.0, -0.75, 0.0, False, False],  # Left
+            # 6: [0.0, -0.50, 0.0, False, False],  # Left
+            # 7: [0.0, -0.25, 0.0, False, False],  # Left
+            # 8: [0.15, 0.00, 0.0, False, False],  # Straight
+            # 9: [0.15, 0.75, 0.0, False, False],  # Right
+            # 10: [0.15, 0.50, 0.0, False, False],  # Right
+            # 11: [0.15, 0.25, 0.0, False, False],  # Right
+            # 12: [0.15, -0.75, 0.0, False, False],  # Left
+            # 13: [0.15, -0.50, 0.0, False, False],  # Left
+            # 14: [0.15, -0.25, 0.0, False, False],  # Left
+            # 15: [0.3, 0.00, 0.0, False, False],  # Straight
+            # 16: [0.3, 0.75, 0.0, False, False],  # Right
+            # 17: [0.3, 0.50, 0.0, False, False],  # Right
+            # 18: [0.3, 0.25, 0.0, False, False],  # Right
+            # 19: [0.3, -0.75, 0.0, False, False],  # Left
+            # 20: [0.3, -0.50, 0.0, False, False],  # Left
+            # 21: [0.3, -0.25, 0.0, False, False],  # Left
+            # 22: [0.7, 0.00, 0.0, False, False],  # Straight
+            # 23: [0.7, 0.75, 0.0, False, False],  # Right
+            # 24: [0.7, 0.50, 0.0, False, False],  # Right
+            # 25: [0.7, 0.25, 0.0, False, False],  # Right
+            # 26: [0.7, -0.75, 0.0, False, False],  # Left
+            # 27: [0.7, -0.50, 0.0, False, False],  # Left
+            # 28: [0.7, -0.25, 0.0, False, False],  # Left
         }
 
 
@@ -354,7 +364,7 @@ class SACExperimentBasic(BaseExperiment):
 
 
         # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
-        # print(f"----------------------------------->{action_msg}")
+        print(f"----------------------------------->{action_msg}") if self.custom_enable_rendering else None
 
         self.last_action = action_control
 
@@ -382,7 +392,7 @@ class SACExperimentBasic(BaseExperiment):
             # Position
             # angle
             # collision
-
+        self.custom_enable_rendering = core.custom_enable_rendering
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
 
         self.radii = get_radii(core.route[core.last_waypoint_index:],5)
@@ -1392,7 +1402,7 @@ class SACExperimentBasic(BaseExperiment):
 
 
 
-        if core.custom_enable_rendering:
+        if self.custom_enable_rendering:
             print(f"Radii {self.radii}")
             print(f"truck FRONT \t\t\t{round(truck_center, 2)}")
             print(f"truck 45 \t\t{round(truck_front_left,2)}\t\t{round(truck_front_right,2)}")
@@ -1568,11 +1578,11 @@ class SACExperimentBasic(BaseExperiment):
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
             reward = reward + hyp_reward* 30
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 30}") if core.custom_enable_rendering else None
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 30}") if self.custom_enable_rendering else None
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
             reward = reward + hyp_reward * 30
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 30}") if core.custom_enable_rendering else None
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 30}") if self.custom_enable_rendering else None
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
         self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
@@ -1581,11 +1591,11 @@ class SACExperimentBasic(BaseExperiment):
         if self.last_closest_distance_to_next_waypoint_line != 0:
             hyp_reward = self.last_closest_distance_to_next_waypoint_line - closest_distance_to_next_waypoint_line
             reward = reward + hyp_reward* 100
-            print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if core.custom_enable_rendering else None
+            print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if self.custom_enable_rendering else None
         else:
             hyp_reward = self.last_closest_distance_to_next_plus_1_waypoint_line - closest_distance_to_next_waypoint_line
             reward = reward + hyp_reward * 100
-            print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if core.custom_enable_rendering else None
+            print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if self.custom_enable_rendering else None
 
         self.last_closest_distance_to_next_waypoint_line = closest_distance_to_next_waypoint_line
         self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
@@ -1607,13 +1617,13 @@ class SACExperimentBasic(BaseExperiment):
         #
         #     reward = reward + reward_bearing_to_ahead_waypoints_ahead
 
-        # if forward_velocity < 0.75:
-        #     # Negative reward for no velocity
-        #     print('REWARD -100 for velocity')
-        #     reward = reward + -100
+        if forward_velocity < 0.75:
+            # Negative reward for no velocity
+            print('REWARD -100 for velocity')
+            reward = reward + -100
 
-        # Negative reward each timestep
-        reward = reward + -5
+        # # Negative reward each timestep
+        # reward = reward + -5
 
 
         if self.done_falling:
@@ -1633,6 +1643,6 @@ class SACExperimentBasic(BaseExperiment):
             reward = reward + 10000
 
         self.reward_metric = reward
-        print(f"FINAL REWARD: {reward}") if core.custom_enable_rendering else None
-        print(f"---------------------------------------------") if core.custom_enable_rendering else None
+        print(f"FINAL REWARD: {reward}") if self.custom_enable_rendering else None
+        print(f"---------------------------------------------") if self.custom_enable_rendering else None
         return reward
