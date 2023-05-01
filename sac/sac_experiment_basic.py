@@ -301,8 +301,8 @@ class SACExperimentBasic(BaseExperiment):
             6: [0.3, -0.60, 0.0, False, False],  # Left
             7: [0.3, -0.40, 0.0, False, False],  # Left
             8: [0.3, -0.20, 0.0, False, False],  # Left
-            10: [0.0, 0.00, 0.0, False, False],  # Coast
-            11: [0.0, 0.00, 1.0, False, False],  # Apply Break
+            9: [0.0, 0.00, 0.0, False, False],  # Coast
+            10: [0.0, 0.00, 1.0, False, False],  # Apply Break
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
             # 2: [0.0, 0.75, 0.0, False, False],  # Right
