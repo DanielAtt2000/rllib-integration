@@ -285,8 +285,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
-                high=np.array([100,100,100,100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
+                low=np.array([0,0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
+                high=np.array([100,100,100,100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
                 dtype=np.float32
             )
 
@@ -1372,10 +1372,10 @@ class SACExperimentBasic(BaseExperiment):
             # np.float32(hyp_distance_to_next_waypoint_line),
             np.float32(angle_to_center_of_lane_degrees),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints),
-            # np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2),
+            np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2),
             np.float32(bearing_to_waypoint),
             np.float32(bearing_to_ahead_waypoints_ahead),
-            # np.float32(bearing_to_ahead_waypoints_ahead_2),
+            np.float32(bearing_to_ahead_waypoints_ahead_2),
             np.float32(angle_between_truck_and_trailer),
             np.float32(trailer_0_left),
             np.float32(trailer_0_right),
@@ -1580,29 +1580,29 @@ class SACExperimentBasic(BaseExperiment):
 
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward* 100
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 100}") if self.custom_enable_rendering else None
+            reward = reward + hyp_reward* 30
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 30}") if self.custom_enable_rendering else None
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward * 100
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 100}") if self.custom_enable_rendering else None
+            reward = reward + hyp_reward * 30
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 30}") if self.custom_enable_rendering else None
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
         self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
 
-        #
-        # if self.last_closest_distance_to_next_waypoint_line != 0:
-        #     hyp_reward = self.last_closest_distance_to_next_waypoint_line - closest_distance_to_next_waypoint_line
-        #     reward = reward + hyp_reward* 100
-        #     print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if self.custom_enable_rendering else None
-        # else:
-        #     hyp_reward = self.last_closest_distance_to_next_plus_1_waypoint_line - closest_distance_to_next_waypoint_line
-        #     reward = reward + hyp_reward * 100
-        #     print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if self.custom_enable_rendering else None
-        #
-        # self.last_closest_distance_to_next_waypoint_line = closest_distance_to_next_waypoint_line
-        # self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
-        #
+
+        if self.last_closest_distance_to_next_waypoint_line != 0:
+            hyp_reward = self.last_closest_distance_to_next_waypoint_line - closest_distance_to_next_waypoint_line
+            reward = reward + hyp_reward* 100
+            print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if self.custom_enable_rendering else None
+        else:
+            hyp_reward = self.last_closest_distance_to_next_plus_1_waypoint_line - closest_distance_to_next_waypoint_line
+            reward = reward + hyp_reward * 100
+            print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if self.custom_enable_rendering else None
+
+        self.last_closest_distance_to_next_waypoint_line = closest_distance_to_next_waypoint_line
+        self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
+
 
 
         # if bearing_to_waypoint == 0:
