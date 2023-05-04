@@ -285,8 +285,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
-                high=np.array([100,100,100,100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
+                high=np.array([100,100,100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
                 dtype=np.float32
             )
 
@@ -301,8 +301,6 @@ class SACExperimentBasic(BaseExperiment):
             6: [0.3, -0.60, 0.0, False, False],  # Left
             7: [0.3, -0.40, 0.0, False, False],  # Left
             8: [0.3, -0.20, 0.0, False, False],  # Left
-            9: [0.0, 0.00, 0.0, False, False],  # Coast
-            10: [0.0, 0.00, 1.0, False, False],  # Apply Break
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
             # 2: [0.0, 0.75, 0.0, False, False],  # Right
@@ -497,7 +495,7 @@ class SACExperimentBasic(BaseExperiment):
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
         # forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
         # forward_velocity_z = np.clip(self.get_forward_velocity_z(core.hero), 0, None)
-        acceleration = np.clip(self.get_acceleration(core.hero), 0, None)
+        # acceleration = np.clip(self.get_acceleration(core.hero), 0, None)
 
         # Angle to center of lane
 
@@ -1362,8 +1360,8 @@ class SACExperimentBasic(BaseExperiment):
 
         observations = [
             np.float32(forward_velocity),
-            np.float32(acceleration),
-            # np.float32(forward_velocity_x),
+            # np.float32(acceleration),
+            # np.float32(forward_veloci ty_x),
             # np.float32(forward_velocity_z),
             np.float32(hyp_distance_to_next_waypoint),
             np.float32(hyp_distance_to_next_plus_1_waypoint),
@@ -1580,12 +1578,12 @@ class SACExperimentBasic(BaseExperiment):
 
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward* 20
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 20}") if self.custom_enable_rendering else None
+            reward = reward + hyp_reward* 30
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 30}") if self.custom_enable_rendering else None
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward * 20
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 20}") if self.custom_enable_rendering else None
+            reward = reward + hyp_reward * 30
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 30}") if self.custom_enable_rendering else None
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
         self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
