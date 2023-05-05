@@ -580,7 +580,10 @@ class CarlaCore:
         else:
             self.chosen_routes[key] += 1
 
-        print(self.chosen_routes)
+        for key,value in self.chosen_routes.items():
+            print(f"{key} : {value}")
+        print('---------')
+
 
         entry_spawn_point = self.map.get_spawn_points()[self.entry_spawn_point_index]
         exit_spawn_point = self.map.get_spawn_points()[self.exit_spawn_point_index]
