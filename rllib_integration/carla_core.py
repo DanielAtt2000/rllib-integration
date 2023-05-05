@@ -118,6 +118,8 @@ class CarlaCore:
         self.entry_spawn_point_index = -1
         self.exit_spawn_point_index = -1
         self.route_lane = ""
+        self.last_roundabout_choice = 1
+        self.chosen_routes = {}
 
         # self.init_server()
         self.connect_client()
@@ -571,7 +573,15 @@ class CarlaCore:
     def set_route(self,failed_entry_spawn_locations):
         self.route_points = []
 
-        self.entry_spawn_point_index, self.exit_spawn_point_index, self.route_lane = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations)
+        self.entry_spawn_point_index, self.exit_spawn_point_index, self.route_lane, self.last_roundabout_choice = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations,self.last_roundabout_choice)
+        key = str(self.entry_spawn_point_index) + " | " + str(self.exit_spawn_point_index)
+        if self.chosen_routes.get(key) is None:
+            self.chosen_routes[key] = 1
+        else:
+            self.chosen_routes[key] += 1
+
+        print(self.chosen_routes)
+
         entry_spawn_point = self.map.get_spawn_points()[self.entry_spawn_point_index]
         exit_spawn_point = self.map.get_spawn_points()[self.exit_spawn_point_index]
 

@@ -123,18 +123,51 @@ spawn_points_2_lane_roundabout_difficult = [
     [112, [82]],
 ]
 
+spawn_points_2_lane_roundabout_small_easy = [
+    [17, [28],"left"],
+    [95, [98],"left"],
+    [2, [19],"left"],
+    [102, [26],"left"],
+    #
+    [44, [27],"right"],
+    [25, [107],"right"],
+    [108, [18],"right"],
+    [77, [75],"right"],
+    #
+    [44, [75],"right"],
+    [25, [27],"right"],
+    [108, [107],"right"],
+]
 
-roundabouts = [spawn_points_2_lane_roundabout_small]
+spawn_points_2_lane_roundabout_small_difficult = [
+    [17, [98],"left"],
+    [17, [19],"left"],
+    [95, [19],"left"],
+    [95, [26],"left"],
+    [2, [26],"left"],
+    [2, [28],"left"],
+    [102, [98],"left"],
+    [102, [28],"left"],
+
+    # [77, [18]],
+
+]
+
+roundabouts = [spawn_points_2_lane_roundabout_small_easy, spawn_points_2_lane_roundabout_small_difficult]
 # roundabouts = [spawn_points_2_lane_roundabout_difficult,spawn_points_2_lane_roundabout_easy]
 
 
-def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):
+def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations, last_roundabout_choice):
     entry_spawn_point_index = -1
     exit_spawn_point_index = -1
 
+    if last_roundabout_choice == 0:
+        last_roundabout_choice = 1
+    else:
+        last_roundabout_choice = 0
 
     while entry_spawn_point_index in failed_spawn_locations:
-        roundabout_choice = random.choice(roundabouts)
+        roundabout_choice = roundabouts[last_roundabout_choice]
         element = random.choice(roundabout_choice)
         entry_spawn_point_index = element[0]
         exit_spawn_point_index = random.choice(element[1])
@@ -155,7 +188,7 @@ def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):
     print("W-----|----E")
     print("------S-----")
 
-    return entry_spawn_point_index, exit_spawn_point_index, route_lane
+    return entry_spawn_point_index, exit_spawn_point_index, route_lane, last_roundabout_choice
 
 # ONLY TO BE USED FOR TESTING
 # def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):
