@@ -285,8 +285,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
-                high=np.array([100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
+                high=np.array([100,100,100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
                 dtype=np.float32
             )
 
@@ -453,8 +453,8 @@ class SACExperimentBasic(BaseExperiment):
         #
         # save_data('waypoints2.pkl',location_from_waypoint_to_vehicle_relative)
 
-        # closest_distance_to_next_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=0)
-        # closest_distance_to_next_plus_1_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=1)
+        closest_distance_to_next_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=0)
+        closest_distance_to_next_plus_1_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=1)
 
         # Hyp distance to next waypoint
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
@@ -1365,8 +1365,8 @@ class SACExperimentBasic(BaseExperiment):
             # np.float32(forward_velocity_z),
             np.float32(hyp_distance_to_next_waypoint),
             np.float32(hyp_distance_to_next_plus_1_waypoint),
-            # np.float32(closest_distance_to_next_waypoint_line),
-            # np.float32(closest_distance_to_next_plus_1_waypoint_line),
+            np.float32(closest_distance_to_next_waypoint_line),
+            np.float32(closest_distance_to_next_plus_1_waypoint_line),
             # np.float32(hyp_distance_to_next_waypoint_line),
             np.float32(angle_to_center_of_lane_degrees),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints),
@@ -1419,8 +1419,8 @@ class SACExperimentBasic(BaseExperiment):
             print(f"forward_velocity:{np.float32(forward_velocity)}")
             print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
             print(f"hyp_distance_to_next_plus_1_waypoint:{np.float32(hyp_distance_to_next_plus_1_waypoint)}")
-            # print(f"closest_distance_to_next_waypoint_line:{np.float32(closest_distance_to_next_waypoint_line)}")
-            # print(f"closest_distance_to_next_plus_1_waypoint_line:{np.float32(closest_distance_to_next_plus_1_waypoint_line)}")
+            print(f"closest_distance_to_next_waypoint_line:{np.float32(closest_distance_to_next_waypoint_line)}")
+            print(f"closest_distance_to_next_plus_1_waypoint_line:{np.float32(closest_distance_to_next_plus_1_waypoint_line)}")
             print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
             print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
             print(f"angle_to_center_of_lane_degrees_ahead_waypoints_2:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2)}")
@@ -1573,34 +1573,34 @@ class SACExperimentBasic(BaseExperiment):
         if self.last_hyp_distance_to_next_plus_1_waypoint == 0:
             self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_waypoint
 
-        # if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
-        #     self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
+        if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
+            self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
 
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward* 100
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 100}") if self.custom_enable_rendering else None
+            reward = reward + hyp_reward* 50
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 50}") if self.custom_enable_rendering else None
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward * 100
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 100}") if self.custom_enable_rendering else None
+            reward = reward + hyp_reward * 50
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 50}") if self.custom_enable_rendering else None
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
         self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
 
 
-        # if self.last_closest_distance_to_next_waypoint_line != 0:
-        #     hyp_reward = self.last_closest_distance_to_next_waypoint_line - closest_distance_to_next_waypoint_line
-        #     reward = reward + hyp_reward* 100
-        #     print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if self.custom_enable_rendering else None
-        # else:
-        #     hyp_reward = self.last_closest_distance_to_next_plus_1_waypoint_line - closest_distance_to_next_waypoint_line
-        #     reward = reward + hyp_reward * 100
-        #     print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if self.custom_enable_rendering else None
-        #
-        # self.last_closest_distance_to_next_waypoint_line = closest_distance_to_next_waypoint_line
-        # self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
-        #
+        if self.last_closest_distance_to_next_waypoint_line != 0:
+            hyp_reward = self.last_closest_distance_to_next_waypoint_line - closest_distance_to_next_waypoint_line
+            reward = reward + hyp_reward* 100
+            print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if self.custom_enable_rendering else None
+        else:
+            hyp_reward = self.last_closest_distance_to_next_plus_1_waypoint_line - closest_distance_to_next_waypoint_line
+            reward = reward + hyp_reward * 100
+            print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if self.custom_enable_rendering else None
+
+        self.last_closest_distance_to_next_waypoint_line = closest_distance_to_next_waypoint_line
+        self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
+
 
 
         # if bearing_to_waypoint == 0:
