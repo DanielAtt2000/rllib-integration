@@ -1573,8 +1573,11 @@ class SACExperimentBasic(BaseExperiment):
         if self.last_hyp_distance_to_next_plus_1_waypoint == 0:
             self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_waypoint
 
-        if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
-            self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
+        # if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
+        #     self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
+
+        if self.last_closest_distance_to_next_waypoint_line == 0:
+            self.last_closest_distance_to_next_waypoint_line = closest_distance_to_next_waypoint_line
 
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
