@@ -17,7 +17,7 @@ import carla
 import os
 import time
 from rllib_integration.GetAngle import calculate_angle_with_center_of_lane, angle_between
-from rllib_integration.TestingWayPointUpdater import plot_points, plot_route
+from rllib_integration.TestingWayPointUpdater import plot_points, plot_route, draw_route_in_order
 from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
 from rllib_integration.Circle import get_radii
@@ -517,7 +517,8 @@ class SACExperimentBasic(BaseExperiment):
             print(f"ERROR HERE3 {e}")
             angle_to_center_of_lane_degrees_ahead_waypoints_2 = 0
 
-        if self.visualiseRoute and self.counter > self.counterThreshold:
+        if self.visualiseRoute and self.counter > 2 :
+            draw_route_in_order(route=core.route)
             plot_route(route=core.route, last_waypoint_index=core.last_waypoint_index, truck_transform=truck_transform, number_of_waypoints_ahead_to_calculate_with=5)
 
             print(f"previous_position={core.route[core.last_waypoint_index-1].location}")
@@ -1576,8 +1577,8 @@ class SACExperimentBasic(BaseExperiment):
         # if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
         #     self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
 
-        if self.last_closest_distance_to_next_waypoint_line == 0:
-            self.last_closest_distance_to_next_waypoint_line = closest_distance_to_next_waypoint_line
+        if self.last_closest_distance_to_next_plus_1_waypoint_line == 0:
+            self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_waypoint_line
 
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint

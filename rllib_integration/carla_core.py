@@ -410,6 +410,38 @@ class CarlaCore:
             return 1
         else:
             return -1
+
+    def is_in_front_of_waypoint_from_vector(self,line_point,vector_line, in_front_point):
+        # https://stackoverflow.com/questions/22668659/calculate-on-which-side-of-a-line-a-point-is
+        # Vector equation of the line is
+        #  r = point on line + t(parallel line)
+
+        x_0 = line_point.location.x
+        y_0 = line_point.location.y
+        t = 2
+        x_1 = x_0 + t*vector_line.x
+        y_1 = y_0 + t*vector_line.y
+
+        x_p = in_front_point.location.x
+        y_p = in_front_point.location.y
+
+        d_pos = (x_1-x_0)*(y_p-y_0) - (x_p-x_0)*(y_1-y_0)
+
+        if d_pos == 0:
+            # point on line
+            return 0
+        elif d_pos > 0:
+            # Point behind line
+            return 1
+        elif d_pos < 0:
+            # Point in front of line
+            return -1
+        else:
+            raise Exception("INVALID POSITION")
+
+
+
+
     def get_perpendicular_distance_between_truck_waypoint_line(self, truck_transform, waypoint_plus_current):
         # https://www.nagwa.com/en/explainers/939127418581/
         # D = magnitude(AP x d) / magnitude(d)
@@ -607,26 +639,37 @@ class CarlaCore:
         self.route.clear()
         last_x = -1
         last_y = -1
+        last_waypoint_transform = None
 
         for route_waypoint in route_waypoints:
 
             # Some waypoint may be duplicated
             # Checking and ignoring duplicated points
-            if last_x == round(route_waypoint[0].transform.location.x, 5) and last_y == round(
-                    route_waypoint[0].transform.location.y, 5):
+            if abs(last_x - round(route_waypoint[0].transform.location.x, 2)) < 0.4 and abs(last_y - round(
+                    route_waypoint[0].transform.location.y, 2)) < 0.4:
                 continue
 
-            last_x = round(route_waypoint[0].transform.location.x, 5)
-            last_y = round(route_waypoint[0].transform.location.y, 5)
+            last_x = round(route_waypoint[0].transform.location.x, 2)
+            last_y = round(route_waypoint[0].transform.location.y, 2)
+
 
             # self.route.append(carla.Transform(
             #     carla.Location(self.normalise_map_location(route_waypoint[0].transform.location.x, 'x'),
             #                    self.normalise_map_location(route_waypoint[0].transform.location.y, 'y'),
             #                    0),
             #     carla.Rotation(0, 0, 0)))
+            if last_waypoint_transform is not None:
+                if -1 == self.is_in_front_of_waypoint_from_vector(line_point=last_waypoint_transform,vector_line=last_waypoint_transform.get_right_vector(),in_front_point=route_waypoint[0].transform):
+                    last_waypoint_transform = route_waypoint[0].transform
 
-            self.route.append(route_waypoint[0].transform)
-            self.route_points.append((route_waypoint[0].transform.location.x,route_waypoint[0].transform.location.y))
+                    self.route.append(route_waypoint[0].transform)
+                    self.route_points.append(
+                        (route_waypoint[0].transform.location.x, route_waypoint[0].transform.location.y))
+            else:
+                last_waypoint_transform = route_waypoint[0].transform
+                self.route.append(route_waypoint[0].transform)
+                self.route_points.append(
+                    (route_waypoint[0].transform.location.x, route_waypoint[0].transform.location.y))
 
         return self.entry_spawn_point_index, entry_spawn_point
 

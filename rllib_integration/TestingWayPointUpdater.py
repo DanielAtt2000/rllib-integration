@@ -90,7 +90,7 @@ def plot_points(previous_position, current_position, next_position, current_wayp
 
     y_min = min(y_values)
     y_max = max(y_values)
-    buffer = 3
+    buffer = 0.5
 
     plt.xlim([x_min - buffer,x_max + buffer])
     plt.ylim([y_min - buffer,y_max + buffer])
@@ -102,7 +102,7 @@ def plot_points(previous_position, current_position, next_position, current_wayp
 
     plt.plot([previous_position.x,next_position.x],[previous_position.y,next_position.y] )
     # plotting the points
-    plt.plot(current_position.x, current_position.y, marker="o", markersize=3, markeredgecolor="red", markerfacecolor="red",label='Current Vehicle Position')
+    plt.plot(current_position.x, current_position.y, marker="^", markersize=3, markeredgecolor="red", markerfacecolor="red",label='Current Vehicle Position')
     plt.plot(current_waypoint.x, current_waypoint.y, marker="o", markersize=3, markeredgecolor="black", markerfacecolor="black",label='Current Waypoint')
     plt.plot(next_waypoint.x, next_waypoint.y, marker="o", markersize=3, markeredgecolor="blue", markerfacecolor="blue",label='Next Waypoint')
     plt.plot(previous_position.x, previous_position.y, marker="o", markersize=3, markeredgecolor="green", markerfacecolor="green",label='Previous Waypoint')
@@ -194,6 +194,42 @@ def plot_route(route,last_waypoint_index=-1,truck_transform=-1,number_of_waypoin
     plt.gca().invert_yaxis()
     plt.legend(loc='upper center')
     plt.show()
+
+def draw_route_in_order(route):
+    x_route = []
+    y_route = []
+    x_min = 10000000
+    x_max = -1000000
+    y_min = 10000000
+    y_max = -1000000
+    
+    for point in route:
+        # print(f"X: {point.location.x} Y:{point.location.y}")
+        x_min = min(x_min,point.location.x)
+        x_max = max(x_max,point.location.x)
+        y_min = min(y_min,point.location.y)
+        y_max = max(y_max,point.location.y)
+        x_route.append(point.location.x)
+        y_route.append(point.location.y)
+
+
+    last_point_plotted = 0
+
+    for p,point in enumerate(route):
+        plt.plot(x_route, y_route, 'g^')
+        for i in range(last_point_plotted):
+            plt.plot(x_route[i],y_route[i],'ro')
+        plt.plot(x_route[last_point_plotted], y_route[last_point_plotted], 'yo')
+        last_point_plotted +=1
+
+        buffer = 10
+        # plt.axis([145,165, 100,130])
+        plt.axis([x_min-buffer, x_max+buffer, y_min-buffer, y_max+buffer])
+        # plt.axis([0, 1, 0, 1])
+        # plt.title(f'{angle_to_center_of_lane_degrees * 180}')
+        plt.gca().invert_yaxis()
+        # plt.legend(loc='upper center')
+        plt.show()
 
 
 def plot_all_routes(all_routes=-1):

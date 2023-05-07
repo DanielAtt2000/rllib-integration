@@ -24,7 +24,7 @@ from git import Repo
 EXPERIMENT_CLASS = SACExperimentBasic
 
 # RUN FUNCTION
-# python3 ./dqn_inference_ray.py dqn/dqn_config.yaml "/home/daniel/ray_results/carla_rllib/dqn_9b664eb1e1/CustomDQNTrainer_CarlaEnv_fc10a_00000_0_2023-01-16_19-09-57/checkpoint_000219"
+# python3 ./sac_inference_ray.py sac/sac_config.yaml
 # /home/daniel/ray_results/carla_rllib/ppo_77e99cc55c/CustomPPOTrainer_CarlaEnv_e71d2_00000_0_2023-01-21_15-14-24/checkpoint_000571
 # /home/daniel/ray_results/carla_rllib/dqn_8138f8582f/CustomDQNTrainer_CarlaEnv_93bce_00000_0_2023-01-30_18-07-29/checkpoint_000750
 # /home/daniel/ray_results/carla_rllib/dqn_ea8eefa922/CustomDQNTrainer_CarlaEnv_16957_00000_0_2023-02-13_23-52-27/checkpoint_000305
@@ -37,6 +37,7 @@ EXPERIMENT_CLASS = SACExperimentBasic
 # /home/daniel/ray_results/carla_rllib/good/dqn_6f31211ee7_2_lidar_images_with_hypreward_+angle_reward/CustomDQNTrainer_CarlaEnv_9f625_00000_0_2023-03-15_22-59-13/checkpoint_000250
 # /home/daniel/ray_results/carla_rllib/dqn_53b9a7ee09/CustomDQNTrainer_CarlaEnv_8a877_00000_0_2023-03-16_08-52-46/checkpoint_000549
 # /home/daniel/ray_results/carla_rllib/good/dqn_0a9d414623_no_lidar_2_ahead_waypoints/CustomDQNTrainer_CarlaEnv_34b01_00000_0_2023-03-17_08-27-43/checkpoint_000099
+# /home/daniel/ray_results/carla_rllib/sac_933af966a6/CustomSACTrainer_CarlaEnv_44868_00000_0_2023-05-06_18-15-50/checkpoint_045000
 def parse_config(args):
     """
     Parses the .yaml configuration file into a readable dictionary
