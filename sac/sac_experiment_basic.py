@@ -195,6 +195,7 @@ class SACExperimentBasic(BaseExperiment):
         self.exit_idx = -1
         self.last_action = [0,0,0]
 
+
         # Saving LIDAR point count
         # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
         # file_lidar_counts.write(str(self.lidar_points_count))
