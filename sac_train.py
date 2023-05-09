@@ -112,7 +112,7 @@ def main():
 
 
     specific_version = False
-    check_commit = False
+    check_commit = True
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())
