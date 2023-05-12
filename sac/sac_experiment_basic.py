@@ -71,6 +71,9 @@ class SACExperimentBasic(BaseExperiment):
         self.vehicle_path = []
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
+        self.hyp_distance_to_next_plus_1_waypoint = []
+        self.closest_distance_to_next_waypoint_line = []
+        self.closest_distance_to_next_plus_1_waypoint_line = []
         # self.acceleration = []
         self.collisions = []
         self.lidar_data = collections.deque(maxlen=4)
@@ -216,21 +219,24 @@ class SACExperimentBasic(BaseExperiment):
         self.last_closest_distance_to_next_waypoint_line = 0
         self.last_closest_distance_to_next_plus_1_waypoint_line = 0
 
-        # self.save_to_file(f"{self.directory}/hyp_distance_to_next_waypoint", self.hyp_distance_to_next_waypoint)
-        # self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees", self.angle_to_center_of_lane_degrees)
-        # self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_ahead_waypoints", self.angle_to_center_of_lane_degrees_ahead_waypoints)
-        # self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_ahead_waypoints_2", self.angle_to_center_of_lane_degrees_ahead_waypoints_2)
-        # self.save_to_file(f"{self.directory}/bearing", self.bearing_to_waypoint)
-        # self.save_to_file(f"{self.directory}/bearing_ahead_ahead", self.bearing_to_ahead_waypoints_ahead)
-        # self.save_to_file(f"{self.directory}/bearing_ahead_ahead_2", self.bearing_to_ahead_waypoints_ahead_2)
-        # self.save_to_file(f"{self.directory}/angle_between_truck_and_trailer", self.angle_between_truck_and_trailer)
+        self.save_to_file(f"{self.directory}/hyp_distance_to_next_waypoint", self.hyp_distance_to_next_waypoint)
+        self.save_to_file(f"{self.directory}/hyp_distance_to_next_plus_1_waypoint", self.hyp_distance_to_next_plus_1_waypoint)
+        self.save_to_file(f"{self.directory}/closest_distance_to_next_waypoint_line", self.closest_distance_to_next_waypoint_line)
+        self.save_to_file(f"{self.directory}/closest_distance_to_next_plus_1_waypoint_line", self.closest_distance_to_next_plus_1_waypoint_line)
+        self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees", self.angle_to_center_of_lane_degrees)
+        self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_ahead_waypoints", self.angle_to_center_of_lane_degrees_ahead_waypoints)
+        self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_ahead_waypoints_2", self.angle_to_center_of_lane_degrees_ahead_waypoints_2)
+        self.save_to_file(f"{self.directory}/bearing_to_waypoint", self.bearing_to_waypoint)
+        self.save_to_file(f"{self.directory}/bearing_to_ahead_waypoints_ahead", self.bearing_to_ahead_waypoints_ahead)
+        self.save_to_file(f"{self.directory}/bearing_to_ahead_waypoints_ahead_2", self.bearing_to_ahead_waypoints_ahead_2)
+        self.save_to_file(f"{self.directory}/angle_between_truck_and_trailer", self.angle_between_truck_and_trailer)
         # self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint", self.trailer_bearing_to_waypoint)
-        # self.save_to_file(f"{self.directory}/forward_velocity", self.forward_velocity)
-        # # self.save_to_file(f"{self.directory}/forward_velocity_x", self.forward_velocity_x)
-        # # self.save_to_file(f"{self.directory}/forward_velocity_z", self.forward_velocity_z)
-        # # self.save_to_file(f"{self.directory}/acceleration", self.acceleration)
-        # self.save_to_file(f"{self.directory}/route", self.temp_route)
-        # self.save_to_file(f"{self.directory}/path", self.vehicle_path)
+        self.save_to_file(f"{self.directory}/forward_velocity", self.forward_velocity)
+        # self.save_to_file(f"{self.directory}/forward_velocity_x", self.forward_velocity_x)
+        # self.save_to_file(f"{self.directory}/forward_velocity_z", self.forward_velocity_z)
+        # self.save_to_file(f"{self.directory}/acceleration", self.acceleration)
+        self.save_to_file(f"{self.directory}/route", self.temp_route)
+        self.save_to_file(f"{self.directory}/path", self.vehicle_path)
         self.save_to_file(f"{self.directory}/lidar_data", self.lidar_data)
         self.save_to_file(f"{self.directory}/collisions", self.collisions)
         self.entry_idx = -1
@@ -274,6 +280,9 @@ class SACExperimentBasic(BaseExperiment):
         self.vehicle_path = []
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
+        self.hyp_distance_to_next_plus_1_waypoint = []
+        self.closest_distance_to_next_waypoint_line = []
+        self.closest_distance_to_next_plus_1_waypoint_line = []
         self.collisions = []
         self.lidar_data = collections.deque(maxlen=4)
         # self.acceleration = []
@@ -328,7 +337,7 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,]),
                 high=np.array([100,100,100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
                 dtype=np.float32
             )
@@ -438,7 +447,7 @@ class SACExperimentBasic(BaseExperiment):
         self.custom_enable_rendering = core.custom_enable_rendering
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
 
-        self.radii = get_radii(core.route[core.last_waypoint_index:],5)
+        self.radii = get_radii(core.route,core.last_waypoint_index,5)
 
         self.entry_idx = core.entry_spawn_point_index
         self.exit_idx = core.exit_spawn_point_index
@@ -1258,21 +1267,24 @@ class SACExperimentBasic(BaseExperiment):
             print('')
             print('')
             time.sleep(0.2)
-        # self.forward_velocity.append(np.float32(forward_velocity))
-        # # self.forward_velocity_x.append(np.float32(forward_velocity_x))
-        # # self.forward_velocity_z.append(np.float32(forward_velocity_z))
-        # self.hyp_distance_to_next_waypoint.append(np.float32(hyp_distance_to_next_waypoint))
-        # self.angle_to_center_of_lane_degrees.append(np.float32(angle_to_center_of_lane_degrees))
-        # self.angle_to_center_of_lane_degrees_ahead_waypoints.append(np.float32(angle_to_center_of_lane_degrees_ahead_waypoints))
-        # self.angle_to_center_of_lane_degrees_ahead_waypoints_2.append(np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2))
-        # self.bearing_to_waypoint.append(np.float32(bearing_to_waypoint))
-        # self.bearing_to_ahead_waypoints_ahead.append(np.float32(bearing_to_ahead_waypoints_ahead))
-        # self.bearing_to_ahead_waypoints_ahead_2.append(np.float32(bearing_to_ahead_waypoints_ahead_2))
-        # self.angle_between_truck_and_trailer.append(np.float32(angle_between_truck_and_trailer))
+        self.forward_velocity.append(np.float32(forward_velocity))
+        # self.forward_velocity_x.append(np.float32(forward_velocity_x))
+        # self.forward_velocity_z.append(np.float32(forward_velocity_z))
+        self.hyp_distance_to_next_waypoint.append(np.float32(hyp_distance_to_next_waypoint))
+        self.hyp_distance_to_next_plus_1_waypoint.append(np.float32(hyp_distance_to_next_plus_1_waypoint))
+        self.closest_distance_to_next_waypoint_line.append(np.float32(closest_distance_to_next_waypoint_line))
+        self.closest_distance_to_next_plus_1_waypoint_line.append(np.float32(closest_distance_to_next_plus_1_waypoint_line))
+        self.angle_to_center_of_lane_degrees.append(np.float32(angle_to_center_of_lane_degrees))
+        self.angle_to_center_of_lane_degrees_ahead_waypoints.append(np.float32(angle_to_center_of_lane_degrees_ahead_waypoints))
+        self.angle_to_center_of_lane_degrees_ahead_waypoints_2.append(np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2))
+        self.bearing_to_waypoint.append(np.float32(bearing_to_waypoint))
+        self.bearing_to_ahead_waypoints_ahead.append(np.float32(bearing_to_ahead_waypoints_ahead))
+        self.bearing_to_ahead_waypoints_ahead_2.append(np.float32(bearing_to_ahead_waypoints_ahead_2))
+        self.angle_between_truck_and_trailer.append(np.float32(angle_between_truck_and_trailer))
         # self.trailer_bearing_to_waypoint.append(np.float32(trailer_bearing_to_waypoint))
         # self.acceleration.append(np.float32(acceleration))
-        # self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
-        # self.temp_route = core.route_points
+        self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
+        self.temp_route = core.route_points
         #
         # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
         # print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
