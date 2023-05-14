@@ -337,7 +337,7 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,]),
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
                 high=np.array([100,100,100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
                 dtype=np.float32
             )
@@ -1420,12 +1420,12 @@ class SACExperimentBasic(BaseExperiment):
 
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward* 20
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 20}") if self.custom_enable_rendering else None
+            reward = reward + hyp_reward* 50
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 50}") if self.custom_enable_rendering else None
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward * 20
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 20}") if self.custom_enable_rendering else None
+            reward = reward + hyp_reward * 50
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 50}") if self.custom_enable_rendering else None
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
         self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint

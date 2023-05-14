@@ -20,21 +20,25 @@ def get_radii(route, last_waypoint_index,no_of_points_to_calculate_chord):
     perpendicular_bisectors = []
     radii = []
 
-    # Lets say we have the next 10 points of the route and we want to find its radius
+    calculate_previous_radii = False
+    if calculate_previous_radii:
+        # Lets say we have the next 10 points of the route and we want to find its radius
 
-    # Calculating the number of chords we can calculate given in the previous waypoints exist
-    no_of_whole_chords_before_current_point = last_waypoint_index//no_of_points_to_calculate_chord
-    # Starting 3 radii before current one.
-    max_chords_before_current_points = 3
-    # If we are ahead that there are plenty of waypoint behind us to calculate three previous chords
-    if no_of_whole_chords_before_current_point >= max_chords_before_current_points:
-        remaining_waypoints_on_route = route[last_waypoint_index-(no_of_points_to_calculate_chord*max_chords_before_current_points):]
+        # Calculating the number of chords we can calculate given in the previous waypoints exist
+        no_of_whole_chords_before_current_point = last_waypoint_index//no_of_points_to_calculate_chord
+        # Starting 3 radii before current one.
+        max_chords_before_current_points = 3
+        # If we are ahead that there are plenty of waypoint behind us to calculate three previous chords
+        if no_of_whole_chords_before_current_point >= max_chords_before_current_points:
+            remaining_waypoints_on_route = route[last_waypoint_index-(no_of_points_to_calculate_chord*max_chords_before_current_points):]
+        else:
+            # If there isnt enough waypoints, we add the max value for the number of chords we cannot calculate and calculate as much chords as we can
+            for i in range(max_chords_before_current_points-no_of_whole_chords_before_current_point):
+                radii.append(max_radius_value)
+            remaining_waypoints_on_route = route[last_waypoint_index-(no_of_points_to_calculate_chord*no_of_whole_chords_before_current_point):]
+
     else:
-        # If there isnt enough waypoints, we add the max value for the number of chords we cannot calculate and calculate as much chords as we can
-        for i in range(max_chords_before_current_points-no_of_whole_chords_before_current_point):
-            radii.append(max_radius_value)
-        remaining_waypoints_on_route = route[last_waypoint_index-(no_of_points_to_calculate_chord*no_of_whole_chords_before_current_point):]
-
+        remaining_waypoints_on_route = route[last_waypoint_index:]
     for i in range(0,len(remaining_waypoints_on_route)-no_of_points_to_calculate_chord,no_of_points_to_calculate_chord):
         x_0 = remaining_waypoints_on_route[i].location.x
         y_0 = remaining_waypoints_on_route[i].location.y
@@ -125,11 +129,14 @@ def get_radii(route, last_waypoint_index,no_of_points_to_calculate_chord):
         riadus = np.clip((r_0 + r_1) / 2, 0, max_radius_value_before_sign)
 
         # If higher value mean tighter radii, the max value needs to be 0
-        assert max_radius_value == 0
-        riadus = 1-riadus
+        signed_radius = False
+        if signed_radius:
+            assert max_radius_value == 0
+            riadus = 1-riadus
 
-        radii.append(sign * riadus)
-        # radii.append(riadus)
+            radii.append(sign * riadus)
+        else:
+            radii.append(riadus)
 
         if len(radii) > length_of_output_array:
             break
