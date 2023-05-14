@@ -37,7 +37,7 @@ def run(args):
     try:
         os.environ['RAY_DISABLE_MEMORY_MONITOR'] = '1'
         ray.init( num_gpus=1,include_dashboard=True,_temp_dir="/home/daniel/data-rllib-integration/ray_logs")
-        tune.run(CustomSACTrainer,
+        analysis = tune.run(CustomSACTrainer,
                  name=args.name,
                  local_dir=args.directory,
                  # stop={"perf/ram_util_percent": 85.0},
@@ -49,7 +49,11 @@ def run(args):
                  resume=False,
                  reuse_actors=True,
                  )
-
+        print("----------------HERE")
+        print(analysis.__dict__)
+        # print(analysis.get_all_configs())
+        # print(analysis.get_best_trial())
+        print("----------------HERE")
     finally:
         kill_all_servers()
         ray.shutdown()
