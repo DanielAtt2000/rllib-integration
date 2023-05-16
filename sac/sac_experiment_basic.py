@@ -11,7 +11,7 @@ from git import Repo
 
 import math
 import numpy as np
-from gymnasium.spaces import Box, Discrete, Dict, Tuple
+from gym.spaces import Box, Discrete, Dict, Tuple
 import warnings
 import carla
 import os
@@ -338,7 +338,7 @@ class SACExperimentBasic(BaseExperiment):
             # })
         return Box(
                 low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
-                high=np.array([100,100,100,100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
+                high=np.array([100,150,150,150,150,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
                 dtype=np.float32
             )
 

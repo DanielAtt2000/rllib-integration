@@ -22,24 +22,24 @@ class SACCallbacks(DefaultCallbacks):
 
     def on_episode_step(self, worker, base_env, episode, **kwargs):
         # Angle with center
-        last_angle_with_center = worker.env.env.experiment.last_angle_with_center
+        last_angle_with_center = worker.env.experiment.last_angle_with_center
         # if last_angle_with_center >= 0:
         episode.user_data["angle_with_center"].append(last_angle_with_center)
 
         # Forward Velocity
-        last_forward_velocity = worker.env.env.experiment.last_forward_velocity
+        last_forward_velocity = worker.env.experiment.last_forward_velocity
         episode.user_data["forward_velocity"].append(last_forward_velocity)
 
         # Reward Proportional to length
-        reward = worker.env.env.experiment.reward_metric
+        reward = worker.env.experiment.reward_metric
         episode.user_data["reward_proportional_to_length"].append(reward)
 
         # Total Reward
         episode.user_data["total_reward"].append(reward)
 
         # Entry Idx
-        episode.user_data["entry_idx"] = worker.env.env.experiment.entry_idx
-        episode.user_data["exit_idx"] = worker.env.env.experiment.exit_idx
+        episode.user_data["entry_idx"] = worker.env.experiment.entry_idx
+        episode.user_data["exit_idx"] = worker.env.experiment.exit_idx
 
     def on_episode_end(self, worker, base_env, policies, episode, **kwargs):
         last_angle_with_center = episode.user_data["angle_with_center"]
@@ -57,10 +57,10 @@ class SACCallbacks(DefaultCallbacks):
             last_forward_velocity = 0
         episode.custom_metrics["forward_velocity"] = last_forward_velocity
 
-        if not worker.env.env.experiment.custom_done_arrived:
+        if not worker.env.experiment.custom_done_arrived:
             episode.custom_metrics["custom_done_arrived"] = 0
 
-        elif worker.env.env.experiment.custom_done_arrived:
+        elif worker.env.experiment.custom_done_arrived:
             episode.custom_metrics["custom_done_arrived"] = 1
 
         else:
@@ -129,16 +129,16 @@ class SACCallbacks(DefaultCallbacks):
                         break
 
         if easy:
-            if not worker.env.env.experiment.custom_done_arrived:
+            if not worker.env.experiment.custom_done_arrived:
                 episode.custom_metrics["easy_custom_done_arrived"] = 0
 
-            elif worker.env.env.experiment.custom_done_arrived:
+            elif worker.env.experiment.custom_done_arrived:
                 episode.custom_metrics["easy_custom_done_arrived"] = 1
         else:
-            if not worker.env.env.experiment.custom_done_arrived:
+            if not worker.env.experiment.custom_done_arrived:
                 episode.custom_metrics["difficult_custom_done_arrived"] = 0
 
-            elif worker.env.env.experiment.custom_done_arrived:
+            elif worker.env.experiment.custom_done_arrived:
                 episode.custom_metrics["difficult_custom_done_arrived"] = 1
 
 
