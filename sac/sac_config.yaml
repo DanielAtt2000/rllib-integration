@@ -3,18 +3,18 @@ num_workers: 1
 num_gpus: 1
 num_cpus_per_worker: 11
 framework: torch
-gamma: 0.99
+gamma: 1
 twin_q: True
 # these probably do nothing
-#q_model_config:
-#  "fcnet_hiddens": [ 512, 512,1024 ]
-#  "fcnet_activation": "relu"
-#policy_model_config:
-#  "fcnet_hiddens": [ 512, 512,1024 ]
-#  "fcnet_activation": "relu"
-#model:
-#  "fcnet_hiddens": [ 512, 512 ]
-#  "fcnet_activation": "tanh"
+q_model_config:
+  "fcnet_hiddens": [ 512, 512 ]
+  "fcnet_activation": "relu"
+policy_model_config:
+  "fcnet_hiddens": [ 512, 512 ]
+  "fcnet_activation": "relu"
+model:
+  "fcnet_hiddens": [ 512, 512 ]
+  "fcnet_activation": "tanh"
 
 #batch_mode: "complete_episodes"
 
