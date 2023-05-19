@@ -1420,10 +1420,14 @@ class SACExperimentBasic(BaseExperiment):
 
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
             reward = reward + hyp_reward* 50
             print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 50}") if self.custom_enable_rendering else None
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
             reward = reward + hyp_reward * 50
             print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 50}") if self.custom_enable_rendering else None
 
@@ -1433,10 +1437,14 @@ class SACExperimentBasic(BaseExperiment):
 
         if self.last_closest_distance_to_next_waypoint_line != 0:
             hyp_reward = self.last_closest_distance_to_next_waypoint_line - closest_distance_to_next_waypoint_line
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
             reward = reward + hyp_reward* 100
             print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if self.custom_enable_rendering else None
         else:
             hyp_reward = self.last_closest_distance_to_next_plus_1_waypoint_line - closest_distance_to_next_waypoint_line
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
             reward = reward + hyp_reward * 100
             print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* 100}") if self.custom_enable_rendering else None
 

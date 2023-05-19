@@ -17,7 +17,7 @@ def open_pickle(filename):
     with open(filename, 'rb') as handle:
         return pickle.load(handle)
 
-directory = 'data_7a487142efe'
+directory = 'data_485ac1cce82'
 df= pd.DataFrame()
 df_done = pd.DataFrame()
 string= '_beforeNormalisation'
@@ -49,6 +49,7 @@ def plot_route(route_points_all,truck_points_all):
         y_route = open_pickle(os.path.join(directory, 'y_route.pickle'))
 
     else:
+        route_points_all = route_points_all[route_points_all != 0]
         for route_id, route in enumerate(route_points_all):
             if "[]\n" in route:
                 continue
@@ -73,6 +74,7 @@ def plot_route(route_points_all,truck_points_all):
             y_route.append(temp_y_route)
             print(f"Route {route_id}/{len(route_points_all)} ready")
 
+        truck_points_all = truck_points_all[truck_points_all != 0]
         for truck_idx, truck_points in enumerate(truck_points_all):
             if "[]\n" in truck_points:
                 continue
@@ -119,7 +121,8 @@ def plot_route(route_points_all,truck_points_all):
     for idx in range(len(x_route)):
 
         # if len(x_truck[idx]) > 0:
-        if idx > 0:
+
+        if idx > 2000:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -160,17 +163,64 @@ if graphs:
             elif "route" in filename or "path" in filename:
                 continue
             else:
+                for col in df.columns:
+                    print(df[col].describe(include='all'))
+                    print('--------------')
                 file = os.path.join(directory, filename)
                 # checking if it is a file
                 print(file)
                 if os.path.isfile(file) and file.endswith('.pkl'):
                     # plt.xlabel(filename)
                     # sns.distplot(data)
-                    x = sns.displot(df[filename + string])
-                    # sns.pointplot(x=df['forward_velocity.pkl'],y=df['forward_velocity_x.pkl'])
-                    # sns.scatterplot(data)
-                    plt.show()
-                    x.savefig(os.path.join(directory, filename + string + '.png'))
+                    if "hyp_distance" in filename or "closest_distance" in filename:
+                        # sns.distplot(df[filename+ string], bins=10, kde=False)
+                        values_greater_than = [len(np.where(df[filename+ string]>10)[0]),
+                                               len(np.where(df[filename+ string]>20)[0]),
+                                               len(np.where(df[filename+ string]>30)[0]),
+                                               len(np.where(df[filename+ string]>40)[0]),
+                                               len(np.where(df[filename+ string]>50)[0])]
+
+                        temp = [10,20,30,40,50]
+                        for value in range(5):
+                            print(f"Values greater than {temp[value]}")
+                            print(values_greater_than[value])
+                            print(values_greater_than[value]/len(df[filename+ string]) * 100)
+                            print('---------------')
+
+                        difference = []
+                        for i,item in enumerate(df.loc[:, filename+ string]):
+                            if i == 0:
+                                continue
+
+                            difference.append(df.loc[i-1, filename+ string] - item )
+
+                        series_difference = pd.Series(difference)
+                        print('----------')
+                        values_greater_than = []
+                        temp = [100]
+                        for value in temp:
+                            values_greater_than.append(len(np.where(series_difference > 0.5)[0]))
+
+
+                        for value in range(len(temp)):
+                            print(f"Values greater than {temp[value]}")
+                            print(values_greater_than[value])
+                            print(values_greater_than[value] / len(series_difference) * 100)
+                            print('---------------')
+
+                        print(series_difference.describe())
+                        sns.distplot(series_difference, bins=10, kde=False)
+
+                        plt.show()
+                        print('----------')
+
+                        plt.show()
+                    else:
+                        x = sns.displot(df[filename + string])
+                        # sns.pointplot(x=df['forward_velocity.pkl'],y=df['forward_velocity_x.pkl'])
+                        # sns.scatterplot(data)
+                        plt.show()
+                        x.savefig(os.path.join(directory, filename + string + '.png'))
 
 
 

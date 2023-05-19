@@ -138,8 +138,8 @@ def get_radii(route, last_waypoint_index,no_of_points_to_calculate_chord):
         else:
             radii.append(riadus)
 
-        if len(radii) > length_of_output_array:
-            break
+        # if len(radii) > length_of_output_array:
+        #     break
 
     if len(radii) < length_of_output_array:
         for i in range(length_of_output_array-len(radii)):

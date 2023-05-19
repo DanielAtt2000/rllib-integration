@@ -14,12 +14,12 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-directory = '../data/data_7a487142efe'
+directory = '/home/daniel/data-rllib-integration/data/data_485ac1cce82'
 
 assert no_changes == True and log == False
 
 
-new_file_dir = directory.split('/')[2]
+new_file_dir = directory.split('/')[-1]
 
 if not os.path.exists(new_file_dir):
     os.mkdir(new_file_dir)
@@ -46,6 +46,9 @@ for filename in os.listdir(directory):
             new_data = []
             temp_array_1 = []
             temp_array_2 = []
+
+            if filename == "collisions" or filename == "lidar_data":
+                continue
 
             for line in lines:
                 if filename == "done":
