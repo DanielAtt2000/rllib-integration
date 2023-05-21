@@ -1421,14 +1421,14 @@ class SACExperimentBasic(BaseExperiment):
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
             hyp_reward = np.clip(hyp_reward, None, 0.5)
             hyp_reward = hyp_reward - 0.5
-            reward = reward + hyp_reward* 50
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 50}") if self.custom_enable_rendering else None
+            reward = reward + hyp_reward* 30
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 30}") if self.custom_enable_rendering else None
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
             hyp_reward = np.clip(hyp_reward, None, 0.5)
             hyp_reward = hyp_reward - 0.5
-            reward = reward + hyp_reward * 50
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 50}") if self.custom_enable_rendering else None
+            reward = reward + hyp_reward * 30
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* 30}") if self.custom_enable_rendering else None
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
         self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
