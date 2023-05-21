@@ -8,6 +8,34 @@ import pickle
 import pandas as pd
 import numpy as np
 
+class Vector:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+
+class Lidar:
+    def __init__(self, front, front_left, front_right, left, right, trailer_0_left, trailer_1_left, trailer_2_left,
+                 trailer_3_left, trailer_4_left, trailer_5_left, trailer_0_right, trailer_1_right, trailer_2_right,
+                 trailer_3_right, trailer_4_right, trailer_5_right):
+        self.front = front
+        self.front_left = front_left
+        self.front_right = front_right
+        self.left = left
+        self.right = right
+        self.trailer_0_left = trailer_0_left
+        self.trailer_1_left = trailer_1_left
+        self.trailer_2_left = trailer_2_left
+        self.trailer_3_left = trailer_3_left
+        self.trailer_4_left = trailer_4_left
+        self.trailer_5_left = trailer_5_left
+        self.trailer_0_right = trailer_0_right
+        self.trailer_1_right = trailer_1_right
+        self.trailer_2_right = trailer_2_right
+        self.trailer_3_right = trailer_3_right
+        self.trailer_4_right = trailer_4_right
+        self.trailer_5_right = trailer_5_right
+
 def save_to_pickle(filename, data):
     filename = filename + '.pickle'
     with open(f'{os.path.join(directory, filename)}', 'wb') as handle:
@@ -17,10 +45,10 @@ def open_pickle(filename):
     with open(filename, 'rb') as handle:
         return pickle.load(handle)
 
-directory = 'data_485ac1cce82'
+directory = 'data_0c3010d3395'
 df= pd.DataFrame()
 df_done = pd.DataFrame()
-string= '_beforeNormalisation'
+string= ''
 for filename in os.listdir(directory):
     file = os.path.join(directory, filename)
     # checking if it is a file
@@ -34,14 +62,15 @@ for filename in os.listdir(directory):
                 df_done['points'] = pd.Series(data[0][0])
                 df_done['output'] = pd.Series(data[0][1])
 
-graphs = True
+graphs = False
+get_from_file = True
 def plot_route(route_points_all,truck_points_all):
     x_route = []
     y_route = []
 
     x_truck = []
     y_truck = []
-    get_from_file = True
+
     if get_from_file:
         x_truck = open_pickle(os.path.join(directory, 'x_truck.pickle'))
         y_truck = open_pickle(os.path.join(directory, 'y_truck.pickle'))
@@ -122,13 +151,33 @@ def plot_route(route_points_all,truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 2000:
+        if idx > 2350:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
             #     y_route[idx] = temp_y_route[idx][len(temp_y_route[idx-1]):]
 
             if len(x_route[idx]) != 0:
+                print('----------')
+                print(f'Showing Episode {idx}/{len(x_route)}')
+                print(df_done.iloc[[idx-1]])
+                for lidar_point in df.loc[idx-1,"lidar_data.pkl"]:
+
+                    print(f"truck FRONT \t\t\t{round(lidar_point.front, 2)}")
+                    print(f"truck 45 \t\t{round(lidar_point.front_left, 2)}\t\t{round(lidar_point.front_right, 2)}")
+                    print(f"truck sides \t\t{round(lidar_point.left, 2)}\t\t{round(lidar_point.right, 2)}")
+                    print(f"")
+                    print(f"trailer_0 \t\t{round(lidar_point.trailer_0_left, 2)}\t\t{round(lidar_point.trailer_0_right, 2)}")
+                    print(f"trailer_1 \t\t{round(lidar_point.trailer_1_left, 2)}\t\t{round(lidar_point.trailer_1_right, 2)}")
+                    print(f"trailer_2 \t\t{round(lidar_point.trailer_2_left, 2)}\t\t{round(lidar_point.trailer_2_right, 2)}")
+                    print(f"trailer_3 \t\t{round(lidar_point.trailer_3_left, 2)}\t\t{round(lidar_point.trailer_3_right, 2)}")
+                    print(f"trailer_4 \t\t{round(lidar_point.trailer_4_left, 2)}\t\t{round(lidar_point.trailer_4_right, 2)}")
+                    print(f"trailer_5 \t\t{round(lidar_point.trailer_5_left, 2)}\t\t{round(lidar_point.trailer_5_right, 2)}")
+                    print(f"------------------------------------------------------")
+
+                print()
+                print()
+                print('----------')
 
                 buffer = 10
 
@@ -137,9 +186,11 @@ def plot_route(route_points_all,truck_points_all):
                 plt.plot(x_truck[idx][0], y_truck[idx][0], 'kd',label='Truck Starting waypoint')
                 plt.plot(x_route[idx+1][2:], y_route[idx+1][2:], 'y^')
                 plt.plot(x_truck[idx][2:], y_truck[idx][2:], "ro")
+                plt.plot(df.loc[idx+1,"collisions.pkl"][1].x,df.loc[idx+1,"collisions.pkl"][1].y,'r*')
+                print()
                 plt.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
                 # plt.axis([0, 1, 0, 1])
-                # plt.title(f'{angle_to_center_of_lane_degrees * 180}')
+                plt.title(f'Collision with {df.loc[idx-1,"collisions.pkl"][0]}')
                 plt.gca().invert_yaxis()
                 plt.legend(loc='upper center')
                 plt.show()

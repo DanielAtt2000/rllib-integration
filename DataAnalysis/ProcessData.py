@@ -7,6 +7,49 @@ from numpy import exp
 from scipy.stats import boxcox
 
 
+class Vector:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+
+class Lidar:
+    def __init__(self, front, front_left, front_right, left, right, trailer_0_left, trailer_1_left, trailer_2_left,
+                 trailer_3_left, trailer_4_left, trailer_5_left, trailer_0_right, trailer_1_right, trailer_2_right,
+                 trailer_3_right, trailer_4_right, trailer_5_right):
+        self.front = front
+        self.front_left = front_left
+        self.front_right = front_right
+        self.left = left
+        self.right = right
+        self.trailer_0_left = trailer_0_left
+        self.trailer_1_left = trailer_1_left
+        self.trailer_2_left = trailer_2_left
+        self.trailer_3_left = trailer_3_left
+        self.trailer_4_left = trailer_4_left
+        self.trailer_5_left = trailer_5_left
+        self.trailer_0_right = trailer_0_right
+        self.trailer_1_right = trailer_1_right
+        self.trailer_2_right = trailer_2_right
+        self.trailer_3_right = trailer_3_right
+        self.trailer_4_right = trailer_4_right
+        self.trailer_5_right = trailer_5_right
+def get_value(text, symbol):
+    location_of_symbol = text.find(symbol)
+    end_of_value_comma = text[location_of_symbol:].find(',')
+    end_of_value_bracket = text[location_of_symbol:].find(')')
+
+    if end_of_value_comma < end_of_value_bracket and end_of_value_comma != -1:
+        end_of_value = end_of_value_comma
+    else:
+        end_of_value = end_of_value_bracket
+
+    return float(text[location_of_symbol + len(symbol) + 1:location_of_symbol + end_of_value])
+
+
+def find(s, ch):
+    return [i for i, ltr in enumerate(s) if ltr == ch]
+
 def min_max_normalisation(name, value):
     min = float(min_max_values[name][0])
     max = float(min_max_values[name][1])
@@ -14,17 +57,17 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-directory = '/home/daniel/data-rllib-integration/data/data_485ac1cce82'
+directory = '/home/daniel/data-rllib-integration/data/data_0c3010d3395'
 
 assert no_changes == True and log == False
 
 
 new_file_dir = directory.split('/')[-1]
 
-if not os.path.exists(new_file_dir):
-    os.mkdir(new_file_dir)
-else:
-    raise Exception('Path already exists')
+# if not os.path.exists(new_file_dir):
+#     os.mkdir(new_file_dir)
+# else:
+#     raise Exception('Path already exists')
 
 def clip_custom(name, value):
     max = float(min_max_values[name][1])
@@ -47,11 +90,58 @@ for filename in os.listdir(directory):
             temp_array_1 = []
             temp_array_2 = []
 
-            if filename == "collisions" or filename == "lidar_data":
-                continue
+
 
             for line in lines:
-                if filename == "done":
+
+                if filename == "collisions":
+
+                    if line == "[]\n":
+                        new_data.append(('None',Vector(x=0,y=0)))
+                        continue
+
+                    splits = line.split('\'')
+                    vehicle = splits[1]
+                    new_data.append((vehicle,Vector(x = get_value(line, 'x'),y = get_value(line, 'y') )))
+                elif filename == "lidar_data":
+                    temp_list = []
+                    if "deque([]" in line:
+                        continue
+                    open_brackets_indices = find(line, '[')
+                    closed_brackets_indices = find(line, ']')
+
+                    lidar_points = []
+                    if len(open_brackets_indices) >= 2:
+                        lidar_points.append(line[open_brackets_indices[1]:closed_brackets_indices[0]])
+                    if len(open_brackets_indices) >= 3:
+                        lidar_points.append(line[open_brackets_indices[2]:closed_brackets_indices[1]])
+                    if len(open_brackets_indices) >= 4:
+                        lidar_points.append(line[open_brackets_indices[3]:closed_brackets_indices[2]])
+                    if len(open_brackets_indices) >= 5:
+                        lidar_points.append(line[open_brackets_indices[4]:closed_brackets_indices[3]])
+
+                    for lidar_point in lidar_points:
+                        splits = lidar_point.split(',')
+
+                        temp_list.append(Lidar(front=float(splits[13]),
+                                              front_right=float(splits[16]),
+                                              front_left=float(splits[17]),
+                                              right=float(splits[14]),
+                                              left=float(splits[15]),
+                                              trailer_0_left=float(splits[1]),
+                                              trailer_1_left=float(splits[3]),
+                                              trailer_2_left=float(splits[5]),
+                                              trailer_3_left=float(splits[7]),
+                                              trailer_4_left=float(splits[9]),
+                                              trailer_5_left=float(splits[11]),
+                                              trailer_0_right=float(splits[2]),
+                                              trailer_1_right=float(splits[4]),
+                                              trailer_2_right=float(splits[6]),
+                                              trailer_3_right=float(splits[8]),
+                                              trailer_4_right=float(splits[10]),
+                                              trailer_5_right=float(splits[12]),))
+                    new_data.append(temp_list)
+                elif filename == "done":
                     if line != "\n":
 
                         entry_pos = line.find("ENTRY: ")

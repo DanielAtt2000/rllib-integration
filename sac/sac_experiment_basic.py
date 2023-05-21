@@ -1376,9 +1376,8 @@ class SACExperimentBasic(BaseExperiment):
         if self.done_arrived:
             done_reason += "done_arrived"
 
-        if done_reason != "":
-            data = f"ENTRY: {core.entry_spawn_point_index} EXIT: {core.exit_spawn_point_index} - {done_reason} \n"
-            self.save_to_file(f"{self.directory}/done",data)
+        data = f"ENTRY: {core.entry_spawn_point_index} EXIT: {core.exit_spawn_point_index} - {done_reason} \n"
+        self.save_to_file(f"{self.directory}/done",data)
 
         return bool(output), self.done_collision_truck, self.done_collision_trailer, (self.done_time_idle or self.done_time_episode), self.done_arrived
 
