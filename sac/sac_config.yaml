@@ -5,7 +5,7 @@ num_cpus_per_worker: 11
 framework: torch
 gamma: 1
 twin_q: True
-# these probably do nothing
+# these probably do nothing temp
 q_model_config:
   "fcnet_hiddens": [ 256, 512 ]
   "fcnet_activation": "relu"
