@@ -15,9 +15,10 @@ class Vector:
 
 
 class Lidar:
-    def __init__(self, front, front_left, front_right, left, right, trailer_0_left, trailer_1_left, trailer_2_left,
+    def __init__(self,time,  front, front_left, front_right, left, right, trailer_0_left, trailer_1_left, trailer_2_left,
                  trailer_3_left, trailer_4_left, trailer_5_left, trailer_0_right, trailer_1_right, trailer_2_right,
                  trailer_3_right, trailer_4_right, trailer_5_right):
+        self.time = time
         self.front = front
         self.front_left = front_left
         self.front_right = front_right
@@ -45,7 +46,7 @@ def open_pickle(filename):
     with open(filename, 'rb') as handle:
         return pickle.load(handle)
 
-directory = 'data_0c3010d3395'
+directory = 'data_98894769d9a'
 df= pd.DataFrame()
 df_done = pd.DataFrame()
 string= ''
@@ -151,17 +152,18 @@ def plot_route(route_points_all,truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 2350:
+        if idx > 1710:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
             #     y_route[idx] = temp_y_route[idx][len(temp_y_route[idx-1]):]
 
             if len(x_route[idx]) != 0:
+                collision_data_diff = 2
                 print('----------')
                 print(f'Showing Episode {idx}/{len(x_route)}')
                 print(df_done.iloc[[idx-1]])
-                for lidar_point in df.loc[idx-1,"lidar_data.pkl"]:
+                for lidar_point in df.loc[idx+1,"lidar_data.pkl"]:
 
                     print(f"truck FRONT \t\t\t{round(lidar_point.front, 2)}")
                     print(f"truck 45 \t\t{round(lidar_point.front_left, 2)}\t\t{round(lidar_point.front_right, 2)}")
@@ -175,6 +177,16 @@ def plot_route(route_points_all,truck_points_all):
                     print(f"trailer_5 \t\t{round(lidar_point.trailer_5_left, 2)}\t\t{round(lidar_point.trailer_5_right, 2)}")
                     print(f"------------------------------------------------------")
 
+                    if df.loc[idx+collision_data_diff,"collisions.pkl"][1] != 0:
+                        if lidar_point.time != df.loc[idx+collision_data_diff,"collisions.pkl"][1]:
+                            print('------------------------')
+                            print(f"Lidar time \t\t\t{lidar_point.time}")
+                            print(f'Collision time \t\t{df.loc[idx+collision_data_diff,"collisions.pkl"][1]}')
+                            print('------------------------')
+
+
+
+
                 print()
                 print()
                 print('----------')
@@ -186,11 +198,12 @@ def plot_route(route_points_all,truck_points_all):
                 plt.plot(x_truck[idx][0], y_truck[idx][0], 'kd',label='Truck Starting waypoint')
                 plt.plot(x_route[idx+1][2:], y_route[idx+1][2:], 'y^')
                 plt.plot(x_truck[idx][2:], y_truck[idx][2:], "ro")
-                plt.plot(df.loc[idx+1,"collisions.pkl"][1].x,df.loc[idx+1,"collisions.pkl"][1].y,'r*')
-                print()
+                plt.plot(df.loc[idx+collision_data_diff,"collisions.pkl"][2].x,df.loc[idx+collision_data_diff,"collisions.pkl"][2].y,'b*')
+
+
                 plt.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
                 # plt.axis([0, 1, 0, 1])
-                plt.title(f'Collision with {df.loc[idx-1,"collisions.pkl"][0]}')
+                plt.title(f'Collision with {df.loc[idx+2,"collisions.pkl"][0]}')
                 plt.gca().invert_yaxis()
                 plt.legend(loc='upper center')
                 plt.show()

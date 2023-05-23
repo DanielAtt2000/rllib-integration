@@ -14,9 +14,10 @@ class Vector:
 
 
 class Lidar:
-    def __init__(self, front, front_left, front_right, left, right, trailer_0_left, trailer_1_left, trailer_2_left,
+    def __init__(self, time, front, front_left, front_right, left, right, trailer_0_left, trailer_1_left, trailer_2_left,
                  trailer_3_left, trailer_4_left, trailer_5_left, trailer_0_right, trailer_1_right, trailer_2_right,
                  trailer_3_right, trailer_4_right, trailer_5_right):
+        self.time = time
         self.front = front
         self.front_left = front_left
         self.front_right = front_right
@@ -57,17 +58,17 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-directory = '/home/daniel/data-rllib-integration/data/data_0c3010d3395'
+directory = '/home/daniel/data-rllib-integration/data/data_98894769d9a'
 
 assert no_changes == True and log == False
 
 
 new_file_dir = directory.split('/')[-1]
 
-# if not os.path.exists(new_file_dir):
-#     os.mkdir(new_file_dir)
-# else:
-#     raise Exception('Path already exists')
+if not os.path.exists(new_file_dir):
+    os.mkdir(new_file_dir)
+else:
+    raise Exception('Path already exists')
 
 def clip_custom(name, value):
     max = float(min_max_values[name][1])
@@ -97,12 +98,13 @@ for filename in os.listdir(directory):
                 if filename == "collisions":
 
                     if line == "[]\n":
-                        new_data.append(('None',Vector(x=0,y=0)))
+                        new_data.append(('None',0,Vector(x=0,y=0)))
                         continue
 
                     splits = line.split('\'')
                     vehicle = splits[1]
-                    new_data.append((vehicle,Vector(x = get_value(line, 'x'),y = get_value(line, 'y') )))
+                    time = splits[7]
+                    new_data.append((vehicle,time, Vector(x = get_value(line, 'x'),y = get_value(line, 'y') )))
                 elif filename == "lidar_data":
                     temp_list = []
                     if "deque([]" in line:
@@ -123,7 +125,8 @@ for filename in os.listdir(directory):
                     for lidar_point in lidar_points:
                         splits = lidar_point.split(',')
 
-                        temp_list.append(Lidar(front=float(splits[13]),
+                        temp_list.append(Lidar(time = splits[0].strip('[').strip("\'"),
+                                                front=float(splits[13]),
                                               front_right=float(splits[16]),
                                               front_left=float(splits[17]),
                                               right=float(splits[14]),
