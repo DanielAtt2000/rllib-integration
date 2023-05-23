@@ -479,7 +479,7 @@ class SACExperimentBasic(BaseExperiment):
             core.last_waypoint_index += 1
             self.last_hyp_distance_to_next_waypoint = 0
             self.last_closest_distance_to_next_waypoint_line = 0
-            print('Passed Waypoint <------------')
+            print('Passed Waypoint <------------') if self.custom_enable_rendering else None
         else:
             pass
 
@@ -1481,7 +1481,7 @@ class SACExperimentBasic(BaseExperiment):
 
         if forward_velocity < 0.75:
             # Negative reward for no velocity
-            print('REWARD -100 for velocity')
+            print('REWARD -100 for velocity') if self.custom_enable_rendering else None
             reward = reward + -100
 
         # # Negative reward each timestep
