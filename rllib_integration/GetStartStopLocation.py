@@ -146,14 +146,14 @@ spawn_points_2_lane_roundabout_small_easy = [
     [17, [28],"left"],
     [95, [98],"left"],
     # v Large gap in waypoints v
-    [2, [19],"left"],
+    # [2, [19],"left"],
     # ^ Large gap in waypoints ^
     [102, [26],"left"],
     #
     [44, [27],"right"],
     [25, [107],"right"],
     # v Large gap in waypoints v
-    [108, [18],"right"],
+    # [108, [18],"right"],
     # ^ Large gap in waypoints ^
     [77, [75],"right"],
     #
@@ -164,8 +164,13 @@ spawn_points_2_lane_roundabout_small_easy = [
 
 spawn_points_2_lane_roundabout_small_difficult = [
     [17, [98],"left"],
-    [17, [19],"left"],
-    [95, [19],"left"],
+    # v Large gap in waypoints v
+    # [17, [19],"left"],
+    # ^ Large gap in waypoints ^
+
+    # v Large gap in waypoints v
+    # [95, [19],"left"],
+    # ^ Large gap in waypoints ^
     [95, [26],"left"],
     [2, [26],"left"],
     [2, [28],"left"],

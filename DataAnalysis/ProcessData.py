@@ -58,17 +58,17 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-directory = '/home/daniel/data-rllib-integration/data/data_98894769d9a'
+directory = '/home/daniel/data-rllib-integration/data/data_d5885fe0125'
 
 assert no_changes == True and log == False
 
 
 new_file_dir = directory.split('/')[-1]
 
-if not os.path.exists(new_file_dir):
-    os.mkdir(new_file_dir)
-else:
-    raise Exception('Path already exists')
+# if not os.path.exists(new_file_dir):
+#     os.mkdir(new_file_dir)
+# else:
+#     raise Exception('Path already exists')
 
 def clip_custom(name, value):
     max = float(min_max_values[name][1])
@@ -94,8 +94,25 @@ for filename in os.listdir(directory):
 
 
             for line in lines:
+                if filename == "line_reward" \
+                        or filename == "point_reward" \
+                        or filename == "radii" \
+                        or filename == "closest_distance_to_next_waypoint_line" \
+                        or filename == "closest_distance_to_next_plus_1_waypoint_line":
+                    temp_array =[]
+                    for data_entry in line.split(','):
+                        data_entry = data_entry.strip()
+                        for data in data_entry.split(','):
+                            if data != '[]':
+                                if data[0] == '[':
+                                    data = data[1:]
+                                if data[-1] == ']':
+                                    data = data[:-1]
+                                temp_array.append(float(data))
 
-                if filename == "collisions":
+                    new_data.append(temp_array)
+
+                elif filename == "collisions":
 
                     if line == "[]\n":
                         new_data.append(('None',0,Vector(x=0,y=0)))
