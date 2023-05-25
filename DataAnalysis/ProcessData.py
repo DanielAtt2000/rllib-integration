@@ -65,10 +65,10 @@ assert no_changes == True and log == False
 
 new_file_dir = directory.split('/')[-1]
 
-# if not os.path.exists(new_file_dir):
-#     os.mkdir(new_file_dir)
-# else:
-#     raise Exception('Path already exists')
+if not os.path.exists(new_file_dir):
+    os.mkdir(new_file_dir)
+else:
+    raise Exception('Path already exists')
 
 def clip_custom(name, value):
     max = float(min_max_values[name][1])
@@ -168,12 +168,14 @@ for filename in os.listdir(directory):
                         exit_pos = line.find("EXIT: ")
                         dash_pos = line.find("-")
 
-                        entry_point = line[entry_pos+len("ENTRY: "):exit_pos].strip()
-                        exit_point = line[exit_pos+len("EXIT: "):dash_pos].strip()
-                        output = line[dash_pos+len('-'):].strip()
+                        output = line[dash_pos + len('-'):].strip()
+                        if output != '':
+                            entry_point = line[entry_pos+len("ENTRY: "):exit_pos].strip()
+                            exit_point = line[exit_pos+len("EXIT: "):dash_pos].strip()
 
-                        temp_array_1.append(f"{entry_point},{exit_point}")
-                        temp_array_2.append(output)
+
+                            temp_array_1.append(f"{entry_point},{exit_point}")
+                            temp_array_2.append(output)
                 elif filename == "trailer_collisions" or filename == "truck_collisions":
                     entry_pos = line.find("type=")
                     collision_object = str(line[entry_pos + len("type="):-3].strip())

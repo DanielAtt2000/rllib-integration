@@ -91,6 +91,7 @@ class SACExperimentBasic(BaseExperiment):
         self.point_reward_location = []
         self.line_reward = []
         self.line_reward_location = []
+        self.total_episode_reward = []
 
         self.custom_enable_rendering = False
 
@@ -199,7 +200,7 @@ class SACExperimentBasic(BaseExperiment):
         self.done_collision_trailer = False
         self.done_arrived = False
         self.custom_done_arrived = False
-        self.reward_metric = 0
+
 
 
         for i in range(self.max_amount_of_occupancy_maps):
@@ -248,6 +249,7 @@ class SACExperimentBasic(BaseExperiment):
         self.save_to_file(f"{self.directory}/lidar_data", self.lidar_data)
         self.save_to_file(f"{self.directory}/collisions", self.collisions)
         self.save_to_file(f"{self.directory}/radii",self.radii)
+        self.save_to_file(f"{self.directory}/total_episode_reward",self.total_episode_reward)
         self.entry_idx = -1
         self.exit_idx = -1
         self.last_action = [0,0,0]
@@ -288,6 +290,7 @@ class SACExperimentBasic(BaseExperiment):
         self.line_reward_location = []
         self.point_reward = []
         self.point_reward_location = []
+        self.total_episode_reward = []
         # self.forward_velocity_x = []
         # self.forward_velocity_z = []
         self.vehicle_path = []
@@ -299,6 +302,7 @@ class SACExperimentBasic(BaseExperiment):
         self.collisions = []
         self.lidar_data = collections.deque(maxlen=4)
         self.radii = []
+        self.reward_metric = 0
         # self.acceleration = []
 
 
@@ -1515,6 +1519,7 @@ class SACExperimentBasic(BaseExperiment):
             print("====> REWARD Done arrived")
             reward = reward + 10000
 
+        self.total_episode_reward.append(reward)
         self.reward_metric = reward
         print(f"FINAL REWARD: {reward}") if self.custom_enable_rendering else None
         print(f"---------------------------------------------") if self.custom_enable_rendering else None

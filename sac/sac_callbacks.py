@@ -111,11 +111,12 @@ class SACCallbacks(DefaultCallbacks):
         # Reward per roundabout
         found = False
         easy = False
+        difficult = False
         for entry_easy in spawn_points_2_lane_roundabout_easy:
             entry_idx = entry_easy[0]
             if episode.user_data["entry_idx"] == entry_idx:
                 if episode.user_data["exit_idx"] in entry_easy[1]:
-                    episode.custom_metrics["easy_episode_reward"] = np.sum(episode.user_data["total_reward"])
+                    episode.custom_metrics["easy_episode_reward"] = sum(episode.user_data["total_reward"])
                     found = True
                     easy = True
                     break
@@ -125,7 +126,8 @@ class SACCallbacks(DefaultCallbacks):
                 entry_idx = entry_difficult[0]
                 if episode.user_data["entry_idx"] == entry_idx:
                     if episode.user_data["exit_idx"] in entry_difficult[1]:
-                        episode.custom_metrics["difficult_episode_reward"] = np.sum(episode.user_data["total_reward"])
+                        episode.custom_metrics["difficult_episode_reward"] = sum(episode.user_data["total_reward"])
+                        difficult = True
                         break
 
         if easy:
@@ -134,13 +136,14 @@ class SACCallbacks(DefaultCallbacks):
 
             elif worker.env.experiment.custom_done_arrived:
                 episode.custom_metrics["easy_custom_done_arrived"] = 1
-        else:
+        elif difficult:
             if not worker.env.experiment.custom_done_arrived:
                 episode.custom_metrics["difficult_custom_done_arrived"] = 0
 
             elif worker.env.experiment.custom_done_arrived:
                 episode.custom_metrics["difficult_custom_done_arrived"] = 1
-
+        else:
+            raise Exception('Something when wrong here')
 
 
 
