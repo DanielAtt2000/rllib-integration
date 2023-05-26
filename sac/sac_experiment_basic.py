@@ -16,20 +16,23 @@ import warnings
 import carla
 import os
 import time
+
+from ray.tune.result import PID
+
 from rllib_integration.GetAngle import calculate_angle_with_center_of_lane, angle_between
 from rllib_integration.TestingWayPointUpdater import plot_points, plot_route, draw_route_in_order
 from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
 from rllib_integration.Circle import get_radii
 from PIL import Image
-
+from simple_pid import PID
 from rllib_integration.lidar_to_grid_map import generate_ray_casting_grid_map
 import collections
 
 class SACExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-
+        self.acceleration_pid = PID(Kp=0.12,Ki=0.02,Kd=0.02,setpoint=5.5,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -79,6 +82,7 @@ class SACExperimentBasic(BaseExperiment):
         self.lidar_data = collections.deque(maxlen=4)
         self.entry_idx = -1
         self.exit_idx = -1
+        self.current_forward_velocity = 0
 
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
@@ -361,16 +365,18 @@ class SACExperimentBasic(BaseExperiment):
             )
 
     def get_actions(self):
+        acceleration_value = self.acceleration_pid(self.current_forward_velocity)
+        print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
         return {
-            0: [0.3, 0.00, 0.0, False, False],  # Straight
-            1: [0.3, 0.80, 0.0, False, False],  # Right
-            2: [0.3, 0.60, 0.0, False, False],  # Right
-            3: [0.3, 0.40, 0.0, False, False],  # Right
-            4: [0.3, 0.20, 0.0, False, False],  # Right
-            5: [0.3, -0.80, 0.0, False, False],  # Left
-            6: [0.3, -0.60, 0.0, False, False],  # Left
-            7: [0.3, -0.40, 0.0, False, False],  # Left
-            8: [0.3, -0.20, 0.0, False, False],  # Left
+            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
+            1: [acceleration_value, 0.80, 0.0, False, False],  # Right
+            2: [acceleration_value, 0.60, 0.0, False, False],  # Right
+            3: [acceleration_value, 0.40, 0.0, False, False],  # Right
+            4: [acceleration_value, 0.20, 0.0, False, False],  # Right
+            5: [acceleration_value, -0.80, 0.0, False, False],  # Left
+            6: [acceleration_value, -0.60, 0.0, False, False],  # Left
+            7: [acceleration_value, -0.40, 0.0, False, False],  # Left
+            8: [acceleration_value, -0.20, 0.0, False, False],  # Left
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
             # 2: [0.0, 0.75, 0.0, False, False],  # Right
@@ -485,9 +491,13 @@ class SACExperimentBasic(BaseExperiment):
 
         # print(f"BEFORE CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
         # Checking if we have passed the last way point
+
+        closest_distance_to_next_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=0)
+        closest_distance_to_next_plus_1_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=1)
+
         in_front_of_waypoint = core.is_in_front_of_waypoint(truck_transform.location.x, truck_transform.location.y)
-        if in_front_of_waypoint == 0 or in_front_of_waypoint == 1:
-            core.last_waypoint_index += 1
+        if 10 > closest_distance_to_next_waypoint_line and (in_front_of_waypoint == 0 or in_front_of_waypoint == 1):
+            core.last_waypoint_index = core.last_waypoint_index + 1
             self.last_hyp_distance_to_next_waypoint = 0
             self.last_closest_distance_to_next_waypoint_line = 0
             print('Passed Waypoint <------------') if self.custom_enable_rendering else None
@@ -523,8 +533,6 @@ class SACExperimentBasic(BaseExperiment):
         #
         # save_data('waypoints2.pkl',location_from_waypoint_to_vehicle_relative)
 
-        closest_distance_to_next_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=0)
-        closest_distance_to_next_plus_1_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=1)
 
         # Hyp distance to next waypoint
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
@@ -563,6 +571,7 @@ class SACExperimentBasic(BaseExperiment):
 
 
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
+        self.current_forward_velocity = forward_velocity
         # forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
         # forward_velocity_z = np.clip(self.get_forward_velocity_z(core.hero), 0, None)
         # acceleration = np.clip(self.get_acceleration(core.hero), 0, None)

@@ -659,6 +659,7 @@ class CarlaCore:
             #                    0),
             #     carla.Rotation(0, 0, 0)))
             if last_waypoint_transform is not None:
+                # Ensuring that the next waypoint is in front of the previous
                 if -1 == self.is_in_front_of_waypoint_from_vector(line_point=last_waypoint_transform,vector_line=last_waypoint_transform.get_right_vector(),in_front_point=route_waypoint[0].transform):
                     last_waypoint_transform = route_waypoint[0].transform
 

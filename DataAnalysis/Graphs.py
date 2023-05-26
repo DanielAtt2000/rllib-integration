@@ -54,7 +54,7 @@ def open_pickle(filename):
         return pickle.load(handle)
 
 
-directory = 'data_daefbe459a3'
+directory = 'data_c5adf178330'
 df = pd.DataFrame()
 df_done = pd.DataFrame()
 string = ''
@@ -72,7 +72,7 @@ for filename in os.listdir(directory):
                 df_done['output'] = pd.Series(data[0][1])
 
 graphs = False
-get_from_file = True
+get_from_file = False
 
 
 def plot_route(route_points_all, truck_points_all):
