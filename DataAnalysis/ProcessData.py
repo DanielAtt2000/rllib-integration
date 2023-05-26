@@ -58,7 +58,7 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-directory = '/home/daniel/data-rllib-integration/data/data_d5885fe0125'
+directory = '/home/daniel/data-rllib-integration/data/data_daefbe459a3'
 
 assert no_changes == True and log == False
 
@@ -94,25 +94,7 @@ for filename in os.listdir(directory):
 
 
             for line in lines:
-                if filename == "line_reward" \
-                        or filename == "point_reward" \
-                        or filename == "radii" \
-                        or filename == "closest_distance_to_next_waypoint_line" \
-                        or filename == "closest_distance_to_next_plus_1_waypoint_line":
-                    temp_array =[]
-                    for data_entry in line.split(','):
-                        data_entry = data_entry.strip()
-                        for data in data_entry.split(','):
-                            if data != '[]':
-                                if data[0] == '[':
-                                    data = data[1:]
-                                if data[-1] == ']':
-                                    data = data[:-1]
-                                temp_array.append(float(data))
-
-                    new_data.append(temp_array)
-
-                elif filename == "collisions":
+                if filename == "collisions":
 
                     if line == "[]\n":
                         new_data.append(('None',0,Vector(x=0,y=0)))
@@ -184,6 +166,7 @@ for filename in os.listdir(directory):
                     if line != "[]":
                         new_data.append(line)
                 else:
+                    temp_array = []
                     for data_entry in line.split(','):
                         data_entry = data_entry.strip()
                         for data in data_entry.split(','):
@@ -192,28 +175,9 @@ for filename in os.listdir(directory):
                                     data = data[1:]
                                 if data[-1] == ']':
                                     data = data[:-1]
+                                temp_array.append(float(data))
 
-                                if no_changes:
-                                    new_data.append(float(data))
-                                else:
-                                    if log:
-                                        # try:
-                                        #     x = math.log10(float(data)+1)
-                                        #     if x >3:
-                                        #         print(data)
-                                        #     new_data.append(x)
-                                        # except ValueError:
-                                        #     print(data)
-                                        #     new_data.append(-10)
-
-                                        # transform to be exponential
-                                        data = exp(float(data))
-                                        # power transform
-                                        new_data.append(boxcox(data,-1))
-                                    else:
-                                        data = clip_custom(filename,float(data))
-                                        data = min_max_normalisation(filename,float(data))
-                                        new_data.append(float(data))
+                    new_data.append(temp_array)
 
             if filename == "done":
                 new_data.append([temp_array_1,temp_array_2])
