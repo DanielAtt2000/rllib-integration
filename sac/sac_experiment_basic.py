@@ -492,11 +492,10 @@ class SACExperimentBasic(BaseExperiment):
         # print(f"BEFORE CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
         # Checking if we have passed the last way point
 
-        closest_distance_to_next_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=0)
-        closest_distance_to_next_plus_1_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=1)
+        distance_to_next_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=1)
 
         in_front_of_waypoint = core.is_in_front_of_waypoint(truck_transform.location.x, truck_transform.location.y)
-        if 10 > closest_distance_to_next_waypoint_line and (in_front_of_waypoint == 0 or in_front_of_waypoint == 1):
+        if 10 > distance_to_next_waypoint_line and (in_front_of_waypoint == 0 or in_front_of_waypoint == 1):
             core.last_waypoint_index = core.last_waypoint_index + 1
             self.last_hyp_distance_to_next_waypoint = 0
             self.last_closest_distance_to_next_waypoint_line = 0
@@ -533,6 +532,8 @@ class SACExperimentBasic(BaseExperiment):
         #
         # save_data('waypoints2.pkl',location_from_waypoint_to_vehicle_relative)
 
+        closest_distance_to_next_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=0)
+        closest_distance_to_next_plus_1_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=1)
 
         # Hyp distance to next waypoint
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)

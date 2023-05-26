@@ -54,7 +54,7 @@ def open_pickle(filename):
         return pickle.load(handle)
 
 
-directory = 'data_c5adf178330'
+directory = 'data_26269feeed4'
 df = pd.DataFrame()
 df_done = pd.DataFrame()
 string = ''
@@ -72,7 +72,7 @@ for filename in os.listdir(directory):
                 df_done['output'] = pd.Series(data[0][1])
 
 graphs = False
-get_from_file = False
+get_from_file = True
 
 
 def plot_route(route_points_all, truck_points_all):
@@ -218,17 +218,14 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 2109:
+        if idx > 1010:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
             #     y_route[idx] = temp_y_route[idx][len(temp_y_route[idx-1]):]
 
             if len(x_route[idx]) != 0:
-                data_diff = 3
-                collision_data_diff = 3
-                reward_data_diff = 3
-                closest_distance_data_diff = 3
+                data_diff = 2
                 print('----------')
                 print(f'Showing Episode {idx}/{len(x_route)}')
                 print(df_done.iloc[[idx - 1]])
@@ -252,11 +249,11 @@ def plot_route(route_points_all, truck_points_all):
                         f"trailer_5 \t\t{round(lidar_point.trailer_5_left, 2)}\t\t{round(lidar_point.trailer_5_right, 2)}")
                     print(f"------------------------------------------------------")
 
-                    if df.loc[idx + collision_data_diff, "collisions.pkl"][1] != 0:
-                        if lidar_point.time != df.loc[idx + collision_data_diff, "collisions.pkl"][1]:
+                    if df.loc[idx + data_diff, "collisions.pkl"][1] != 0:
+                        if lidar_point.time != df.loc[idx + data_diff, "collisions.pkl"][1]:
                             print('------------------------')
                             print(f"Lidar time \t\t\t{lidar_point.time}")
-                            print(f'Collision time \t\t{df.loc[idx + collision_data_diff, "collisions.pkl"][1]}')
+                            print(f'Collision time \t\t{df.loc[idx + data_diff, "collisions.pkl"][1]}')
                             print('------------------------')
 
                 print()
@@ -274,57 +271,57 @@ def plot_route(route_points_all, truck_points_all):
                 a1.plot(x_truck[idx][0], y_truck[idx][0], 'kd', label='Truck Starting waypoint')
                 a1.plot(x_route[idx + 1][2:], y_route[idx + 1][2:], 'y^')
                 a1.plot(x_truck[idx][2:], y_truck[idx][2:], "ro")
-                a1.plot(df.loc[idx + collision_data_diff, "collisions.pkl"][2].x,
-                        df.loc[idx + collision_data_diff, "collisions.pkl"][2].y, 'b*')
+                a1.plot(df.loc[idx + data_diff, "collisions.pkl"][2].x,
+                        df.loc[idx + data_diff, "collisions.pkl"][2].y, 'b*')
 
                 a1.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
                 # plt.axis([0, 1, 0, 1])
                 a1.set_title(
-                    f'Collision with {df.loc[idx + collision_data_diff, "collisions.pkl"][0]}. Episode {idx}/{len(x_route)} Route {df_done.loc[idx + done_data_diff]}')
+                    f'Collision with {df.loc[idx + data_diff, "collisions.pkl"][0]}. Episode {idx}/{len(x_route)} Route {df_done.loc[idx + done_data_diff]}')
                 a1.invert_yaxis()
                 a1.legend(loc='upper center')
 
-                if df.loc[idx + collision_data_diff, "collisions.pkl"][0] != "None":
-                    assert df.loc[idx + collision_data_diff, "collisions.pkl"][0] in df_done.loc[idx + done_data_diff][
+                if df.loc[idx + data_diff, "collisions.pkl"][0] != "None":
+                    assert df.loc[idx + data_diff, "collisions.pkl"][0] in df_done.loc[idx + done_data_diff][
                         1]
                 else:
                     assert "arrived" in df_done.loc[idx + done_data_diff][1]
 
-                assert len(df.loc[idx + reward_data_diff, "point_reward.pkl"]) == len(x_truck[idx][2:])
-                assert len(df.loc[idx + reward_data_diff, "line_reward.pkl"]) == len(x_truck[idx][2:])
-                assert len(df.loc[idx + reward_data_diff, "total_episode_reward.pkl"]) == len(x_truck[idx][2:])
+                assert len(df.loc[idx + data_diff, "point_reward.pkl"]) == len(x_truck[idx][2:])
+                assert len(df.loc[idx + data_diff, "line_reward.pkl"]) == len(x_truck[idx][2:])
+                assert len(df.loc[idx + data_diff, "total_episode_reward.pkl"]) == len(x_truck[idx][2:])
 
-                a2.plot(np.array(df.loc[idx + reward_data_diff, "point_reward.pkl"]), label='Waypoint reward')
-                a2.plot(np.array(df.loc[idx + reward_data_diff, "line_reward.pkl"]), label='Line reward')
-                a2.plot(np.array(df.loc[idx + reward_data_diff, "total_episode_reward.pkl"]),
-                        label='Total Episode Reward')
+                a2.plot(np.array(df.loc[idx + data_diff, "point_reward.pkl"]), label='Waypoint reward')
+                a2.plot(np.array(df.loc[idx + data_diff, "line_reward.pkl"]), label='Line reward')
+                # a2.plot(np.array(df.loc[idx + data_diff, "total_episode_reward.pkl"]),
+                #         label='Total Episode Reward')
 
                 combined_rewards = []
-                for line_reward, point_reward in zip(df.loc[idx + reward_data_diff, "line_reward.pkl"],
-                                                     df.loc[idx + reward_data_diff, "point_reward.pkl"]):
+                for line_reward, point_reward in zip(df.loc[idx + data_diff, "line_reward.pkl"],
+                                                     df.loc[idx + data_diff, "point_reward.pkl"]):
                     combined_rewards.append(line_reward + point_reward)
                 # a2.plot(combined_rewards, label='Combined reward')
 
                 assert len(
-                    df.loc[idx + closest_distance_data_diff, "closest_distance_to_next_waypoint_line.pkl"]) - 2 == len(
+                    df.loc[idx + data_diff, "closest_distance_to_next_waypoint_line.pkl"]) - 2 == len(
                     x_truck[idx][2:])
                 assert len(df.loc[
-                               idx + closest_distance_data_diff, "closest_distance_to_next_plus_1_waypoint_line.pkl"]) - 2 == len(
+                               idx + data_diff, "closest_distance_to_next_plus_1_waypoint_line.pkl"]) - 2 == len(
                     x_truck[idx][2:])
 
-                a2.plot(df.loc[idx + closest_distance_data_diff, "closest_distance_to_next_waypoint_line.pkl"],
+                a2.plot(df.loc[idx + data_diff, "closest_distance_to_next_waypoint_line.pkl"],
                         label='Distance to line')
-                a2.plot(df.loc[idx + closest_distance_data_diff, "closest_distance_to_next_plus_1_waypoint_line.pkl"],
+                a2.plot(df.loc[idx + data_diff, "closest_distance_to_next_plus_1_waypoint_line.pkl"],
                         label='+1 Distance to line')
 
                 temp = []
 
                 for i, item in enumerate(
-                        df.loc[idx + closest_distance_data_diff, "closest_distance_to_next_waypoint_line.pkl"]):
+                        df.loc[idx + data_diff, "closest_distance_to_next_waypoint_line.pkl"]):
                     if i != 0:
                         line_reward_multiply_factor = 100
                         hyp_reward = \
-                            df.loc[idx + closest_distance_data_diff, "closest_distance_to_next_waypoint_line.pkl"][
+                            df.loc[idx + data_diff, "closest_distance_to_next_waypoint_line.pkl"][
                                 i - 1] - item
 
                         hyp_reward = np.clip(hyp_reward, None, 0.5)
@@ -336,14 +333,14 @@ def plot_route(route_points_all, truck_points_all):
                 a2.legend(loc='upper center')
 
                 assert len(
-                    df.loc[idx + closest_distance_data_diff, "closest_distance_to_next_waypoint_line.pkl"]) - 2 == len(
+                    df.loc[idx + data_diff, "closest_distance_to_next_waypoint_line.pkl"]) - 2 == len(
                     x_truck[idx][2:])
                 assert len(df.loc[
-                               idx + closest_distance_data_diff, "closest_distance_to_next_plus_1_waypoint_line.pkl"]) - 2 == len(
+                               idx + data_diff, "closest_distance_to_next_plus_1_waypoint_line.pkl"]) - 2 == len(
                     x_truck[idx][2:])
 
-                # a3.plot(df.loc[idx+closest_distance_data_diff, "closest_distance_to_next_waypoint_line.pkl"], label='Distance to line')
-                # a3.plot(df.loc[idx+closest_distance_data_diff, "closest_distance_to_next_plus_1_waypoint_line.pkl"], label='+1 Distance to line')
+                # a3.plot(df.loc[idx+data_diff, "closest_distance_to_next_waypoint_line.pkl"], label='Distance to line')
+                # a3.plot(df.loc[idx+data_diff, "closest_distance_to_next_plus_1_waypoint_line.pkl"], label='+1 Distance to line')
                 #
                 # a3.axis([0, 500, -1, 25])
                 # a3.legend(loc='upper center')

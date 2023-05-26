@@ -58,7 +58,7 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-directory = '/home/daniel/data-rllib-integration/data/data_c5adf178330'
+directory = '/home/daniel/data-rllib-integration/data/data_26269feeed4'
 
 assert no_changes == True and log == False
 
