@@ -8,6 +8,7 @@ import pickle
 import pandas as pd
 import numpy as np
 
+from DataAnalysis.ProcessData import data_file
 from rllib_integration.GetStartStopLocation import spawn_points_2_lane_roundabout_small_easy, \
     spawn_points_2_lane_roundabout_small_difficult
 
@@ -54,11 +55,19 @@ def open_pickle(filename):
         return pickle.load(handle)
 
 
-directory = 'data_26269feeed4'
+directory = data_file
 df = pd.DataFrame()
 df_done = pd.DataFrame()
 string = ''
+largest_filename = "angle_to_center_of_lane_degrees.pkl"
+with open(os.path.join(directory, largest_filename), 'rb') as handle:
+    data = pickle.load(handle)
+    df[str(largest_filename)] = pd.Series(data)
+    # df = df.fillna(0)
+
 for filename in os.listdir(directory):
+    if largest_filename in filename:
+        continue
     file = os.path.join(directory, filename)
     # checking if it is a file
     if os.path.isfile(file) and file.endswith('.pkl'):
@@ -71,8 +80,7 @@ for filename in os.listdir(directory):
                 df_done['points'] = pd.Series(data[0][0])
                 df_done['output'] = pd.Series(data[0][1])
 
-graphs = False
-get_from_file = True
+graphs = True
 
 
 def plot_route(route_points_all, truck_points_all):
@@ -82,13 +90,13 @@ def plot_route(route_points_all, truck_points_all):
     x_truck = []
     y_truck = []
 
-    if get_from_file:
+    try:
         x_truck = open_pickle(os.path.join(directory, 'x_truck.pickle'))
         y_truck = open_pickle(os.path.join(directory, 'y_truck.pickle'))
         x_route = open_pickle(os.path.join(directory, 'x_route.pickle'))
         y_route = open_pickle(os.path.join(directory, 'y_route.pickle'))
 
-    else:
+    except:
         route_points_all = route_points_all[route_points_all != 0]
         for route_id, route in enumerate(route_points_all):
             if "[]\n" in route:
@@ -214,11 +222,24 @@ def plot_route(route_points_all, truck_points_all):
     plt.legend(loc='upper center')
     plt.show()
 
+    temp_data_diff = 2
+    counter = 0
+    for idx in range(len(x_route)):
+        try:
+            assert len(df.loc[idx + temp_data_diff, "point_reward.pkl"]) == len(x_truck[idx][2:])
+        except:
+            temp_data_diff +=1
+            # print(len(df.loc[idx + 2, "point_reward.pkl"]))
+            # print(len(x_truck[idx][2:]))
+            counter +=1
+            print(idx)
+    print(counter)
+    input('Have you check the data diff?')
     for idx in range(len(x_route)):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 1010:
+        if idx > 700:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -229,32 +250,34 @@ def plot_route(route_points_all, truck_points_all):
                 print('----------')
                 print(f'Showing Episode {idx}/{len(x_route)}')
                 print(df_done.iloc[[idx - 1]])
-                for lidar_point in df.loc[idx + 1, "lidar_data.pkl"]:
+                lidar = False
+                if lidar:
+                    for lidar_point in df.loc[idx + 1, "lidar_data.pkl"]:
 
-                    print(f"truck FRONT \t\t\t{round(lidar_point.front, 2)}")
-                    print(f"truck 45 \t\t{round(lidar_point.front_left, 2)}\t\t{round(lidar_point.front_right, 2)}")
-                    print(f"truck sides \t\t{round(lidar_point.left, 2)}\t\t{round(lidar_point.right, 2)}")
-                    print(f"")
-                    print(
-                        f"trailer_0 \t\t{round(lidar_point.trailer_0_left, 2)}\t\t{round(lidar_point.trailer_0_right, 2)}")
-                    print(
-                        f"trailer_1 \t\t{round(lidar_point.trailer_1_left, 2)}\t\t{round(lidar_point.trailer_1_right, 2)}")
-                    print(
-                        f"trailer_2 \t\t{round(lidar_point.trailer_2_left, 2)}\t\t{round(lidar_point.trailer_2_right, 2)}")
-                    print(
-                        f"trailer_3 \t\t{round(lidar_point.trailer_3_left, 2)}\t\t{round(lidar_point.trailer_3_right, 2)}")
-                    print(
-                        f"trailer_4 \t\t{round(lidar_point.trailer_4_left, 2)}\t\t{round(lidar_point.trailer_4_right, 2)}")
-                    print(
-                        f"trailer_5 \t\t{round(lidar_point.trailer_5_left, 2)}\t\t{round(lidar_point.trailer_5_right, 2)}")
-                    print(f"------------------------------------------------------")
+                        print(f"truck FRONT \t\t\t{round(lidar_point.front, 2)}")
+                        print(f"truck 45 \t\t{round(lidar_point.front_left, 2)}\t\t{round(lidar_point.front_right, 2)}")
+                        print(f"truck sides \t\t{round(lidar_point.left, 2)}\t\t{round(lidar_point.right, 2)}")
+                        print(f"")
+                        print(
+                            f"trailer_0 \t\t{round(lidar_point.trailer_0_left, 2)}\t\t{round(lidar_point.trailer_0_right, 2)}")
+                        print(
+                            f"trailer_1 \t\t{round(lidar_point.trailer_1_left, 2)}\t\t{round(lidar_point.trailer_1_right, 2)}")
+                        print(
+                            f"trailer_2 \t\t{round(lidar_point.trailer_2_left, 2)}\t\t{round(lidar_point.trailer_2_right, 2)}")
+                        print(
+                            f"trailer_3 \t\t{round(lidar_point.trailer_3_left, 2)}\t\t{round(lidar_point.trailer_3_right, 2)}")
+                        print(
+                            f"trailer_4 \t\t{round(lidar_point.trailer_4_left, 2)}\t\t{round(lidar_point.trailer_4_right, 2)}")
+                        print(
+                            f"trailer_5 \t\t{round(lidar_point.trailer_5_left, 2)}\t\t{round(lidar_point.trailer_5_right, 2)}")
+                        print(f"------------------------------------------------------")
 
-                    if df.loc[idx + data_diff, "collisions.pkl"][1] != 0:
-                        if lidar_point.time != df.loc[idx + data_diff, "collisions.pkl"][1]:
-                            print('------------------------')
-                            print(f"Lidar time \t\t\t{lidar_point.time}")
-                            print(f'Collision time \t\t{df.loc[idx + data_diff, "collisions.pkl"][1]}')
-                            print('------------------------')
+                        if df.loc[idx + data_diff, "collisions.pkl"][1] != 0:
+                            if lidar_point.time != df.loc[idx + data_diff, "collisions.pkl"][1]:
+                                print('------------------------')
+                                print(f"Lidar time \t\t\t{lidar_point.time}")
+                                print(f'Collision time \t\t{df.loc[idx + data_diff, "collisions.pkl"][1]}')
+                                print('------------------------')
 
                 print()
                 print()
@@ -381,7 +404,7 @@ if graphs:
                 # sns.scatterplot(data)
                 plt.show()
                 x.savefig(os.path.join(directory, filename + string + '.png'))
-            elif "route" in filename or "path" in filename:
+            elif "route" in filename or "path" in filename or "lidar_data" in filename:
                 continue
             else:
                 for col in df.columns:
@@ -418,9 +441,9 @@ if graphs:
                         series_difference = pd.Series(difference)
                         print('----------')
                         values_greater_than = []
-                        temp = [100]
+                        temp = [0.5]
                         for value in temp:
-                            values_greater_than.append(len(np.where(series_difference > 0.5)[0]))
+                            values_greater_than.append(len(np.where(series_difference > 0.18)[0]))
 
                         for value in range(len(temp)):
                             print(f"Values greater than {temp[value]}")
@@ -429,7 +452,8 @@ if graphs:
                             print('---------------')
 
                         print(series_difference.describe())
-                        sns.distplot(series_difference, bins=10, kde=False)
+                        a = sns.distplot(series_difference,bins=10000)
+                        a.set(xlim=(-0.25,0.25))
 
                         plt.show()
                         print('----------')
