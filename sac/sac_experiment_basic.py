@@ -32,7 +32,7 @@ import collections
 class SACExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        self.acceleration_pid = PID(Kp=0.12,Ki=0.02,Kd=0.02,setpoint=5.5,sample_time=None,output_limits=(0,1))
+        self.acceleration_pid = PID(Kp=0.12,Ki=0.02,Kd=0.02,setpoint=9,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
