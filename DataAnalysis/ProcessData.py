@@ -60,7 +60,7 @@ no_changes = True
 log = False
 data_file = 'data_6d5d7368db1'
 directory = '/home/daniel/data-rllib-integration/data/' + data_file
-for_graphs = True
+for_graphs = False
 def main():
     assert no_changes == True and log == False
 

@@ -80,7 +80,7 @@ for filename in os.listdir(directory):
                 df_done['points'] = pd.Series(data[0][0])
                 df_done['output'] = pd.Series(data[0][1])
 
-graphs = True
+graphs = False
 
 
 def plot_route(route_points_all, truck_points_all):
@@ -173,54 +173,54 @@ def plot_route(route_points_all, truck_points_all):
     easy_x_indices = []
     difficiult_x_indices = []
 
-    done_data_diff = -3
-    current_difficulty = ""
-    for idx in range(len(x_route)):
-
-        if idx > 5 and idx + 10 < len(x_route):
-            entry = int(df_done.loc[idx + done_data_diff][0].split(',')[0])
-            exit = int(df_done.loc[idx + done_data_diff][0].split(',')[1])
-
-            for easy in spawn_points_2_lane_roundabout_small_easy:
-                if easy[0] == entry and easy[1][0] == exit:
-                    current_difficulty = "easy"
-            for difficult in spawn_points_2_lane_roundabout_small_difficult:
-                if difficult[0] == entry and difficult[1][0] == exit:
-                    current_difficulty = "difficult"
-
-            if current_difficulty == "easy":
-                all_line_easy_rewards.append(sum(df.loc[idx + 2, "line_reward.pkl"]))
-                all_point_easy_rewards.append(sum(df.loc[idx + 2, "point_reward.pkl"]))
-                all_episodes_easy_sum.append(
-                    sum(df.loc[idx + 2, "line_reward.pkl"]) + sum(df.loc[idx + 2, "point_reward.pkl"]))
-                easy_x_indices.append(idx + 2)
-            elif current_difficulty == "difficult":
-                all_line_difficult_rewards.append(sum(df.loc[idx + 2, "line_reward.pkl"]))
-                all_point_difficult_rewards.append(sum(df.loc[idx + 2, "point_reward.pkl"]))
-                all_episodes_difficult_sum.append(
-                    sum(df.loc[idx + 2, "line_reward.pkl"]) + sum(df.loc[idx + 2, "point_reward.pkl"]))
-                difficiult_x_indices.append(idx + 2)
-            else:
-                raise Exception('wtf')
-    plt.figure(figsize=(80, 5))
-    plt.ylim(-20000)
-    plt.plot(difficiult_x_indices, all_episodes_difficult_sum, label='All DIFFICULT episode rewards')
-    plt.plot(easy_x_indices, all_episodes_easy_sum, label='All EASY episode rewards')
-
-    window = 10
-    average_difficult_y = []
-    average_easy_y = []
-    for ind in range(len(all_episodes_difficult_sum) - window + 1):
-        average_difficult_y.append(np.mean(all_episodes_difficult_sum[ind:ind + window]))
-    for ind in range(len(all_episodes_easy_sum) - window + 1):
-        average_easy_y.append(np.mean(all_episodes_easy_sum[ind:ind + window]))
-    # plt.plot(average_difficult_y,label='average_DIFFICULT _y')
-    # plt.plot(average_easy_y,label='average_easy_y ')
-
-    # plt.plot(all_point_difficult_rewards,label='all_point_difficult_rewards')
-    # plt.plot(all_line_difficult_rewards,label='all_line_difficult_rewards')
-    plt.legend(loc='upper center')
-    plt.show()
+    done_data_diff = -1
+    # current_difficulty = ""
+    # for idx in range(len(x_route)):
+    #
+    #     if idx > 5 and idx + 10 < len(x_route):
+    #         entry = int(df_done.loc[idx + done_data_diff][0].split(',')[0])
+    #         exit = int(df_done.loc[idx + done_data_diff][0].split(',')[1])
+    #
+    #         for easy in spawn_points_2_lane_roundabout_small_easy:
+    #             if easy[0] == entry and easy[1][0] == exit:
+    #                 current_difficulty = "easy"
+    #         for difficult in spawn_points_2_lane_roundabout_small_difficult:
+    #             if difficult[0] == entry and difficult[1][0] == exit:
+    #                 current_difficulty = "difficult"
+    #
+    #         if current_difficulty == "easy":
+    #             all_line_easy_rewards.append(sum(df.loc[idx + 2, "line_reward.pkl"]))
+    #             all_point_easy_rewards.append(sum(df.loc[idx + 2, "point_reward.pkl"]))
+    #             all_episodes_easy_sum.append(
+    #                 sum(df.loc[idx + 2, "line_reward.pkl"]) + sum(df.loc[idx + 2, "point_reward.pkl"]))
+    #             easy_x_indices.append(idx + 2)
+    #         elif current_difficulty == "difficult":
+    #             all_line_difficult_rewards.append(sum(df.loc[idx + 2, "line_reward.pkl"]))
+    #             all_point_difficult_rewards.append(sum(df.loc[idx + 2, "point_reward.pkl"]))
+    #             all_episodes_difficult_sum.append(
+    #                 sum(df.loc[idx + 2, "line_reward.pkl"]) + sum(df.loc[idx + 2, "point_reward.pkl"]))
+    #             difficiult_x_indices.append(idx + 2)
+    #         else:
+    #             raise Exception('wtf')
+    # plt.figure(figsize=(80, 5))
+    # plt.ylim(-20000)
+    # plt.plot(difficiult_x_indices, all_episodes_difficult_sum, label='All DIFFICULT episode rewards')
+    # plt.plot(easy_x_indices, all_episodes_easy_sum, label='All EASY episode rewards')
+    #
+    # window = 10
+    # average_difficult_y = []
+    # average_easy_y = []
+    # for ind in range(len(all_episodes_difficult_sum) - window + 1):
+    #     average_difficult_y.append(np.mean(all_episodes_difficult_sum[ind:ind + window]))
+    # for ind in range(len(all_episodes_easy_sum) - window + 1):
+    #     average_easy_y.append(np.mean(all_episodes_easy_sum[ind:ind + window]))
+    # # plt.plot(average_difficult_y,label='average_DIFFICULT _y')
+    # # plt.plot(average_easy_y,label='average_easy_y ')
+    #
+    # # plt.plot(all_point_difficult_rewards,label='all_point_difficult_rewards')
+    # # plt.plot(all_line_difficult_rewards,label='all_line_difficult_rewards')
+    # plt.legend(loc='upper center')
+    # plt.show()
 
     temp_data_diff = 2
     counter = 0
@@ -239,14 +239,14 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 700:
+        if idx > 800:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
             #     y_route[idx] = temp_y_route[idx][len(temp_y_route[idx-1]):]
 
             if len(x_route[idx]) != 0:
-                data_diff = 2
+                data_diff = 3
                 print('----------')
                 print(f'Showing Episode {idx}/{len(x_route)}')
                 print(df_done.iloc[[idx - 1]])
@@ -283,7 +283,7 @@ def plot_route(route_points_all, truck_points_all):
                 print()
                 print('----------')
 
-                buffer = 200
+                buffer = 20
 
                 fig, axes = plt.subplots(ncols=2, nrows=1, figsize=(15, 10))
                 a1 = axes[0]
