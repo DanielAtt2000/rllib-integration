@@ -32,7 +32,7 @@ import collections
 class SACExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        self.acceleration_pid = PID(Kp=0.12,Ki=0.02,Kd=0.02,setpoint=9,sample_time=None,output_limits=(0,1))
+        # self.acceleration_pid = PID(Kp=0.12,Ki=0.02,Kd=0.02,setpoint=9,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -365,47 +365,47 @@ class SACExperimentBasic(BaseExperiment):
             )
 
     def get_actions(self):
-        acceleration_value = self.acceleration_pid(self.current_forward_velocity)
-        print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
+        # acceleration_value = self.acceleration_pid(self.current_forward_velocity)
+        # print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
         return {
-            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
-            1: [acceleration_value, 0.80, 0.0, False, False],  # Right
-            2: [acceleration_value, 0.60, 0.0, False, False],  # Right
-            3: [acceleration_value, 0.40, 0.0, False, False],  # Right
-            4: [acceleration_value, 0.20, 0.0, False, False],  # Right
-            5: [acceleration_value, -0.80, 0.0, False, False],  # Left
-            6: [acceleration_value, -0.60, 0.0, False, False],  # Left
-            7: [acceleration_value, -0.40, 0.0, False, False],  # Left
-            8: [acceleration_value, -0.20, 0.0, False, False],  # Left
-            # 0: [0.0, 0.00, 0.0, False, False],  # Coast
-            # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
-            # 2: [0.0, 0.75, 0.0, False, False],  # Right
-            # 3: [0.0, 0.50, 0.0, False, False],  # Right
-            # 4: [0.0, 0.25, 0.0, False, False],  # Right
-            # 5: [0.0, -0.75, 0.0, False, False],  # Left
-            # 6: [0.0, -0.50, 0.0, False, False],  # Left
-            # 7: [0.0, -0.25, 0.0, False, False],  # Left
-            # 8: [0.15, 0.00, 0.0, False, False],  # Straight
-            # 9: [0.15, 0.75, 0.0, False, False],  # Right
-            # 10: [0.15, 0.50, 0.0, False, False],  # Right
-            # 11: [0.15, 0.25, 0.0, False, False],  # Right
-            # 12: [0.15, -0.75, 0.0, False, False],  # Left
-            # 13: [0.15, -0.50, 0.0, False, False],  # Left
-            # 14: [0.15, -0.25, 0.0, False, False],  # Left
-            # 15: [0.3, 0.00, 0.0, False, False],  # Straight
-            # 16: [0.3, 0.75, 0.0, False, False],  # Right
-            # 17: [0.3, 0.50, 0.0, False, False],  # Right
-            # 18: [0.3, 0.25, 0.0, False, False],  # Right
-            # 19: [0.3, -0.75, 0.0, False, False],  # Left
-            # 20: [0.3, -0.50, 0.0, False, False],  # Left
-            # 21: [0.3, -0.25, 0.0, False, False],  # Left
-            # 22: [0.7, 0.00, 0.0, False, False],  # Straight
-            # 23: [0.7, 0.75, 0.0, False, False],  # Right
-            # 24: [0.7, 0.50, 0.0, False, False],  # Right
-            # 25: [0.7, 0.25, 0.0, False, False],  # Right
-            # 26: [0.7, -0.75, 0.0, False, False],  # Left
-            # 27: [0.7, -0.50, 0.0, False, False],  # Left
-            # 28: [0.7, -0.25, 0.0, False, False],  # Left
+            # 0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
+            # 1: [acceleration_value, 0.80, 0.0, False, False],  # Right
+            # 2: [acceleration_value, 0.60, 0.0, False, False],  # Right
+            # 3: [acceleration_value, 0.40, 0.0, False, False],  # Right
+            # 4: [acceleration_value, 0.20, 0.0, False, False],  # Right
+            # 5: [acceleration_value, -0.80, 0.0, False, False],  # Left
+            # 6: [acceleration_value, -0.60, 0.0, False, False],  # Left
+            # 7: [acceleration_value, -0.40, 0.0, False, False],  # Left
+            # 8: [acceleration_value, -0.20, 0.0, False, False],  # Left
+            0: [0.0, 0.00, 0.0, False, False],  # Coast
+            1: [0.0, 0.00, 1.0, False, False],  # Apply Break
+            2: [0.0, 0.75, 0.0, False, False],  # Right
+            3: [0.0, 0.50, 0.0, False, False],  # Right
+            4: [0.0, 0.25, 0.0, False, False],  # Right
+            5: [0.0, -0.75, 0.0, False, False],  # Left
+            6: [0.0, -0.50, 0.0, False, False],  # Left
+            7: [0.0, -0.25, 0.0, False, False],  # Left
+            8: [0.15, 0.00, 0.0, False, False],  # Straight
+            9: [0.15, 0.75, 0.0, False, False],  # Right
+            10: [0.15, 0.50, 0.0, False, False],  # Right
+            11: [0.15, 0.25, 0.0, False, False],  # Right
+            12: [0.15, -0.75, 0.0, False, False],  # Left
+            13: [0.15, -0.50, 0.0, False, False],  # Left
+            14: [0.15, -0.25, 0.0, False, False],  # Left
+            15: [0.3, 0.00, 0.0, False, False],  # Straight
+            16: [0.3, 0.75, 0.0, False, False],  # Right
+            17: [0.3, 0.50, 0.0, False, False],  # Right
+            18: [0.3, 0.25, 0.0, False, False],  # Right
+            19: [0.3, -0.75, 0.0, False, False],  # Left
+            20: [0.3, -0.50, 0.0, False, False],  # Left
+            21: [0.3, -0.25, 0.0, False, False],  # Left
+            22: [0.7, 0.00, 0.0, False, False],  # Straight
+            23: [0.7, 0.75, 0.0, False, False],  # Right
+            24: [0.7, 0.50, 0.0, False, False],  # Right
+            25: [0.7, 0.25, 0.0, False, False],  # Right
+            26: [0.7, -0.75, 0.0, False, False],  # Left
+            27: [0.7, -0.50, 0.0, False, False],  # Left
+            28: [0.7, -0.25, 0.0, False, False],  # Left
         }
 
 
@@ -1449,16 +1449,16 @@ class SACExperimentBasic(BaseExperiment):
         waypoint_reward_multiply_factor = 10
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            hyp_reward = np.clip(hyp_reward, None, 0.18)
-            hyp_reward = hyp_reward - 0.18
+            hyp_reward = np.clip(hyp_reward, None, 0.8)
+            hyp_reward = hyp_reward - 0.8
             reward = reward + hyp_reward* waypoint_reward_multiply_factor
             self.point_reward.append(hyp_reward* waypoint_reward_multiply_factor)
             self.point_reward_location.append(1)
             print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* waypoint_reward_multiply_factor}") if self.custom_enable_rendering else None
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
-            hyp_reward = np.clip(hyp_reward, None, 0.18)
-            hyp_reward = hyp_reward - 0.18
+            hyp_reward = np.clip(hyp_reward, None, 0.8)
+            hyp_reward = hyp_reward - 0.8
             reward = reward + hyp_reward * waypoint_reward_multiply_factor
             self.point_reward.append(hyp_reward* waypoint_reward_multiply_factor)
             self.point_reward_location.append(2)
@@ -1470,16 +1470,16 @@ class SACExperimentBasic(BaseExperiment):
         line_reward_multiply_factor = 100
         if self.last_closest_distance_to_next_waypoint_line != 0:
             hyp_reward = self.last_closest_distance_to_next_waypoint_line - closest_distance_to_next_waypoint_line
-            hyp_reward = np.clip(hyp_reward, None, 0.18)
-            hyp_reward = hyp_reward - 0.18
+            hyp_reward = np.clip(hyp_reward, None, 0.8)
+            hyp_reward = hyp_reward - 0.8
             reward = reward + hyp_reward* line_reward_multiply_factor
             self.line_reward.append(hyp_reward* line_reward_multiply_factor)
             self.line_reward_location.append(1)
             print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* line_reward_multiply_factor}") if self.custom_enable_rendering else None
         else:
             hyp_reward = self.last_closest_distance_to_next_plus_1_waypoint_line - closest_distance_to_next_waypoint_line
-            hyp_reward = np.clip(hyp_reward, None, 0.18)
-            hyp_reward = hyp_reward - 0.18
+            hyp_reward = np.clip(hyp_reward, None, 0.8)
+            hyp_reward = hyp_reward - 0.8
             reward = reward + hyp_reward * line_reward_multiply_factor
             self.line_reward.append(hyp_reward* line_reward_multiply_factor)
             self.line_reward_location.append(2)

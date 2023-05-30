@@ -239,14 +239,19 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 800:
+        if idx > 5700:
+
+            for i in range(100):
+                if abs(len(df.loc[idx + i, 'bearing_to_waypoint.pkl']) - len(x_truck[idx][2:])) < 3:
+                    data_diff = i
+                    break
+
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
             #     y_route[idx] = temp_y_route[idx][len(temp_y_route[idx-1]):]
 
             if len(x_route[idx]) != 0:
-                data_diff = 3
                 print('----------')
                 print(f'Showing Episode {idx}/{len(x_route)}')
                 print(df_done.iloc[[idx - 1]])
