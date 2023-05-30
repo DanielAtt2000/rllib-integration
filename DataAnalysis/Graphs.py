@@ -80,7 +80,7 @@ for filename in os.listdir(directory):
                 df_done['points'] = pd.Series(data[0][0])
                 df_done['output'] = pd.Series(data[0][1])
 
-graphs = False
+graphs = True
 
 
 def plot_route(route_points_all, truck_points_all):
@@ -448,7 +448,7 @@ if graphs:
                         values_greater_than = []
                         temp = [0.5]
                         for value in temp:
-                            values_greater_than.append(len(np.where(series_difference > 0.18)[0]))
+                            values_greater_than.append(len(np.where(series_difference > 0.4)[0]))
 
                         for value in range(len(temp)):
                             print(f"Values greater than {temp[value]}")
@@ -458,7 +458,7 @@ if graphs:
 
                         print(series_difference.describe())
                         a = sns.distplot(series_difference,bins=10000)
-                        a.set(xlim=(-0.25,0.25))
+                        a.set(xlim=(-0.5,1))
 
                         plt.show()
                         print('----------')
