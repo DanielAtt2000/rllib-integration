@@ -58,9 +58,9 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-data_file = 'data_30217765de6'
+data_file = 'data_b4a43483037'
 directory = '/home/daniel/data-rllib-integration/data/' + data_file
-for_graphs = True
+for_graphs = False
 def main():
     assert no_changes == True and log == False
 
