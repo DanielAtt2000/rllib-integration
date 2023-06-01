@@ -239,7 +239,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 5700:
+        if idx > 2:
 
             for i in range(100):
                 if abs(len(df.loc[idx + i, 'bearing_to_waypoint.pkl']) - len(x_truck[idx][2:])) < 3:
