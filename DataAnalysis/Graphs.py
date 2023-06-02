@@ -237,7 +237,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 1130:
+        if idx > 2:
             data_diff = 2
             for i in range(20):
                 if abs(len(df.loc[idx + i, 'bearing_to_waypoint.pkl']) - len(x_truck[idx][2:])) < 3:
@@ -405,7 +405,7 @@ def plot_route(route_points_all, truck_points_all):
 
                 items_to_plot = sorted(items_to_plot)
                 num_of_cols = 4
-                num_of_rows = len(items_to_plot) // num_of_cols
+                num_of_rows = len(items_to_plot) // num_of_cols + 1
                 fig, axes = plt.subplots(ncols=num_of_cols, nrows=num_of_rows, figsize=(15, 10))
 
                 for ax, col_name in zip(axes.ravel(), items_to_plot):

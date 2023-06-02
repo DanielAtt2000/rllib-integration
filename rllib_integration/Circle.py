@@ -1,4 +1,6 @@
 import math
+from statistics import mean
+
 import numpy as np
 
 from rllib_integration.GetAngle import calculate_angle_with_center_of_lane
@@ -145,4 +147,4 @@ def get_radii(route, last_waypoint_index,no_of_points_to_calculate_chord):
         for i in range(length_of_output_array-len(radii)):
             radii.append(max_radius_value)
 
-    return radii[0:length_of_output_array]
+    return radii[0:length_of_output_array], mean(radii[0:length_of_output_array//2])

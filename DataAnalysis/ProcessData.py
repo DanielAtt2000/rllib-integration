@@ -58,9 +58,9 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-data_file = 'data_0fd742fb067'
+data_file = 'data_c13447424dc'
 directory = '/home/daniel/data-rllib-integration/data/' + data_file
-for_graphs = True
+for_graphs = False
 def main():
     assert no_changes == True and log == False
 
@@ -93,7 +93,8 @@ def main():
                 temp_array_1 = []
                 temp_array_2 = []
 
-
+                if 'radii' in filename:
+                    continue
 
                 for line in lines:
                     if filename == "collisions":
@@ -168,6 +169,7 @@ def main():
                         if line != "[]":
                             new_data.append(line)
                     else:
+
                         if for_graphs:
                             for data_entry in line.split(','):
                                 data_entry = data_entry.strip()

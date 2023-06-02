@@ -375,7 +375,7 @@ def visualise_all_routes(map):
 
 
                 print(f"length of route {len(route)}")
-                print(f"Radii: {get_radii(route,5)}")
+                print(f"Radii: {get_radii(route=route,last_waypoint_index=0,no_of_points_to_calculate_chord=5)}")
                 all_routes.append(route)
 
     plot_all_routes(all_routes=all_routes)

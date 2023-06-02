@@ -32,7 +32,7 @@ import collections
 class SACExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        self.acceleration_pid = PID(Kp=0.1,Ki=0.00,Kd=0.00,setpoint=8.33,sample_time=None,output_limits=(0,1))
+        self.acceleration_pid = PID(Kp=0.05,Ki=0.00,Kd=0.00,setpoint=8.33,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -43,7 +43,7 @@ class SACExperimentBasic(BaseExperiment):
         self.last_action = [0,0,0]
         self.lidar_points_count = []
         self.reward_metric = 0
-
+        self.current_time = 'None'
         self.min_lidar_values = 1000000
         self.max_lidar_values = -100000
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
@@ -91,6 +91,7 @@ class SACExperimentBasic(BaseExperiment):
         self.occupancy_map_y = 84
         self.max_amount_of_occupancy_maps = 11
         self.radii = []
+        self.mean_radius = []
         self.point_reward = []
         self.point_reward_location = []
         self.line_reward = []
@@ -117,6 +118,7 @@ class SACExperimentBasic(BaseExperiment):
     def save_to_file(self, file_name, data):
         # Saving LIDAR point count
         counts = open(file_name, 'a')
+        counts.write(f'${self.current_time}$')
         counts.write(str(data))
         counts.write(str('\n'))
         counts.close()
@@ -253,6 +255,7 @@ class SACExperimentBasic(BaseExperiment):
         self.save_to_file(f"{self.directory}/lidar_data", self.lidar_data)
         self.save_to_file(f"{self.directory}/collisions", self.collisions)
         self.save_to_file(f"{self.directory}/radii",self.radii)
+        self.save_to_file(f"{self.directory}/mean_radius",self.mean_radius)
         self.save_to_file(f"{self.directory}/total_episode_reward",self.total_episode_reward)
         self.entry_idx = -1
         self.exit_idx = -1
@@ -306,6 +309,7 @@ class SACExperimentBasic(BaseExperiment):
         self.collisions = []
         self.lidar_data = collections.deque(maxlen=4)
         self.radii = []
+        self.mean_radius = []
         self.reward_metric = 0
         # self.acceleration = []
 
@@ -359,8 +363,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
-                high=np.array([100,1,100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
+                low=np.array([0,0,0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,1,100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             )
 
@@ -471,7 +475,7 @@ class SACExperimentBasic(BaseExperiment):
         self.custom_enable_rendering = core.custom_enable_rendering
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
 
-        self.radii = get_radii(core.route,core.last_waypoint_index,5)
+        radii, mean_radius = get_radii(core.route,core.last_waypoint_index,5)
 
         self.entry_idx = core.entry_spawn_point_index
         self.exit_idx = core.exit_spawn_point_index
@@ -1265,13 +1269,15 @@ class SACExperimentBasic(BaseExperiment):
 
         observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
-        observations.extend(self.radii)
+        observations.extend(radii)
+        observations.append(np.float32(mean_radius))
 
 
 
 
         if self.custom_enable_rendering:
-            print(f"Radii {self.radii}")
+            print(f"Radii {radii}")
+            print(f'Mean radius {mean_radius}')
             print(f"truck FRONT \t\t\t{round(truck_center, 2)}")
             print(f"truck 45 \t\t{round(truck_front_left,2)}\t\t{round(truck_front_right,2)}")
             print(f"truck sides \t\t{round(truck_left, 2)}\t\t{round(truck_right, 2)}")
@@ -1316,6 +1322,8 @@ class SACExperimentBasic(BaseExperiment):
         # self.acceleration.append(np.float32(acceleration))
         self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
         self.temp_route = core.route_points
+        self.radii.append(radii)
+        self.mean_radius.append(mean_radius)
         #
         # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
         # print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
