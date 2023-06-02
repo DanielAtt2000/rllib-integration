@@ -32,7 +32,7 @@ import collections
 class SACExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        self.acceleration_pid = PID(Kp=0.05,Ki=0.00,Kd=0.00,setpoint=8.33,sample_time=None,output_limits=(0,1))
+        self.acceleration_pid = PID(Kp=0.1,Ki=0.00,Kd=0.00,setpoint=8.33,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -359,8 +359,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
-                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
+                low=np.array([0,0,0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,]),
+                high=np.array([100,1,100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]),
                 dtype=np.float32
             )
 
@@ -531,6 +531,7 @@ class SACExperimentBasic(BaseExperiment):
         #         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
         #
         # save_data('waypoints2.pkl',location_from_waypoint_to_vehicle_relative)
+        number_of_waypoints = len(core.route)
 
         closest_distance_to_next_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=0)
         closest_distance_to_next_plus_1_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=1)
@@ -1223,6 +1224,8 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(truck_front_left)])
 
         observations = [
+            np.float32(number_of_waypoints),
+            np.float32(core.last_waypoint_index/number_of_waypoints),
             np.float32(forward_velocity),
             # np.float32(acceleration),
             # np.float32(forward_veloci ty_x),
@@ -1446,7 +1449,7 @@ class SACExperimentBasic(BaseExperiment):
         if self.last_closest_distance_to_next_plus_1_waypoint_line == 0:
             self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_waypoint_line
 
-        waypoint_reward_multiply_factor = 50
+        waypoint_reward_multiply_factor = 0.5
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
             hyp_reward = np.clip(hyp_reward, None, 0.8)
@@ -1467,7 +1470,7 @@ class SACExperimentBasic(BaseExperiment):
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
         self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
 
-        line_reward_multiply_factor = 100
+        line_reward_multiply_factor = 1
         if self.last_closest_distance_to_next_waypoint_line != 0:
             hyp_reward = self.last_closest_distance_to_next_waypoint_line - closest_distance_to_next_waypoint_line
             hyp_reward = np.clip(hyp_reward, None, 0.8)

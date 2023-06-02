@@ -8,7 +8,7 @@ import pickle
 import pandas as pd
 import numpy as np
 
-from DataAnalysis.ProcessData import data_file
+from DataAnalysis.ProcessData import data_file, for_graphs
 from rllib_integration.GetStartStopLocation import spawn_points_2_lane_roundabout_small_easy, \
     spawn_points_2_lane_roundabout_small_difficult
 
@@ -79,8 +79,6 @@ for filename in os.listdir(directory):
             else:
                 df_done['points'] = pd.Series(data[0][0])
                 df_done['output'] = pd.Series(data[0][1])
-
-graphs = False
 
 
 def plot_route(route_points_all, truck_points_all):
@@ -239,13 +237,15 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 2:
-
-            for i in range(100):
+        if idx > 1130:
+            data_diff = 2
+            for i in range(20):
                 if abs(len(df.loc[idx + i, 'bearing_to_waypoint.pkl']) - len(x_truck[idx][2:])) < 3:
-                    data_diff = i
+                    # data_diff = i
+                    print(f'Data diff {data_diff}')
                     break
-
+            if data_diff == -1:
+                raise Exception('Data diff not found')
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -330,6 +330,29 @@ def plot_route(route_points_all, truck_points_all):
                     combined_rewards.append(line_reward + point_reward)
                 # a2.plot(combined_rewards, label='Combined reward')
 
+                print(f'line Reward total {sum(df.loc[idx + data_diff, "line_reward.pkl"])}')
+                print(f'Point Reward total {sum(df.loc[idx + data_diff, "point_reward.pkl"])}')
+                print(f'Sums Reward total {sum(df.loc[idx + data_diff, "point_reward.pkl"]) + sum(df.loc[idx + data_diff, "line_reward.pkl"])}')
+                print(f'Total Episode Reward total {sum(df.loc[idx + data_diff, "total_episode_reward.pkl"])}')
+                print(f'Total Episode Reward WITHOUT LAST total {sum(df.loc[idx + data_diff, "total_episode_reward.pkl"][:-1])}')
+
+
+                point_reward = list(df.loc[idx + data_diff, "point_reward.pkl"])
+                line_reward = list(df.loc[idx + data_diff, "line_reward.pkl"])
+
+                def divide(list, dividend):
+                    new_list = []
+                    for item in list:
+                        new_list.append(item / dividend)
+                    return new_list
+
+
+                print(f'New sum {sum(divide(point_reward,50)) + sum(divide(line_reward,100))}')
+
+
+
+
+
                 assert len(
                     df.loc[idx + data_diff, "closest_distance_to_next_waypoint_line.pkl"]) - 2 == len(
                     x_truck[idx][2:])
@@ -393,7 +416,7 @@ def plot_route(route_points_all, truck_points_all):
                 plt.show()
 
 
-if graphs:
+if for_graphs:
     for filename in os.listdir(directory):
         if "forward_velocity_z" not in filename:
             if "done" in filename:
@@ -450,7 +473,7 @@ if graphs:
                         values_greater_than = []
                         temp = [0.5]
                         for value in temp:
-                            values_greater_than.append(len(np.where(series_difference > 0.4)[0]))
+                            values_greater_than.append(len(np.where(series_difference > 0.8)[0]))
 
                         for value in range(len(temp)):
                             print(f"Values greater than {temp[value]}")
