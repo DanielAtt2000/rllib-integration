@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import datetime
+from copy import copy, deepcopy
 
 # Copyright (c) 2021 Computer Vision Center (CVC) at the Universitat Autonoma de
 # Barcelona (UAB).
@@ -54,6 +55,7 @@ class SACExperimentBasic(BaseExperiment):
         self.counterThreshold = 10
         self.last_hyp_distance_to_next_waypoint = 0
         self.last_hyp_distance_to_next_plus_1_waypoint = 0
+        self.passed_waypoint = False
 
         self.last_closest_distance_to_next_waypoint_line = 0
         self.last_closest_distance_to_next_plus_1_waypoint_line = 0
@@ -497,12 +499,13 @@ class SACExperimentBasic(BaseExperiment):
         # Checking if we have passed the last way point
 
         distance_to_next_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=1)
-
+        self.passed_waypoint = False
         in_front_of_waypoint = core.is_in_front_of_waypoint(truck_transform.location.x, truck_transform.location.y)
         if 10 > distance_to_next_waypoint_line and (in_front_of_waypoint == 0 or in_front_of_waypoint == 1):
             core.last_waypoint_index = core.last_waypoint_index + 1
             self.last_hyp_distance_to_next_waypoint = 0
             self.last_closest_distance_to_next_waypoint_line = 0
+            self.passed_waypoint = True
             print('Passed Waypoint <------------') if self.custom_enable_rendering else None
         else:
             pass
@@ -1321,7 +1324,7 @@ class SACExperimentBasic(BaseExperiment):
         # self.trailer_bearing_to_waypoint.append(np.float32(trailer_bearing_to_waypoint))
         # self.acceleration.append(np.float32(acceleration))
         self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
-        self.temp_route = core.route_points
+        self.temp_route = deepcopy(core.route_points)
         self.radii.append(radii)
         self.mean_radius.append(mean_radius)
         #
@@ -1499,6 +1502,8 @@ class SACExperimentBasic(BaseExperiment):
         self.last_closest_distance_to_next_waypoint_line = closest_distance_to_next_waypoint_line
         self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
 
+        if self.passed_waypoint:
+            reward = reward + 50
 
 
         # if bearing_to_waypoint == 0:
@@ -1539,7 +1544,7 @@ class SACExperimentBasic(BaseExperiment):
             reward = reward + -1000
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward = reward + 10000
+            # reward = reward + 10000
 
         self.total_episode_reward.append(reward)
         self.reward_metric = reward

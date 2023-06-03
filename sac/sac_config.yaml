@@ -7,10 +7,10 @@ gamma: 1
 twin_q: True
 # these probably do nothing temp
 q_model_config:
-  "fcnet_hiddens": [ 256, 512 ]
+  "fcnet_hiddens": [ 256, 512, 512 ]
   "fcnet_activation": "relu"
 policy_model_config:
-  "fcnet_hiddens": [ 256, 512 ]
+  "fcnet_hiddens": [ 256, 512, 512 ]
   "fcnet_activation": "relu"
 #model:
 #  "fcnet_hiddens": [ 512, 512 ]
