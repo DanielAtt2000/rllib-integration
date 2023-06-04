@@ -5,12 +5,12 @@ num_cpus_per_worker: 11
 framework: torch
 gamma: 1
 twin_q: True
-# these probably do nothing temp
+# these probably do nothing
 q_model_config:
-  "fcnet_hiddens": [ 256, 512, 512 ]
+  "fcnet_hiddens": [ 512, 512, 1024 ]
   "fcnet_activation": "relu"
 policy_model_config:
-  "fcnet_hiddens": [ 256, 512, 512 ]
+  "fcnet_hiddens": [ 512, 512, 1024 ]
   "fcnet_activation": "relu"
 #model:
 #  "fcnet_hiddens": [ 512, 512 ]
@@ -23,7 +23,7 @@ recreate_failed_workers: True
 # Do hard syncs.
 # Soft-syncs seem to work less reliably for discrete action spaces.
 tau: 1
-#lr: 0.0001
+#lr: 0.001
 target_network_update_freq: 8000
 #initial_alpha: 0.2
 # auto = 0.98 * -log(1/|A|)
@@ -33,7 +33,7 @@ n_step: 1
 rollout_fragment_length: 1
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
-  capacity: 500000
+  capacity: 400000
   # How many steps of the model to sample before learning starts.
   # If True prioritized replay buffer will be used.
   prioritized_replay_alpha: 0.6
@@ -46,10 +46,10 @@ min_sample_timesteps_per_iteration: 4
 # Paper uses 20k random timesteps, which is not exactly the same, but
 # seems to work nevertheless. We use 100k here for the longer Atari
 # runs (DQN style: filling up the buffer a bit before learning).
-#optimization:
-#    actor_learning_rate: 0.00005
-#    critic_learning_rate: 0.00005
-#    entropy_learning_rate: 0.00005
+optimization:
+    actor_learning_rate: 0.00005
+    critic_learning_rate: 0.00005
+    entropy_learning_rate: 0.00005
 
 "exploration_config": {
   "type": "EpsilonGreedy",

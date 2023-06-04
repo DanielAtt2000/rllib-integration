@@ -198,7 +198,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 1050:
+        if idx > 1640:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -288,6 +288,13 @@ def plot_route(route_points_all, truck_points_all):
                 print(f'Total Episode Reward total {sum(df.loc[idx, "total_episode_reward"])}')
                 print(f'Total Episode Reward WITHOUT LAST total {sum(df.loc[idx, "total_episode_reward"][:-1])}')
 
+                last_waypoint = 0
+                for r,reward in enumerate(df.loc[idx, "total_episode_reward"]):
+                    if reward > 40:
+                        print(sum(df.loc[idx, "total_episode_reward"][last_waypoint:r]))
+                        last_waypoint = r +1
+
+
 
                 point_reward = list(df.loc[idx, "point_reward"])
                 line_reward = list(df.loc[idx, "line_reward"])
@@ -299,7 +306,7 @@ def plot_route(route_points_all, truck_points_all):
                     return new_list
 
 
-                print(f'New sum {sum(divide(point_reward,50)) + sum(divide(line_reward,100))}')
+                # print(f'New sum {sum(divide(point_reward,50)) + sum(divide(line_reward,100))}')
 
 
 
@@ -332,7 +339,7 @@ def plot_route(route_points_all, truck_points_all):
                         temp.append(hyp_reward * line_reward_multiply_factor)
 
                 # a2.plot(temp, label='Custom previous-current')
-                a2.axis([0, 1000, -55, 70])
+                a2.axis([0, 1000, -5, 10])
                 a2.legend(loc='upper center')
 
                 assert len(

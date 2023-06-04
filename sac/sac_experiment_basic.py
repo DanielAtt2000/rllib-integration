@@ -33,7 +33,7 @@ import collections
 class SACExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        self.acceleration_pid = PID(Kp=0.05,Ki=0.00,Kd=0.00,setpoint=8.33,sample_time=None,output_limits=(0,1))
+        # self.acceleration_pid = PID(Kp=0.05,Ki=0.00,Kd=0.00,setpoint=8.33,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -365,24 +365,24 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,1,100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             )
 
     def get_actions(self):
-        acceleration_value = self.acceleration_pid(self.current_forward_velocity)
-        print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
+        # acceleration_value = self.acceleration_pid(self.current_forward_velocity)
+        # print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
         return {
-            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
-            1: [acceleration_value, 0.80, 0.0, False, False],  # Right
-            2: [acceleration_value, 0.60, 0.0, False, False],  # Right
-            3: [acceleration_value, 0.40, 0.0, False, False],  # Right
-            4: [acceleration_value, 0.20, 0.0, False, False],  # Right
-            5: [acceleration_value, -0.80, 0.0, False, False],  # Left
-            6: [acceleration_value, -0.60, 0.0, False, False],  # Left
-            7: [acceleration_value, -0.40, 0.0, False, False],  # Left
-            8: [acceleration_value, -0.20, 0.0, False, False],  # Left
+            0: [0.3, 0.00, 0.0, False, False],  # Straight
+            1: [0.3, 0.80, 0.0, False, False],  # Right
+            2: [0.3, 0.60, 0.0, False, False],  # Right
+            3: [0.3, 0.40, 0.0, False, False],  # Right
+            4: [0.3, 0.20, 0.0, False, False],  # Right
+            5: [0.3, -0.80, 0.0, False, False],  # Left
+            6: [0.3, -0.60, 0.0, False, False],  # Left
+            7: [0.3, -0.40, 0.0, False, False],  # Left
+            8: [0.3, -0.20, 0.0, False, False],  # Left
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
             # 2: [0.0, 0.75, 0.0, False, False],  # Right
@@ -477,7 +477,7 @@ class SACExperimentBasic(BaseExperiment):
         self.custom_enable_rendering = core.custom_enable_rendering
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
 
-        radii, mean_radius = get_radii(core.route,core.last_waypoint_index,5)
+        radii, _ = get_radii(core.route,core.last_waypoint_index,5)
 
         self.entry_idx = core.entry_spawn_point_index
         self.exit_idx = core.exit_spawn_point_index
@@ -1231,8 +1231,8 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(truck_front_left)])
 
         observations = [
-            np.float32(number_of_waypoints),
-            np.float32(core.last_waypoint_index/number_of_waypoints),
+            # np.float32(number_of_waypoints),
+            # np.float32(core.last_waypoint_index/number_of_waypoints),
             np.float32(forward_velocity),
             # np.float32(acceleration),
             # np.float32(forward_veloci ty_x),
@@ -1273,14 +1273,14 @@ class SACExperimentBasic(BaseExperiment):
         observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
         observations.extend(radii)
-        observations.append(np.float32(mean_radius))
+        # observations.append(np.float32(mean_radius))
 
 
 
 
         if self.custom_enable_rendering:
             print(f"Radii {radii}")
-            print(f'Mean radius {mean_radius}')
+            # print(f'Mean radius {mean_radius}')
             print(f"truck FRONT \t\t\t{round(truck_center, 2)}")
             print(f"truck 45 \t\t{round(truck_front_left,2)}\t\t{round(truck_front_right,2)}")
             print(f"truck sides \t\t{round(truck_left, 2)}\t\t{round(truck_right, 2)}")
@@ -1326,7 +1326,7 @@ class SACExperimentBasic(BaseExperiment):
         self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
         self.temp_route = deepcopy(core.route_points)
         self.radii.append(radii)
-        self.mean_radius.append(mean_radius)
+        # self.mean_radius.append(mean_radius)
         #
         # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
         # print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
@@ -1460,19 +1460,19 @@ class SACExperimentBasic(BaseExperiment):
         if self.last_closest_distance_to_next_plus_1_waypoint_line == 0:
             self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_waypoint_line
 
-        waypoint_reward_multiply_factor = 0.5
+        waypoint_reward_multiply_factor = 50
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            hyp_reward = np.clip(hyp_reward, None, 0.8)
-            hyp_reward = hyp_reward - 0.8
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
             reward = reward + hyp_reward* waypoint_reward_multiply_factor
             self.point_reward.append(hyp_reward* waypoint_reward_multiply_factor)
             self.point_reward_location.append(1)
             print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* waypoint_reward_multiply_factor}") if self.custom_enable_rendering else None
         else:
             hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
-            hyp_reward = np.clip(hyp_reward, None, 0.8)
-            hyp_reward = hyp_reward - 0.8
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
             reward = reward + hyp_reward * waypoint_reward_multiply_factor
             self.point_reward.append(hyp_reward* waypoint_reward_multiply_factor)
             self.point_reward_location.append(2)
@@ -1481,19 +1481,19 @@ class SACExperimentBasic(BaseExperiment):
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
         self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
 
-        line_reward_multiply_factor = 1
+        line_reward_multiply_factor = 100
         if self.last_closest_distance_to_next_waypoint_line != 0:
             hyp_reward = self.last_closest_distance_to_next_waypoint_line - closest_distance_to_next_waypoint_line
-            hyp_reward = np.clip(hyp_reward, None, 0.8)
-            hyp_reward = hyp_reward - 0.8
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
             reward = reward + hyp_reward* line_reward_multiply_factor
             self.line_reward.append(hyp_reward* line_reward_multiply_factor)
             self.line_reward_location.append(1)
             print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* line_reward_multiply_factor}") if self.custom_enable_rendering else None
         else:
             hyp_reward = self.last_closest_distance_to_next_plus_1_waypoint_line - closest_distance_to_next_waypoint_line
-            hyp_reward = np.clip(hyp_reward, None, 0.8)
-            hyp_reward = hyp_reward - 0.8
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
             reward = reward + hyp_reward * line_reward_multiply_factor
             self.line_reward.append(hyp_reward* line_reward_multiply_factor)
             self.line_reward_location.append(2)
