@@ -1503,7 +1503,7 @@ class SACExperimentBasic(BaseExperiment):
         self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
 
         if self.passed_waypoint:
-            reward = reward + 50
+            reward = reward + 500
 
 
         # if bearing_to_waypoint == 0:
