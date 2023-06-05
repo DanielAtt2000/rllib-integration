@@ -365,8 +365,8 @@ class SACExperimentBasic(BaseExperiment):
             # )
             # })
         return Box(
-                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             )
 
@@ -477,7 +477,7 @@ class SACExperimentBasic(BaseExperiment):
         self.custom_enable_rendering = core.custom_enable_rendering
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
 
-        radii, _ = get_radii(core.route,core.last_waypoint_index,5)
+        radii, mean_radius = get_radii(core.route,core.last_waypoint_index,5)
 
         self.entry_idx = core.entry_spawn_point_index
         self.exit_idx = core.exit_spawn_point_index
@@ -1273,14 +1273,14 @@ class SACExperimentBasic(BaseExperiment):
         observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
         observations.extend(radii)
-        # observations.append(np.float32(mean_radius))
+        observations.append(np.float32(mean_radius))
 
 
 
 
         if self.custom_enable_rendering:
             print(f"Radii {radii}")
-            # print(f'Mean radius {mean_radius}')
+            print(f'Mean radius {mean_radius}')
             print(f"truck FRONT \t\t\t{round(truck_center, 2)}")
             print(f"truck 45 \t\t{round(truck_front_left,2)}\t\t{round(truck_front_right,2)}")
             print(f"truck sides \t\t{round(truck_left, 2)}\t\t{round(truck_right, 2)}")
@@ -1326,7 +1326,7 @@ class SACExperimentBasic(BaseExperiment):
         self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
         self.temp_route = deepcopy(core.route_points)
         self.radii.append(radii)
-        # self.mean_radius.append(mean_radius)
+        self.mean_radius.append(mean_radius)
         #
         # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
         # print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
@@ -1460,7 +1460,7 @@ class SACExperimentBasic(BaseExperiment):
         if self.last_closest_distance_to_next_plus_1_waypoint_line == 0:
             self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_waypoint_line
 
-        waypoint_reward_multiply_factor = 50
+        waypoint_reward_multiply_factor = 30
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
             hyp_reward = np.clip(hyp_reward, None, 0.5)
