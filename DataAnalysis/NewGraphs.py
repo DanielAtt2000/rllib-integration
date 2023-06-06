@@ -1,5 +1,8 @@
 from copy import deepcopy
+from datetime import datetime
 from math import ceil
+# from statistics import mean
+from numpy import mean
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -194,11 +197,16 @@ def plot_route(route_points_all, truck_points_all):
     plt.legend(loc='upper center')
     plt.show()
 
+
+
     for idx in range(len(x_route)):
+        after_this_time = "2023_06_04__18_20_0"
+
+
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 1640:
+        if idx > 1700:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -289,12 +297,16 @@ def plot_route(route_points_all, truck_points_all):
                 print(f'Total Episode Reward WITHOUT LAST total {sum(df.loc[idx, "total_episode_reward"][:-1])}')
 
                 last_waypoint = 0
+                temp_arry = []
                 for r,reward in enumerate(df.loc[idx, "total_episode_reward"]):
                     if reward > 40:
+                        temp_arry.append(sum(df.loc[idx, "total_episode_reward"][last_waypoint:r]))
                         print(sum(df.loc[idx, "total_episode_reward"][last_waypoint:r]))
+                        print(f'Average {mean(df.loc[idx, "total_episode_reward"][last_waypoint:r])}')
+
                         last_waypoint = r +1
-
-
+                print(f'Average overall {mean(temp_arry[2:])}')
+                print(df.loc[idx, "Time"])
 
                 point_reward = list(df.loc[idx, "point_reward"])
                 line_reward = list(df.loc[idx, "line_reward"])
@@ -339,7 +351,7 @@ def plot_route(route_points_all, truck_points_all):
                         temp.append(hyp_reward * line_reward_multiply_factor)
 
                 # a2.plot(temp, label='Custom previous-current')
-                a2.axis([0, 1000, -5, 10])
+                a2.axis([0, 1000, -100, 10])
                 a2.legend(loc='upper center')
 
                 assert len(

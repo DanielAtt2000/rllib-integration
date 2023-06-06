@@ -60,7 +60,7 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-data_file = 'data_58a38e1f978'
+data_file = 'data_310249c5e36'
 directory = '/home/daniel/data-rllib-integration/data/' + data_file
 for_graphs = False
 def main():
@@ -101,13 +101,13 @@ def main():
                 for line in lines:
                     if filename == "collisions":
 
-                        if "[]\n" in line:
-                            new_data.append(('None',0,Vector(x=0,y=0)))
-                            continue
-
                         locations_of_USD = find(line, '$')
                         time = line[locations_of_USD[0] + 1:locations_of_USD[1]]
                         line = line[locations_of_USD[1] + 1:]
+
+                        if "[]" in line:
+                            new_data.append((time, 'None',Vector(x=0,y=0)))
+                            continue
 
                         splits = line.split('\'')
                         vehicle = splits[1]

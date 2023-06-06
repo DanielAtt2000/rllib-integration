@@ -1460,7 +1460,7 @@ class SACExperimentBasic(BaseExperiment):
         if self.last_closest_distance_to_next_plus_1_waypoint_line == 0:
             self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_waypoint_line
 
-        waypoint_reward_multiply_factor = 30
+        waypoint_reward_multiply_factor = 50
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
             hyp_reward = np.clip(hyp_reward, None, 0.5)
@@ -1531,20 +1531,20 @@ class SACExperimentBasic(BaseExperiment):
 
 
         if self.done_falling:
-            reward = reward + -1000
+            reward = reward + -10000
             print('====> REWARD Done falling')
         if self.done_collision_truck or self.done_collision_trailer:
             print("====> REWARD Done collision")
-            reward = reward + -1000
+            reward = reward + -10000
         if self.done_time_idle:
             print("====> REWARD Done idle")
-            reward = reward + -1000
+            reward = reward + -10000
         if self.done_time_episode:
             print("====> REWARD Done max time")
-            reward = reward + -1000
+            reward = reward + -10000
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            # reward = reward + 10000
+            reward = reward + 500
 
         self.total_episode_reward.append(reward)
         self.reward_metric = reward
