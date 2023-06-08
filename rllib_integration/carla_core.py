@@ -228,7 +228,8 @@ class CarlaCore:
         time.sleep(time_to_sleep_between_commands)
         pyautogui.click()
         time.sleep(time_to_sleep_between_commands)
-
+        time.sleep(5)
+        print('Moved Cursor')
         pyautogui.hotkey('ctrl', 'p', interval=0.25)
         time.sleep(time_to_sleep_between_commands)
         pyautogui.write(map_name, interval=0.25)
