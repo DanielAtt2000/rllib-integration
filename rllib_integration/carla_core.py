@@ -203,6 +203,40 @@ class CarlaCore:
             self.save_to_pickle('server_ports',[2000])
             return 2000
 
+    def kill_carla(self):
+        print("Killing process")
+        processes = [p for p in psutil.process_iter() if ("ue4editor" in p.name().lower() or "crashreportclient" in p.name().lower())]
+        for process in processes:
+            os.kill(process.pid, signal.SIGKILL)
+
+    def open_carla(self,map_name):
+        time_to_sleep_between_commands = 3
+
+        time.sleep(time_to_sleep_between_commands)
+        unreal_engine_dir = "/home/daniel/carla/Unreal/CarlaUE4/"
+        os.chdir(unreal_engine_dir)
+        os.system("xdg-open .")
+        time.sleep(time_to_sleep_between_commands)
+        pyautogui.moveTo(700, 200)
+        time.sleep(time_to_sleep_between_commands)
+        pyautogui.doubleClick()
+        time.sleep(150)
+
+        pyautogui.moveTo(150, 600)
+        time.sleep(time_to_sleep_between_commands)
+        pyautogui.click()
+        time.sleep(time_to_sleep_between_commands)
+
+        pyautogui.hotkey('ctrl', 'p', interval=0.25)
+        time.sleep(time_to_sleep_between_commands)
+        pyautogui.write(map_name, interval=0.25)
+        time.sleep(time_to_sleep_between_commands)
+        pyautogui.press('enter')
+        time.sleep(time_to_sleep_between_commands)
+        pyautogui.press('esc')
+        time.sleep(time_to_sleep_between_commands)
+        pyautogui.hotkey('alt', 'p', interval=0.25)
+        time.sleep(40)
 
     def connect_client(self):
         """Connect to the client"""
@@ -251,24 +285,32 @@ class CarlaCore:
                 time.sleep(3)
 
             try:
-                # Create a socket instance
-                socketObject = socket.socket()
 
-                # Using the socket connect to a server...in this case localhost
-                socketObject.connect((self.config["host"], int(self.config["programPort"])))
-                print("Connected to server")
-                # Send a message to the web server to supply a page as given by Host param of GET request
-                HTTPMessage = "restart"
-                bytes = str.encode(HTTPMessage)
-                socketObject.sendall(bytes)
+                time.sleep(5)
 
-                # Receive the data
-                while (True):
-                    data = socketObject.recv(1024)
-                    print(data)
-                    break
+                self.kill_carla()
+                time.sleep(5)
+                self.open_carla("doubleRoundabout37")
+                time.sleep(10)
 
-                socketObject.close()
+                # # Create a socket instance
+                # socketObject = socket.socket()
+                #
+                # # Using the socket connect to a server...in this case localhost
+                # socketObject.connect((self.config["host"], int(self.config["programPort"])))
+                # print("Connected to server")
+                # # Send a message to the web server to supply a page as given by Host param of GET request
+                # HTTPMessage = "restart"
+                # bytes = str.encode(HTTPMessage)
+                # socketObject.sendall(bytes)
+                #
+                # # Receive the data
+                # while (True):
+                #     data = socketObject.recv(1024)
+                #     print(data)
+                #     break
+                #
+                # socketObject.close()
             except Exception as e:
                 print(f"Failed to restart carla,{e}")
                 time.sleep(3)
