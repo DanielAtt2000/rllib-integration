@@ -58,7 +58,7 @@ class CarlaEnv(gym.Env):
         self.date_time_format = "%m%d%Y_%H%M%S%f"
         self.counter = datetime.now().strftime(self.date_time_format)
         self.collision_data_file_name = "collision_data_inner_roundabout"
-        self.collision_data = read_data_from_pickle(f"/home/daniel/data-rllib-integration/image_data/{self.collision_data_file_name}.pkl")
+        # self.collision_data = read_data_from_pickle(f"/home/daniel/data-rllib-integration/image_data/{self.collision_data_file_name}.pkl")
 
         self.reset()
 

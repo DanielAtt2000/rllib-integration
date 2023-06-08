@@ -1531,17 +1531,17 @@ class SACExperimentBasic(BaseExperiment):
 
 
         if self.done_falling:
-            reward = reward + -10000
+            reward = reward + -20000
             print('====> REWARD Done falling')
         if self.done_collision_truck or self.done_collision_trailer:
             print("====> REWARD Done collision")
-            reward = reward + -10000
+            reward = reward + -20000
         if self.done_time_idle:
             print("====> REWARD Done idle")
-            reward = reward + -10000
+            reward = reward + -20000
         if self.done_time_episode:
             print("====> REWARD Done max time")
-            reward = reward + -10000
+            reward = reward + -20000
         if self.done_arrived:
             print("====> REWARD Done arrived")
             reward = reward + 500

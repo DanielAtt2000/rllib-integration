@@ -10,7 +10,7 @@ import os
 import random
 import signal
 import time
-
+import pickle
 import numpy as np
 import psutil
 import logging
@@ -180,6 +180,29 @@ class CarlaCore:
     #         preexec_fn=os.setsid,
     #         stdout=open(os.devnull, "w"),
     #     )
+    def save_to_pickle(self,filename, data):
+        filename = filename + '.pickle'
+        with open(f'{filename}', 'wb') as handle:
+            pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    def open_pickle(self,filename):
+        with open(filename, 'rb') as handle:
+            return pickle.load(handle)
+
+    def get_server_port(self):
+        possible_ports = [2000,2001]
+        try:
+            server_ports = self.open_pickle('server_ports.pickle')
+            for port in server_ports:
+                possible_ports.remove(port)
+            if len(possible_ports) != 0:
+                return possible_ports[0]
+            else:
+                raise Exception('We should be here SERVER PORT')
+        except:
+            self.save_to_pickle('server_ports',[2000])
+            return 2000
+
 
     def connect_client(self):
         """Connect to the client"""
@@ -187,7 +210,8 @@ class CarlaCore:
         for i in range(self.config["retries_on_error"]):
             try:
                 kill_all_servers()
-                self.client = carla.Client(self.config["host"], self.server_port)
+
+                self.client = carla.Client(self.config["host"], 2000)
 
             except Exception as e:
                 print(" FAILED TO CONNECT TO CLIENT: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
