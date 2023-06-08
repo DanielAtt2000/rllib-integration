@@ -19,6 +19,8 @@ import datetime
 import carla
 from matplotlib import pyplot as plt
 
+import pyautogui
+
 from rllib_integration.LineIntersection import Point, lineLineIntersection
 from rllib_integration.RouteGeneration.global_route_planner import GlobalRoutePlanner
 from rllib_integration.sensors.sensor_interface import SensorInterface
