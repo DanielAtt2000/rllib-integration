@@ -141,11 +141,22 @@ class CarlaCore:
     def init_server(self):
         """Start a server on a random port"""
         self.server_port = random.randint(15000, 32000)
+        time.sleep(random.randint(0,20))
 
-        print(f"Waiting for {self.server_port/300}")
+        waiting_times = self.open_pickle('waiting_times')
+        waiting_time = waiting_times.pop(0)
+        self.save_to_pickle('waiting_times',waiting_times)
+
+        print(f"Waiting for {waiting_time}")
+        # time.sleep(waiting_time)
+        previous_time = datetime.datetime.now()
+
+        while datetime.datetime.now() < previous_time + datetime.timedelta(seconds=waiting_time):
+            continue
+
 
         # Ray tends to start all processes simultaneously. Use random delays to avoid problems
-        time.sleep(self.server_port/300)
+        # time.sleep(self.server_port/300)
 
         uses_server_port = is_used(self.server_port)
         uses_stream_port = is_used(self.server_port + 1)
@@ -194,7 +205,7 @@ class CarlaCore:
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def open_pickle(self,filename):
-        with open(filename, 'rb') as handle:
+        with open(filename + '.pickle', 'rb') as handle:
             return pickle.load(handle)
 
     def get_server_port(self):

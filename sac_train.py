@@ -13,7 +13,7 @@ from __future__ import print_function
 import argparse
 import os
 import random
-
+import pickle
 import yaml
 
 import ray
@@ -32,7 +32,10 @@ from sac.sac_trainer import CustomSACTrainer
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
 EXPERIMENT_CLASS = SACExperimentBasic
 
-
+def save_to_pickle(filename, data):
+    filename = filename + '.pickle'
+    with open(filename, 'wb') as handle:
+        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 def run(args):
     try:
@@ -118,6 +121,8 @@ def main():
 
     specific_version = False
     check_commit = True
+
+    save_to_pickle('waiting_times',[0,10,210,450])
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())
