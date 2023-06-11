@@ -104,13 +104,13 @@ env_config:
     timestep: 0.1 # IMP IMP
     # IMP
     retries_on_error: 25
-    resolution_x: 300
-    resolution_y: 300
+    resolution_x: 50
+    resolution_y: 50
     carla_location: '/home/daniel/carla/Dist/CARLA_Shipping_0.9.13-1-g8854804f4-dirty/LinuxNoEditor'
-    quality_level: "Low"
+    quality_level: Low
     enable_map_assets: True
     enable_rendering: True
-    show_display: True
+    show_display: False
     map_buffer : 1.2
     truckTrailerCombo: True
 
