@@ -142,7 +142,7 @@ class CarlaCore:
         """Start a server on a random port"""
         self.server_port = random.randint(15000, 32000)
 
-        print(f"Waiting for {elf.server_port/300}")
+        print(f"Waiting for {self.server_port/300}")
 
         # Ray tends to start all processes simultaneously. Use random delays to avoid problems
         time.sleep(self.server_port/300)
