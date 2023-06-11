@@ -1547,7 +1547,7 @@ class SACExperimentBasic(BaseExperiment):
             reward = reward + 500
 
         self.total_episode_reward.append(reward)
-        self.reward_metric = rewards
+        self.reward_metric = reward
         print(f"FINAL REWARD: {reward}") if self.custom_enable_rendering else None
         print(f"---------------------------------------------") if self.custom_enable_rendering else None
         return reward
