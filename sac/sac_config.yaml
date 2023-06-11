@@ -1,5 +1,5 @@
 # Works for both torch and tf.
-num_workers: 3
+num_workers: 4
 num_gpus: 1
 num_cpus_per_worker: 6
 framework: torch
@@ -107,7 +107,7 @@ env_config:
     resolution_x: 50
     resolution_y: 50
     carla_location: '/home/daniel/carla/Dist/CARLA_Shipping_0.9.13-1-g8854804f4-dirty/LinuxNoEditor'
-    quality_level: Epic
+    quality_level: Low
     enable_map_assets: True
     enable_rendering: True
     show_display: True

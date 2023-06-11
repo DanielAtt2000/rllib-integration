@@ -143,7 +143,7 @@ class CarlaCore:
         self.server_port = random.randint(15000, 32000)
 
         # Ray tends to start all processes simultaneously. Use random delays to avoid problems
-        time.sleep(20)
+        time.sleep(120)
 
         uses_server_port = is_used(self.server_port)
         uses_stream_port = is_used(self.server_port + 1)
