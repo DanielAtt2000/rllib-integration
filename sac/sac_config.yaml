@@ -107,7 +107,7 @@ env_config:
     resolution_x: 50
     resolution_y: 50
     carla_location: '/home/daniel/carla/Dist/CARLA_Shipping_0.9.13-1-g8854804f4-dirty/LinuxNoEditor'
-    quality_level: Low
+    quality_level: Epic
     enable_map_assets: True
     enable_rendering: True
     show_display: True
