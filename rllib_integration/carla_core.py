@@ -6,6 +6,7 @@ import math
 # This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
 
+import subprocess
 import os
 import random
 import signal
@@ -115,7 +116,7 @@ class CarlaCore:
 
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
 
-        os.mkdir(os.path.join("results", "run_" + str(self.current_time)))
+        # os.mkdir(os.path.join("results", "run_" + str(self.current_time)))
 
         self.entry_spawn_point_index = -1
         self.exit_spawn_point_index = -1
@@ -123,7 +124,7 @@ class CarlaCore:
         self.last_roundabout_choice = 1
         self.chosen_routes = {}
 
-        # self.init_server()
+        self.init_server()
         self.connect_client()
 
     # def init_server(self):
@@ -137,51 +138,54 @@ class CarlaCore:
     #             if str(self.server_port) not in line:
     #                 portsFileWrite.write(line)
 
-    # def init_server(self):
-    #     """Start a server on a random port"""
-    #     self.server_port = random.randint(15000, 32000)
-    #
-    #     # Ray tends to start all processes simultaneously. Use random delays to avoid problems
-    #     time.sleep(random.uniform(0, 1))
-    #
-    #     uses_server_port = is_used(self.server_port)
-    #     uses_stream_port = is_used(self.server_port + 1)
-    #     while uses_server_port and uses_stream_port:
-    #         if uses_server_port:
-    #             print("Is using the server port: " + self.server_port)
-    #         if uses_stream_port:
-    #             print("Is using the streaming port: " + str(self.server_port+1))
-    #         self.server_port += 2
-    #         uses_server_port = is_used(self.server_port)
-    #         uses_stream_port = is_used(self.server_port+1)
-    #
-    #     if self.config["show_display"]:
-    #         server_command = [
-    #             "{}/CarlaUE4.sh".format(os.environ["CARLA_ROOT"]),
-    #             "-windowed",
-    #             "-ResX={}".format(self.config["resolution_x"]),
-    #             "-ResY={}".format(self.config["resolution_y"]),
-    #         ]
-    #     else:
-    #         server_command = [
-    #             "DISPLAY= ",
-    #             "{}/CarlaUE4.sh".format(os.environ["CARLA_ROOT"]),
-    #             "-opengl"  # no-display isn't supported for Unreal 4.24 with vulkan
-    #         ]
-    #
-    #     server_command += [
-    #         "--carla-rpc-port={}".format(self.server_port),
-    #         "-quality-level={}".format(self.config["quality_level"])
-    #     ]
-    #
-    #     server_command_text = " ".join(map(str, server_command))
-    #     print(server_command_text)
-    #     server_process = subprocess.Popen(
-    #         server_command_text,
-    #         shell=True,
-    #         preexec_fn=os.setsid,
-    #         stdout=open(os.devnull, "w"),
-    #     )
+    def init_server(self):
+        """Start a server on a random port"""
+        self.server_port = random.randint(15000, 32000)
+
+        # Ray tends to start all processes simultaneously. Use random delays to avoid problems
+        time.sleep(random.uniform(0, 1))
+
+        uses_server_port = is_used(self.server_port)
+        uses_stream_port = is_used(self.server_port + 1)
+        while uses_server_port and uses_stream_port:
+            if uses_server_port:
+                print("Is using the server port: " + self.server_port)
+            if uses_stream_port:
+                print("Is using the streaming port: " + str(self.server_port+1))
+            self.server_port += 2
+            uses_server_port = is_used(self.server_port)
+            uses_stream_port = is_used(self.server_port+1)
+
+        if self.config["show_display"]:
+            server_command = [
+                "{}/CarlaUE4.sh".format(self.config['carla_location']),
+                "-windowed",
+                "-ResX={}".format(self.config["resolution_x"]),
+                "-ResY={}".format(self.config["resolution_y"]),
+            ]
+        else:
+            server_command = [
+                "DISPLAY= ",
+                "{}/CarlaUE4.sh".format(self.config['carla_location']),
+                "-opengl"  # no-display isn't supported for Unreal 4.24 with vulkan
+            ]
+
+        server_command += [
+            "--carla-rpc-port={}".format(self.server_port),
+            "-quality-level={}".format(self.config["quality_level"])
+        ]
+
+        server_command_text = " ".join(map(str, server_command))
+        print(server_command_text)
+        server_process = subprocess.Popen(
+            server_command_text,
+            shell=True,
+            preexec_fn=os.setsid,
+            stdout=open(os.devnull, "w"),
+        )
+
+        time.sleep(10)
+        print('Waited 10 seconds for server')
     def save_to_pickle(self,filename, data):
         filename = filename + '.pickle'
         with open(f'{filename}', 'wb') as handle:
@@ -246,79 +250,107 @@ class CarlaCore:
 
         for i in range(self.config["retries_on_error"]):
             try:
-                kill_all_servers()
-
-                self.client = carla.Client(self.config["host"], 2000)
-
-            except Exception as e:
-                print(" FAILED TO CONNECT TO CLIENT: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
-                time.sleep(3)
-
-            try:
-                print(f"Trying to set up client {i+1} time")
-                import os
-                print(os.getcwd())
-                file = open('rllib_integration/enable_rendering.txt','r')
+                file = open('rllib_integration/enable_rendering.txt', 'r')
 
                 if str(file.readline()) == 'False':
                     self.custom_enable_rendering = False
                 else:
                     self.custom_enable_rendering = True
 
+                self.client = carla.Client(self.config["host"], self.server_port)
                 self.client.set_timeout(self.config["timeout"])
-                time.sleep(0.2)
                 self.world = self.client.get_world()
-                time.sleep(0.2)
+
                 settings = self.world.get_settings()
-                time.sleep(0.2)
                 settings.no_rendering_mode = not self.custom_enable_rendering
-                time.sleep(0.2)
                 settings.synchronous_mode = True
-                time.sleep(0.2)
                 settings.fixed_delta_seconds = self.config["timestep"]
-                time.sleep(0.2)
                 self.world.apply_settings(settings)
-                time.sleep(0.5)
                 self.world.tick()
-                time.sleep(0.5)
+
                 return
 
             except Exception as e:
-                print(" FAILED TO STEP UP CLIENT: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
-                time.sleep(3)
-
-            try:
-
-                time.sleep(5)
-
-                self.kill_carla()
-                time.sleep(5)
-                self.open_carla("doubleRoundabout37")
-                time.sleep(10)
-
-                # # Create a socket instance
-                # socketObject = socket.socket()
-                #
-                # # Using the socket connect to a server...in this case localhost
-                # socketObject.connect((self.config["host"], int(self.config["programPort"])))
-                # print("Connected to server")
-                # # Send a message to the web server to supply a page as given by Host param of GET request
-                # HTTPMessage = "restart"
-                # bytes = str.encode(HTTPMessage)
-                # socketObject.sendall(bytes)
-                #
-                # # Receive the data
-                # while (True):
-                #     data = socketObject.recv(1024)
-                #     print(data)
-                #     break
-                #
-                # socketObject.close()
-            except Exception as e:
-                print(f"Failed to restart carla,{e}")
+                print(" Waiting for server to be ready: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
                 time.sleep(3)
 
         raise Exception("Cannot connect to server. Try increasing 'timeout' or 'retries_on_error' at the carla configuration")
+
+        # for i in range(self.config["retries_on_error"]):
+        #     try:
+        #         # kill_all_servers()
+        #
+        #         self.client = carla.Client(self.config["host"], self.server_port)
+        #
+        #     except Exception as e:
+        #         print(" FAILED TO CONNECT TO CLIENT: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
+        #         time.sleep(3)
+        #
+        #     try:
+        #         print(f"Trying to set up client {i+1} time")
+        #         import os
+        #         print(os.getcwd())
+        #         file = open('rllib_integration/enable_rendering.txt','r')
+        #
+        #         if str(file.readline()) == 'False':
+        #             self.custom_enable_rendering = False
+        #         else:
+        #             self.custom_enable_rendering = True
+        #
+        #         self.client.set_timeout(self.config["timeout"])
+        #         time.sleep(0.2)
+        #         self.world = self.client.get_world()
+        #         time.sleep(0.2)
+        #         settings = self.world.get_settings()
+        #         time.sleep(0.2)
+        #         settings.no_rendering_mode = not self.custom_enable_rendering
+        #         time.sleep(0.2)
+        #         settings.synchronous_mode = True
+        #         time.sleep(0.2)
+        #         settings.fixed_delta_seconds = self.config["timestep"]
+        #         time.sleep(0.2)
+        #         self.world.apply_settings(settings)
+        #         time.sleep(0.5)
+        #         self.world.tick()
+        #         time.sleep(0.5)
+        #         return
+        #
+        #     except Exception as e:
+        #         print(" FAILED TO STEP UP CLIENT: {}, attempt {} of {}".format(e, i + 1, self.config["retries_on_error"]))
+        #         time.sleep(3)
+        #
+        #     try:
+        #
+        #         time.sleep(5)
+        #
+        #         self.kill_carla()
+        #         time.sleep(5)
+        #         self.open_carla("doubleRoundabout37")
+        #         time.sleep(10)
+        #
+        #         # # Create a socket instance
+        #         # socketObject = socket.socket()
+        #         #
+        #         # # Using the socket connect to a server...in this case localhost
+        #         # socketObject.connect((self.config["host"], int(self.config["programPort"])))
+        #         # print("Connected to server")
+        #         # # Send a message to the web server to supply a page as given by Host param of GET request
+        #         # HTTPMessage = "restart"
+        #         # bytes = str.encode(HTTPMessage)
+        #         # socketObject.sendall(bytes)
+        #         #
+        #         # # Receive the data
+        #         # while (True):
+        #         #     data = socketObject.recv(1024)
+        #         #     print(data)
+        #         #     break
+        #         #
+        #         # socketObject.close()
+        #     except Exception as e:
+        #         print(f"Failed to restart carla,{e}")
+        #         time.sleep(3)
+        #
+        # raise Exception("Cannot connect to server. Try increasing 'timeout' or 'retries_on_error' at the carla configuration")
 
     def setup_experiment(self, experiment_config):
         """Initialize the hero and sensors"""

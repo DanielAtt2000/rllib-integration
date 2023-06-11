@@ -1,7 +1,7 @@
 # Works for both torch and tf.
-num_workers: 1
+num_workers: 4
 num_gpus: 1
-num_cpus_per_worker: 11
+num_cpus_per_worker: 4
 framework: torch
 gamma: 1
 twin_q: True
@@ -106,6 +106,7 @@ env_config:
     retries_on_error: 25
     resolution_x: 300
     resolution_y: 300
+    carla_location: '/home/daniel/carla/Dist/CARLA_Shipping_0.9.13-1-g8854804f4-dirty/LinuxNoEditor'
     quality_level: "Low"
     enable_map_assets: True
     enable_rendering: True

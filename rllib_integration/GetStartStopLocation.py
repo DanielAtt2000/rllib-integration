@@ -22,162 +22,157 @@ spawn_points = pd.DataFrame(data={'N_IN':[17], 'N_OUT':[10],
                                'E_IN':[7], 'E_OUT':[6]
                                })
 
-spawn_points_2_lane_roundabout_small = [
-    # [70, [75,28,35]],
-    # [38, [16,7]],
-    # [64, [28,35,15]],
-    # [17, [7,29]],
-    # [66, [35,15,75]],
-    # [6, [29,52]],
-    # [58, [15,75,28]],
-    # [77, [52,16]]
-    [17,[28],"left"],
-    [17,[98],"left"],
-    [17,[19],"left"],
-
-    [44,[27],"right"],
-    [44,[75],"right"],
-
-    [95,[98],"left"],
-    [95,[19],"left"],
-    [95,[26],"left"],
-
-    [25,[27],"right"],
-    [25,[107],"right"],
-
-    [2,[19],"left"],
-    [2,[26],"left"],
-    [2,[28],"left"],
-
-    [108,[107],"right"],
-    [108,[18],"right"],
-
-    [102,[26],"left"],
-    [102,[28],"left"],
-    [102,[98],"left"],
-
-    [77,[75],"right"],
-#     REmoved 77 to 18 --too tight
-]
-
-spawn_points_2_lane_roundabout_large = [
-    # [32, [34,4,71]],
-    # [86,[10,33]],
-    # [40,[4,71,11]],
-    # [89,[33,68]],
-    # [65,[71,11,34]],
-    # [27,[68,25]],
-    # [23,[11,34,4]],
-    # [24,[25,10]],
-    [118,[84], "left"],
-    [118,[121], "left"],
-    [118,[58], "left"],
-
-    [97,[22], "right"],
-    [97,[82], "right"],
-
-    [76,[121], "left"],
-    [76,[58], "left"],
-    [76,[74], "left"],
-
-    [112,[82], "right"],
-    [112,[9], "right"],
-
-    [39,[58], "left"],
-    [39,[74], "left"],
-    [39,[84], "left"],
-
-    [41,[9], "right"],
-    [41,[56], "right"],
-
-    [111,[74], "left"],
-    [111,[84], "left"],
-    [111,[121], "left"],
-
-    [55,[56], "right"],
-    [55,[22], "right"],
-#     Removed 112 to 82 too tight
-]
-
-
-spawn_points_2_lane_roundabout_easy = [
-    # From large roundabout
-    [118, [84, 121, 58]],
-    [97, [22, 82]],
-    [76, [121, 58, 74]],
-    [112, [9]],
-    [39, [58, 74, 84]],
-    [41, [9, 56]],
-    [111, [74, 84, 121]],
-    [55, [56, 22]],
-
-    # From small roundabout
-    [17, [28]],
-    [95, [98]],
-    [2, [19]],
-    [102, [26]],
-
-    [44, [27]],
-    [25, [107]],
-    [108, [18]],
-    [77, [75]],
-
-    [44, [75]],
-    [25, [27]],
-    [108, [107]],
-]
-
-
-
-spawn_points_2_lane_roundabout_difficult = [
-    # From small roundabout
-    [17, [98, 19]],
-    [95, [19, 26]],
-    [2, [26, 28]],
-    [102, [28, 98]],
-
-    [77,[18]],
-
-    # From large roundabout
-    [112, [82]],
-]
+# spawn_points_2_lane_roundabout_small = [
+#     # [70, [75,28,35]],
+#     # [38, [16,7]],
+#     # [64, [28,35,15]],
+#     # [17, [7,29]],
+#     # [66, [35,15,75]],
+#     # [6, [29,52]],
+#     # [58, [15,75,28]],
+#     # [77, [52,16]]
+#     [17,[28],"left"],
+#     [17,[98],"left"],
+#     [17,[19],"left"],
+#
+#     [44,[27],"right"],
+#     [44,[75],"right"],
+#
+#     [95,[98],"left"],
+#     [95,[19],"left"],
+#     [95,[26],"left"],
+#
+#     [25,[27],"right"],
+#     [25,[107],"right"],
+#
+#     [2,[19],"left"],
+#     [2,[26],"left"],
+#     [2,[28],"left"],
+#
+#     [108,[107],"right"],
+#     [108,[18],"right"],
+#
+#     [102,[26],"left"],
+#     [102,[28],"left"],
+#     [102,[98],"left"],
+#
+#     [77,[75],"right"],
+# #     REmoved 77 to 18 --too tight
+# ]
+#
+# spawn_points_2_lane_roundabout_large = [
+#     # [32, [34,4,71]],
+#     # [86,[10,33]],
+#     # [40,[4,71,11]],
+#     # [89,[33,68]],
+#     # [65,[71,11,34]],
+#     # [27,[68,25]],
+#     # [23,[11,34,4]],
+#     # [24,[25,10]],
+#     [118,[84], "left"],
+#     [118,[121], "left"],
+#     [118,[58], "left"],
+#
+#     [97,[22], "right"],
+#     [97,[82], "right"],
+#
+#     [76,[121], "left"],
+#     [76,[58], "left"],
+#     [76,[74], "left"],
+#
+#     [112,[82], "right"],
+#     [112,[9], "right"],
+#
+#     [39,[58], "left"],
+#     [39,[74], "left"],
+#     [39,[84], "left"],
+#
+#     [41,[9], "right"],
+#     [41,[56], "right"],
+#
+#     [111,[74], "left"],
+#     [111,[84], "left"],
+#     [111,[121], "left"],
+#
+#     [55,[56], "right"],
+#     [55,[22], "right"],
+# #     Removed 112 to 82 too tight
+# ]
+#
+#
+# spawn_points_2_lane_roundabout_easy = [
+#     # From large roundabout
+#     [118, [84, 121, 58]],
+#     [97, [22, 82]],
+#     [76, [121, 58, 74]],
+#     [112, [9]],
+#     [39, [58, 74, 84]],
+#     [41, [9, 56]],
+#     [111, [74, 84, 121]],
+#     [55, [56, 22]],
+#
+#     # From small roundabout
+#     [17, [28]],
+#     [95, [98]],
+#     [2, [19]],
+#     [102, [26]],
+#
+#     [44, [27]],
+#     [25, [107]],
+#     [108, [18]],
+#     [77, [75]],
+#
+#     [44, [75]],
+#     [25, [27]],
+#     [108, [107]],
+# ]
+#
+#
+#
+# spawn_points_2_lane_roundabout_difficult = [
+#     # From small roundabout
+#     [17, [98, 19]],
+#     [95, [19, 26]],
+#     [2, [26, 28]],
+#     [102, [28, 98]],
+#
+#     [77,[18]],
+#
+#     # From large roundabout
+#     [112, [82]],
+# ]
 
 spawn_points_2_lane_roundabout_small_easy = [
-    [17, [28],"left"],
-    [95, [98],"left"],
-    # v Large gap in waypoints v
-    # [2, [19],"left"],
-    # ^ Large gap in waypoints ^
-    [102, [26],"left"],
-    #
-    [44, [27],"right"],
-    [25, [107],"right"],
-    # v Large gap in waypoints v
-    # [108, [18],"right"],
-    # ^ Large gap in waypoints ^
-    [77, [75],"right"],
-    #
-    [44, [75],"right"],
-    [25, [27],"right"],
-    [108, [107],"right"],
+    [31, [84],"left"],
+    [61, [95],"right"],
+    [61, [4],"right"],
+
+    [117, [120], "left"],
+    [40, [4], "right"],
+    [40, [10], "right"],
+
+    [34, [112], "left"],
+    [11, [10], "right"],
+    [11, [3], "right"],
+
+    [5, [41], "left"],
+    # [97, [3], "right"],
+    [97, [95], "right"],
+
 ]
 
 spawn_points_2_lane_roundabout_small_difficult = [
-    [17, [98],"left"],
-    # v Large gap in waypoints v
-    # [17, [19],"left"],
-    # ^ Large gap in waypoints ^
+    [31, [120],"left"],
+    [31, [112],"left"],
 
-    # v Large gap in waypoints v
-    # [95, [19],"left"],
-    # ^ Large gap in waypoints ^
-    [95, [26],"left"],
-    [2, [26],"left"],
-    [2, [28],"left"],
-    [102, [98],"left"],
-    [102, [28],"left"],
+    [117, [112],"left"],
+    [117, [41],"left"],
 
-    # [77, [18]],
+    [34, [41], "left"],
+    [34, [84], "left"],
+
+    [5, [84], "left"],
+    [5, [120], "left"],
 
 ]
 
@@ -378,7 +373,7 @@ def visualise_all_routes(map):
                 print(f"Radii: {get_radii(route=route,last_waypoint_index=0,no_of_points_to_calculate_chord=5)}")
                 all_routes.append(route)
 
-    plot_all_routes(all_routes=all_routes)
+    plot_all_routes(all_routes=all_routes,all_spawn_points=map.get_spawn_points())
 
 
 

@@ -232,7 +232,7 @@ def draw_route_in_order(route):
         plt.show()
 
 
-def plot_all_routes(all_routes=-1):
+def plot_all_routes(all_routes=-1,all_spawn_points=-1):
     x_routes = []
     y_routes = []
     for route in all_routes:
@@ -269,6 +269,14 @@ def plot_all_routes(all_routes=-1):
     y_max = maxiumum(y_routes)
     buffer = 10
 
+
+    for s,spawn_point in enumerate(all_spawn_points):
+        if spawn_point.location.y > 0:
+            plt.plot([spawn_point.location.x], [spawn_point.location.y], 'b^')
+            plt.annotate(str(s), (spawn_point.location.x, spawn_point.location.y))
+
+    plt.gca().invert_yaxis()
+    plt.show()
     # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
     idx = 0
     idx_2 = 0

@@ -9,7 +9,7 @@
 import numpy as np
 
 from ray.rllib.algorithms.callbacks import DefaultCallbacks
-from rllib_integration.GetStartStopLocation import spawn_points_2_lane_roundabout_easy,spawn_points_2_lane_roundabout_difficult
+from rllib_integration.GetStartStopLocation import spawn_points_2_lane_roundabout_small_difficult,spawn_points_2_lane_roundabout_small_easy
 
 class SACCallbacks(DefaultCallbacks):
     def on_episode_start(self, worker, base_env, policies, episode, **kwargs):
@@ -112,7 +112,7 @@ class SACCallbacks(DefaultCallbacks):
         found = False
         easy = False
         difficult = False
-        for entry_easy in spawn_points_2_lane_roundabout_easy:
+        for entry_easy in spawn_points_2_lane_roundabout_small_easy:
             entry_idx = entry_easy[0]
             if episode.user_data["entry_idx"] == entry_idx:
                 if episode.user_data["exit_idx"] in entry_easy[1]:
@@ -122,7 +122,7 @@ class SACCallbacks(DefaultCallbacks):
                     break
 
         if not found:
-            for entry_difficult in spawn_points_2_lane_roundabout_difficult:
+            for entry_difficult in spawn_points_2_lane_roundabout_small_difficult:
                 entry_idx = entry_difficult[0]
                 if episode.user_data["entry_idx"] == entry_idx:
                     if episode.user_data["exit_idx"] in entry_difficult[1]:
@@ -143,6 +143,8 @@ class SACCallbacks(DefaultCallbacks):
             elif worker.env.experiment.custom_done_arrived:
                 episode.custom_metrics["difficult_custom_done_arrived"] = 1
         else:
+            print(f"Entry {episode.user_data['entry_idx']}")
+            print(f"Exit {episode.user_data['exit_idx']}")
             raise Exception('Something when wrong here')
 
 
