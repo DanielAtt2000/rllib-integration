@@ -141,18 +141,7 @@ class CarlaCore:
     def init_server(self):
         """Start a server on a random port"""
         self.server_port = random.randint(15000, 32000)
-        time.sleep(random.randint(0,20))
-
-        waiting_times = self.open_pickle('waiting_times')
-        waiting_time = waiting_times.pop(0)
-        self.save_to_pickle('waiting_times',waiting_times)
-
-        print(f"Waiting for {waiting_time}")
-        # time.sleep(waiting_time)
-        previous_time = datetime.datetime.now()
-
-        while datetime.datetime.now() < previous_time + datetime.timedelta(seconds=waiting_time):
-            continue
+        time.sleep(random.randint(0,10))
 
 
         # Ray tends to start all processes simultaneously. Use random delays to avoid problems
@@ -183,11 +172,14 @@ class CarlaCore:
                 "-opengl"  # no-display isn't supported for Unreal 4.24 with vulkan
             ]
 
+        map_name = "doubleRoundabout37"
+
         server_command += [
             "--carla-rpc-port={}".format(self.server_port),
-            "-quality-level={}".format(self.config["quality_level"])
+            "-quality-level={}".format(self.config["quality_level"]),
+            "--map={}".format(map_name)
         ]
-
+        print(f'Selected Port {self.server_port}')
         server_command_text = " ".join(map(str, server_command))
         print(server_command_text)
         server_process = subprocess.Popen(
@@ -198,7 +190,24 @@ class CarlaCore:
         )
 
         time.sleep(10)
-        print('Waited 10 seconds for server')
+
+        server_command_2 = [
+            "{}/PythonAPI/util/config.py".format(self.config['carla_location']),
+            "--port {}".format(self.server_port),
+            "--weather {}".format("Default"),
+            "--map {}".format(map_name),
+        ]
+        server_command_text_2 = " ".join(map(str, server_command_2))
+
+        server_process = subprocess.Popen(
+            server_command_text_2,
+            shell=True,
+            preexec_fn=os.setsid,
+            stdout=open(os.devnull, "w"),
+        )
+
+        time.sleep(5)
+        print('Waited 5 seconds for server')
     def save_to_pickle(self,filename, data):
         filename = filename + '.pickle'
         with open(f'{filename}', 'wb') as handle:
@@ -378,7 +387,7 @@ class CarlaCore:
         self.map = self.world.get_map()
 
         # Choose the weather of the simulation
-        weather = getattr(carla.WeatherParameters, experiment_config["weather"])
+        weather = getattr(carla.WeatherParameters, "Default")
         self.world.set_weather(weather)
         #
         # self.tm_port = self.server_port // 10 + self.server_port % 10

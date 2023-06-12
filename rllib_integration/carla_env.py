@@ -14,8 +14,21 @@ import cv2
 import gym
 from datetime import datetime
 import pandas as pd
+import time
 
 from rllib_integration.carla_core import CarlaCore
+
+
+def save_to_pickle(filename, data):
+    filename = filename + '.pickle'
+    with open(f'{filename}', 'wb') as handle:
+        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def open_pickle(filename):
+    with open(filename + '.pickle', 'rb') as handle:
+        return pickle.load(handle)
+
 
 # import time
 class CarlaEnv(gym.Env):
@@ -30,6 +43,14 @@ class CarlaEnv(gym.Env):
         self.experiment = self.config["experiment"]["type"](self.config["experiment"])
         self.action_space = self.experiment.get_action_space()
         self.observation_space = self.experiment.get_observation_space()
+
+        waiting_times = open_pickle('waiting_times')
+        waiting_time = waiting_times.pop(0)
+        save_to_pickle('waiting_times',waiting_times)
+
+        print(f"Waiting for {waiting_time}")
+        time.sleep(waiting_time)
+
 
         self.core = CarlaCore(self.config['carla'])
         self.core.setup_experiment(self.experiment.config)
