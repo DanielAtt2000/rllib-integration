@@ -112,7 +112,8 @@ class SACExperimentBasic(BaseExperiment):
         repo = Repo('.')
         remote = repo.remote('origin')
         remote.fetch()
-        self.directory = f"/home/daniel/data-rllib-integration/data/data_{str(repo.head.commit)[:11]}"
+        commit_hash = deepcopy(str(repo.head.commit)[:11])
+        self.directory = f"/home/daniel/data-rllib-integration/data/data_{commit_hash}"
 
         if not os.path.exists(self.directory):
             os.mkdir(self.directory)
