@@ -1,7 +1,7 @@
 # Works for both torch and tf.
 num_workers: 1
 num_gpus: 1
-num_cpus_per_worker: 4
+num_cpus_per_worker: 8
 framework: torch
 gamma: 1
 twin_q: True
@@ -30,7 +30,7 @@ target_network_update_freq: 8000
 target_entropy: auto
 clip_rewards: False
 n_step: 1
-rollout_fragment_length: auto
+rollout_fragment_length: 1
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
   capacity: 400000

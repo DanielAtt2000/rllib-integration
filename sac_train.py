@@ -116,7 +116,7 @@ def main():
 
 
     launch_tensorboard(logdir= path,
-                       host="localhost")
+                       host="localhost", port="6010")
 
 
     specific_version = False
