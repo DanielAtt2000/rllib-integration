@@ -1,7 +1,7 @@
 # Works for both torch and tf.
 num_workers: 1
 num_gpus: 1
-num_cpus_per_worker: 8
+num_cpus_per_worker: 4
 framework: torch
 gamma: 1
 twin_q: True
@@ -30,7 +30,7 @@ target_network_update_freq: 8000
 target_entropy: auto
 clip_rewards: False
 n_step: 1
-rollout_fragment_length: 1
+rollout_fragment_length: auto
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
   capacity: 400000
@@ -42,7 +42,7 @@ replay_buffer_config:
 store_buffer_in_checkpoints: False
 num_steps_sampled_before_learning_starts: 10000
 train_batch_size: 256
-min_sample_timesteps_per_iteration: 4
+#min_sample_timesteps_per_iteration: 4
 # Paper uses 20k random timesteps, which is not exactly the same, but
 # seems to work nevertheless. We use 100k here for the longer Atari
 # runs (DQN style: filling up the buffer a bit before learning).
@@ -104,8 +104,8 @@ env_config:
     timestep: 0.1 # IMP IMP
     # IMP
     retries_on_error: 25
-    resolution_x: 50
-    resolution_y: 50
+    resolution_x: 300
+    resolution_y: 300
     carla_location: '/home/daniel/carla/Dist/CARLA_Shipping_0.9.13-1-g8854804f4-dirty/LinuxNoEditor'
     quality_level: Low
     enable_map_assets: True
