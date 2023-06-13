@@ -209,6 +209,7 @@ class SACExperimentBasic(BaseExperiment):
         self.done_collision_trailer = False
         self.done_arrived = False
         self.custom_done_arrived = False
+        self.done_far_from_path = False
 
 
 
@@ -1401,8 +1402,9 @@ class SACExperimentBasic(BaseExperiment):
         self.done_collision_truck = (self.last_no_of_collisions_truck > 0)
         self.done_collision_trailer = (self.last_no_of_collisions_trailer > 0)
         self.done_arrived = self.completed_route(core)
+        self.done_far_from_path = self.last_hyp_distance_to_next_waypoint > 10
 
-        output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision_truck or self.done_collision_trailer or self.done_arrived
+        output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision_truck or self.done_collision_trailer or self.done_arrived or self.done_far_from_path
         self.custom_done_arrived = self.done_arrived
 
         done_reason = ""
@@ -1416,6 +1418,8 @@ class SACExperimentBasic(BaseExperiment):
             done_reason += "done_collision_truck"
         if self.done_collision_trailer:
             done_reason += "done_collision_trailer"
+        if self.done_far_from_path:
+            done_reason += "done_far_from_path"
         if self.done_arrived:
             done_reason += "done_arrived"
 
@@ -1542,6 +1546,9 @@ class SACExperimentBasic(BaseExperiment):
             reward = reward + -10000
         if self.done_time_episode:
             print("====> REWARD Done max time")
+            reward = reward + -10000
+        if self.done_far_from_path:
+            print("====> REWARD Done far from path")
             reward = reward + -10000
         if self.done_arrived:
             print("====> REWARD Done arrived")
