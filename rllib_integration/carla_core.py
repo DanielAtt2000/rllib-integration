@@ -177,7 +177,8 @@ class CarlaCore:
         server_command += [
             "--carla-rpc-port={}".format(self.server_port),
             "-quality-level={}".format(self.config["quality_level"]),
-            "--map={}".format(map_name)
+            "--map={}".format(map_name),
+            "--no-rendering"
         ]
         print(f'Selected Port {self.server_port}')
         server_command_text = " ".join(map(str, server_command))
