@@ -1451,11 +1451,11 @@ class SACExperimentBasic(BaseExperiment):
         # est
         reward = 0
 
-        forward_velocity = observation.values[0]
-        hyp_distance_to_next_waypoint = observation.values[1]
-        hyp_distance_to_next_plus_1_waypoint = observation.values[2]
-        closest_distance_to_next_waypoint_line = observation.values[3]
-        closest_distance_to_next_plus_1_waypoint_line = observation.values[4]
+        forward_velocity = observation['values'][0]
+        hyp_distance_to_next_waypoint = observation['values'][1]
+        hyp_distance_to_next_plus_1_waypoint = observation['values'][2]
+        closest_distance_to_next_waypoint_line = observation['values'][3]
+        closest_distance_to_next_plus_1_waypoint_line = observation['values'][4]
 
         # print(f"in rewards forward_velocity {forward_velocity}")
         # print(f"in rewards hyp_distance_to_next_waypoint {hyp_distance_to_next_waypoint}")
