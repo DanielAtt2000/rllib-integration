@@ -11,6 +11,34 @@ import numpy as np
 from ray.rllib.algorithms.callbacks import DefaultCallbacks
 from rllib_integration.GetStartStopLocation import spawn_points_2_lane_roundabout_small_difficult,spawn_points_2_lane_roundabout_small_easy
 
+def get_route_type(current_entry_idx, current_exit_idx):
+    found = False
+    easy = False
+    difficult = False
+    for entry_easy in spawn_points_2_lane_roundabout_small_easy:
+        entry_idx = entry_easy[0]
+        if current_entry_idx == entry_idx:
+            if current_exit_idx in entry_easy[1]:
+                found = True
+                easy = True
+                break
+
+    if not found:
+        for entry_difficult in spawn_points_2_lane_roundabout_small_difficult:
+            entry_idx = entry_difficult[0]
+            if current_entry_idx == entry_idx:
+                if current_exit_idx in entry_difficult[1]:
+                    difficult = True
+                    break
+
+    if easy:
+        return 'easy'
+    elif difficult:
+        return 'difficult'
+    else:
+        raise Exception('No path type found')
+
+
 class SACCallbacks(DefaultCallbacks):
     def on_episode_start(self, worker, base_env, policies, episode, **kwargs):
         episode.user_data["angle_with_center"] = []
@@ -109,34 +137,17 @@ class SACCallbacks(DefaultCallbacks):
 
 
         # Reward per roundabout
-        found = False
-        easy = False
-        difficult = False
-        for entry_easy in spawn_points_2_lane_roundabout_small_easy:
-            entry_idx = entry_easy[0]
-            if episode.user_data["entry_idx"] == entry_idx:
-                if episode.user_data["exit_idx"] in entry_easy[1]:
-                    episode.custom_metrics["easy_episode_reward"] = sum(episode.user_data["total_reward"])
-                    found = True
-                    easy = True
-                    break
+        path_type = get_route_type(current_entry_idx=episode.user_data["entry_idx"], current_exit_idx=episode.user_data["exit_idx"])
 
-        if not found:
-            for entry_difficult in spawn_points_2_lane_roundabout_small_difficult:
-                entry_idx = entry_difficult[0]
-                if episode.user_data["entry_idx"] == entry_idx:
-                    if episode.user_data["exit_idx"] in entry_difficult[1]:
-                        episode.custom_metrics["difficult_episode_reward"] = sum(episode.user_data["total_reward"])
-                        difficult = True
-                        break
-
-        if easy:
+        if path_type == 'easy':
+            episode.custom_metrics["easy_episode_reward"] = sum(episode.user_data["total_reward"])
             if not worker.env.experiment.custom_done_arrived:
                 episode.custom_metrics["easy_custom_done_arrived"] = 0
 
             elif worker.env.experiment.custom_done_arrived:
                 episode.custom_metrics["easy_custom_done_arrived"] = 1
-        elif difficult:
+        elif path_type == 'difficult':
+            episode.custom_metrics["difficult_episode_reward"] = sum(episode.user_data["total_reward"])
             if not worker.env.experiment.custom_done_arrived:
                 episode.custom_metrics["difficult_custom_done_arrived"] = 0
 

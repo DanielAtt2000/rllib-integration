@@ -122,7 +122,7 @@ def main():
     specific_version = False
     check_commit = True
 
-    save_to_pickle('waiting_times',[0,20,30,40,50,50])
+    save_to_pickle('waiting_times',[0,20,40,60,80,100])
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())

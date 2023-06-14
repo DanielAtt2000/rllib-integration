@@ -30,6 +30,9 @@ from simple_pid import PID
 from rllib_integration.lidar_to_grid_map import generate_ray_casting_grid_map
 import collections
 
+from sac.sac_callbacks import get_route_type
+
+
 class SACExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
@@ -338,6 +341,14 @@ class SACExperimentBasic(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
+        obs_space = Dict( {
+            'values':Box(
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                dtype=np.float32
+            ),
+            'route': Discrete(2)
+        })
         # test
         # image_space = Dict(
         #     {"values":
@@ -366,11 +377,7 @@ class SACExperimentBasic(BaseExperiment):
             #     dtype=np.float64
             # )
             # })
-        return Box(
-                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
-                dtype=np.float32
-            )
+        return obs_space
 
     def get_actions(self):
         acceleration_value = self.acceleration_pid(self.current_forward_velocity)
@@ -1232,7 +1239,7 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(truck_front_right),
             np.float32(truck_front_left)])
 
-        observations = [
+        value_observations = [
             # np.float32(number_of_waypoints),
             # np.float32(core.last_waypoint_index/number_of_waypoints),
             np.float32(forward_velocity),
@@ -1272,15 +1279,25 @@ class SACExperimentBasic(BaseExperiment):
             # np.float32(acceleration)
                            ]
 
-        observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
+        value_observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
-        observations.extend(radii)
-        observations.append(np.float32(mean_radius))
+        value_observations.extend(radii)
+        value_observations.append(np.float32(mean_radius))
+
+        route_type_string = get_route_type(current_entry_idx=self.entry_idx, current_exit_idx=self.exit_idx)
+
+        if route_type_string == 'easy':
+            route_type = 0
+        elif route_type_string == 'difficult':
+            route_type = 1
+        else:
+            raise Exception('This should never happen')
 
 
 
 
         if self.custom_enable_rendering:
+            print(f'Route Type {route_type}')
             print(f"Radii {radii}")
             print(f'Mean radius {mean_radius}')
             print(f"truck FRONT \t\t\t{round(truck_center, 2)}")
@@ -1345,7 +1362,7 @@ class SACExperimentBasic(BaseExperiment):
         # print(f"acceleration:{np.float32(acceleration)}")
 
         self.counter += 1
-        return observations,\
+        return {'values':value_observations,'route': route_type},\
             {"truck_z_value":truck_transform.location.z }
 
     def get_speed(self, hero):
@@ -1434,11 +1451,11 @@ class SACExperimentBasic(BaseExperiment):
         # est
         reward = 0
 
-        forward_velocity = observation[0]
-        hyp_distance_to_next_waypoint = observation[1]
-        hyp_distance_to_next_plus_1_waypoint = observation[2]
-        closest_distance_to_next_waypoint_line = observation[3]
-        closest_distance_to_next_plus_1_waypoint_line = observation[4]
+        forward_velocity = observation.values[0]
+        hyp_distance_to_next_waypoint = observation.values[1]
+        hyp_distance_to_next_plus_1_waypoint = observation.values[2]
+        closest_distance_to_next_waypoint_line = observation.values[3]
+        closest_distance_to_next_plus_1_waypoint_line = observation.values[4]
 
         # print(f"in rewards forward_velocity {forward_velocity}")
         # print(f"in rewards hyp_distance_to_next_waypoint {hyp_distance_to_next_waypoint}")
