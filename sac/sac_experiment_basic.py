@@ -33,7 +33,7 @@ import collections
 class SACExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        # self.acceleration_pid = PID(Kp=0.05,Ki=0.00,Kd=0.00,setpoint=8.33,sample_time=None,output_limits=(0,1))
+        self.acceleration_pid = PID(Kp=0.05,Ki=0.00,Kd=0.00,setpoint=8.33,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -373,18 +373,18 @@ class SACExperimentBasic(BaseExperiment):
             )
 
     def get_actions(self):
-        # acceleration_value = self.acceleration_pid(self.current_forward_velocity)
-        # print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
+        acceleration_value = self.acceleration_pid(self.current_forward_velocity)
+        print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
         return {
-            0: [0.3, 0.00, 0.0, False, False],  # Straight
-            1: [0.3, 0.80, 0.0, False, False],  # Right
-            2: [0.3, 0.60, 0.0, False, False],  # Right
-            3: [0.3, 0.40, 0.0, False, False],  # Right
-            4: [0.3, 0.20, 0.0, False, False],  # Right
-            5: [0.3, -0.80, 0.0, False, False],  # Left
-            6: [0.3, -0.60, 0.0, False, False],  # Left
-            7: [0.3, -0.40, 0.0, False, False],  # Left
-            8: [0.3, -0.20, 0.0, False, False],  # Left
+            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
+            1: [acceleration_value, 0.80, 0.0, False, False],  # Right
+            2: [acceleration_value, 0.60, 0.0, False, False],  # Right
+            3: [acceleration_value, 0.40, 0.0, False, False],  # Right
+            4: [acceleration_value, 0.20, 0.0, False, False],  # Right
+            5: [acceleration_value, -0.80, 0.0, False, False],  # Left
+            6: [acceleration_value, -0.60, 0.0, False, False],  # Left
+            7: [acceleration_value, -0.40, 0.0, False, False],  # Left
+            8: [acceleration_value, -0.20, 0.0, False, False],  # Left
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
             # 2: [0.0, 0.75, 0.0, False, False],  # Right
@@ -477,7 +477,7 @@ class SACExperimentBasic(BaseExperiment):
             # angle
             # collision
         self.custom_enable_rendering = core.custom_enable_rendering
-        self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
+        self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S_%f")
 
         radii, mean_radius = get_radii(core.route,core.last_waypoint_index,5)
 
@@ -1508,7 +1508,7 @@ class SACExperimentBasic(BaseExperiment):
         self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
 
         if self.passed_waypoint:
-            reward = reward + 500
+            reward = reward + 1000
 
 
         # if bearing_to_waypoint == 0:
@@ -1536,23 +1536,23 @@ class SACExperimentBasic(BaseExperiment):
 
 
         if self.done_falling:
-            reward = reward + -10000
+            reward = reward + -20000
             print('====> REWARD Done falling')
         if self.done_collision_truck or self.done_collision_trailer:
             print("====> REWARD Done collision")
-            reward = reward + -10000
+            reward = reward + -20000
         if self.done_time_idle:
             print("====> REWARD Done idle")
-            reward = reward + -10000
+            reward = reward + -20000
         if self.done_time_episode:
             print("====> REWARD Done max time")
-            reward = reward + -10000
+            reward = reward + -20000
         if self.done_far_from_path:
             print("====> REWARD Done far from path")
-            reward = reward + -10000
+            reward = reward + -20000
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward = reward + 500
+            reward = reward + 10000
 
         self.total_episode_reward.append(reward)
         self.reward_metric = reward

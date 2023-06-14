@@ -68,6 +68,8 @@ with open(os.path.join(directory, largest_filename), 'rb') as handle:
     df = data
 
 
+
+
 for filename in os.listdir(directory):
     if largest_filename in filename:
         continue
@@ -77,8 +79,9 @@ for filename in os.listdir(directory):
         with open(file, 'rb') as handle:
             data = pickle.load(handle)
             df = pd.merge(df,data, on='Time')
+            # df = df.drop_duplicates(subset=['Time'])
 
-
+# df = df.reset_index()
 
 def plot_route(route_points_all, truck_points_all):
     x_route = []
@@ -159,9 +162,11 @@ def plot_route(route_points_all, truck_points_all):
             for easy in spawn_points_2_lane_roundabout_small_easy:
                 if easy[0] == entry and easy[1][0] == exit:
                     current_difficulty = "easy"
+                    break
             for difficult in spawn_points_2_lane_roundabout_small_difficult:
                 if difficult[0] == entry and difficult[1][0] == exit:
                     current_difficulty = "difficult"
+                    break
 
             if current_difficulty == "easy":
                 all_line_easy_rewards.append(sum(df.loc[idx, "line_reward"]))
@@ -206,7 +211,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 2100:
+        if idx > 2250:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -353,6 +358,7 @@ def plot_route(route_points_all, truck_points_all):
                 # a2.plot(temp, label='Custom previous-current')
                 a2.axis([0, 1000, -100, 10])
                 a2.legend(loc='upper center')
+                a2.set_title(df.loc[idx, "Time"])
 
                 assert len(
                     df.loc[idx, "closest_distance_to_next_waypoint_line"]) - 2 == len(
@@ -368,7 +374,7 @@ def plot_route(route_points_all, truck_points_all):
                 # a3.legend(loc='upper center')
                 items_to_plot = []
                 items_not_to_plot = ['Collisions', 'Done', 'lidar_data', 'line_reward_location',
-                                     'path',
+                                     'path', 'index',
                                      'point_reward_location', 'radii', 'route','EntryExit', 'Time','Vehicle']
                 for col in df.columns:
                     if col not in items_not_to_plot:
