@@ -1525,7 +1525,7 @@ class SACExperimentBasic(BaseExperiment):
         self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
 
         if self.passed_waypoint:
-            reward = reward + 1000
+            reward = reward + 500
 
 
         # if bearing_to_waypoint == 0:
@@ -1553,23 +1553,23 @@ class SACExperimentBasic(BaseExperiment):
 
 
         if self.done_falling:
-            reward = reward + -20000
+            reward = reward + -10000
             print('====> REWARD Done falling')
         if self.done_collision_truck or self.done_collision_trailer:
             print("====> REWARD Done collision")
-            reward = reward + -20000
+            reward = reward + -10000
         if self.done_time_idle:
             print("====> REWARD Done idle")
-            reward = reward + -20000
+            reward = reward + -10000
         if self.done_time_episode:
             print("====> REWARD Done max time")
-            reward = reward + -20000
+            reward = reward + -10000
         if self.done_far_from_path:
             print("====> REWARD Done far from path")
-            reward = reward + -20000
+            reward = reward + -10000
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward = reward + 10000
+            reward = reward + 500
 
         self.total_episode_reward.append(reward)
         self.reward_metric = reward
