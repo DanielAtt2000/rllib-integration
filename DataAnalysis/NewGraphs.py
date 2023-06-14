@@ -79,8 +79,8 @@ for filename in os.listdir(directory):
         with open(file, 'rb') as handle:
             data = pickle.load(handle)
             df = pd.merge(df,data, on='Time')
-            # df = df.drop_duplicates(subset=['Time'])
-
+#             df = df.drop_duplicates(subset=['Time'])
+#
 # df = df.reset_index()
 
 def plot_route(route_points_all, truck_points_all):
@@ -211,7 +211,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 2250:
+        if idx > 0:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]

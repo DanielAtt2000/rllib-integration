@@ -9,6 +9,8 @@
 from __future__ import print_function
 
 import argparse
+import pickle
+
 import yaml
 
 import ray
@@ -38,6 +40,12 @@ EXPERIMENT_CLASS = SACExperimentBasic
 # /home/daniel/ray_results/carla_rllib/dqn_53b9a7ee09/CustomDQNTrainer_CarlaEnv_8a877_00000_0_2023-03-16_08-52-46/checkpoint_000549
 # /home/daniel/ray_results/carla_rllib/good/dqn_0a9d414623_no_lidar_2_ahead_waypoints/CustomDQNTrainer_CarlaEnv_34b01_00000_0_2023-03-17_08-27-43/checkpoint_000099
 # /home/daniel/ray_results/carla_rllib/sac_933af966a6/CustomSACTrainer_CarlaEnv_44868_00000_0_2023-05-06_18-15-50/checkpoint_045000
+
+def save_to_pickle(filename, data):
+    filename = filename + '.pickle'
+    with open(filename, 'wb') as handle:
+        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 def parse_config(args):
     """
     Parses the .yaml configuration file into a readable dictionary
@@ -79,6 +87,8 @@ def main():
         repo = Repo('.')
         remote = repo.remote('origin')
         remote.fetch()
+
+        save_to_pickle('waiting_times', [0, 20, 30, 40, 50])
 
 
         # Restore agent
