@@ -211,7 +211,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 0:
+        if idx > 1580:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]

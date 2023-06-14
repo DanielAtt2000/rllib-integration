@@ -492,8 +492,8 @@ class SACExperimentBasic(BaseExperiment):
         self.exit_idx = core.exit_spawn_point_index
 
         number_of_waypoints_ahead_to_calculate_with = 0
-        ahead_waypoints = 10
-        ahead_waypoints_2 = 20
+        ahead_waypoints = 7
+        ahead_waypoints_2 = 15
 
         # Getting truck location
         truck_transform = core.hero.get_transform()

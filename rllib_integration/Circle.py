@@ -16,13 +16,13 @@ class Vector():
         self.x_1 = x_1
         self.y_1 = y_1
 def get_radii(route, last_waypoint_index,no_of_points_to_calculate_chord):
-    max_radius_value = 0
+    max_radius_value = 1
     max_radius_value_before_sign = 1
     length_of_output_array = 10
     perpendicular_bisectors = []
     radii = []
 
-    calculate_previous_radii = False
+    calculate_previous_radii = True
     if calculate_previous_radii:
         # Lets say we have the next 10 points of the route and we want to find its radius
 
@@ -138,6 +138,7 @@ def get_radii(route, last_waypoint_index,no_of_points_to_calculate_chord):
 
             radii.append(sign * riadus)
         else:
+            assert max_radius_value == 1
             radii.append(riadus)
 
         # if len(radii) > length_of_output_array:
