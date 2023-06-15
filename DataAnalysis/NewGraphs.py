@@ -211,7 +211,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 1885:
+        if idx > 1720:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -221,9 +221,9 @@ def plot_route(route_points_all, truck_points_all):
                 print('----------')
                 print(f'Showing Episode {idx}/{len(x_route)}')
                 # print(df_done.iloc[[idx]])
-                lidar = False
+                lidar = True
                 if lidar:
-                    for lidar_point in df.loc[idx + 1, "lidar_data"]:
+                    for lidar_point in df.loc[idx, "lidar_data"]:
 
                         print(f"truck FRONT \t\t\t{round(lidar_point.front, 2)}")
                         print(f"truck 45 \t\t{round(lidar_point.front_left, 2)}\t\t{round(lidar_point.front_right, 2)}")
@@ -243,12 +243,12 @@ def plot_route(route_points_all, truck_points_all):
                             f"trailer_5 \t\t{round(lidar_point.trailer_5_left, 2)}\t\t{round(lidar_point.trailer_5_right, 2)}")
                         print(f"------------------------------------------------------")
 
-                        if df.loc[idx, "Collisions"][1] != 0:
-                            if lidar_point.time != df.loc[idx, "Collisions"][1]:
-                                print('------------------------')
-                                print(f"Lidar time \t\t\t{lidar_point.time}")
-                                print(f'Collision time \t\t{df.loc[idx, "Collisions"][1]}')
-                                print('------------------------')
+                        # if df.loc[idx, "Collisions"] != 0:
+                        #     if lidar_point.time != df.loc[idx, "Collisions"][1]:
+                        #         print('------------------------')
+                        #         print(f"Lidar time \t\t\t{lidar_point.time}")
+                        #         print(f'Collision time \t\t{df.loc[idx, "Collisions"][1]}')
+                        #         print('------------------------')
 
                 print()
                 print()

@@ -143,12 +143,12 @@ spawn_points = pd.DataFrame(data={'N_IN':[17], 'N_OUT':[10],
 # ]
 
 spawn_points_2_lane_roundabout_small_easy = [
-    [31, [84],"left"],
+    [31, [43],"left"],
     [61, [95],"right"],
-    [61, [4],"right"],
+    [61, [42],"right"],
 
     [117, [120], "left"],
-    [40, [4], "right"],
+    [40, [42], "right"],
     [40, [10], "right"],
 
     # Large gap in waypoints
@@ -164,6 +164,22 @@ spawn_points_2_lane_roundabout_small_easy = [
 ]
 
 spawn_points_2_lane_roundabout_small_difficult = [
+    # In Editor
+    # [17, [98],"left"],
+    # # Large gaps in waypoints
+    # # [31, [112],"left"],
+    #
+    # # Large gaps in waypoints
+    # # [117, [112],"left"],
+    # [95, [26],"left"],
+    #
+    # [2, [26], "left"],
+    # [2, [28], "left"],
+    #
+    # [102, [98], "left"],
+    # [102, [28], "left"],
+    # In Editor
+
     [31, [120],"left"],
     # Large gaps in waypoints
     # [31, [112],"left"],
@@ -173,10 +189,12 @@ spawn_points_2_lane_roundabout_small_difficult = [
     [117, [41],"left"],
 
     [34, [41], "left"],
-    [34, [84], "left"],
+    [34, [43], "left"],
 
-    [5, [84], "left"],
+    [5, [43], "left"],
     [5, [120], "left"],
+    #
+
 
 ]
 

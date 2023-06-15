@@ -343,8 +343,8 @@ class SACExperimentBasic(BaseExperiment):
         """
         obs_space = Dict( {
             'values':Box(
-                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             ),
             'route': Discrete(2)
@@ -654,8 +654,12 @@ class SACExperimentBasic(BaseExperiment):
         truck_center = 0
         truck_right = 0
         truck_left= 0
-        truck_front_right = 0
-        truck_front_left = 0
+        truck_front_22right = 0
+        truck_front_45right = 0
+        truck_front_67right = 0
+        truck_front_22left = 0
+        truck_front_45left = 0
+        truck_front_67left = 0
 
         for sensor in sensor_data:
             if sensor == 'collision_truck':
@@ -1143,15 +1147,35 @@ class SACExperimentBasic(BaseExperiment):
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_center"]["range"])
                 truck_center = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
-            elif sensor == "lidar_truck_front_left_truck":
-                lidar_points = sensor_data['lidar_truck_front_left_truck'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_left"]["range"])
-                truck_front_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+            elif sensor == "lidar_truck_front_22left_truck":
+                lidar_points = sensor_data['lidar_truck_front_22left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_22left"]["range"])
+                truck_front_22left = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
-            elif sensor == "lidar_truck_front_right_truck":
-                lidar_points = sensor_data['lidar_truck_front_right_truck'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_right"]["range"])
-                truck_front_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+            elif sensor == "lidar_truck_front_45left_truck":
+                lidar_points = sensor_data['lidar_truck_front_45left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_45left"]["range"])
+                truck_front_45left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_67left_truck":
+                lidar_points = sensor_data['lidar_truck_front_67left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_67left"]["range"])
+                truck_front_67left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_22right_truck":
+                lidar_points = sensor_data['lidar_truck_front_22right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_22right"]["range"])
+                truck_front_22right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_45right_truck":
+                lidar_points = sensor_data['lidar_truck_front_45right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_45right"]["range"])
+                truck_front_45right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_67right_truck":
+                lidar_points = sensor_data['lidar_truck_front_67right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_67right"]["range"])
+                truck_front_67right = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
             elif sensor == "lidar_truck_truck":
                 lidar_points = sensor_data['lidar_truck_truck'][1]
@@ -1236,8 +1260,14 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(truck_center),
             np.float32(truck_right),
             np.float32(truck_left),
-            np.float32(truck_front_right),
-            np.float32(truck_front_left)])
+            np.float32(truck_front_22left),
+            np.float32(truck_front_45left),
+            np.float32(truck_front_67left),
+            np.float32(truck_front_22right),
+            np.float32(truck_front_45right),
+            np.float32(truck_front_67right),
+
+        ])
 
         value_observations = [
             # np.float32(number_of_waypoints),
@@ -1273,8 +1303,12 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(truck_center),
             np.float32(truck_right),
             np.float32(truck_left),
-            np.float32(truck_front_right),
-            np.float32(truck_front_left),
+            np.float32(truck_front_22left),
+            np.float32(truck_front_45left),
+            np.float32(truck_front_67left),
+            np.float32(truck_front_22right),
+            np.float32(truck_front_45right),
+            np.float32(truck_front_67right),
             # np.float32(trailer_bearing_to_waypoint),
             # np.float32(acceleration)
                            ]
@@ -1300,16 +1334,28 @@ class SACExperimentBasic(BaseExperiment):
             print(f'Route Type {route_type}')
             print(f"Radii {radii}")
             print(f'Mean radius {mean_radius}')
-            print(f"truck FRONT \t\t\t{round(truck_center, 2)}")
-            print(f"truck 45 \t\t{round(truck_front_left,2)}\t\t{round(truck_front_right,2)}")
-            print(f"truck sides \t\t{round(truck_left, 2)}\t\t{round(truck_right, 2)}")
+            # print(f"truck FRONT \t\t\t{round(truck_center, 2)}")
+            # print(f"truck 45 \t\t{round(truck_front_left,2)}\t\t{round(truck_front_right,2)}")
+            # print(f"truck sides \t\t{round(truck_left, 2)}\t\t{round(truck_right, 2)}")
+            # print(f"")
+            # print(f"trailer_0 \t\t{round(trailer_0_left,2)}\t\t{round(trailer_0_right,2)}")
+            # print(f"trailer_1 \t\t{round(trailer_1_left,2)}\t\t{round(trailer_2_right,2)}")
+            # print(f"trailer_2 \t\t{round(trailer_2_left,2)}\t\t{round(trailer_2_right,2)}")
+            # print(f"trailer_3 \t\t{round(trailer_3_left,2)}\t\t{round(trailer_3_right,2)}")
+            # print(f"trailer_4 \t\t{round(trailer_4_left,2)}\t\t{round(trailer_4_right,2)}")
+            # print(f"trailer_5 \t\t{round(trailer_5_left,2)}\t\t{round(trailer_5_right,2)}")
+            print(f"truck FRONT \t\t\t{np.float32(truck_center)}")
+            print(f"truck 22 \t\t{np.float32(truck_front_22left)}\t\t{np.float32(truck_front_22right)}")
+            print(f"truck 45 \t\t{np.float32(truck_front_45left)}\t\t{np.float32(truck_front_45right)}")
+            print(f"truck 67 \t\t{np.float32(truck_front_67left)}\t\t{np.float32(truck_front_67right)}")
+            print(f"truck sides \t\t{np.float32(truck_left)}\t\t{np.float32(truck_right)}")
             print(f"")
-            print(f"trailer_0 \t\t{round(trailer_0_left,2)}\t\t{round(trailer_0_right,2)}")
-            print(f"trailer_1 \t\t{round(trailer_1_left,2)}\t\t{round(trailer_2_right,2)}")
-            print(f"trailer_2 \t\t{round(trailer_2_left,2)}\t\t{round(trailer_2_right,2)}")
-            print(f"trailer_3 \t\t{round(trailer_3_left,2)}\t\t{round(trailer_3_right,2)}")
-            print(f"trailer_4 \t\t{round(trailer_4_left,2)}\t\t{round(trailer_4_right,2)}")
-            print(f"trailer_5 \t\t{round(trailer_5_left,2)}\t\t{round(trailer_5_right,2)}")
+            print(f"trailer_0 \t\t{np.float32(trailer_0_left)}\t\t{np.float32(trailer_0_right)}")
+            print(f"trailer_1 \t\t{np.float32(trailer_1_left)}\t\t{np.float32(trailer_2_right)}")
+            print(f"trailer_2 \t\t{np.float32(trailer_2_left)}\t\t{np.float32(trailer_2_right)}")
+            print(f"trailer_3 \t\t{np.float32(trailer_3_left)}\t\t{np.float32(trailer_3_right)}")
+            print(f"trailer_4 \t\t{np.float32(trailer_4_left)}\t\t{np.float32(trailer_4_right)}")
+            print(f"trailer_5 \t\t{np.float32(trailer_5_left)}\t\t{np.float32(trailer_5_right)}")
             print('')
             print(f"forward_velocity:{np.float32(forward_velocity)}")
             print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")

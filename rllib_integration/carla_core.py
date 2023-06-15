@@ -1043,7 +1043,7 @@ class CarlaCore:
         # Get the camera position
         server_view_x = transform.location.x - 11 * transform.get_forward_vector().x
         server_view_y = transform.location.y - 11 * transform.get_forward_vector().y
-        server_view_z = transform.location.z + 18
+        server_view_z = transform.location.z + 22
         # For car
         # server_view_x = transform.location.x - 5 * transform.get_forward_vector().x
         # server_view_y = transform.location.y - 5 * transform.get_forward_vector().y
