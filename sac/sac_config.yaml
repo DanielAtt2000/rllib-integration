@@ -1,7 +1,7 @@
 # Works for both torch and tf.
-num_workers: 4
+num_workers: 5
 num_gpus: 1
-num_cpus_per_worker: 4
+num_cpus_per_worker: 3
 framework: torch
 gamma: 1
 twin_q: True
@@ -12,9 +12,9 @@ q_model_config:
 policy_model_config:
   "fcnet_hiddens": [ 512, 512, 1024 ]
   "fcnet_activation": "relu"
-#model:
-#  "fcnet_hiddens": [ 512, 512 ]
-#  "fcnet_activation": "tanh"
+model:
+  "fcnet_hiddens": [ 256, 512 ]
+  "fcnet_activation": "tanh"
 
 #batch_mode: "complete_episodes"
 
