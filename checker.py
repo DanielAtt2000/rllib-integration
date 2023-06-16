@@ -30,7 +30,7 @@ def commit_hash():
     repo = Repo('.')
     remote = repo.remote('origin')
     remote.fetch()
-    latest_remote_commit = remote.refs[repo.active_branch.name].commit
+    # latest_remote_commit = remote.refs[repo.active_branch.name].commit
     latest_local_commit = repo.head.commit
 
     # assert latest_local_commit == latest_remote_commit
