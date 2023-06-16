@@ -120,7 +120,7 @@ def main():
 
 
     specific_version = False
-    check_commit = False
+    check_commit = True
 
     save_to_pickle('waiting_times',[0,20,100, 120,140,160,180])
 
