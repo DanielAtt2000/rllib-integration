@@ -112,11 +112,13 @@ class SACExperimentBasic(BaseExperiment):
         for i in range(self.max_amount_of_occupancy_maps):
             self.occupancy_maps.append(np.zeros((self.occupancy_map_y,self.occupancy_map_x,1)))
 
+        with open(f"commit_hashes/{self.config['hero']['random_file_no']}.txt",'r') as file:
+            commit_hash = file.readline()
 
-        repo = Repo('.')
-        remote = repo.remote('origin')
-        remote.fetch()
-        commit_hash = deepcopy(str(repo.head.commit)[:11])
+        # repo = Repo('.')
+        # remote = repo.remote('origin')
+        # remote.fetch()
+        # commit_hash = deepcopy(str(repo.head.commit)[:11])
         self.directory = f"/home/daniel/data-rllib-integration/data/data_{commit_hash}"
 
         if not os.path.exists(self.directory):
@@ -1332,7 +1334,7 @@ class SACExperimentBasic(BaseExperiment):
             raise Exception('This should never happen')
 
         self.lidar_collision = False
-        if any(lidar_point < 0.025 for lidar_point in lidar_data_points):
+        if any(lidar_point < 0.005 for lidar_point in lidar_data_points):
             self.lidar_collision = True
 
 

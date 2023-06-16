@@ -66,6 +66,17 @@ def run(args):
 # less than 10% of the memory on this node is available for use. This can cause unexpected crashes.
 # Consider reducing the memory used by your application or reducing the Ray object store size by setting `object_store_memory` when calling `ray.init`.
 
+def save_commit_hash_to_file(args, commit_hash):
+    random_file_no = 0
+
+    while os.path.exists(f'commit_hashes/{random_file_no}.txt'):
+        random_file_no += 1
+
+    args.config['env_config']['experiment']['hero']['random_file_no'] = random_file_no
+
+    with open(f'commit_hashes/{random_file_no}.txt','w') as file:
+        file.write(commit_hash)
+
 def parse_config(args):
     """
     Parses the .yaml configuration file into a readable dictionary
@@ -111,6 +122,8 @@ def main():
 
     args = argparser.parse_args()
     args.config = parse_config(args)
+
+    save_commit_hash_to_file(args,str(commit_hash()))
 
     path = os.path.join(args.directory, args.name + '_' + str(commit_hash()))
 

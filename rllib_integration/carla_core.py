@@ -101,7 +101,7 @@ class CarlaCore:
         self.sensor_interface_trailer = SensorInterface()
         self.server_port = 2000
         self.server_port_lines = ''
-        self.visualise_all_routes = True
+        self.visualise_all_routes = False
         self.times_crazy = []
         self.custom_enable_rendering = False
 

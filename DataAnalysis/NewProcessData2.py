@@ -60,7 +60,7 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-data_file = 'data_959343023e8'
+data_file = 'data_4258a5466ae'
 directory = '/home/daniel/data-rllib-integration/data/' + data_file
 for_graphs = False
 def main():
@@ -140,8 +140,8 @@ def main():
 
                             temp_list.append(Lidar(time = splits[0].strip('[').strip("\'"),
                                                     front=float(splits[13]),
-                                                  front_right=float(splits[16]),
-                                                  front_left=float(splits[17]),
+                                                  front_right=float(splits[17]),
+                                                  front_left=float(splits[16]),
                                                   right=float(splits[14]),
                                                   left=float(splits[15]),
                                                   trailer_0_left=float(splits[1]),
