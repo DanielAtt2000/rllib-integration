@@ -1,5 +1,5 @@
 # Works for both torch and tf.
-num_workers: 2
+num_workers: 3
 num_gpus: 1
 num_cpus_per_worker: 2
 framework: torch
