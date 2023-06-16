@@ -1332,7 +1332,7 @@ class SACExperimentBasic(BaseExperiment):
             raise Exception('This should never happen')
 
         self.lidar_collision = False
-        if any(lidar_point < 0.005 for lidar_point in lidar_data_points):
+        if any(lidar_point < 0.025 for lidar_point in lidar_data_points):
             self.lidar_collision = True
 
 
