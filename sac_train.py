@@ -120,9 +120,9 @@ def main():
 
 
     specific_version = False
-    check_commit = True
+    check_commit = False
 
-    save_to_pickle('waiting_times',[0,20,60,80,100, 120,140,160,180])
+    save_to_pickle('waiting_times',[0,20,100, 120,140,160,180])
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())
