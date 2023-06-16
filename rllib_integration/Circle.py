@@ -22,7 +22,7 @@ def get_radii(route, last_waypoint_index,no_of_points_to_calculate_chord):
     perpendicular_bisectors = []
     radii = []
 
-    calculate_previous_radii = True
+    calculate_previous_radii = False
     if calculate_previous_radii:
         # Lets say we have the next 10 points of the route and we want to find its radius
 

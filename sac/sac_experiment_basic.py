@@ -36,7 +36,7 @@ from sac.sac_callbacks import get_route_type
 class SACExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        self.acceleration_pid = PID(Kp=0.05,Ki=0.1,Kd=0.00,setpoint=8.33,sample_time=None,output_limits=(0,1))
+        # self.acceleration_pid = PID(Kp=0.05,Ki=0.1,Kd=0.00,setpoint=8.33,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -104,6 +104,7 @@ class SACExperimentBasic(BaseExperiment):
         self.total_episode_reward = []
 
         self.custom_enable_rendering = False
+        self.lidar_collision = False
 
 
         self.occupancy_maps = collections.deque(maxlen=self.max_amount_of_occupancy_maps)
@@ -213,7 +214,7 @@ class SACExperimentBasic(BaseExperiment):
         self.done_arrived = False
         self.custom_done_arrived = False
         self.done_far_from_path = False
-
+        self.lidar_collision = False
 
 
         for i in range(self.max_amount_of_occupancy_maps):
@@ -343,8 +344,8 @@ class SACExperimentBasic(BaseExperiment):
         """
         obs_space = Dict( {
             'values':Box(
-                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             ),
             'route': Discrete(2)
@@ -380,18 +381,18 @@ class SACExperimentBasic(BaseExperiment):
         return obs_space
 
     def get_actions(self):
-        acceleration_value = self.acceleration_pid(self.current_forward_velocity)
-        print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
+        # acceleration_value = self.acceleration_pid(self.current_forward_velocity)
+        # print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
         return {
-            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
-            1: [acceleration_value, 0.80, 0.0, False, False],  # Right
-            2: [acceleration_value, 0.60, 0.0, False, False],  # Right
-            3: [acceleration_value, 0.40, 0.0, False, False],  # Right
-            4: [acceleration_value, 0.20, 0.0, False, False],  # Right
-            5: [acceleration_value, -0.80, 0.0, False, False],  # Left
-            6: [acceleration_value, -0.60, 0.0, False, False],  # Left
-            7: [acceleration_value, -0.40, 0.0, False, False],  # Left
-            8: [acceleration_value, -0.20, 0.0, False, False],  # Left
+            0: [0.3, 0.00, 0.0, False, False],  # Straight
+            1: [0.3, 0.80, 0.0, False, False],  # Right
+            2: [0.3, 0.60, 0.0, False, False],  # Right
+            3: [0.3, 0.40, 0.0, False, False],  # Right
+            4: [0.3, 0.20, 0.0, False, False],  # Right
+            5: [0.3, -0.80, 0.0, False, False],  # Left
+            6: [0.3, -0.60, 0.0, False, False],  # Left
+            7: [0.3, -0.40, 0.0, False, False],  # Left
+            8: [0.3, -0.20, 0.0, False, False],  # Left
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
             # 2: [0.0, 0.75, 0.0, False, False],  # Right
@@ -654,12 +655,12 @@ class SACExperimentBasic(BaseExperiment):
         truck_center = 0
         truck_right = 0
         truck_left= 0
-        truck_front_22right = 0
+        # truck_front_22right = 0
         truck_front_45right = 0
-        truck_front_67right = 0
-        truck_front_22left = 0
+        # truck_front_67right = 0
+        # truck_front_22left = 0
         truck_front_45left = 0
-        truck_front_67left = 0
+        # truck_front_67left = 0
 
         for sensor in sensor_data:
             if sensor == 'collision_truck':
@@ -1260,12 +1261,12 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(truck_center),
             np.float32(truck_right),
             np.float32(truck_left),
-            np.float32(truck_front_22left),
+            # np.float32(truck_front_22left),
             np.float32(truck_front_45left),
-            np.float32(truck_front_67left),
-            np.float32(truck_front_22right),
+            # np.float32(truck_front_67left),
+            # np.float32(truck_front_22right),
             np.float32(truck_front_45right),
-            np.float32(truck_front_67right),
+            # np.float32(truck_front_67right),
 
         ])
 
@@ -1288,6 +1289,11 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(bearing_to_ahead_waypoints_ahead),
             np.float32(bearing_to_ahead_waypoints_ahead_2),
             np.float32(angle_between_truck_and_trailer),
+
+            # np.float32(trailer_bearing_to_waypoint),
+            # np.float32(acceleration)
+                           ]
+        lidar_data_points = [
             np.float32(trailer_0_left),
             np.float32(trailer_0_right),
             np.float32(trailer_1_left),
@@ -1303,16 +1309,14 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(truck_center),
             np.float32(truck_right),
             np.float32(truck_left),
-            np.float32(truck_front_22left),
+            # np.float32(truck_front_22left),
             np.float32(truck_front_45left),
-            np.float32(truck_front_67left),
-            np.float32(truck_front_22right),
+            # np.float32(truck_front_67left),
+            # np.float32(truck_front_22right),
             np.float32(truck_front_45right),
-            np.float32(truck_front_67right),
-            # np.float32(trailer_bearing_to_waypoint),
-            # np.float32(acceleration)
-                           ]
-
+            # np.float32(truck_front_67right)
+        ]
+        value_observations.extend(lidar_data_points)
         value_observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
         value_observations.extend(radii)
@@ -1327,7 +1331,10 @@ class SACExperimentBasic(BaseExperiment):
         else:
             raise Exception('This should never happen')
 
-
+        self.lidar_collision = False
+        for lidar_point in lidar_data_points:
+            if lidar_point < 0.01:
+                self.lidar_collision = True
 
 
         if self.custom_enable_rendering:
@@ -1345,9 +1352,9 @@ class SACExperimentBasic(BaseExperiment):
             # print(f"trailer_4 \t\t{round(trailer_4_left,2)}\t\t{round(trailer_4_right,2)}")
             # print(f"trailer_5 \t\t{round(trailer_5_left,2)}\t\t{round(trailer_5_right,2)}")
             print(f"truck FRONT \t\t\t{np.float32(truck_center)}")
-            print(f"truck 22 \t\t{np.float32(truck_front_22left)}\t\t{np.float32(truck_front_22right)}")
+            # print(f"truck 22 \t\t{np.float32(truck_front_22left)}\t\t{np.float32(truck_front_22right)}")
             print(f"truck 45 \t\t{np.float32(truck_front_45left)}\t\t{np.float32(truck_front_45right)}")
-            print(f"truck 67 \t\t{np.float32(truck_front_67left)}\t\t{np.float32(truck_front_67right)}")
+            # print(f"truck 67 \t\t{np.float32(truck_front_67left)}\t\t{np.float32(truck_front_67right)}")
             print(f"truck sides \t\t{np.float32(truck_left)}\t\t{np.float32(truck_right)}")
             print(f"")
             print(f"trailer_0 \t\t{np.float32(trailer_0_left)}\t\t{np.float32(trailer_0_right)}")
@@ -1467,7 +1474,7 @@ class SACExperimentBasic(BaseExperiment):
         self.done_arrived = self.completed_route(core)
         self.done_far_from_path = self.last_hyp_distance_to_next_waypoint > 10
 
-        output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision_truck or self.done_collision_trailer or self.done_arrived or self.done_far_from_path
+        output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision_truck or self.done_collision_trailer or self.done_arrived or self.done_far_from_path or self.lidar_collision
         self.custom_done_arrived = self.done_arrived
 
         done_reason = ""
@@ -1485,6 +1492,8 @@ class SACExperimentBasic(BaseExperiment):
             done_reason += "done_far_from_path"
         if self.done_arrived:
             done_reason += "done_arrived"
+        if self.lidar_collision:
+            done_reason += "lidar_collision"
 
         if done_reason != "":
             data = f"ENTRY: {core.entry_spawn_point_index} EXIT: {core.exit_spawn_point_index} - {done_reason} \n"
@@ -1601,7 +1610,7 @@ class SACExperimentBasic(BaseExperiment):
         if self.done_falling:
             reward = reward + -10000
             print('====> REWARD Done falling')
-        if self.done_collision_truck or self.done_collision_trailer:
+        if self.done_collision_truck or self.done_collision_trailer or self.lidar_collision:
             print("====> REWARD Done collision")
             reward = reward + -10000
         if self.done_time_idle:

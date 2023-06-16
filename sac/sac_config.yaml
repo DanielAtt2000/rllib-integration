@@ -1,5 +1,5 @@
 # Works for both torch and tf.
-num_workers: 7
+num_workers: 4
 num_gpus: 1
 num_cpus_per_worker: 2
 framework: torch
@@ -106,7 +106,7 @@ env_config:
     retries_on_error: 25
     resolution_x: 300
     resolution_y: 300
-    carla_location: '/home/daniel/carla/Dist/CARLA_Shipping_0.9.13-1-g8854804f4-dirty/LinuxNoEditor'
+    carla_location: '/home/daniel/Desktop/CARLA_Shipping_0.9.13-1-g8854804f4-dirty/LinuxNoEditor'
     quality_level: Low
     enable_map_assets: True
     enable_rendering: True
@@ -429,17 +429,17 @@ env_config:
           horizontal_fov: '2'
           sensor_tick: '0'
           transform: '1.2,-1.2,1,0,0,-90' # x,y,z,pitch, yaw, roll
-        lidar_truck_front_22left:
-          type: "sensor.lidar.ray_cast_semantic"
-          channels: "32"
-          range: "17.0"
-          points_per_second: "5000"
-          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
-          upper_fov: '45'
-          lower_fov: '-90'
-          horizontal_fov: '2'
-          sensor_tick: '0'
-          transform: '2.3,-1.2,1,0,0,-22.5' # x,y,z,pitch, yaw, roll
+#        lidar_truck_front_22left:
+#          type: "sensor.lidar.ray_cast_semantic"
+#          channels: "32"
+#          range: "17.0"
+#          points_per_second: "5000"
+#          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+#          upper_fov: '45'
+#          lower_fov: '-90'
+#          horizontal_fov: '2'
+#          sensor_tick: '0'
+#          transform: '2.3,-1.2,1,0,0,-22.5' # x,y,z,pitch, yaw, roll
         lidar_truck_front_45left:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
@@ -451,28 +451,28 @@ env_config:
           horizontal_fov: '2'
           sensor_tick: '0'
           transform: '2.3,-1.2,1,0,0,-45' # x,y,z,pitch, yaw, roll
-        lidar_truck_front_67left:
-          type: "sensor.lidar.ray_cast_semantic"
-          channels: "32"
-          range: "17.0"
-          points_per_second: "5000"
-          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
-          upper_fov: '45'
-          lower_fov: '-90'
-          horizontal_fov: '2'
-          sensor_tick: '0'
-          transform: '2.3,-1.2,1,0,0,-67.5' # x,y,z,pitch, yaw, roll
-        lidar_truck_front_22right:
-          type: "sensor.lidar.ray_cast_semantic"
-          channels: "32"
-          range: "17.0"
-          points_per_second: "5000"
-          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
-          upper_fov: '45'
-          lower_fov: '-90'
-          horizontal_fov: '2'
-          sensor_tick: '0'
-          transform: '2.3,1.2,1,0,0,22.5' # x,y,z,pitch, yaw, roll
+#        lidar_truck_front_67left:
+#          type: "sensor.lidar.ray_cast_semantic"
+#          channels: "32"
+#          range: "17.0"
+#          points_per_second: "5000"
+#          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+#          upper_fov: '45'
+#          lower_fov: '-90'
+#          horizontal_fov: '2'
+#          sensor_tick: '0'
+#          transform: '2.3,-1.2,1,0,0,-67.5' # x,y,z,pitch, yaw, roll
+#        lidar_truck_front_22right:
+#          type: "sensor.lidar.ray_cast_semantic"
+#          channels: "32"
+#          range: "17.0"
+#          points_per_second: "5000"
+#          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+#          upper_fov: '45'
+#          lower_fov: '-90'
+#          horizontal_fov: '2'
+#          sensor_tick: '0'
+#          transform: '2.3,1.2,1,0,0,22.5' # x,y,z,pitch, yaw, roll
         lidar_truck_front_45right:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
@@ -484,17 +484,17 @@ env_config:
           horizontal_fov: '2'
           sensor_tick: '0'
           transform: '2.3,1.2,1,0,0,45' # x,y,z,pitch, yaw, roll
-        lidar_truck_front_67right:
-          type: "sensor.lidar.ray_cast_semantic"
-          channels: "32"
-          range: "17.0"
-          points_per_second: "5000"
-          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
-          upper_fov: '45'
-          lower_fov: '-90'
-          horizontal_fov: '2'
-          sensor_tick: '0'
-          transform: '2.3,1.2,1,0,0,67.5' # x,y,z,pitch, yaw, roll
+#        lidar_truck_front_67right:
+#          type: "sensor.lidar.ray_cast_semantic"
+#          channels: "32"
+#          range: "17.0"
+#          points_per_second: "5000"
+#          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+#          upper_fov: '45'
+#          lower_fov: '-90'
+#          horizontal_fov: '2'
+#          sensor_tick: '0'
+#          transform: '2.3,1.2,1,0,0,67.5' # x,y,z,pitch, yaw, roll
 #        semantic_camera:
 #          type: "sensor.camera.semantic_segmentation"
 #          transform: '0.0,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
