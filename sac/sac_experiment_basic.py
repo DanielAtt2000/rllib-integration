@@ -1332,9 +1332,8 @@ class SACExperimentBasic(BaseExperiment):
             raise Exception('This should never happen')
 
         self.lidar_collision = False
-        for lidar_point in lidar_data_points:
-            if lidar_point < 0.01:
-                self.lidar_collision = True
+        if any(lidar_point < 0.005 for lidar_point in lidar_data_points):
+            self.lidar_collision = True
 
 
         if self.custom_enable_rendering:
@@ -1610,8 +1609,11 @@ class SACExperimentBasic(BaseExperiment):
         if self.done_falling:
             reward = reward + -10000
             print('====> REWARD Done falling')
-        if self.done_collision_truck or self.done_collision_trailer or self.lidar_collision:
+        if self.done_collision_truck or self.done_collision_trailer:
             print("====> REWARD Done collision")
+            reward = reward + -10000
+        if self.lidar_collision:
+            print("====> REWARD Lidar collision")
             reward = reward + -10000
         if self.done_time_idle:
             print("====> REWARD Done idle")
