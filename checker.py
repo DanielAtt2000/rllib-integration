@@ -33,6 +33,6 @@ def commit_hash():
     latest_remote_commit = remote.refs[repo.active_branch.name].commit
     latest_local_commit = repo.head.commit
 
-    # assert latest_local_commit == latest_remote_commit
+    assert latest_local_commit == latest_remote_commit
     commit_value = str(latest_local_commit)[:10]
     return commit_value
