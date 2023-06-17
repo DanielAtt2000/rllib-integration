@@ -1,7 +1,7 @@
 # Works for both torch and tf.
-num_workers: 7
+num_workers: 2
 num_gpus: 1
-num_cpus_per_worker: 2
+num_cpus_per_worker: 4
 framework: torch
 gamma: 1
 twin_q: True
