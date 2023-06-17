@@ -112,11 +112,12 @@ class SACExperimentBasic(BaseExperiment):
         for i in range(self.max_amount_of_occupancy_maps):
             self.occupancy_maps.append(np.zeros((self.occupancy_map_y,self.occupancy_map_x,1)))
 
-
-        repo = Repo('.')
-        remote = repo.remote('origin')
-        remote.fetch()
-        commit_hash = deepcopy(str(repo.head.commit)[:11])
+        with open(f"commit_hashes/{self.config['hero']['random_file_no']}.txt",'r') as file:
+            commit_hash = file.readline()
+        # repo = Repo('.')
+        # remote = repo.remote('origin')
+        # remote.fetch()
+        # commit_hash = deepcopy(str(repo.head.commit)[:11])
         self.directory = f"/home/daniel/data-rllib-integration/data/data_{commit_hash}"
 
         if not os.path.exists(self.directory):
@@ -344,8 +345,8 @@ class SACExperimentBasic(BaseExperiment):
         """
         obs_space = Dict( {
             'values':Box(
-                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             ),
             'route': Discrete(2)
@@ -651,16 +652,24 @@ class SACExperimentBasic(BaseExperiment):
         trailer_4_right = 0
         trailer_5_left = 0
         trailer_5_right = 0
+        trailer_6_left = 0
+        trailer_6_right = 0
+        trailer_7_left = 0
+        trailer_7_right = 0
 
         truck_center = 0
         truck_right = 0
         truck_left= 0
-        # truck_front_22right = 0
+        truck_front_15right = 0
+        truck_front_30right = 0
         truck_front_45right = 0
-        # truck_front_67right = 0
-        # truck_front_22left = 0
+        truck_front_60right = 0
+        truck_front_75right = 0
+        truck_front_15left = 0
+        truck_front_30left = 0
         truck_front_45left = 0
-        # truck_front_67left = 0
+        truck_front_60left = 0
+        truck_front_75left = 0
 
         for sensor in sensor_data:
             if sensor == 'collision_truck':
@@ -1133,6 +1142,26 @@ class SACExperimentBasic(BaseExperiment):
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5_right"]["range"])
                 trailer_5_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
+            elif sensor == "lidar_trailer_6_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_6_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_6_left"]["range"])
+                trailer_6_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_6_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_6_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_6_right"]["range"])
+                trailer_6_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_7_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_7_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_7_left"]["range"])
+                trailer_7_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_7_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_7_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_7_right"]["range"])
+                trailer_7_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
             elif sensor == "lidar_truck_right_truck":
                 lidar_points = sensor_data['lidar_truck_right_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_right"]["range"])
@@ -1148,35 +1177,61 @@ class SACExperimentBasic(BaseExperiment):
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_center"]["range"])
                 truck_center = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
-            elif sensor == "lidar_truck_front_22left_truck":
-                lidar_points = sensor_data['lidar_truck_front_22left_truck'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_22left"]["range"])
-                truck_front_22left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_15left_truck":
+                lidar_points = sensor_data['lidar_truck_front_15left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_15left"]["range"])
+                truck_front_15left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+
+            elif sensor == "lidar_truck_front_30left_truck":
+                lidar_points = sensor_data['lidar_truck_front_30left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_30left"]["range"])
+                truck_front_30left = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
             elif sensor == "lidar_truck_front_45left_truck":
                 lidar_points = sensor_data['lidar_truck_front_45left_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_45left"]["range"])
                 truck_front_45left = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
-            elif sensor == "lidar_truck_front_67left_truck":
-                lidar_points = sensor_data['lidar_truck_front_67left_truck'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_67left"]["range"])
-                truck_front_67left = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
-            elif sensor == "lidar_truck_front_22right_truck":
-                lidar_points = sensor_data['lidar_truck_front_22right_truck'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_22right"]["range"])
-                truck_front_22right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+            elif sensor == "lidar_truck_front_60left_truck":
+                lidar_points = sensor_data['lidar_truck_front_60left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_60left"]["range"])
+                truck_front_60left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+
+            elif sensor == "lidar_truck_front_75left_truck":
+                lidar_points = sensor_data['lidar_truck_front_75left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_75left"]["range"])
+                truck_front_75left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+
+            elif sensor == "lidar_truck_front_15right_truck":
+                lidar_points = sensor_data['lidar_truck_front_15right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_15right"]["range"])
+                truck_front_15right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+
+            elif sensor == "lidar_truck_front_30right_truck":
+                lidar_points = sensor_data['lidar_truck_front_30right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_30right"]["range"])
+                truck_front_30right = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
             elif sensor == "lidar_truck_front_45right_truck":
                 lidar_points = sensor_data['lidar_truck_front_45right_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_45right"]["range"])
                 truck_front_45right = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
-            elif sensor == "lidar_truck_front_67right_truck":
-                lidar_points = sensor_data['lidar_truck_front_67right_truck'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_67right"]["range"])
-                truck_front_67right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+            elif sensor == "lidar_truck_front_60right_truck":
+                lidar_points = sensor_data['lidar_truck_front_60right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_60right"]["range"])
+                truck_front_60right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_75right_truck":
+                lidar_points = sensor_data['lidar_truck_front_75right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_75right"]["range"])
+                truck_front_75right = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
             elif sensor == "lidar_truck_truck":
                 lidar_points = sensor_data['lidar_truck_truck'][1]
@@ -1258,15 +1313,23 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(trailer_4_right),
             np.float32(trailer_5_left),
             np.float32(trailer_5_right),
+            np.float32(trailer_6_left),
+            np.float32(trailer_6_right),
+            np.float32(trailer_7_left),
+            np.float32(trailer_7_right),
             np.float32(truck_center),
             np.float32(truck_right),
             np.float32(truck_left),
-            # np.float32(truck_front_22left),
+            np.float32(truck_front_15left),
+            np.float32(truck_front_30left),
             np.float32(truck_front_45left),
-            # np.float32(truck_front_67left),
-            # np.float32(truck_front_22right),
+            np.float32(truck_front_60left),
+            np.float32(truck_front_75left),
+            np.float32(truck_front_15right),
+            np.float32(truck_front_30right),
             np.float32(truck_front_45right),
-            # np.float32(truck_front_67right),
+            np.float32(truck_front_60right),
+            np.float32(truck_front_75right),
 
         ])
 
@@ -1306,15 +1369,23 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(trailer_4_right),
             np.float32(trailer_5_left),
             np.float32(trailer_5_right),
+            np.float32(trailer_6_left),
+            np.float32(trailer_6_right),
+            np.float32(trailer_7_left),
+            np.float32(trailer_7_right),
             np.float32(truck_center),
             np.float32(truck_right),
             np.float32(truck_left),
-            # np.float32(truck_front_22left),
+            np.float32(truck_front_15left),
+            np.float32(truck_front_30left),
             np.float32(truck_front_45left),
-            # np.float32(truck_front_67left),
-            # np.float32(truck_front_22right),
+            np.float32(truck_front_60left),
+            np.float32(truck_front_75left),
+            np.float32(truck_front_15right),
+            np.float32(truck_front_30right),
             np.float32(truck_front_45right),
-            # np.float32(truck_front_67right)
+            np.float32(truck_front_60right),
+            np.float32(truck_front_75right),
         ]
         value_observations.extend(lidar_data_points)
         value_observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
