@@ -24,13 +24,13 @@ recreate_failed_workers: True
 # Soft-syncs seem to work less reliably for discrete action spaces.
 tau: 1
 #lr: 0.001
-target_network_update_freq: 8000
+#target_network_update_freq: 8000
 #initial_alpha: 0.2
 # auto = 0.98 * -log(1/|A|)
 target_entropy: auto
 clip_rewards: False
 n_step: 1
-rollout_fragment_length: 1
+#rollout_fragment_length: 1
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
   capacity: 400000
