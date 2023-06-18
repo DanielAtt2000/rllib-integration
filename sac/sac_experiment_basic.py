@@ -12,7 +12,7 @@ from git import Repo
 
 import math
 import numpy as np
-from gym.spaces import Box, Discrete, Dict, Tuple
+from gymnasium.spaces import Box, Discrete, Dict, Tuple
 import warnings
 import carla
 import os
@@ -1544,8 +1544,21 @@ class SACExperimentBasic(BaseExperiment):
         self.done_arrived = self.completed_route(core)
         self.done_far_from_path = self.last_hyp_distance_to_next_waypoint > 10
 
+        done_output = {'done_time_idle' : self.done_time_idle,
+                       'done_falling' : self.done_falling,
+                       'done_time_episode' : self.done_time_episode,
+                       'done_collision_truck' : self.done_collision_truck,
+                       'done_collision_trailer' : self.done_collision_trailer,
+                       'done_lidar_collision' : self.lidar_collision,
+                       'done_arrived' : self.done_arrived,
+                       'done_far_from_path' : self.done_far_from_path
+                       }
+
         output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision_truck or self.done_collision_trailer or self.done_arrived or self.done_far_from_path or self.lidar_collision
         self.custom_done_arrived = self.done_arrived
+
+        terminated = self.done_collision_truck or self.done_collision_trailer or self.done_arrived or self.lidar_collision
+        truncated = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_far_from_path
 
         done_reason = ""
         if self.done_time_idle:
@@ -1569,7 +1582,7 @@ class SACExperimentBasic(BaseExperiment):
             data = f"ENTRY: {core.entry_spawn_point_index} EXIT: {core.exit_spawn_point_index} - {done_reason} \n"
             self.save_to_file(f"{self.directory}/done",data)
 
-        return bool(output), self.done_collision_truck, self.done_collision_trailer, (self.done_time_idle or self.done_time_episode), self.done_arrived
+        return terminated, truncated, done_output
 
     def compute_reward(self, observation, info, core):
         """Computes the reward"""
