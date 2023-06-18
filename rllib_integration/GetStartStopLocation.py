@@ -198,7 +198,7 @@ spawn_points_2_lane_roundabout_small_difficult = [
 
 ]
 
-roundabouts = [spawn_points_2_lane_roundabout_small_easy, spawn_points_2_lane_roundabout_small_difficult]
+roundabouts = [spawn_points_2_lane_roundabout_small_difficult]
 # roundabouts = [spawn_points_2_lane_roundabout_difficult,spawn_points_2_lane_roundabout_easy]
 
 
@@ -211,6 +211,7 @@ def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations, last_round
     else:
         last_roundabout_choice = 0
 
+    last_roundabout_choice = 0
     while entry_spawn_point_index in failed_spawn_locations:
         roundabout_choice = roundabouts[last_roundabout_choice]
         element = random.choice(roundabout_choice)
