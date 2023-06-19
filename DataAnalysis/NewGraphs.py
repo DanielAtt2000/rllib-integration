@@ -78,6 +78,12 @@ for filename in os.listdir(directory):
     if os.path.isfile(file) and file.endswith('.pkl'):
         with open(file, 'rb') as handle:
             data = pickle.load(handle)
+            if len(data) == 0:
+                print(f'{file} has no data')
+                # a = random.randint(0,100)
+                # x = input(f'Enter {a}:')
+                continue
+
             df = pd.merge(df,data, on='Time')
 #             df = df.drop_duplicates(subset=['Time'])
 #
@@ -168,20 +174,20 @@ def plot_route(route_points_all, truck_points_all):
                     current_difficulty = "difficult"
                     break
 
-            if current_difficulty == "easy":
-                all_line_easy_rewards.append(sum(df.loc[idx, "line_reward"]))
-                all_point_easy_rewards.append(sum(df.loc[idx, "point_reward"]))
-                all_episodes_easy_sum.append(
-                    sum(df.loc[idx, "line_reward"]) + sum(df.loc[idx, "point_reward"]))
-                easy_x_indices.append(idx)
-            elif current_difficulty == "difficult":
-                all_line_difficult_rewards.append(sum(df.loc[idx, "line_reward"]))
-                all_point_difficult_rewards.append(sum(df.loc[idx, "point_reward"]))
-                all_episodes_difficult_sum.append(
-                    sum(df.loc[idx, "line_reward"]) + sum(df.loc[idx, "point_reward"]))
-                difficiult_x_indices.append(idx)
-            else:
-                raise Exception('wtf')
+            # if current_difficulty == "easy":
+            #     all_line_easy_rewards.append(sum(df.loc[idx, "line_reward"]))
+            #     all_point_easy_rewards.append(sum(df.loc[idx, "point_reward"]))
+            #     all_episodes_easy_sum.append(
+            #         sum(df.loc[idx, "line_reward"]) + sum(df.loc[idx, "point_reward"]))
+            #     easy_x_indices.append(idx)
+            # elif current_difficulty == "difficult":
+            #     all_line_difficult_rewards.append(sum(df.loc[idx, "line_reward"]))
+            #     all_point_difficult_rewards.append(sum(df.loc[idx, "point_reward"]))
+            #     all_episodes_difficult_sum.append(
+            #         sum(df.loc[idx, "line_reward"]) + sum(df.loc[idx, "point_reward"]))
+            #     difficiult_x_indices.append(idx)
+            # else:
+            #     raise Exception('wtf')
     plt.figure(figsize=(80, 5))
     plt.ylim(-20000)
     plt.plot(difficiult_x_indices, all_episodes_difficult_sum, label='All DIFFICULT episode rewards')
@@ -211,7 +217,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 5300:
+        if idx > 4400:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -280,24 +286,24 @@ def plot_route(route_points_all, truck_points_all):
                 # else:
                 #     assert "arrived" in df.loc[idx,'Done']
 
-                assert len(df.loc[idx, "point_reward"]) == len(x_truck[idx][2:])
-                assert len(df.loc[idx, "line_reward"]) == len(x_truck[idx][2:])
+                # assert len(df.loc[idx, "point_reward"]) == len(x_truck[idx][2:])
+                # assert len(df.loc[idx, "line_reward"]) == len(x_truck[idx][2:])
                 assert len(df.loc[idx, "total_episode_reward"]) == len(x_truck[idx][2:])
 
-                a2.plot(np.array(df.loc[idx, "point_reward"]), label='Waypoint reward')
-                a2.plot(np.array(df.loc[idx, "line_reward"]), label='Line reward')
+                # a2.plot(np.array(df.loc[idx, "point_reward"]), label='Waypoint reward')
+                # a2.plot(np.array(df.loc[idx, "line_reward"]), label='Line reward')
                 # a2.plot(np.array(df.loc[idx, "total_episode_reward"]),
                 #         label='Total Episode Reward')
 
                 combined_rewards = []
-                for line_reward, point_reward in zip(df.loc[idx, "line_reward"],
-                                                     df.loc[idx, "point_reward"]):
-                    combined_rewards.append(line_reward + point_reward)
+                # for line_reward, point_reward in zip(df.loc[idx, "line_reward"],
+                #                                      df.loc[idx, "point_reward"]):
+                #     combined_rewards.append(line_reward + point_reward)
                 # a2.plot(combined_rewards, label='Combined reward')
 
-                print(f'line Reward total {sum(df.loc[idx, "line_reward"])}')
-                print(f'Point Reward total {sum(df.loc[idx, "point_reward"])}')
-                print(f'Sums Reward total {sum(df.loc[idx, "point_reward"]) + sum(df.loc[idx, "line_reward"])}')
+                # print(f'line Reward total {sum(df.loc[idx, "line_reward"])}')
+                # print(f'Point Reward total {sum(df.loc[idx, "point_reward"])}')
+                # print(f'Sums Reward total {sum(df.loc[idx, "point_reward"]) + sum(df.loc[idx, "line_reward"])}')
                 print(f'Total Episode Reward total {sum(df.loc[idx, "total_episode_reward"])}')
                 print(f'Total Episode Reward WITHOUT LAST total {sum(df.loc[idx, "total_episode_reward"][:-1])}')
 
@@ -313,8 +319,8 @@ def plot_route(route_points_all, truck_points_all):
                 print(f'Average overall {mean(temp_arry[2:])}')
                 print(df.loc[idx, "Time"])
 
-                point_reward = list(df.loc[idx, "point_reward"])
-                line_reward = list(df.loc[idx, "line_reward"])
+                # point_reward = list(df.loc[idx, "point_reward"])
+                # line_reward = list(df.loc[idx, "line_reward"])
 
                 def divide(list, dividend):
                     new_list = []
