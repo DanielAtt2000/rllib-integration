@@ -1,5 +1,5 @@
 # Works for both torch and tf.
-num_workers: 3
+num_workers: 7
 num_gpus: 1
 num_cpus_per_worker: 2
 framework: torch
@@ -24,7 +24,7 @@ recreate_failed_workers: True
 # Soft-syncs seem to work less reliably for discrete action spaces.
 tau: 1
 #lr: 0.001
-target_network_update_freq: 4000
+target_network_update_freq: 8000
 #initial_alpha: 0.2
 # auto = 0.98 * -log(1/|A|)
 target_entropy: auto
@@ -33,7 +33,7 @@ n_step: 1
 #rollout_fragment_length: 1
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
-  capacity: 400000
+  capacity: 600000
   # How many steps of the model to sample before learning starts.
   # If True prioritized replay buffer will be used.
   prioritized_replay_alpha: 0.6
