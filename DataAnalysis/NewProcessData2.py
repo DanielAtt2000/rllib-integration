@@ -60,7 +60,7 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-data_file = 'data_11fa43309e6'
+data_file = 'data_4a6c85c6b62'
 directory = '/home/daniel/data-rllib-integration/data/' + data_file
 for_graphs = False
 def main():
