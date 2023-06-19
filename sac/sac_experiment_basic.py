@@ -487,7 +487,7 @@ class SACExperimentBasic(BaseExperiment):
         self.custom_enable_rendering = core.custom_enable_rendering
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S_%f")
 
-        radii, mean_radius = get_radii(core.route,core.last_waypoint_index,5)
+        radii, mean_radius = get_radii(core.route,core.last_waypoint_index,7)
 
         self.entry_idx = core.entry_spawn_point_index
         self.exit_idx = core.exit_spawn_point_index
