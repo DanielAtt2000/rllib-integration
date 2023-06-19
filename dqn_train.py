@@ -13,7 +13,7 @@ from __future__ import print_function
 import argparse
 import os
 import random
-
+import pickle
 import yaml
 
 import ray
@@ -29,28 +29,35 @@ from dqn.dqn_experiment_basic import DQNExperimentBasic
 from dqn.dqn_callbacks import DQNCallbacks
 from dqn.dqn_trainer import CustomDQNTrainer
 
-
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
 EXPERIMENT_CLASS = DQNExperimentBasic
+
+def save_to_pickle(filename, data):
+    filename = filename + '.pickle'
+    with open(filename, 'wb') as handle:
+        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 def run(args):
     try:
         os.environ['RAY_DISABLE_MEMORY_MONITOR'] = '1'
-        ray.init(num_gpus=1,include_dashboard=True,_temp_dir="/home/daniel/rllib-integration/ray_logs")
-        tune.run(CustomDQNTrainer,
+        ray.init( num_gpus=1,include_dashboard=True,_temp_dir="/home/daniel/data-rllib-integration/ray_logs")
+        analysis = tune.run(CustomDQNTrainer,
                  name=args.name,
                  local_dir=args.directory,
                  # stop={"perf/ram_util_percent": 85.0},
-                 checkpoint_freq=1,
+                 checkpoint_freq=1000,
                  # checkpoint_at_end=True,
                  restore=get_checkpoint(args.name, args.directory, args.restore, args.overwrite),
                  config=args.config,
                  # queue_trials=True,
                  resume=False,
                  reuse_actors=True,
-
-        )
-
+                 )
+        print("----------------HERE")
+        print(analysis.__dict__)
+        # print(analysis.get_all_configs())
+        # print(analysis.get_best_trial())
+        print("----------------HERE")
     finally:
         kill_all_servers()
         ray.shutdown()
@@ -109,16 +116,19 @@ def main():
 
 
     launch_tensorboard(logdir= path,
-                       host="localhost")
+                       host="localhost", port="6010")
+
 
     specific_version = False
-    check_commit = False
+    check_commit = True
+
+    save_to_pickle('waiting_times',[0,20,40,60,80,100, 120,140,160,180])
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())
 
         if specific_version:
-            args.name = "dqn_8f844bf22a"
+            args.name = ""
             x = random.randint(0,100)
             inp = input(f'SPECIFIC NAME APPLIED  ENTER {x} to confirm:')
 

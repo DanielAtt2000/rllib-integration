@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import datetime
+from copy import copy, deepcopy
 
 # Copyright (c) 2021 Computer Vision Center (CVC) at the Universitat Autonoma de
 # Barcelona (UAB).
@@ -10,26 +12,31 @@ from git import Repo
 
 import math
 import numpy as np
-from gym.spaces import Discrete, Box
-# from gym.spaces import Box, Discrete, Dict, Tuple
+from gym.spaces import Box, Discrete, Dict, Tuple
 import warnings
 import carla
 import os
 import time
+
+from ray.tune.result import PID
+
 from rllib_integration.GetAngle import calculate_angle_with_center_of_lane, angle_between
-from rllib_integration.TestingWayPointUpdater import plot_points, plot_route
+from rllib_integration.TestingWayPointUpdater import plot_points, plot_route, draw_route_in_order
 from rllib_integration.base_experiment import BaseExperiment
 from rllib_integration.helper import post_process_image
 from rllib_integration.Circle import get_radii
 from PIL import Image
-
+from simple_pid import PID
 from rllib_integration.lidar_to_grid_map import generate_ray_casting_grid_map
 import collections
+
+from dqn.dqn_callbacks import get_route_type
+
 
 class DQNExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-
+        # self.acceleration_pid = PID(Kp=0.05,Ki=0.1,Kd=0.00,setpoint=8.33,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -40,7 +47,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.last_action = [0,0,0]
         self.lidar_points_count = []
         self.reward_metric = 0
-
+        self.current_time = 'None'
         self.min_lidar_values = 1000000
         self.max_lidar_values = -100000
         self.lidar_max_points = self.config["hero"]["lidar_max_points"]
@@ -50,6 +57,11 @@ class DQNExperimentBasic(BaseExperiment):
         self.visualiseOccupancyGirdMap = False
         self.counterThreshold = 10
         self.last_hyp_distance_to_next_waypoint = 0
+        self.last_hyp_distance_to_next_plus_1_waypoint = 0
+        self.passed_waypoint = False
+
+        self.last_closest_distance_to_next_waypoint_line = 0
+        self.last_closest_distance_to_next_plus_1_waypoint_line = 0
 
         self.x_dist_to_waypoint = []
         self.y_dist_to_waypoint = []
@@ -60,17 +72,22 @@ class DQNExperimentBasic(BaseExperiment):
         self.bearing_to_ahead_waypoints_ahead = []
         self.bearing_to_ahead_waypoints_ahead_2 = []
         self.angle_between_truck_and_trailer = []
+        self.trailer_bearing_to_waypoint = []
         self.forward_velocity = []
         # self.forward_velocity_x = []
         # self.forward_velocity_z = []
         self.vehicle_path = []
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
+        self.hyp_distance_to_next_plus_1_waypoint = []
+        self.closest_distance_to_next_waypoint_line = []
+        self.closest_distance_to_next_plus_1_waypoint_line = []
         # self.acceleration = []
-        self.truck_collisions = []
-        self.trailer_collisions =[]
+        self.collisions = []
+        self.lidar_data = collections.deque(maxlen=4)
         self.entry_idx = -1
         self.exit_idx = -1
+        self.current_forward_velocity = 0
 
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
@@ -79,7 +96,15 @@ class DQNExperimentBasic(BaseExperiment):
         self.occupancy_map_y = 84
         self.max_amount_of_occupancy_maps = 11
         self.radii = []
+        self.mean_radius = []
+        self.point_reward = []
+        self.point_reward_location = []
+        self.line_reward = []
+        self.line_reward_location = []
+        self.total_episode_reward = []
 
+        self.custom_enable_rendering = False
+        self.lidar_collision = False
 
 
         self.occupancy_maps = collections.deque(maxlen=self.max_amount_of_occupancy_maps)
@@ -91,7 +116,8 @@ class DQNExperimentBasic(BaseExperiment):
         repo = Repo('.')
         remote = repo.remote('origin')
         remote.fetch()
-        self.directory = f"data/data_{str(repo.head.commit)[:11]}"
+        commit_hash = deepcopy(str(repo.head.commit)[:11])
+        self.directory = f"/home/daniel/data-rllib-integration/data/data_{commit_hash}"
 
         if not os.path.exists(self.directory):
             os.mkdir(self.directory)
@@ -99,9 +125,52 @@ class DQNExperimentBasic(BaseExperiment):
     def save_to_file(self, file_name, data):
         # Saving LIDAR point count
         counts = open(file_name, 'a')
+        counts.write(f'${self.current_time}$')
         counts.write(str(data))
         counts.write(str('\n'))
         counts.close()
+
+    def lidar_right_left_closest_points(self,sensor_data,sensor_name):
+        sensor_name_no_trailer = sensor_name[:-8]
+        lidar_points = sensor_data[sensor_name][1]
+        lidar_range = float(self.config["hero"]["sensors"][sensor_name_no_trailer]["range"])
+
+        # LIDAR GRAPH
+        #           x
+        #           |
+        #           |
+        # ----------+-------- y
+        #           |
+        #           |
+
+        # Left and Right Lidar points
+        horizontal_indices = np.where((lidar_points[0] > -1) & (lidar_points[0] < 1))
+        horizontal_relevant_lidar_y_points = lidar_points[1][horizontal_indices]
+
+        if len(horizontal_relevant_lidar_y_points) == 0:
+            right = 1
+            left = 1
+        else:
+            greater_0_indices = np.where(horizontal_relevant_lidar_y_points > 0)
+            smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
+
+            if greater_0_indices[0].size != 0:
+                right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices])) / lidar_range
+            else:
+                right = 1
+
+            if smaller_0_indices[0].size != 0:
+                left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices])) / lidar_range
+            else:
+                left = 1
+
+            if right < 0:
+                right = 0
+
+            if left < 0:
+                left = 0
+        return right, left
+
 
     # Rotation matrix function
     def rotate_matrix(self, x, y, angle, x_shift=0, y_shift=0, units="DEGREES"):
@@ -144,8 +213,9 @@ class DQNExperimentBasic(BaseExperiment):
         self.done_collision_trailer = False
         self.done_arrived = False
         self.custom_done_arrived = False
-        self.reward_metric = 0
-        self.radii = []
+        self.done_far_from_path = False
+        self.lidar_collision = False
+
 
         for i in range(self.max_amount_of_occupancy_maps):
             self.occupancy_maps.append(np.zeros((self.occupancy_map_y, self.occupancy_map_x,1)))
@@ -162,25 +232,43 @@ class DQNExperimentBasic(BaseExperiment):
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
 
+        self.last_hyp_distance_to_next_waypoint = 0
+        self.last_hyp_distance_to_next_plus_1_waypoint = 0
+
+        self.last_closest_distance_to_next_waypoint_line = 0
+        self.last_closest_distance_to_next_plus_1_waypoint_line = 0
+
         self.save_to_file(f"{self.directory}/hyp_distance_to_next_waypoint", self.hyp_distance_to_next_waypoint)
+        self.save_to_file(f"{self.directory}/hyp_distance_to_next_plus_1_waypoint", self.hyp_distance_to_next_plus_1_waypoint)
+        self.save_to_file(f"{self.directory}/closest_distance_to_next_waypoint_line", self.closest_distance_to_next_waypoint_line)
+        self.save_to_file(f"{self.directory}/closest_distance_to_next_plus_1_waypoint_line", self.closest_distance_to_next_plus_1_waypoint_line)
         self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees", self.angle_to_center_of_lane_degrees)
         self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_ahead_waypoints", self.angle_to_center_of_lane_degrees_ahead_waypoints)
         self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_ahead_waypoints_2", self.angle_to_center_of_lane_degrees_ahead_waypoints_2)
-        self.save_to_file(f"{self.directory}/bearing", self.bearing_to_waypoint)
-        self.save_to_file(f"{self.directory}/bearing_ahead_ahead", self.bearing_to_ahead_waypoints_ahead)
-        self.save_to_file(f"{self.directory}/bearing_ahead_ahead_2", self.bearing_to_ahead_waypoints_ahead_2)
+        self.save_to_file(f"{self.directory}/bearing_to_waypoint", self.bearing_to_waypoint)
+        self.save_to_file(f"{self.directory}/bearing_to_ahead_waypoints_ahead", self.bearing_to_ahead_waypoints_ahead)
+        self.save_to_file(f"{self.directory}/bearing_to_ahead_waypoints_ahead_2", self.bearing_to_ahead_waypoints_ahead_2)
         self.save_to_file(f"{self.directory}/angle_between_truck_and_trailer", self.angle_between_truck_and_trailer)
+        # self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint", self.trailer_bearing_to_waypoint)
         self.save_to_file(f"{self.directory}/forward_velocity", self.forward_velocity)
+        self.save_to_file(f"{self.directory}/line_reward", self.line_reward)
+        self.save_to_file(f"{self.directory}/line_reward_location", self.line_reward_location)
+        self.save_to_file(f"{self.directory}/point_reward", self.point_reward)
+        self.save_to_file(f"{self.directory}/point_reward_location", self.point_reward_location)
         # self.save_to_file(f"{self.directory}/forward_velocity_x", self.forward_velocity_x)
         # self.save_to_file(f"{self.directory}/forward_velocity_z", self.forward_velocity_z)
         # self.save_to_file(f"{self.directory}/acceleration", self.acceleration)
         self.save_to_file(f"{self.directory}/route", self.temp_route)
         self.save_to_file(f"{self.directory}/path", self.vehicle_path)
-        self.save_to_file(f"{self.directory}/truck_collisions", self.truck_collisions)
-        self.save_to_file(f"{self.directory}/trailer_collisions", self.trailer_collisions)
+        self.save_to_file(f"{self.directory}/lidar_data", self.lidar_data)
+        self.save_to_file(f"{self.directory}/collisions", self.collisions)
+        self.save_to_file(f"{self.directory}/radii",self.radii)
+        self.save_to_file(f"{self.directory}/mean_radius",self.mean_radius)
+        self.save_to_file(f"{self.directory}/total_episode_reward",self.total_episode_reward)
         self.entry_idx = -1
         self.exit_idx = -1
         self.last_action = [0,0,0]
+
 
         # Saving LIDAR point count
         # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
@@ -211,14 +299,26 @@ class DQNExperimentBasic(BaseExperiment):
         self.bearing_to_ahead_waypoints_ahead = []
         self.bearing_to_ahead_waypoints_ahead_2 = []
         self.angle_between_truck_and_trailer = []
+        self.trailer_bearing_to_waypoint = []
         self.forward_velocity = []
+        self.line_reward = []
+        self.line_reward_location = []
+        self.point_reward = []
+        self.point_reward_location = []
+        self.total_episode_reward = []
         # self.forward_velocity_x = []
         # self.forward_velocity_z = []
         self.vehicle_path = []
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
-        self.truck_collisions = []
-        self.trailer_collisions =[]
+        self.hyp_distance_to_next_plus_1_waypoint = []
+        self.closest_distance_to_next_waypoint_line = []
+        self.closest_distance_to_next_plus_1_waypoint_line = []
+        self.collisions = []
+        self.lidar_data = collections.deque(maxlen=4)
+        self.radii = []
+        self.mean_radius = []
+        self.reward_metric = 0
         # self.acceleration = []
 
 
@@ -226,6 +326,12 @@ class DQNExperimentBasic(BaseExperiment):
 
 
     # [33,28, 27, 17,  14, 11, 10, 5]
+
+    def get_min_lidar_point(self,lidar_points, lidar_range) :
+        if len(lidar_points) != 0:
+            return np.clip(min(lidar_points)/lidar_range,0,1)
+        else:
+            return 1
 
     def get_action_space(self):
         """Returns the action space, in this case, a discrete space"""
@@ -236,6 +342,14 @@ class DQNExperimentBasic(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
+        obs_space = Dict( {
+            'values':Box(
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                dtype=np.float32
+            ),
+            'route': Discrete(2)
+        })
         # test
         # image_space = Dict(
         #     {"values":
@@ -264,43 +378,32 @@ class DQNExperimentBasic(BaseExperiment):
             #     dtype=np.float64
             # )
             # })
-        return Box(
-                low=np.array([0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,-1,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,100,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1]),
-                dtype=np.float32
-            )
+        return obs_space
 
     def get_actions(self):
+        # acceleration_value = self.acceleration_pid(self.current_forward_velocity)
+        # print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
         return {
-            0: [0.0, 0.00, 0.0, False, False],  # Coast
-            1: [0.0, 0.00, 1.0, False, False],  # Apply Break
-            2: [0.0, 0.75, 0.0, False, False],  # Right
-            3: [0.0, 0.50, 0.0, False, False],  # Right
-            4: [0.0, 0.25, 0.0, False, False],  # Right
-            5: [0.0, -0.75, 0.0, False, False],  # Left
-            6: [0.0, -0.50, 0.0, False, False],  # Left
-            7: [0.0, -0.25, 0.0, False, False],  # Left
-            8: [0.15, 0.00, 0.0, False, False],  # Straight
-            9: [0.15, 0.75, 0.0, False, False],  # Right
-            10: [0.15, 0.50, 0.0, False, False],  # Right
-            11: [0.15, 0.25, 0.0, False, False],  # Right
-            12: [0.15, -0.75, 0.0, False, False],  # Left
-            13: [0.15, -0.50, 0.0, False, False],  # Left
-            14: [0.15, -0.25, 0.0, False, False],  # Left
-            15: [0.3, 0.00, 0.0, False, False],  # Straight
-            16: [0.3, 0.75, 0.0, False, False],  # Right
-            17: [0.3, 0.50, 0.0, False, False],  # Right
-            18: [0.3, 0.25, 0.0, False, False],  # Right
-            19: [0.3, -0.75, 0.0, False, False],  # Left
-            20: [0.3, -0.50, 0.0, False, False],  # Left
-            21: [0.3, -0.25, 0.0, False, False],  # Left
-            22: [0.7, 0.00, 0.0, False, False],  # Straight
-            23: [0.7, 0.75, 0.0, False, False],  # Right
-            24: [0.7, 0.50, 0.0, False, False],  # Right
-            25: [0.7, 0.25, 0.0, False, False],  # Right
-            26: [0.7, -0.75, 0.0, False, False],  # Left
-            27: [0.7, -0.50, 0.0, False, False],  # Left
-            28: [0.7, -0.25, 0.0, False, False],  # Left
+            0: [0.3, 0.00, 0.0, False, False],  # Straight
+            1: [0.3, 0.80, 0.0, False, False],  # Right
+            2: [0.3, 0.60, 0.0, False, False],  # Right
+            3: [0.3, 0.40, 0.0, False, False],  # Right
+            4: [0.3, 0.20, 0.0, False, False],  # Right
+            5: [0.3, -0.80, 0.0, False, False],  # Left
+            6: [0.3, -0.60, 0.0, False, False],  # Left
+            7: [0.3, -0.40, 0.0, False, False],  # Left
+            8: [0.3, -0.20, 0.0, False, False],  # Left
+            # 0: [0.0, 0.00, 0.0, False, False],  # Coast
+            # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
+            # 2: [0.0, 0.75, 0.0, False, False],  # Right
+            # 3: [0.0, 0.50, 0.0, False, False],  # Right
+            # 4: [0.0, 0.25, 0.0, False, False],  # Right
+            # 5: [0.0, -0.75, 0.0, False, False],  # Left
+            # 6: [0.0, -0.50, 0.0, False, False],  # Left
+            # 7: [0.0, -0.25, 0.0, False, False],  # Left
+            # 8: [0.15, 0.00, 0.0, False, False],  # Straight
+            # 9: [0.15, 0.75, 0.0, False, False],  # Right
+            # 10: [0.15, 0.50, 0.0, False, False],  # Right
             # 11: [0.15, 0.25, 0.0, False, False],  # Right
             # 12: [0.15, -0.75, 0.0, False, False],  # Left
             # 13: [0.15, -0.50, 0.0, False, False],  # Left
@@ -319,13 +422,6 @@ class DQNExperimentBasic(BaseExperiment):
             # 26: [0.7, -0.75, 0.0, False, False],  # Left
             # 27: [0.7, -0.50, 0.0, False, False],  # Left
             # 28: [0.7, -0.25, 0.0, False, False],  # Left
-            # 29: [1.0, 0.00, 0.0, False, False],  # Straight
-            # 30: [1.0, 0.75, 0.0, False, False],  # Right
-            # 31: [1.0, 0.50, 0.0, False, False],  # Right
-            # 32: [1.0, 0.25, 0.0, False, False],  # Right
-            # 33: [1.0, -0.75, 0.0, False, False],  # Left
-            # 34: [1.0, -0.50, 0.0, False, False],  # Left
-            # 35: [1.0, -0.25, 0.0, False, False],  # Left
         }
 
 
@@ -360,7 +456,7 @@ class DQNExperimentBasic(BaseExperiment):
 
 
         # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
-        print(f"----------------------------------->{action_msg}")
+        print(f"----------------------------------->{action_msg}") if self.custom_enable_rendering else None
 
         self.last_action = action_control
 
@@ -388,8 +484,10 @@ class DQNExperimentBasic(BaseExperiment):
             # Position
             # angle
             # collision
+        self.custom_enable_rendering = core.custom_enable_rendering
+        self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S_%f")
 
-        self.radii = get_radii(core.route[core.last_waypoint_index:],5)
+        radii, mean_radius = get_radii(core.route,core.last_waypoint_index,5)
 
         self.entry_idx = core.entry_spawn_point_index
         self.exit_idx = core.exit_spawn_point_index
@@ -400,6 +498,8 @@ class DQNExperimentBasic(BaseExperiment):
 
         # Getting truck location
         truck_transform = core.hero.get_transform()
+        truck_forward_vector = truck_transform.get_forward_vector()
+
 
         if core.config["truckTrailerCombo"]:
             # Getting trailer location
@@ -407,31 +507,39 @@ class DQNExperimentBasic(BaseExperiment):
 
         # print(f"BEFORE CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
         # Checking if we have passed the last way point
+
+        distance_to_next_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=1)
+        self.passed_waypoint = False
         in_front_of_waypoint = core.is_in_front_of_waypoint(truck_transform.location.x, truck_transform.location.y)
-        if in_front_of_waypoint == 0 or in_front_of_waypoint == 1:
-            core.last_waypoint_index += 1
+        if 10 > distance_to_next_waypoint_line and (in_front_of_waypoint == 0 or in_front_of_waypoint == 1):
+            core.last_waypoint_index = core.last_waypoint_index + 1
             self.last_hyp_distance_to_next_waypoint = 0
-            print('Passed Waypoint <------------')
+            self.last_closest_distance_to_next_waypoint_line = 0
+            self.passed_waypoint = True
+            print('Passed Waypoint <------------') if self.custom_enable_rendering else None
         else:
             pass
 
-        number_of_waypoints_to_plot_on_lidar = 20
-        location_from_waypoint_to_vehicle_relative = np.zeros([2,number_of_waypoints_to_plot_on_lidar])
+        lidar = False
 
-        for i in range(0,number_of_waypoints_to_plot_on_lidar,2):
-            try:
-                x_dist = core.route[core.last_waypoint_index + i].location.x - (truck_transform.location.x + 2)
-                y_dist = core.route[core.last_waypoint_index + i].location.y - (truck_transform.location.y + 0.10)
+        if lidar:
+            number_of_waypoints_to_plot_on_lidar = 20
+            location_from_waypoint_to_vehicle_relative = np.zeros([2, number_of_waypoints_to_plot_on_lidar])
 
-                xr, yr = self.rotate_matrix(x_dist,y_dist,360-truck_transform.rotation.yaw,0,0,units="DEGREES")
+            for i in range(0,number_of_waypoints_to_plot_on_lidar,2):
+                try:
+                    x_dist = core.route[core.last_waypoint_index + i].location.x - (truck_transform.location.x + 2)
+                    y_dist = core.route[core.last_waypoint_index + i].location.y - (truck_transform.location.y + 0.10)
+
+                    xr, yr = self.rotate_matrix(x_dist,y_dist,360-truck_transform.rotation.yaw,0,0,units="DEGREES")
 
 
-                location_from_waypoint_to_vehicle_relative[0][i] = xr
-                location_from_waypoint_to_vehicle_relative[1][i] = yr
-                location_from_waypoint_to_vehicle_relative[0][i+1] = xr + 0.1
-                location_from_waypoint_to_vehicle_relative[1][i+1] = yr + 0.1
-            except Exception as e:
-                print("At end of route, nothing major wrong")
+                    location_from_waypoint_to_vehicle_relative[0][i] = xr
+                    location_from_waypoint_to_vehicle_relative[1][i] = yr
+                    location_from_waypoint_to_vehicle_relative[0][i+1] = xr + 0.1
+                    location_from_waypoint_to_vehicle_relative[1][i+1] = yr + 0.1
+                except Exception as e:
+                    print("At end of route, nothing major wrong")
 
         # print(f"UP HERE{location_from_waypoint_to_vehicle_relative}")
         # import pickle
@@ -440,34 +548,49 @@ class DQNExperimentBasic(BaseExperiment):
         #         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
         #
         # save_data('waypoints2.pkl',location_from_waypoint_to_vehicle_relative)
+        number_of_waypoints = len(core.route)
 
+        closest_distance_to_next_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=0)
+        closest_distance_to_next_plus_1_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=1)
+
+        # Hyp distance to next waypoint
         x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
         y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y - truck_transform.location.y)
         hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
-        hyp_distance_to_next_waypoint = np.clip(hyp_distance_to_next_waypoint,0,100)
 
-        bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
+        # Hyp distance to next waypoint +1
+        x_dist_to_next_waypoint = abs(core.route[
+                                          core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with + 1].location.x - truck_transform.location.x)
+        y_dist_to_next_waypoint = abs(core.route[
+                                          core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with + 1].location.y - truck_transform.location.y)
+        hyp_distance_to_next_plus_1_waypoint = math.sqrt(
+            (x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
+
+        bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=truck_forward_vector)
 
         try:
-            bearing_to_ahead_waypoints_ahead = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
+            bearing_to_ahead_waypoints_ahead = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints].get_forward_vector(),vehicle_forward_vector=truck_forward_vector)
 
         except Exception as e:
             print(f"ERROR HERE1 {e}")
             bearing_to_ahead_waypoints_ahead = 0
 
         try:
-            bearing_to_ahead_waypoints_ahead_2 = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints_2].get_forward_vector(),vehicle_forward_vector=truck_transform.get_forward_vector())
+            bearing_to_ahead_waypoints_ahead_2 = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints_2].get_forward_vector(),vehicle_forward_vector=truck_forward_vector)
         except Exception as e:
             print(f"ERROR HERE2 {e}")
             bearing_to_ahead_waypoints_ahead_2 = 0
 
 
-        angle_between_truck_and_trailer = angle_between(waypoint_forward_vector=truck_transform.get_forward_vector(),vehicle_forward_vector=trailer_transform.get_forward_vector())
+        angle_between_truck_and_trailer = angle_between(waypoint_forward_vector=truck_forward_vector,vehicle_forward_vector=trailer_transform.get_forward_vector())
 
-        self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
-        self.temp_route = core.route_points
+        # trailer_bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=trailer_transform.get_forward_vector())
+
+
+
 
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
+        self.current_forward_velocity = forward_velocity
         # forward_velocity_x = np.clip(self.get_forward_velocity_x(core.hero), 0, None)
         # forward_velocity_z = np.clip(self.get_forward_velocity_z(core.hero), 0, None)
         # acceleration = np.clip(self.get_acceleration(core.hero), 0, None)
@@ -492,7 +615,8 @@ class DQNExperimentBasic(BaseExperiment):
             print(f"ERROR HERE3 {e}")
             angle_to_center_of_lane_degrees_ahead_waypoints_2 = 0
 
-        if self.visualiseRoute and self.counter > self.counterThreshold:
+        if self.visualiseRoute and self.counter > 2 :
+            draw_route_in_order(route=core.route)
             plot_route(route=core.route, last_waypoint_index=core.last_waypoint_index, truck_transform=truck_transform, number_of_waypoints_ahead_to_calculate_with=5)
 
             print(f"previous_position={core.route[core.last_waypoint_index-1].location}")
@@ -515,6 +639,29 @@ class DQNExperimentBasic(BaseExperiment):
 
         depth_camera_data = None
         current_occupancy_map = None
+        trailer_0_left = 0
+        trailer_0_right = 0
+        trailer_1_left = 0
+        trailer_1_right = 0
+        trailer_2_left = 0
+        trailer_2_right = 0
+        trailer_3_left = 0
+        trailer_3_right = 0
+        trailer_4_left = 0
+        trailer_4_right = 0
+        trailer_5_left = 0
+        trailer_5_right = 0
+
+        truck_center = 0
+        truck_right = 0
+        truck_left= 0
+        # truck_front_22right = 0
+        truck_front_45right = 0
+        # truck_front_67right = 0
+        # truck_front_22left = 0
+        truck_front_45left = 0
+        # truck_front_67left = 0
+
         for sensor in sensor_data:
             if sensor == 'collision_truck':
                 # TODO change to only take collision with road
@@ -524,12 +671,13 @@ class DQNExperimentBasic(BaseExperiment):
                 # static.sidewalk
 
                 self.last_no_of_collisions_truck = len(sensor_data[sensor][1])
-                self.truck_collisions.append(str(sensor_data[sensor][1][0]))
+                self.collisions.append(['truck',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][1]),self.current_time])
+
                 print(f'COLLISIONS TRUCK {sensor_data[sensor][1][0]}')
 
             elif sensor == "collision_trailer":
                 self.last_no_of_collisions_trailer = len(sensor_data[sensor][1])
-                self.trailer_collisions.append(str(sensor_data[sensor][1][0]))
+                self.collisions.append(['trailer',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][1]),self.current_time])
                 print(f'COLLISIONS TRAILER {sensor_data[sensor][1][0]}')
 
             elif sensor == "depth_camera_truck":
@@ -543,8 +691,495 @@ class DQNExperimentBasic(BaseExperiment):
                 # print(depth_camera_data.shape)
 
                 assert depth_camera_data is not None
-            elif sensor == "lidar_truck":
-                lidar_points = sensor_data['lidar_truck'][1]
+            elif sensor == "lidar_truck_side_truck":
+                lidar_points = sensor_data['lidar_truck_side_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_side"]["range"])
+
+                # LIDAR GRAPH
+                #           x
+                #           |
+                #           |
+                # ----------+-------- y
+                #           |
+                #           |
+
+                # Left and Right Lidar points
+                horizontal_indices = np.where((lidar_points[0] > -1) & (lidar_points[0] < 1 ))
+                horizontal_relevant_lidar_y_points = lidar_points[1][horizontal_indices]
+
+                # Forward lidar points
+                vertical_indices = np.where((lidar_points[1] > -1) & (lidar_points[1] < 1) & (lidar_points[0] > 0))
+                vertical_relevant_lidar_x_points = lidar_points[0][vertical_indices]
+
+                # Angled lidar points
+                angle_45_indices = np.where((lidar_points[0] > 0) & (np.absolute(np.absolute(lidar_points[0]) - np.absolute(lidar_points[1])) <= 1.5))
+                angle_45_relevant_lidar_x_points = lidar_points[0][angle_45_indices]
+                angle_45_relevant_lidar_y_points = lidar_points[1][angle_45_indices]
+
+                # print(f"lidar opints {lidar_points}")
+                # print(f"horizontal_indices {horizontal_indices}")
+                # print(f"horizontal_relevant_lidar_y_points {horizontal_relevant_lidar_y_points}")
+                # print(f"vertical_indices {vertical_indices}")
+                # print(f"vertical_relevant_lidar_x_points {vertical_relevant_lidar_x_points}")
+                # print(f"angle_45_indices {angle_45_indices}")
+                # print(f"angle_45_relevant_lidar_x_points{angle_45_relevant_lidar_x_points}")
+                # print(f"angle_45_relevant_lidar_y_points{angle_45_relevant_lidar_y_points}")
+
+                if len(angle_45_relevant_lidar_x_points) == 0:
+                    truck_front_right = 1
+                    truck_front_left = 1
+                else:
+
+                    greater_0_indices = np.where(angle_45_relevant_lidar_y_points > 0)
+                    smaller_0_indices = np.where(angle_45_relevant_lidar_y_points < 0)
+
+
+                    if greater_0_indices[0].size != 0:
+                        closest_point = min(abs(angle_45_relevant_lidar_x_points[greater_0_indices]**2 + angle_45_relevant_lidar_y_points[greater_0_indices]**2))
+                        truck_front_right = math.sqrt(closest_point) / lidar_range
+                    else:
+                        truck_front_right = 1
+
+                    if smaller_0_indices[0].size != 0:
+                        closest_point = min(abs(
+                            angle_45_relevant_lidar_x_points[smaller_0_indices] ** 2 + angle_45_relevant_lidar_y_points[
+                                smaller_0_indices] ** 2))
+                        truck_front_left = math.sqrt(closest_point) / lidar_range
+                    else:
+                        truck_front_left = 1
+
+                    if truck_front_right < 0:
+                        truck_front_right = 0
+
+                    if truck_front_left < 0:
+                        truck_front_left = 0
+
+
+                if len(horizontal_relevant_lidar_y_points) == 0:
+                    truck_right = 1
+                    truck_left = 1
+                else:
+                    greater_0_indices = np.where(horizontal_relevant_lidar_y_points > 0)
+                    smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
+
+
+                    if greater_0_indices[0].size != 0:
+                        truck_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices])) / lidar_range
+                    else:
+                        truck_right = 1
+
+                    if smaller_0_indices[0].size != 0:
+                        truck_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices])) / lidar_range
+                    else:
+                        truck_left = 1
+
+                    if truck_right < 0:
+                        truck_right = 0
+
+                    if truck_left < 0:
+                        truck_left = 0
+
+                if len(vertical_relevant_lidar_x_points) == 0:
+                    truck_center = 1
+                else:
+                    truck_center = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
+
+                    if truck_center < 0:
+                        truck_center = 0
+
+            elif sensor == "lidar_trailer_0_left_3x_trailer":
+                lidar_points = sensor_data['lidar_trailer_0_left_3x_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_left_3x"]["range"])
+
+                # LIDAR GRAPH
+                #           x
+                #           |
+                #           |
+                # ----------+-------- y
+                #           |
+                #           |
+
+                # Forward lidar points
+                vertical_indices = np.where((lidar_points[1] > -1) & (lidar_points[1] < 1) & (lidar_points[0] > 0))
+                vertical_relevant_lidar_x_points = lidar_points[0][vertical_indices]
+
+                # Angled lidar points
+                angle_45_indices = np.where((lidar_points[0] > 0) & (np.absolute(np.absolute(lidar_points[0]) - np.absolute(lidar_points[1])) <= 1.5))
+                angle_45_relevant_lidar_x_points = lidar_points[0][angle_45_indices]
+                angle_45_relevant_lidar_y_points = lidar_points[1][angle_45_indices]
+
+                # print(f"lidar opints {lidar_points}")
+                # print(f"horizontal_indices {horizontal_indices}")
+                # print(f"horizontal_relevant_lidar_y_points {horizontal_relevant_lidar_y_points}")
+                # print(f"vertical_indices {vertical_indices}")
+                # print(f"vertical_relevant_lidar_x_points {vertical_relevant_lidar_x_points}")
+                # print(f"angle_45_indices {angle_45_indices}")
+                # print(f"angle_45_relevant_lidar_x_points{angle_45_relevant_lidar_x_points}")
+                # print(f"angle_45_relevant_lidar_y_points{angle_45_relevant_lidar_y_points}")
+
+                if len(angle_45_relevant_lidar_x_points) == 0:
+                    trailer_0_left = 1
+                    trailer_2_left = 1
+                else:
+
+                    greater_0_indices = np.where(angle_45_relevant_lidar_y_points > 0)
+                    smaller_0_indices = np.where(angle_45_relevant_lidar_y_points < 0)
+
+
+                    if greater_0_indices[0].size != 0:
+                        closest_point = min(abs(angle_45_relevant_lidar_x_points[greater_0_indices]**2 + angle_45_relevant_lidar_y_points[greater_0_indices]**2))
+                        trailer_0_left = math.sqrt(closest_point) / lidar_range
+                    else:
+                        trailer_0_left = 1
+
+                    if smaller_0_indices[0].size != 0:
+                        closest_point = min(abs(
+                            angle_45_relevant_lidar_x_points[smaller_0_indices] ** 2 + angle_45_relevant_lidar_y_points[
+                                smaller_0_indices] ** 2))
+                        trailer_2_left = math.sqrt(closest_point) / lidar_range
+                    else:
+                        trailer_2_left = 1
+
+                    if trailer_0_left < 0:
+                        trailer_0_left = 0
+
+                    if trailer_2_left < 0:
+                        trailer_2_left = 0
+
+                if len(vertical_relevant_lidar_x_points) == 0:
+                    trailer_1_left = 1
+                else:
+                    trailer_1_left = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
+
+                    if trailer_1_left < 0:
+                        trailer_1_left = 0
+
+            elif sensor == "lidar_trailer_1_left_3x_trailer":
+                lidar_points = sensor_data['lidar_trailer_1_left_3x_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_left_3x"]["range"])
+
+                # LIDAR GRAPH
+                #           x
+                #           |
+                #           |
+                # ----------+-------- y
+                #           |
+                #           |
+
+                # Forward lidar points
+                vertical_indices = np.where((lidar_points[1] > -1) & (lidar_points[1] < 1) & (lidar_points[0] > 0))
+                vertical_relevant_lidar_x_points = lidar_points[0][vertical_indices]
+
+                # Angled lidar points
+                angle_45_indices = np.where((lidar_points[0] > 0) & (np.absolute(np.absolute(lidar_points[0]) - np.absolute(lidar_points[1])) <= 1.5))
+                angle_45_relevant_lidar_x_points = lidar_points[0][angle_45_indices]
+                angle_45_relevant_lidar_y_points = lidar_points[1][angle_45_indices]
+
+                # print(f"lidar opints {lidar_points}")
+                # print(f"horizontal_indices {horizontal_indices}")
+                # print(f"horizontal_relevant_lidar_y_points {horizontal_relevant_lidar_y_points}")
+                # print(f"vertical_indices {vertical_indices}")
+                # print(f"vertical_relevant_lidar_x_points {vertical_relevant_lidar_x_points}")
+                # print(f"angle_45_indices {angle_45_indices}")
+                # print(f"angle_45_relevant_lidar_x_points{angle_45_relevant_lidar_x_points}")
+                # print(f"angle_45_relevant_lidar_y_points{angle_45_relevant_lidar_y_points}")
+
+                if len(angle_45_relevant_lidar_x_points) == 0:
+                    trailer_3_left = 1
+                    trailer_5_left = 1
+                else:
+
+                    greater_0_indices = np.where(angle_45_relevant_lidar_y_points > 0)
+                    smaller_0_indices = np.where(angle_45_relevant_lidar_y_points < 0)
+
+
+                    if greater_0_indices[0].size != 0:
+                        closest_point = min(abs(angle_45_relevant_lidar_x_points[greater_0_indices]**2 + angle_45_relevant_lidar_y_points[greater_0_indices]**2))
+                        trailer_3_left = math.sqrt(closest_point) / lidar_range
+                    else:
+                        trailer_3_left = 1
+
+                    if smaller_0_indices[0].size != 0:
+                        closest_point = min(abs(
+                            angle_45_relevant_lidar_x_points[smaller_0_indices] ** 2 + angle_45_relevant_lidar_y_points[
+                                smaller_0_indices] ** 2))
+                        trailer_5_left = math.sqrt(closest_point) / lidar_range
+                    else:
+                        trailer_5_left = 1
+
+                    if trailer_3_left < 0:
+                        trailer_3_left = 0
+
+                    if trailer_5_left < 0:
+                        trailer_5_left = 0
+
+                if len(vertical_relevant_lidar_x_points) == 0:
+                    trailer_4_left = 1
+                else:
+                    trailer_4_left = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
+
+                    if trailer_4_left < 0:
+                        trailer_4_left = 0
+
+            elif sensor == "lidar_trailer_0_right_3x_trailer":
+                lidar_points = sensor_data['lidar_trailer_0_right_3x_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_right_3x"]["range"])
+
+                # LIDAR GRAPH
+                #           x
+                #           |
+                #           |
+                # ----------+-------- y
+                #           |
+                #           |
+
+                # Forward lidar points
+                vertical_indices = np.where((lidar_points[1] > -1) & (lidar_points[1] < 1) & (lidar_points[0] > 0))
+                vertical_relevant_lidar_x_points = lidar_points[0][vertical_indices]
+
+                # Angled lidar points
+                angle_45_indices = np.where((lidar_points[0] > 0) & (np.absolute(np.absolute(lidar_points[0]) - np.absolute(lidar_points[1])) <= 1.5))
+                angle_45_relevant_lidar_x_points = lidar_points[0][angle_45_indices]
+                angle_45_relevant_lidar_y_points = lidar_points[1][angle_45_indices]
+
+                # print(f"lidar opints {lidar_points}")
+                # print(f"horizontal_indices {horizontal_indices}")
+                # print(f"horizontal_relevant_lidar_y_points {horizontal_relevant_lidar_y_points}")
+                # print(f"vertical_indices {vertical_indices}")
+                # print(f"vertical_relevant_lidar_x_points {vertical_relevant_lidar_x_points}")
+                # print(f"angle_45_indices {angle_45_indices}")
+                # print(f"angle_45_relevant_lidar_x_points{angle_45_relevant_lidar_x_points}")
+                # print(f"angle_45_relevant_lidar_y_points{angle_45_relevant_lidar_y_points}")
+
+                if len(angle_45_relevant_lidar_x_points) == 0:
+                    trailer_0_right = 1
+                    trailer_2_right = 1
+                else:
+
+                    greater_0_indices = np.where(angle_45_relevant_lidar_y_points > 0)
+                    smaller_0_indices = np.where(angle_45_relevant_lidar_y_points < 0)
+
+
+                    if greater_0_indices[0].size != 0:
+                        closest_point = min(abs(angle_45_relevant_lidar_x_points[greater_0_indices]**2 + angle_45_relevant_lidar_y_points[greater_0_indices]**2))
+                        trailer_0_right = math.sqrt(closest_point) / lidar_range
+                    else:
+                        trailer_0_right = 1
+
+                    if smaller_0_indices[0].size != 0:
+                        closest_point = min(abs(
+                            angle_45_relevant_lidar_x_points[smaller_0_indices] ** 2 + angle_45_relevant_lidar_y_points[
+                                smaller_0_indices] ** 2))
+                        trailer_2_right = math.sqrt(closest_point) / lidar_range
+                    else:
+                        trailer_2_right = 1
+
+                    if trailer_0_right < 0:
+                        trailer_0_right = 0
+
+                    if trailer_2_right < 0:
+                        trailer_2_right = 0
+
+                if len(vertical_relevant_lidar_x_points) == 0:
+                    trailer_1_right = 1
+                else:
+                    trailer_1_right = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
+
+                    if trailer_1_right < 0:
+                        trailer_1_right = 0
+
+            elif sensor == "lidar_trailer_1_right_3x_trailer":
+                lidar_points = sensor_data['lidar_trailer_1_right_3x_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_right_3x"]["range"])
+
+                # LIDAR GRAPH
+                #           x
+                #           |
+                #           |
+                # ----------+-------- y
+                #           |
+                #           |
+
+                # Forward lidar points
+                vertical_indices = np.where((lidar_points[1] > -1) & (lidar_points[1] < 1) & (lidar_points[0] > 0))
+                vertical_relevant_lidar_x_points = lidar_points[0][vertical_indices]
+
+                # Angled lidar points
+                angle_45_indices = np.where((lidar_points[0] > 0) & (np.absolute(np.absolute(lidar_points[0]) - np.absolute(lidar_points[1])) <= 1.5))
+                angle_45_relevant_lidar_x_points = lidar_points[0][angle_45_indices]
+                angle_45_relevant_lidar_y_points = lidar_points[1][angle_45_indices]
+
+                # print(f"lidar opints {lidar_points}")
+                # print(f"horizontal_indices {horizontal_indices}")
+                # print(f"horizontal_relevant_lidar_y_points {horizontal_relevant_lidar_y_points}")
+                # print(f"vertical_indices {vertical_indices}")
+                # print(f"vertical_relevant_lidar_x_points {vertical_relevant_lidar_x_points}")
+                # print(f"angle_45_indices {angle_45_indices}")
+                # print(f"angle_45_relevant_lidar_x_points{angle_45_relevant_lidar_x_points}")
+                # print(f"angle_45_relevant_lidar_y_points{angle_45_relevant_lidar_y_points}")
+
+                if len(angle_45_relevant_lidar_x_points) == 0:
+                    trailer_3_right = 1
+                    trailer_5_right = 1
+                else:
+
+                    greater_0_indices = np.where(angle_45_relevant_lidar_y_points > 0)
+                    smaller_0_indices = np.where(angle_45_relevant_lidar_y_points < 0)
+
+
+                    if greater_0_indices[0].size != 0:
+                        closest_point = min(abs(angle_45_relevant_lidar_x_points[greater_0_indices]**2 + angle_45_relevant_lidar_y_points[greater_0_indices]**2))
+                        trailer_3_right = math.sqrt(closest_point) / lidar_range
+                    else:
+                        trailer_3_right = 1
+
+                    if smaller_0_indices[0].size != 0:
+                        closest_point = min(abs(
+                            angle_45_relevant_lidar_x_points[smaller_0_indices] ** 2 + angle_45_relevant_lidar_y_points[
+                                smaller_0_indices] ** 2))
+                        trailer_5_right = math.sqrt(closest_point) / lidar_range
+                    else:
+                        trailer_5_right = 1
+
+                    if trailer_3_right < 0:
+                        trailer_3_right = 0
+
+                    if trailer_5_right < 0:
+                        trailer_5_right = 0
+
+                if len(vertical_relevant_lidar_x_points) == 0:
+                    trailer_4_right = 1
+                else:
+                    trailer_4_right = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
+
+                    if trailer_4_right < 0:
+                        trailer_4_right = 0
+
+            elif sensor == "lidar_trailer_0_trailer":
+                trailer_0_right, trailer_0_left = self.lidar_right_left_closest_points(sensor_data=sensor_data,
+                                                                                       sensor_name=sensor)
+            elif sensor == "lidar_trailer_1_trailer":
+                trailer_1_right, trailer_1_left = self.lidar_right_left_closest_points(sensor_data=sensor_data,
+                                                                                       sensor_name=sensor)
+            elif sensor == "lidar_trailer_2_trailer":
+                trailer_2_right, trailer_2_left = self.lidar_right_left_closest_points(sensor_data=sensor_data,
+                                                                                       sensor_name=sensor)
+            elif sensor == "lidar_trailer_3_trailer":
+                trailer_3_right, trailer_3_left = self.lidar_right_left_closest_points(sensor_data=sensor_data,
+                                                                                       sensor_name=sensor)
+            elif sensor == "lidar_trailer_4_trailer":
+                trailer_4_right, trailer_4_left = self.lidar_right_left_closest_points(sensor_data=sensor_data,
+                                                                                       sensor_name=sensor)
+            elif sensor == "lidar_trailer_5_trailer":
+                trailer_5_right, trailer_5_left = self.lidar_right_left_closest_points(sensor_data=sensor_data,
+                                                                                       sensor_name=sensor)
+            elif sensor == "lidar_trailer_0_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_0_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_left"]["range"])
+                trailer_0_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_0_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_0_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_right"]["range"])
+                trailer_0_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_1_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_1_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_left"]["range"])
+                trailer_1_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_1_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_1_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_right"]["range"])
+                trailer_1_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_2_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_2_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_2_left"]["range"])
+                trailer_2_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_2_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_2_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_2_right"]["range"])
+                trailer_2_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_3_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_3_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_3_left"]["range"])
+                trailer_3_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_3_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_3_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_3_right"]["range"])
+                trailer_3_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_4_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_4_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_4_left"]["range"])
+                trailer_4_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+
+            elif sensor == "lidar_trailer_4_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_4_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_4_right"]["range"])
+                trailer_4_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_5_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_5_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5_left"]["range"])
+                trailer_5_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_5_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_5_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5_right"]["range"])
+                trailer_5_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_right_truck":
+                lidar_points = sensor_data['lidar_truck_right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_right"]["range"])
+                truck_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_left_truck":
+                lidar_points = sensor_data['lidar_truck_left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_left"]["range"])
+                truck_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_center_truck":
+                lidar_points = sensor_data['lidar_truck_center_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_center"]["range"])
+                truck_center = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_22left_truck":
+                lidar_points = sensor_data['lidar_truck_front_22left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_22left"]["range"])
+                truck_front_22left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_45left_truck":
+                lidar_points = sensor_data['lidar_truck_front_45left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_45left"]["range"])
+                truck_front_45left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_67left_truck":
+                lidar_points = sensor_data['lidar_truck_front_67left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_67left"]["range"])
+                truck_front_67left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_22right_truck":
+                lidar_points = sensor_data['lidar_truck_front_22right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_22right"]["range"])
+                truck_front_22right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_45right_truck":
+                lidar_points = sensor_data['lidar_truck_front_45right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_45right"]["range"])
+                truck_front_45right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_67right_truck":
+                lidar_points = sensor_data['lidar_truck_front_67right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_67right"]["range"])
+                truck_front_67right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_truck":
+                lidar_points = sensor_data['lidar_truck_truck'][1]
                 # print(lidar_points.shape)
                 # print(f"BEFORE {lidar_points[0][len(lidar_points) - 20]}-{lidar_points[1][len(lidar_points) - 20]}")
                 # print(f"BEFORE {lidar_points[0][len(lidar_points) - 19]}-{lidar_points[1][len(lidar_points) - 19]}")
@@ -608,11 +1243,45 @@ class DQNExperimentBasic(BaseExperiment):
             plt.imshow(depth_camera_data, interpolation='nearest')
             plt.show()
 
-        observations = [
+        # Only saving the last lidar data points
+        self.lidar_data.append([
+            self.current_time,
+            np.float32(trailer_0_left),
+            np.float32(trailer_0_right),
+            np.float32(trailer_1_left),
+            np.float32(trailer_1_right),
+            np.float32(trailer_2_left),
+            np.float32(trailer_2_right),
+            np.float32(trailer_3_left),
+            np.float32(trailer_3_right),
+            np.float32(trailer_4_left),
+            np.float32(trailer_4_right),
+            np.float32(trailer_5_left),
+            np.float32(trailer_5_right),
+            np.float32(truck_center),
+            np.float32(truck_right),
+            np.float32(truck_left),
+            # np.float32(truck_front_22left),
+            np.float32(truck_front_45left),
+            # np.float32(truck_front_67left),
+            # np.float32(truck_front_22right),
+            np.float32(truck_front_45right),
+            # np.float32(truck_front_67right),
+
+        ])
+
+        value_observations = [
+            # np.float32(number_of_waypoints),
+            # np.float32(core.last_waypoint_index/number_of_waypoints),
             np.float32(forward_velocity),
-            # np.float32(forward_velocity_x),
+            # np.float32(acceleration),
+            # np.float32(forward_veloci ty_x),
             # np.float32(forward_velocity_z),
             np.float32(hyp_distance_to_next_waypoint),
+            np.float32(hyp_distance_to_next_plus_1_waypoint),
+            np.float32(closest_distance_to_next_waypoint_line),
+            np.float32(closest_distance_to_next_plus_1_waypoint_line),
+            # np.float32(hyp_distance_to_next_waypoint_line),
             np.float32(angle_to_center_of_lane_degrees),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2),
@@ -620,19 +1289,102 @@ class DQNExperimentBasic(BaseExperiment):
             np.float32(bearing_to_ahead_waypoints_ahead),
             np.float32(bearing_to_ahead_waypoints_ahead_2),
             np.float32(angle_between_truck_and_trailer),
+
+            # np.float32(trailer_bearing_to_waypoint),
             # np.float32(acceleration)
                            ]
+        lidar_data_points = [
+            np.float32(trailer_0_left),
+            np.float32(trailer_0_right),
+            np.float32(trailer_1_left),
+            np.float32(trailer_1_right),
+            np.float32(trailer_2_left),
+            np.float32(trailer_2_right),
+            np.float32(trailer_3_left),
+            np.float32(trailer_3_right),
+            np.float32(trailer_4_left),
+            np.float32(trailer_4_right),
+            np.float32(trailer_5_left),
+            np.float32(trailer_5_right),
+            np.float32(truck_center),
+            np.float32(truck_right),
+            np.float32(truck_left),
+            # np.float32(truck_front_22left),
+            np.float32(truck_front_45left),
+            # np.float32(truck_front_67left),
+            # np.float32(truck_front_22right),
+            np.float32(truck_front_45right),
+            # np.float32(truck_front_67right)
+        ]
+        value_observations.extend(lidar_data_points)
+        value_observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
-        observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
+        value_observations.extend(radii)
+        value_observations.append(np.float32(mean_radius))
 
-        observations.extend(self.radii)
+        route_type_string = get_route_type(current_entry_idx=self.entry_idx, current_exit_idx=self.exit_idx)
 
-        print(f"Radii {self.radii}")
+        if route_type_string == 'easy':
+            route_type = 0
+        elif route_type_string == 'difficult':
+            route_type = 1
+        else:
+            raise Exception('This should never happen')
 
+        self.lidar_collision = False
+        if any(lidar_point < 0.03 for lidar_point in lidar_data_points):
+            self.lidar_collision = True
+
+
+        if self.custom_enable_rendering:
+            print(f'Route Type {route_type}')
+            print(f"Radii {radii}")
+            print(f'Mean radius {mean_radius}')
+            # print(f"truck FRONT \t\t\t{round(truck_center, 2)}")
+            # print(f"truck 45 \t\t{round(truck_front_left,2)}\t\t{round(truck_front_right,2)}")
+            # print(f"truck sides \t\t{round(truck_left, 2)}\t\t{round(truck_right, 2)}")
+            # print(f"")
+            # print(f"trailer_0 \t\t{round(trailer_0_left,2)}\t\t{round(trailer_0_right,2)}")
+            # print(f"trailer_1 \t\t{round(trailer_1_left,2)}\t\t{round(trailer_2_right,2)}")
+            # print(f"trailer_2 \t\t{round(trailer_2_left,2)}\t\t{round(trailer_2_right,2)}")
+            # print(f"trailer_3 \t\t{round(trailer_3_left,2)}\t\t{round(trailer_3_right,2)}")
+            # print(f"trailer_4 \t\t{round(trailer_4_left,2)}\t\t{round(trailer_4_right,2)}")
+            # print(f"trailer_5 \t\t{round(trailer_5_left,2)}\t\t{round(trailer_5_right,2)}")
+            print(f"truck FRONT \t\t\t{np.float32(truck_center)}")
+            # print(f"truck 22 \t\t{np.float32(truck_front_22left)}\t\t{np.float32(truck_front_22right)}")
+            print(f"truck 45 \t\t{np.float32(truck_front_45left)}\t\t{np.float32(truck_front_45right)}")
+            # print(f"truck 67 \t\t{np.float32(truck_front_67left)}\t\t{np.float32(truck_front_67right)}")
+            print(f"truck sides \t\t{np.float32(truck_left)}\t\t{np.float32(truck_right)}")
+            print(f"")
+            print(f"trailer_0 \t\t{np.float32(trailer_0_left)}\t\t{np.float32(trailer_0_right)}")
+            print(f"trailer_1 \t\t{np.float32(trailer_1_left)}\t\t{np.float32(trailer_2_right)}")
+            print(f"trailer_2 \t\t{np.float32(trailer_2_left)}\t\t{np.float32(trailer_2_right)}")
+            print(f"trailer_3 \t\t{np.float32(trailer_3_left)}\t\t{np.float32(trailer_3_right)}")
+            print(f"trailer_4 \t\t{np.float32(trailer_4_left)}\t\t{np.float32(trailer_4_right)}")
+            print(f"trailer_5 \t\t{np.float32(trailer_5_left)}\t\t{np.float32(trailer_5_right)}")
+            print('')
+            print(f"forward_velocity:{np.float32(forward_velocity)}")
+            print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
+            print(f"hyp_distance_to_next_plus_1_waypoint:{np.float32(hyp_distance_to_next_plus_1_waypoint)}")
+            print(f"closest_distance_to_next_waypoint_line:{np.float32(closest_distance_to_next_waypoint_line)}")
+            print(f"closest_distance_to_next_plus_1_waypoint_line:{np.float32(closest_distance_to_next_plus_1_waypoint_line)}")
+            print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
+            print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
+            print(f"angle_to_center_of_lane_degrees_ahead_waypoints_2:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2)}")
+            print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
+            print(f"bearing_to_ahead_waypoints_ahead:{np.float32(bearing_to_ahead_waypoints_ahead)}")
+            print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
+            print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
+            print('')
+            print('')
+            time.sleep(0.2)
         self.forward_velocity.append(np.float32(forward_velocity))
         # self.forward_velocity_x.append(np.float32(forward_velocity_x))
         # self.forward_velocity_z.append(np.float32(forward_velocity_z))
         self.hyp_distance_to_next_waypoint.append(np.float32(hyp_distance_to_next_waypoint))
+        self.hyp_distance_to_next_plus_1_waypoint.append(np.float32(hyp_distance_to_next_plus_1_waypoint))
+        self.closest_distance_to_next_waypoint_line.append(np.float32(closest_distance_to_next_waypoint_line))
+        self.closest_distance_to_next_plus_1_waypoint_line.append(np.float32(closest_distance_to_next_plus_1_waypoint_line))
         self.angle_to_center_of_lane_degrees.append(np.float32(angle_to_center_of_lane_degrees))
         self.angle_to_center_of_lane_degrees_ahead_waypoints.append(np.float32(angle_to_center_of_lane_degrees_ahead_waypoints))
         self.angle_to_center_of_lane_degrees_ahead_waypoints_2.append(np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2))
@@ -640,7 +1392,12 @@ class DQNExperimentBasic(BaseExperiment):
         self.bearing_to_ahead_waypoints_ahead.append(np.float32(bearing_to_ahead_waypoints_ahead))
         self.bearing_to_ahead_waypoints_ahead_2.append(np.float32(bearing_to_ahead_waypoints_ahead_2))
         self.angle_between_truck_and_trailer.append(np.float32(angle_between_truck_and_trailer))
+        # self.trailer_bearing_to_waypoint.append(np.float32(trailer_bearing_to_waypoint))
         # self.acceleration.append(np.float32(acceleration))
+        self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
+        self.temp_route = deepcopy(core.route_points)
+        self.radii.append(radii)
+        self.mean_radius.append(mean_radius)
         #
         # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
         # print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
@@ -649,14 +1406,16 @@ class DQNExperimentBasic(BaseExperiment):
         # print(f"bearing_to_ahead_waypoints_ahead:{np.float32(bearing_to_ahead_waypoints_ahead)}")
         # print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
         # print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
-        # print(f"forward_velocity:{np.float32(forward_velocity)}")
+
         # print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
+        # print(f"trailer_bearing_to_waypoint:{np.float32(trailer_bearing_to_waypoint)}")
         # print(f"forward_velocity_x:{np.float32(forward_velocity_x)}")
         # print(f"forward_velocity_z:{np.float32(forward_velocity_z)}")
         # print(f"acceleration:{np.float32(acceleration)}")
 
         self.counter += 1
-        return observations,{}
+        return {'values':value_observations,'route': route_type},\
+            {"truck_z_value":truck_transform.location.z }
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -712,8 +1471,9 @@ class DQNExperimentBasic(BaseExperiment):
         self.done_collision_truck = (self.last_no_of_collisions_truck > 0)
         self.done_collision_trailer = (self.last_no_of_collisions_trailer > 0)
         self.done_arrived = self.completed_route(core)
+        self.done_far_from_path = self.last_hyp_distance_to_next_waypoint > 10
 
-        output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision_truck or self.done_collision_trailer or self.done_arrived
+        output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision_truck or self.done_collision_trailer or self.done_arrived or self.done_far_from_path or self.lidar_collision
         self.custom_done_arrived = self.done_arrived
 
         done_reason = ""
@@ -727,8 +1487,12 @@ class DQNExperimentBasic(BaseExperiment):
             done_reason += "done_collision_truck"
         if self.done_collision_trailer:
             done_reason += "done_collision_trailer"
+        if self.done_far_from_path:
+            done_reason += "done_far_from_path"
         if self.done_arrived:
             done_reason += "done_arrived"
+        if self.lidar_collision:
+            done_reason += "lidar_collision"
 
         if done_reason != "":
             data = f"ENTRY: {core.entry_spawn_point_index} EXIT: {core.exit_spawn_point_index} - {done_reason} \n"
@@ -736,38 +1500,93 @@ class DQNExperimentBasic(BaseExperiment):
 
         return bool(output), self.done_collision_truck, self.done_collision_trailer, (self.done_time_idle or self.done_time_episode), self.done_arrived
 
-    def compute_reward(self, observation, core):
+    def compute_reward(self, observation, info, core):
         """Computes the reward"""
-
+        # est
         reward = 0
 
-        forward_velocity = observation[0]
-        hyp_distance_to_next_waypoint = observation[1]
+        forward_velocity = observation['values'][0]
+        hyp_distance_to_next_waypoint = observation['values'][1]
+        hyp_distance_to_next_plus_1_waypoint = observation['values'][2]
+        closest_distance_to_next_waypoint_line = observation['values'][3]
+        closest_distance_to_next_plus_1_waypoint_line = observation['values'][4]
+
         # print(f"in rewards forward_velocity {forward_velocity}")
         # print(f"in rewards hyp_distance_to_next_waypoint {hyp_distance_to_next_waypoint}")
 
-        # bearing_to_waypoint = observation["values"][4]
+        #bearing_to_waypoint = observation[5]
         # bearing_to_ahead_waypoints_ahead = observation["values"][5]
         # angle_between_truck_and_trailer = observation["values"][6]
 
-
         self.last_forward_velocity = forward_velocity
 
-        print(f"Hyp distance in rewards {hyp_distance_to_next_waypoint}")
+        # print(f"Hyp distance in rewards {hyp_distance_to_next_waypoint}")
+        # print(f"self.last_hyp_distance_to_next_waypoint {self.last_hyp_distance_to_next_waypoint}")
+        # print(f"self.last_hyp_distance_to_next_plus_1_waypoint {self.last_hyp_distance_to_next_plus_1_waypoint}")
+        # print(f"Hyp distance line in rewards {hyp_distance_to_next_waypoint_line}")
+        # print(f"self.last_hyp_distance_to_next_waypoint_lines {self.last_hyp_distance_to_next_waypoint_line}")
+        # print(f"self.last_hyp_distance_to_next_plus_1_waypoint_line {self.last_hyp_distance_to_next_plus_1_waypoint_line}")
+
+        if self.last_hyp_distance_to_next_plus_1_waypoint == 0:
+            self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_waypoint
+
+        # if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
+        #     self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
+
+        if self.last_closest_distance_to_next_plus_1_waypoint_line == 0:
+            self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_waypoint_line
+
+        waypoint_reward_multiply_factor = 50
         if self.last_hyp_distance_to_next_waypoint != 0:
             hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-            reward = reward + hyp_reward*100
-            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward*100}")
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
+            reward = reward + hyp_reward* waypoint_reward_multiply_factor
+            self.point_reward.append(hyp_reward* waypoint_reward_multiply_factor)
+            self.point_reward_location.append(1)
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* waypoint_reward_multiply_factor}") if self.custom_enable_rendering else None
+        else:
+            hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
+            reward = reward + hyp_reward * waypoint_reward_multiply_factor
+            self.point_reward.append(hyp_reward* waypoint_reward_multiply_factor)
+            self.point_reward_location.append(2)
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* waypoint_reward_multiply_factor}") if self.custom_enable_rendering else None
 
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
+        self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
 
+        line_reward_multiply_factor = 100
+        if self.last_closest_distance_to_next_waypoint_line != 0:
+            hyp_reward = self.last_closest_distance_to_next_waypoint_line - closest_distance_to_next_waypoint_line
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
+            reward = reward + hyp_reward* line_reward_multiply_factor
+            self.line_reward.append(hyp_reward* line_reward_multiply_factor)
+            self.line_reward_location.append(1)
+            print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* line_reward_multiply_factor}") if self.custom_enable_rendering else None
+        else:
+            hyp_reward = self.last_closest_distance_to_next_plus_1_waypoint_line - closest_distance_to_next_waypoint_line
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
+            reward = reward + hyp_reward * line_reward_multiply_factor
+            self.line_reward.append(hyp_reward* line_reward_multiply_factor)
+            self.line_reward_location.append(2)
+            print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* line_reward_multiply_factor}") if self.custom_enable_rendering else None
+
+        self.last_closest_distance_to_next_waypoint_line = closest_distance_to_next_waypoint_line
+        self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
+
+        if self.passed_waypoint:
+            reward = reward + 500
 
 
         # if bearing_to_waypoint == 0:
-        #     reward += 50
+        #      reward = reward+ 50
         # else:
         #     print(f"REWARD bearing_to_waypoint {abs(1/bearing_to_waypoint)}")
-        #     reward += abs(1/bearing_to_waypoint)
+        #     reward = reward+ abs(1/bearing_to_waypoint)
 
         # if bearing_to_ahead_waypoints_ahead == 0:
         #     reward = reward + 30
@@ -780,26 +1599,37 @@ class DQNExperimentBasic(BaseExperiment):
 
         if forward_velocity < 0.75:
             # Negative reward for no velocity
-            print('REWARD -100 for velocity')
+            print('REWARD -100 for velocity') if self.custom_enable_rendering else None
             reward = reward + -100
+
+        # # Negative reward each timestep
+        # reward = reward + -5
 
 
         if self.done_falling:
-            reward = reward + -1000
+            reward = reward + -10000
             print('====> REWARD Done falling')
         if self.done_collision_truck or self.done_collision_trailer:
             print("====> REWARD Done collision")
-            reward = reward + -1000
+            reward = reward + -10000
+        if self.lidar_collision:
+            print("====> REWARD Lidar collision")
+            reward = reward + -10000
         if self.done_time_idle:
             print("====> REWARD Done idle")
-            reward = reward + -1000
+            reward = reward + -10000
         if self.done_time_episode:
             print("====> REWARD Done max time")
-            reward = reward + -1000
+            reward = reward + -10000
+        if self.done_far_from_path:
+            print("====> REWARD Done far from path")
+            reward = reward + -10000
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward = reward + 10000
+            reward = reward + 500
 
+        self.total_episode_reward.append(reward)
         self.reward_metric = reward
-        print(f"Reward: {reward}")
+        print(f"FINAL REWARD: {reward}") if self.custom_enable_rendering else None
+        print(f"---------------------------------------------") if self.custom_enable_rendering else None
         return reward
