@@ -217,7 +217,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 4400:
+        if idx > 0:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -277,7 +277,7 @@ def plot_route(route_points_all, truck_points_all):
                 a1.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
                 # plt.axis([0, 1, 0, 1])
                 a1.set_title(
-                    f'Collision with {df.loc[idx, "Vehicle"]}. Episode {idx}/{len(x_route)}')
+                    f'{df.loc[idx, "Done"]}. Episode {idx}/{len(x_route)}')
                 a1.invert_yaxis()
                 a1.legend(loc='upper center')
 

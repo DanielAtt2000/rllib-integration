@@ -36,7 +36,7 @@ from sac.sac_callbacks import get_route_type
 class SACExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        # self.acceleration_pid = PID(Kp=0.05,Ki=0.1,Kd=0.00,setpoint=8.33,sample_time=None,output_limits=(0,1))
+        self.acceleration_pid = PID(Kp=0.2,Ki=0.0,Kd=0.0,setpoint=7.5,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -344,8 +344,8 @@ class SACExperimentBasic(BaseExperiment):
         """
         obs_space = Dict( {
             'values':Box(
-                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             ),
             'route': Discrete(2)
@@ -381,18 +381,18 @@ class SACExperimentBasic(BaseExperiment):
         return obs_space
 
     def get_actions(self):
-        # acceleration_value = self.acceleration_pid(self.current_forward_velocity)
-        # print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
+        acceleration_value = self.acceleration_pid(self.current_forward_velocity)
+        print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
         return {
-            0: [0.3, 0.00, 0.0, False, False],  # Straight
-            1: [0.3, 0.80, 0.0, False, False],  # Right
-            2: [0.3, 0.60, 0.0, False, False],  # Right
-            3: [0.3, 0.40, 0.0, False, False],  # Right
-            4: [0.3, 0.20, 0.0, False, False],  # Right
-            5: [0.3, -0.80, 0.0, False, False],  # Left
-            6: [0.3, -0.60, 0.0, False, False],  # Left
-            7: [0.3, -0.40, 0.0, False, False],  # Left
-            8: [0.3, -0.20, 0.0, False, False],  # Left
+            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
+            1: [acceleration_value, 0.80, 0.0, False, False],  # Right
+            2: [acceleration_value, 0.60, 0.0, False, False],  # Right
+            3: [acceleration_value, 0.40, 0.0, False, False],  # Right
+            4: [acceleration_value, 0.20, 0.0, False, False],  # Right
+            5: [acceleration_value, -0.80, 0.0, False, False],  # Left
+            6: [acceleration_value, -0.60, 0.0, False, False],  # Left
+            7: [acceleration_value, -0.40, 0.0, False, False],  # Left
+            8: [acceleration_value, -0.20, 0.0, False, False],  # Left
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
             # 2: [0.0, 0.75, 0.0, False, False],  # Right
@@ -651,16 +651,24 @@ class SACExperimentBasic(BaseExperiment):
         trailer_4_right = 0
         trailer_5_left = 0
         trailer_5_right = 0
+        trailer_6_left = 0
+        trailer_6_right = 0
+        trailer_7_left = 0
+        trailer_7_right = 0
 
         truck_center = 0
         truck_right = 0
         truck_left= 0
-        # truck_front_22right = 0
+        truck_front_15right = 0
+        truck_front_30right = 0
         truck_front_45right = 0
-        # truck_front_67right = 0
-        # truck_front_22left = 0
+        truck_front_60right = 0
+        truck_front_75right = 0
+        truck_front_15left = 0
+        truck_front_30left = 0
         truck_front_45left = 0
-        # truck_front_67left = 0
+        truck_front_60left = 0
+        truck_front_75left = 0
 
         for sensor in sensor_data:
             if sensor == 'collision_truck':
@@ -1133,6 +1141,26 @@ class SACExperimentBasic(BaseExperiment):
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5_right"]["range"])
                 trailer_5_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
+            elif sensor == "lidar_trailer_6_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_6_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_6_left"]["range"])
+                trailer_6_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_6_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_6_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_6_right"]["range"])
+                trailer_6_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_7_left_trailer":
+                lidar_points = sensor_data['lidar_trailer_7_left_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_7_left"]["range"])
+                trailer_7_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_trailer_7_right_trailer":
+                lidar_points = sensor_data['lidar_trailer_7_right_trailer'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_7_right"]["range"])
+                trailer_7_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
             elif sensor == "lidar_truck_right_truck":
                 lidar_points = sensor_data['lidar_truck_right_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_right"]["range"])
@@ -1148,35 +1176,55 @@ class SACExperimentBasic(BaseExperiment):
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_center"]["range"])
                 truck_center = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
-            elif sensor == "lidar_truck_front_22left_truck":
-                lidar_points = sensor_data['lidar_truck_front_22left_truck'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_22left"]["range"])
-                truck_front_22left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+            elif sensor == "lidar_truck_front_15left_truck":
+                lidar_points = sensor_data['lidar_truck_front_15left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_15left"]["range"])
+                truck_front_15left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_30left_truck":
+                lidar_points = sensor_data['lidar_truck_front_30left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_30left"]["range"])
+                truck_front_30left = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
             elif sensor == "lidar_truck_front_45left_truck":
                 lidar_points = sensor_data['lidar_truck_front_45left_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_45left"]["range"])
                 truck_front_45left = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
-            elif sensor == "lidar_truck_front_67left_truck":
-                lidar_points = sensor_data['lidar_truck_front_67left_truck'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_67left"]["range"])
-                truck_front_67left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+            elif sensor == "lidar_truck_front_60left_truck":
+                lidar_points = sensor_data['lidar_truck_front_60left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_60left"]["range"])
+                truck_front_60left = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
-            elif sensor == "lidar_truck_front_22right_truck":
-                lidar_points = sensor_data['lidar_truck_front_22right_truck'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_22right"]["range"])
-                truck_front_22right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+            elif sensor == "lidar_truck_front_75left_truck":
+                lidar_points = sensor_data['lidar_truck_front_75left_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_75left"]["range"])
+                truck_front_75left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_15right_truck":
+                lidar_points = sensor_data['lidar_truck_front_15right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_15right"]["range"])
+                truck_front_15right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_30right_truck":
+                lidar_points = sensor_data['lidar_truck_front_30right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_30right"]["range"])
+                truck_front_30right = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
             elif sensor == "lidar_truck_front_45right_truck":
                 lidar_points = sensor_data['lidar_truck_front_45right_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_45right"]["range"])
                 truck_front_45right = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
-            elif sensor == "lidar_truck_front_67right_truck":
-                lidar_points = sensor_data['lidar_truck_front_67right_truck'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_67right"]["range"])
-                truck_front_67right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+            elif sensor == "lidar_truck_front_60right_truck":
+                lidar_points = sensor_data['lidar_truck_front_60right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_60right"]["range"])
+                truck_front_60right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+            elif sensor == "lidar_truck_front_75right_truck":
+                lidar_points = sensor_data['lidar_truck_front_75right_truck'][1]
+                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_75right"]["range"])
+                truck_front_75right = self.get_min_lidar_point(lidar_points[0], lidar_range)
 
             elif sensor == "lidar_truck_truck":
                 lidar_points = sensor_data['lidar_truck_truck'][1]
@@ -1258,15 +1306,23 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(trailer_4_right),
             np.float32(trailer_5_left),
             np.float32(trailer_5_right),
+            np.float32(trailer_6_left),
+            np.float32(trailer_6_right),
+            np.float32(trailer_7_left),
+            np.float32(trailer_7_right),
             np.float32(truck_center),
             np.float32(truck_right),
             np.float32(truck_left),
-            # np.float32(truck_front_22left),
+            np.float32(truck_front_15left),
+            np.float32(truck_front_30left),
             np.float32(truck_front_45left),
-            # np.float32(truck_front_67left),
-            # np.float32(truck_front_22right),
+            np.float32(truck_front_60left),
+            np.float32(truck_front_75left),
+            np.float32(truck_front_15right),
+            np.float32(truck_front_30right),
             np.float32(truck_front_45right),
-            # np.float32(truck_front_67right),
+            np.float32(truck_front_60right),
+            np.float32(truck_front_75right),
 
         ])
 
@@ -1306,15 +1362,23 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(trailer_4_right),
             np.float32(trailer_5_left),
             np.float32(trailer_5_right),
+            np.float32(trailer_6_left),
+            np.float32(trailer_6_right),
+            np.float32(trailer_7_left),
+            np.float32(trailer_7_right),
             np.float32(truck_center),
             np.float32(truck_right),
             np.float32(truck_left),
-            # np.float32(truck_front_22left),
+            np.float32(truck_front_15left),
+            np.float32(truck_front_30left),
             np.float32(truck_front_45left),
-            # np.float32(truck_front_67left),
-            # np.float32(truck_front_22right),
+            np.float32(truck_front_60left),
+            np.float32(truck_front_75left),
+            np.float32(truck_front_15right),
+            np.float32(truck_front_30right),
             np.float32(truck_front_45right),
-            # np.float32(truck_front_67right)
+            np.float32(truck_front_60right),
+            np.float32(truck_front_75right),
         ]
         value_observations.extend(lidar_data_points)
         value_observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
@@ -1554,7 +1618,7 @@ class SACExperimentBasic(BaseExperiment):
         #     self.point_reward_location.append(2)
         #     print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* waypoint_reward_multiply_factor}") if self.custom_enable_rendering else None
         #
-        # self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
+        self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
         # self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
         #
         # line_reward_multiply_factor = 100
