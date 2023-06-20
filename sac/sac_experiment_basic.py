@@ -1641,9 +1641,9 @@ class SACExperimentBasic(BaseExperiment):
         #
         # self.last_closest_distance_to_next_waypoint_line = closest_distance_to_next_waypoint_line
         # self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
-
-        if self.passed_waypoint:
-            reward = reward + 10
+        #
+        # if self.passed_waypoint:
+        #     reward = reward + 10
 
 
         # if bearing_to_waypoint == 0:
@@ -1666,8 +1666,8 @@ class SACExperimentBasic(BaseExperiment):
             print('REWARD -100 for velocity') if self.custom_enable_rendering else None
             reward = reward + 0
 
-        # Negative reward each timestep
-        reward = reward + -1
+        # # Negative reward each timestep
+        # reward = reward + -1
 
 
         if self.done_falling:
@@ -1690,7 +1690,7 @@ class SACExperimentBasic(BaseExperiment):
             reward = reward + -10
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward = reward + 0
+            reward = reward + 1
 
         self.total_episode_reward.append(reward)
         self.reward_metric = reward
