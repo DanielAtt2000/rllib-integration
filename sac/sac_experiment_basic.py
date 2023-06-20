@@ -36,7 +36,7 @@ from sac.sac_callbacks import get_route_type
 class SACExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        self.acceleration_pid = PID(Kp=0.2,Ki=0.0,Kd=0.0,setpoint=7.5,sample_time=None,output_limits=(0,1))
+        # self.acceleration_pid = PID(Kp=0.2,Ki=0.0,Kd=0.0,setpoint=7.5,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -71,9 +71,14 @@ class SACExperimentBasic(BaseExperiment):
         self.angle_to_center_of_lane_degrees_7 = []
         self.angle_to_center_of_lane_degrees_ahead_waypoints = []
         self.angle_to_center_of_lane_degrees_ahead_waypoints_2 = []
-        self.angle_between_waypoints_2 = []
+        self.angle_between_waypoints_minus5 = []
+        self.angle_between_waypoints_minus7 = []
+        self.angle_between_waypoints_minus10 = []
+        self.angle_between_waypoints_minus12 = []
         self.angle_between_waypoints_5 = []
         self.angle_between_waypoints_7 = []
+        self.angle_between_waypoints_10 = []
+        self.angle_between_waypoints_12 = []
         self.bearing_to_waypoint = []
         self.bearing_to_waypoint_2 = []
         self.bearing_to_waypoint_5 = []
@@ -257,9 +262,14 @@ class SACExperimentBasic(BaseExperiment):
         self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_7", self.angle_to_center_of_lane_degrees_7)
         self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_ahead_waypoints", self.angle_to_center_of_lane_degrees_ahead_waypoints)
         self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_ahead_waypoints_2", self.angle_to_center_of_lane_degrees_ahead_waypoints_2)
-        self.save_to_file(f"{self.directory}/angle_between_waypoints_2", self.angle_between_waypoints_2)
+        self.save_to_file(f"{self.directory}/angle_between_waypoints_minus5", self.angle_between_waypoints_minus5)
+        self.save_to_file(f"{self.directory}/angle_between_waypoints_minus7", self.angle_between_waypoints_minus7)
+        self.save_to_file(f"{self.directory}/angle_between_waypoints_minus10", self.angle_between_waypoints_minus10)
+        self.save_to_file(f"{self.directory}/angle_between_waypoints_minus12", self.angle_between_waypoints_minus12)
         self.save_to_file(f"{self.directory}/angle_between_waypoints_5", self.angle_between_waypoints_5)
         self.save_to_file(f"{self.directory}/angle_between_waypoints_7", self.angle_between_waypoints_7)
+        self.save_to_file(f"{self.directory}/angle_between_waypoints_10", self.angle_between_waypoints_10)
+        self.save_to_file(f"{self.directory}/angle_between_waypoints_12", self.angle_between_waypoints_12)
         self.save_to_file(f"{self.directory}/bearing_to_waypoint", self.bearing_to_waypoint)
         self.save_to_file(f"{self.directory}/bearing_to_waypoint_2", self.bearing_to_waypoint_2)
         self.save_to_file(f"{self.directory}/bearing_to_waypoint_5", self.bearing_to_waypoint_5)
@@ -316,9 +326,14 @@ class SACExperimentBasic(BaseExperiment):
         self.angle_to_center_of_lane_degrees_7 = []
         self.angle_to_center_of_lane_degrees_ahead_waypoints = []
         self.angle_to_center_of_lane_degrees_ahead_waypoints_2 = []
-        self.angle_between_waypoints_2 = []
+        self.angle_between_waypoints_minus5 = []
+        self.angle_between_waypoints_minus7 = []
+        self.angle_between_waypoints_minus10 = []
+        self.angle_between_waypoints_minus12 = []
         self.angle_between_waypoints_5 = []
         self.angle_between_waypoints_7 = []
+        self.angle_between_waypoints_10 = []
+        self.angle_between_waypoints_12 = []
         self.bearing_to_waypoint = []
         self.bearing_to_waypoint_2 = []
         self.bearing_to_waypoint_5 = []
@@ -371,8 +386,8 @@ class SACExperimentBasic(BaseExperiment):
         """
         obs_space = Dict( {
             'values':Box(
-                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             ),
             'route': Discrete(2)
@@ -408,18 +423,18 @@ class SACExperimentBasic(BaseExperiment):
         return obs_space
 
     def get_actions(self):
-        acceleration_value = self.acceleration_pid(self.current_forward_velocity)
-        print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
+        # acceleration_value = self.acceleration_pid(self.current_forward_velocity)
+        # print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
         return {
-            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
-            1: [acceleration_value, 0.80, 0.0, False, False],  # Right
-            2: [acceleration_value, 0.60, 0.0, False, False],  # Right
-            3: [acceleration_value, 0.40, 0.0, False, False],  # Right
-            4: [acceleration_value, 0.20, 0.0, False, False],  # Right
-            5: [acceleration_value, -0.80, 0.0, False, False],  # Left
-            6: [acceleration_value, -0.60, 0.0, False, False],  # Left
-            7: [acceleration_value, -0.40, 0.0, False, False],  # Left
-            8: [acceleration_value, -0.20, 0.0, False, False],  # Left
+            0: [0.3, 0.00, 0.0, False, False],  # Straight
+            1: [0.3, 0.80, 0.0, False, False],  # Right
+            2: [0.3, 0.60, 0.0, False, False],  # Right
+            3: [0.3, 0.40, 0.0, False, False],  # Right
+            4: [0.3, 0.20, 0.0, False, False],  # Right
+            5: [0.3, -0.80, 0.0, False, False],  # Left
+            6: [0.3, -0.60, 0.0, False, False],  # Left
+            7: [0.3, -0.40, 0.0, False, False],  # Left
+            8: [0.3, -0.20, 0.0, False, False],  # Left
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
             # 2: [0.0, 0.75, 0.0, False, False],  # Right
@@ -628,20 +643,78 @@ class SACExperimentBasic(BaseExperiment):
         # forward_velocity_z = np.clip(self.get_forward_velocity_z(core.hero), 0, None)
         # acceleration = np.clip(self.get_acceleration(core.hero), 0, None)
 
-        angle_between_waypoints_2 = calculate_angle_with_center_of_lane(
-            previous_position=core.route[core.last_waypoint_index+2].location,
-            current_position=core.route[core.last_waypoint_index].location,
-            next_position=core.route[core.last_waypoint_index + 4].location)
+        def abs_clip_normalise(value, normalisation_value):
+            clipped = np.clip(abs(value),0,normalisation_value)
+            return clipped/normalisation_value
+
+        if core.last_waypoint_index - 5 > 0:
+            angle_between_waypoints_minus5 = calculate_angle_with_center_of_lane(
+                previous_position=core.route[core.last_waypoint_index].location,
+                current_position=core.route[core.last_waypoint_index - 5].location,
+                next_position=core.route[core.last_waypoint_index + 5].location)
+            angle_between_waypoints_minus5 = abs_clip_normalise(angle_between_waypoints_minus5, math.pi)
+        else:
+            angle_between_waypoints_minus5 = 1
+
+        if core.last_waypoint_index - 7 > 0:
+            angle_between_waypoints_minus7 = calculate_angle_with_center_of_lane(
+                previous_position=core.route[core.last_waypoint_index].location,
+                current_position=core.route[core.last_waypoint_index - 7].location,
+                next_position=core.route[core.last_waypoint_index + 7].location)
+            angle_between_waypoints_minus7 = abs_clip_normalise(angle_between_waypoints_minus7, math.pi)
+        else:
+            angle_between_waypoints_minus7 = 1
+
+        if core.last_waypoint_index - 10 > 0:
+            angle_between_waypoints_minus10 = calculate_angle_with_center_of_lane(
+                previous_position=core.route[core.last_waypoint_index].location,
+                current_position=core.route[core.last_waypoint_index - 10].location,
+                next_position=core.route[core.last_waypoint_index + 10].location)
+            angle_between_waypoints_minus10 = abs_clip_normalise(angle_between_waypoints_minus10, math.pi)
+        else:
+            angle_between_waypoints_minus10 = 1
+
+        if core.last_waypoint_index - 12 > 0:
+            angle_between_waypoints_minus12 = calculate_angle_with_center_of_lane(
+                previous_position=core.route[core.last_waypoint_index].location,
+                current_position=core.route[core.last_waypoint_index - 12].location,
+                next_position=core.route[core.last_waypoint_index + 12].location)
+            angle_between_waypoints_minus12 = abs_clip_normalise(angle_between_waypoints_minus12, math.pi)
+        else:
+            angle_between_waypoints_minus12 = 1
 
         angle_between_waypoints_5 = calculate_angle_with_center_of_lane(
             previous_position=core.route[core.last_waypoint_index+5].location,
             current_position=core.route[core.last_waypoint_index].location,
             next_position=core.route[core.last_waypoint_index + 10].location)
+        angle_between_waypoints_5 = abs_clip_normalise(angle_between_waypoints_5,math.pi)
 
         angle_between_waypoints_7 = calculate_angle_with_center_of_lane(
             previous_position=core.route[core.last_waypoint_index+7].location,
             current_position=core.route[core.last_waypoint_index].location,
             next_position=core.route[core.last_waypoint_index + 14].location)
+        angle_between_waypoints_7 = abs_clip_normalise(angle_between_waypoints_7,math.pi)
+
+
+        if len(core.route) > core.last_waypoint_index + 20:
+            angle_between_waypoints_10 = calculate_angle_with_center_of_lane(
+                previous_position=core.route[core.last_waypoint_index + 10].location,
+                current_position=core.route[core.last_waypoint_index].location,
+                next_position=core.route[core.last_waypoint_index + 20].location)
+            angle_between_waypoints_10 = abs_clip_normalise(angle_between_waypoints_10, math.pi)
+
+        else:
+            angle_between_waypoints_10 = 1
+
+        if len(core.route) > core.last_waypoint_index + 24:
+            angle_between_waypoints_12 = calculate_angle_with_center_of_lane(
+                previous_position=core.route[core.last_waypoint_index + 12].location,
+                current_position=core.route[core.last_waypoint_index].location,
+                next_position=core.route[core.last_waypoint_index + 24].location)
+            angle_between_waypoints_12 = abs_clip_normalise(angle_between_waypoints_12, math.pi)
+
+        else:
+            angle_between_waypoints_12 = 1
 
         # Angle to center of lane
 
@@ -1407,9 +1480,6 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(angle_to_center_of_lane_degrees_7),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2),
-            np.float32(angle_between_waypoints_2),
-            np.float32(angle_between_waypoints_5),
-            np.float32(angle_between_waypoints_7),
             np.float32(bearing_to_waypoint),
             np.float32(bearing_to_waypoint_2),
             np.float32(bearing_to_waypoint_5),
@@ -1417,6 +1487,14 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(bearing_to_ahead_waypoints_ahead),
             np.float32(bearing_to_ahead_waypoints_ahead_2),
             np.float32(angle_between_truck_and_trailer),
+            np.float32(angle_between_waypoints_5),
+            np.float32(angle_between_waypoints_7),
+            np.float32(angle_between_waypoints_10),
+            np.float32(angle_between_waypoints_12),
+            np.float32(angle_between_waypoints_minus5),
+            np.float32(angle_between_waypoints_minus7),
+            np.float32(angle_between_waypoints_minus10),
+            np.float32(angle_between_waypoints_minus12),
 
             # np.float32(trailer_bearing_to_waypoint),
             # np.float32(acceleration)
@@ -1510,9 +1588,14 @@ class SACExperimentBasic(BaseExperiment):
             print(f"angle_to_center_of_lane_degrees_7:{np.float32(angle_to_center_of_lane_degrees_7)}")
             print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
             print(f"angle_to_center_of_lane_degrees_ahead_waypoints_2:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2)}")
-            print(f"angle_between_waypoints_2:{np.float32(angle_between_waypoints_2)}")
             print(f"angle_between_waypoints_5:{np.float32(angle_between_waypoints_5)}")
             print(f"angle_between_waypoints_7:{np.float32(angle_between_waypoints_7)}")
+            print(f"angle_between_waypoints_10:{np.float32(angle_between_waypoints_10)}")
+            print(f"angle_between_waypoints_12:{np.float32(angle_between_waypoints_12)}")
+            print(f"angle_between_waypoints_minus5:{np.float32(angle_between_waypoints_minus5)}")
+            print(f"angle_between_waypoints_minus7:{np.float32(angle_between_waypoints_minus7)}")
+            print(f"angle_between_waypoints_minus10:{np.float32(angle_between_waypoints_minus10)}")
+            print(f"angle_between_waypoints_minus12:{np.float32(angle_between_waypoints_minus12)}")
             print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
             print(f"bearing_to_waypoint_2:{np.float32(bearing_to_waypoint_2)}")
             print(f"bearing_to_waypoint_5:{np.float32(bearing_to_waypoint_5)}")
@@ -1536,9 +1619,14 @@ class SACExperimentBasic(BaseExperiment):
         self.angle_to_center_of_lane_degrees_7.append(np.float32(angle_to_center_of_lane_degrees_7))
         self.angle_to_center_of_lane_degrees_ahead_waypoints.append(np.float32(angle_to_center_of_lane_degrees_ahead_waypoints))
         self.angle_to_center_of_lane_degrees_ahead_waypoints_2.append(np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2))
-        self.angle_between_waypoints_2.append(np.float32(angle_between_waypoints_2))
         self.angle_between_waypoints_5.append(np.float32(angle_between_waypoints_5))
         self.angle_between_waypoints_7.append(np.float32(angle_between_waypoints_7))
+        self.angle_between_waypoints_10.append(np.float32(angle_between_waypoints_10))
+        self.angle_between_waypoints_12.append(np.float32(angle_between_waypoints_12))
+        self.angle_between_waypoints_minus5.append(np.float32(angle_between_waypoints_minus5))
+        self.angle_between_waypoints_minus7.append(np.float32(angle_between_waypoints_minus7))
+        self.angle_between_waypoints_minus10.append(np.float32(angle_between_waypoints_minus10))
+        self.angle_between_waypoints_minus12.append(np.float32(angle_between_waypoints_minus12))
         self.bearing_to_waypoint.append(np.float32(bearing_to_waypoint))
         self.bearing_to_waypoint_2.append(np.float32(bearing_to_waypoint_2))
         self.bearing_to_waypoint_5.append(np.float32(bearing_to_waypoint_5))

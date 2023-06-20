@@ -24,14 +24,22 @@ class Vector:
 
 
 class Lidar:
-    def __init__(self, time, front, front_left, front_right, left, right, trailer_0_left, trailer_1_left,
-                 trailer_2_left,
+    def __init__(self, time, front, right15, right30, right45, right60, right75, left15, left30,left45,left60,left75, left, right, trailer_0_left, trailer_1_left, trailer_2_left,
                  trailer_3_left, trailer_4_left, trailer_5_left, trailer_0_right, trailer_1_right, trailer_2_right,
                  trailer_3_right, trailer_4_right, trailer_5_right):
         self.time = time
         self.front = front
-        self.front_left = front_left
-        self.front_right = front_right
+        self.right15 = right15
+        self.right30 = right30
+        self.right45 = right45
+        self.right60 = right60
+        self.right75 = right75
+        self.left15 = left15
+        self.left30 = left30
+        self.left45 = left45
+        self.left60 = left60
+        self.left75 = left75
+
         self.left = left
         self.right = right
         self.trailer_0_left = trailer_0_left
@@ -46,7 +54,6 @@ class Lidar:
         self.trailer_3_right = trailer_3_right
         self.trailer_4_right = trailer_4_right
         self.trailer_5_right = trailer_5_right
-
 
 def save_to_pickle(filename, data):
     filename = filename + '.pickle'
@@ -217,7 +224,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 0:
+        if idx > 3800:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -232,7 +239,11 @@ def plot_route(route_points_all, truck_points_all):
                     for lidar_point in df.loc[idx, "lidar_data"]:
 
                         print(f"truck FRONT \t\t\t{round(lidar_point.front, 2)}")
-                        print(f"truck 45 \t\t{round(lidar_point.front_left, 2)}\t\t{round(lidar_point.front_right, 2)}")
+                        print(f"truck 15 \t\t{round(lidar_point.left15, 2)}\t\t{round(lidar_point.right15, 2)}")
+                        print(f"truck 30 \t\t{round(lidar_point.left30, 2)}\t\t{round(lidar_point.right30, 2)}")
+                        print(f"truck 45 \t\t{round(lidar_point.left45, 2)}\t\t{round(lidar_point.right45, 2)}")
+                        print(f"truck 60 \t\t{round(lidar_point.left60, 2)}\t\t{round(lidar_point.right60, 2)}")
+                        print(f"truck 75 \t\t{round(lidar_point.left75, 2)}\t\t{round(lidar_point.right75, 2)}")
                         print(f"truck sides \t\t{round(lidar_point.left, 2)}\t\t{round(lidar_point.right, 2)}")
                         print(f"")
                         print(
@@ -247,6 +258,10 @@ def plot_route(route_points_all, truck_points_all):
                             f"trailer_4 \t\t{round(lidar_point.trailer_4_left, 2)}\t\t{round(lidar_point.trailer_4_right, 2)}")
                         print(
                             f"trailer_5 \t\t{round(lidar_point.trailer_5_left, 2)}\t\t{round(lidar_point.trailer_5_right, 2)}")
+                        print(
+                            f"trailer_6 \t\t{round(lidar_point.trailer_6_left, 2)}\t\t{round(lidar_point.trailer_6_right, 2)}")
+                        print(
+                            f"trailer_7 \t\t{round(lidar_point.trailer_7_left, 2)}\t\t{round(lidar_point.trailer_7_right, 2)}")
                         print(f"------------------------------------------------------")
 
                         # if df.loc[idx, "Collisions"] != 0:

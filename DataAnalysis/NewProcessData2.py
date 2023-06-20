@@ -16,13 +16,22 @@ class Vector:
 
 
 class Lidar:
-    def __init__(self, time, front, front_left, front_right, left, right, trailer_0_left, trailer_1_left, trailer_2_left,
+    def __init__(self, time, front, right15, right30, right45, right60, right75, left15, left30,left45,left60,left75, left, right, trailer_0_left, trailer_1_left, trailer_2_left,
                  trailer_3_left, trailer_4_left, trailer_5_left, trailer_0_right, trailer_1_right, trailer_2_right,
-                 trailer_3_right, trailer_4_right, trailer_5_right):
+                 trailer_3_right, trailer_4_right, trailer_5_right,trailer_6_left,trailer_6_right, trailer_7_left, trailer_7_right):
         self.time = time
         self.front = front
-        self.front_left = front_left
-        self.front_right = front_right
+        self.right15 = right15
+        self.right30 = right30
+        self.right45 = right45
+        self.right60 = right60
+        self.right75 = right75
+        self.left15 = left15
+        self.left30 = left30
+        self.left45 = left45
+        self.left60 = left60
+        self.left75 = left75
+
         self.left = left
         self.right = right
         self.trailer_0_left = trailer_0_left
@@ -31,12 +40,16 @@ class Lidar:
         self.trailer_3_left = trailer_3_left
         self.trailer_4_left = trailer_4_left
         self.trailer_5_left = trailer_5_left
+        self.trailer_6_left = trailer_6_left
+        self.trailer_7_left = trailer_7_left
         self.trailer_0_right = trailer_0_right
         self.trailer_1_right = trailer_1_right
         self.trailer_2_right = trailer_2_right
         self.trailer_3_right = trailer_3_right
         self.trailer_4_right = trailer_4_right
         self.trailer_5_right = trailer_5_right
+        self.trailer_6_right = trailer_6_right
+        self.trailer_7_right = trailer_7_right
 def get_value(text, symbol):
     location_of_symbol = text.find(symbol)
     end_of_value_comma = text[location_of_symbol:].find(',')
@@ -60,7 +73,7 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-data_file = 'data_7ebf7142f4d'
+data_file = 'data_3ee0eaee3a8'
 directory = '/home/daniel/data-rllib-integration/data/' + data_file
 for_graphs = False
 def main():
@@ -139,23 +152,39 @@ def main():
                             splits = lidar_point.split(',')
 
                             temp_list.append(Lidar(time = splits[0].strip('[').strip("\'"),
-                                                    front=float(splits[13]),
-                                                  front_right=float(splits[16]),
-                                                  front_left=float(splits[17]),
-                                                  right=float(splits[14]),
-                                                  left=float(splits[15]),
-                                                  trailer_0_left=float(splits[1]),
-                                                  trailer_1_left=float(splits[3]),
-                                                  trailer_2_left=float(splits[5]),
-                                                  trailer_3_left=float(splits[7]),
-                                                  trailer_4_left=float(splits[9]),
-                                                  trailer_5_left=float(splits[11]),
-                                                  trailer_0_right=float(splits[2]),
-                                                  trailer_1_right=float(splits[4]),
-                                                  trailer_2_right=float(splits[6]),
-                                                  trailer_3_right=float(splits[8]),
-                                                  trailer_4_right=float(splits[10]),
-                                                  trailer_5_right=float(splits[12]),))
+                                                    front=float(splits[17]),
+                                                    right=float(splits[18]),
+                                                    left=float(splits[19]),
+                                                    left15=float(splits[20]),
+                                                    left30=float(splits[21]),
+                                                    left45=float(splits[22]),
+                                                    left60=float(splits[23]),
+                                                    left75=float(splits[24]),
+                                                    right15=float(splits[25]),
+                                                    right30=float(splits[26]),
+                                                    right45=float(splits[27]),
+                                                    right60=float(splits[28]),
+                                                    right75=float(splits[29]),
+                                                    trailer_0_left=float(splits[1]),
+                                                    trailer_1_left=float(splits[3]),
+                                                    trailer_2_left=float(splits[5]),
+                                                    trailer_3_left=float(splits[7]),
+                                                    trailer_4_left=float(splits[9]),
+                                                    trailer_5_left=float(splits[11]),
+                                                    trailer_6_left=float(splits[13]),
+                                                    trailer_7_left=float(splits[15]),
+                                                    trailer_0_right=float(splits[2]),
+                                                    trailer_1_right=float(splits[4]),
+                                                    trailer_2_right=float(splits[6]),
+                                                    trailer_3_right=float(splits[8]),
+                                                    trailer_4_right=float(splits[10]),
+                                                    trailer_5_right=float(splits[12]),
+                                                    trailer_6_right=float(splits[14]),
+                                                    trailer_7_right=float(splits[16]),
+
+
+
+                                                   ))
                         new_data.append([time,temp_list])
                     elif filename == "done":
                         if line != "\n":
