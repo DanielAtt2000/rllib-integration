@@ -1769,59 +1769,59 @@ class SACExperimentBasic(BaseExperiment):
         # print(f"self.last_hyp_distance_to_next_waypoint_lines {self.last_hyp_distance_to_next_waypoint_line}")
         # print(f"self.last_hyp_distance_to_next_plus_1_waypoint_line {self.last_hyp_distance_to_next_plus_1_waypoint_line}")
 
-        # if self.last_hyp_distance_to_next_plus_1_waypoint == 0:
-        #     self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_waypoint
-        #
-        # # if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
-        # #     self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
-        #
-        # if self.last_closest_distance_to_next_plus_1_waypoint_line == 0:
-        #     self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_waypoint_line
-        #
-        # waypoint_reward_multiply_factor = 50
-        # if self.last_hyp_distance_to_next_waypoint != 0:
-        #     hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
-        #     hyp_reward = np.clip(hyp_reward, None, 0.5)
-        #     hyp_reward = hyp_reward - 0.5
-        #     reward = reward + hyp_reward* waypoint_reward_multiply_factor
-        #     self.point_reward.append(hyp_reward* waypoint_reward_multiply_factor)
-        #     self.point_reward_location.append(1)
-        #     print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* waypoint_reward_multiply_factor}") if self.custom_enable_rendering else None
-        # else:
-        #     hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
-        #     hyp_reward = np.clip(hyp_reward, None, 0.5)
-        #     hyp_reward = hyp_reward - 0.5
-        #     reward = reward + hyp_reward * waypoint_reward_multiply_factor
-        #     self.point_reward.append(hyp_reward* waypoint_reward_multiply_factor)
-        #     self.point_reward_location.append(2)
-        #     print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* waypoint_reward_multiply_factor}") if self.custom_enable_rendering else None
-        #
+        if self.last_hyp_distance_to_next_plus_1_waypoint == 0:
+            self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_waypoint
+
+        # if self.last_hyp_distance_to_next_plus_1_waypoint_line == 0:
+        #     self.last_hyp_distance_to_next_plus_1_waypoint_line = hyp_distance_to_next_waypoint_line
+
+        if self.last_closest_distance_to_next_plus_1_waypoint_line == 0:
+            self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_waypoint_line
+
+        waypoint_reward_multiply_factor = 50
+        if self.last_hyp_distance_to_next_waypoint != 0:
+            hyp_reward = self.last_hyp_distance_to_next_waypoint - hyp_distance_to_next_waypoint
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
+            reward = reward + hyp_reward* waypoint_reward_multiply_factor
+            self.point_reward.append(hyp_reward* waypoint_reward_multiply_factor)
+            self.point_reward_location.append(1)
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* waypoint_reward_multiply_factor}") if self.custom_enable_rendering else None
+        else:
+            hyp_reward = self.last_hyp_distance_to_next_plus_1_waypoint - hyp_distance_to_next_waypoint
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
+            reward = reward + hyp_reward * waypoint_reward_multiply_factor
+            self.point_reward.append(hyp_reward* waypoint_reward_multiply_factor)
+            self.point_reward_location.append(2)
+            print(f"REWARD hyp_distance_to_next_waypoint = {hyp_reward* waypoint_reward_multiply_factor}") if self.custom_enable_rendering else None
+
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
-        # self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
-        #
-        # line_reward_multiply_factor = 100
-        # if self.last_closest_distance_to_next_waypoint_line != 0:
-        #     hyp_reward = self.last_closest_distance_to_next_waypoint_line - closest_distance_to_next_waypoint_line
-        #     hyp_reward = np.clip(hyp_reward, None, 0.5)
-        #     hyp_reward = hyp_reward - 0.5
-        #     reward = reward + hyp_reward* line_reward_multiply_factor
-        #     self.line_reward.append(hyp_reward* line_reward_multiply_factor)
-        #     self.line_reward_location.append(1)
-        #     print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* line_reward_multiply_factor}") if self.custom_enable_rendering else None
-        # else:
-        #     hyp_reward = self.last_closest_distance_to_next_plus_1_waypoint_line - closest_distance_to_next_waypoint_line
-        #     hyp_reward = np.clip(hyp_reward, None, 0.5)
-        #     hyp_reward = hyp_reward - 0.5
-        #     reward = reward + hyp_reward * line_reward_multiply_factor
-        #     self.line_reward.append(hyp_reward* line_reward_multiply_factor)
-        #     self.line_reward_location.append(2)
-        #     print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* line_reward_multiply_factor}") if self.custom_enable_rendering else None
-        #
-        # self.last_closest_distance_to_next_waypoint_line = closest_distance_to_next_waypoint_line
-        # self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
-        #
+        self.last_hyp_distance_to_next_plus_1_waypoint = hyp_distance_to_next_plus_1_waypoint
+
+        line_reward_multiply_factor = 100
+        if self.last_closest_distance_to_next_waypoint_line != 0:
+            hyp_reward = self.last_closest_distance_to_next_waypoint_line - closest_distance_to_next_waypoint_line
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
+            reward = reward + hyp_reward* line_reward_multiply_factor
+            self.line_reward.append(hyp_reward* line_reward_multiply_factor)
+            self.line_reward_location.append(1)
+            print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* line_reward_multiply_factor}") if self.custom_enable_rendering else None
+        else:
+            hyp_reward = self.last_closest_distance_to_next_plus_1_waypoint_line - closest_distance_to_next_waypoint_line
+            hyp_reward = np.clip(hyp_reward, None, 0.5)
+            hyp_reward = hyp_reward - 0.5
+            reward = reward + hyp_reward * line_reward_multiply_factor
+            self.line_reward.append(hyp_reward* line_reward_multiply_factor)
+            self.line_reward_location.append(2)
+            print(f"REWARD closest_distance_to_next_waypoint_line = {hyp_reward* line_reward_multiply_factor}") if self.custom_enable_rendering else None
+
+        self.last_closest_distance_to_next_waypoint_line = closest_distance_to_next_waypoint_line
+        self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
+
         if self.passed_waypoint:
-            reward = reward + 10
+            reward = reward + 500
 
 
         # if bearing_to_waypoint == 0:
@@ -1842,33 +1842,30 @@ class SACExperimentBasic(BaseExperiment):
         if forward_velocity < 0.75:
             # Negative reward for no velocity
             print('REWARD -100 for velocity') if self.custom_enable_rendering else None
-            reward = reward + 0
+            reward = reward + -100
 
-        # Negative reward each timestep
-        reward = reward + -1
+        # # Negative reward each timestep
+        # reward = reward + -5
 
 
         if self.done_falling:
-            reward = reward + -10
+            reward = reward + -10000
             print('====> REWARD Done falling')
         if self.done_collision_truck or self.done_collision_trailer:
             print("====> REWARD Done collision")
-            reward = reward + -10
-        if self.lidar_collision:
-            print("====> REWARD Lidar collision")
-            reward = reward + -10
+            reward = reward + -10000
         if self.done_time_idle:
             print("====> REWARD Done idle")
-            reward = reward + -10
+            reward = reward + -10000
         if self.done_time_episode:
             print("====> REWARD Done max time")
-            reward = reward + -10
+            reward = reward + -10000
         if self.done_far_from_path:
             print("====> REWARD Done far from path")
-            reward = reward + -10
+            reward = reward + -10000
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward = reward + 0
+            reward = reward + 500
 
         self.total_episode_reward.append(reward)
         self.reward_metric = reward
