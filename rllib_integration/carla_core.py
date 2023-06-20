@@ -290,6 +290,9 @@ class CarlaCore:
                 settings.fixed_delta_seconds = self.config["timestep"]
                 self.world.apply_settings(settings)
                 self.world.tick()
+                self.world.tick()
+                self.world.tick()
+                self.world.tick()
 
                 return
 
