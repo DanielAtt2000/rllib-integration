@@ -198,7 +198,7 @@ spawn_points_2_lane_roundabout_small_difficult = [
 
 ]
 
-roundabouts = [spawn_points_2_lane_roundabout_small_difficult]
+roundabouts = [spawn_points_2_lane_roundabout_small_easy, spawn_points_2_lane_roundabout_small_difficult]
 # roundabouts = [spawn_points_2_lane_roundabout_difficult,spawn_points_2_lane_roundabout_easy]
 
 
