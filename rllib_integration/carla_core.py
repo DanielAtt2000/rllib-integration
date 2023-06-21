@@ -730,15 +730,15 @@ class CarlaCore:
         self.route_points = []
 
         self.entry_spawn_point_index, self.exit_spawn_point_index, self.route_lane, self.last_roundabout_choice = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations,self.last_roundabout_choice)
-        key = str(self.entry_spawn_point_index) + " | " + str(self.exit_spawn_point_index)
-        if self.chosen_routes.get(key) is None:
-            self.chosen_routes[key] = 1
-        else:
-            self.chosen_routes[key] += 1
-
-        for key,value in self.chosen_routes.items():
-            print(f"{key} : {value}")
-        print('---------')
+        # key = str(self.entry_spawn_point_index) + " | " + str(self.exit_spawn_point_index)
+        # if self.chosen_routes.get(key) is None:
+        #     self.chosen_routes[key] = 1
+        # else:
+        #     self.chosen_routes[key] += 1
+        #
+        # for key,value in self.chosen_routes.items():
+        #     print(f"{key} : {value}")
+        # print('---------')
 
 
         entry_spawn_point = self.map.get_spawn_points()[self.entry_spawn_point_index]
@@ -807,7 +807,7 @@ class CarlaCore:
         # Part 1: destroy all sensors (if necessary)
         self.sensor_interface_truck.destroy()
         if hero_config["truckTrailerCombo"]:
-            print("TRAILER PART 1/7")
+            # print("TRAILER PART 1/7")
             self.sensor_interface_trailer.destroy()
 
         self.world.tick()
@@ -848,7 +848,7 @@ class CarlaCore:
         self.hero_blueprints.set_attribute("role_name", "hero")
 
         if hero_config["truckTrailerCombo"]:
-            print("TRAILER PART 2/7")
+            # print("TRAILER PART 2/7")
             self.trailer_blueprints = random.choice(get_actor_blueprints(self.world, hero_config["blueprintTrailer"], "2"))
             self.trailer_blueprints.set_attribute("role_name", "hero-trailer")
 
@@ -858,7 +858,7 @@ class CarlaCore:
             self.hero = None
 
         if hero_config["truckTrailerCombo"] and self.hero_trailer is not None:
-            print("TRAILER PART 3/7")
+            # print("TRAILER PART 3/7")
             self.hero_trailer.destroy()
             self.hero_trailer = None
 
@@ -874,7 +874,7 @@ class CarlaCore:
             entry_spawn_point_index, entry_spawn_point = self.set_route(failed_entry_spawn_locations)
 
             if hero_config["truckTrailerCombo"]:
-                print("TRAILER PART 4/7")
+                # print("TRAILER PART 4/7")
                 # Spawning the trailer first and than spawning the truck in a location a bit forward up to connect with it
                 entry_spawn_point.location.z = 0.5
                 self.hero_trailer = self.world.try_spawn_actor(self.trailer_blueprints, entry_spawn_point)
@@ -890,7 +890,7 @@ class CarlaCore:
             if self.hero is not None:
                 print("Truck spawned!")
                 if hero_config["truckTrailerCombo"]:
-                    print("TRAILER PART 5/7")
+                    # print("TRAILER PART 5/7")
                     if self.hero_trailer is not None:
                         print("Trailer spawned!")
                     else:
@@ -906,7 +906,7 @@ class CarlaCore:
             print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points<====')
             return
         if hero_config["truckTrailerCombo"] and self.hero_trailer is None:
-            print("TRAILER PART 6/7")
+            # print("TRAILER PART 6/7")
             print("We ran out of spawn points")
             print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points<====')
             return

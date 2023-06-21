@@ -126,7 +126,8 @@ class SACCallbacks(DefaultCallbacks):
                 episode.custom_metrics[
                     "collision_without_reward_proportional_to_length"] = collision_without_reward_proportional_to_length
             else:
-                print_error_message(reward_proportional_to_length[-1])
+                # print_error_message(reward_proportional_to_length[-1])
+                pass
 
             both_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"])
             both_without_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"][:-1])
