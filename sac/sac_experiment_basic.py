@@ -79,14 +79,17 @@ class SACExperimentBasic(BaseExperiment):
         self.angle_between_waypoints_7 = []
         self.angle_between_waypoints_10 = []
         self.angle_between_waypoints_12 = []
-        self.bearing_to_waypoint = []
-        self.bearing_to_waypoint_2 = []
-        self.bearing_to_waypoint_5 = []
-        self.bearing_to_waypoint_7 = []
-        self.bearing_to_ahead_waypoints_ahead = []
+        self.truck_bearing_to_waypoint = []
+        self.truck_bearing_to_waypoint_2 = []
+        self.truck_bearing_to_waypoint_5 = []
+        self.truck_bearing_to_waypoint_7 = []
+        self.truck_bearing_to_ahead_waypoints_ahead = []
         # self.bearing_to_ahead_waypoints_ahead_2 = []
         self.angle_between_truck_and_trailer = []
         self.trailer_bearing_to_waypoint = []
+        self.trailer_bearing_to_waypoint_2 = []
+        self.trailer_bearing_to_waypoint_5 = []
+        self.trailer_bearing_to_waypoint_7 = []
         self.forward_velocity = []
         # self.forward_velocity_x = []
         # self.forward_velocity_z = []
@@ -270,14 +273,17 @@ class SACExperimentBasic(BaseExperiment):
         self.save_to_file(f"{self.directory}/angle_between_waypoints_7", self.angle_between_waypoints_7)
         self.save_to_file(f"{self.directory}/angle_between_waypoints_10", self.angle_between_waypoints_10)
         self.save_to_file(f"{self.directory}/angle_between_waypoints_12", self.angle_between_waypoints_12)
-        self.save_to_file(f"{self.directory}/bearing_to_waypoint", self.bearing_to_waypoint)
-        self.save_to_file(f"{self.directory}/bearing_to_waypoint_2", self.bearing_to_waypoint_2)
-        self.save_to_file(f"{self.directory}/bearing_to_waypoint_5", self.bearing_to_waypoint_5)
-        self.save_to_file(f"{self.directory}/bearing_to_waypoint_7", self.bearing_to_waypoint_7)
-        self.save_to_file(f"{self.directory}/bearing_to_ahead_waypoints_ahead", self.bearing_to_ahead_waypoints_ahead)
+        self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint", self.truck_bearing_to_waypoint)
+        self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint_2", self.truck_bearing_to_waypoint_2)
+        self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint_5", self.truck_bearing_to_waypoint_5)
+        self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint_7", self.truck_bearing_to_waypoint_7)
+        self.save_to_file(f"{self.directory}/truck_bearing_to_ahead_waypoints_ahead", self.truck_bearing_to_ahead_waypoints_ahead)
         # self.save_to_file(f"{self.directory}/bearing_to_ahead_waypoints_ahead_2", self.bearing_to_ahead_waypoints_ahead_2)
         self.save_to_file(f"{self.directory}/angle_between_truck_and_trailer", self.angle_between_truck_and_trailer)
-        # self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint", self.trailer_bearing_to_waypoint)
+        self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint", self.trailer_bearing_to_waypoint)
+        self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint_2", self.trailer_bearing_to_waypoint_2)
+        self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint_5", self.trailer_bearing_to_waypoint_5)
+        self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint_7", self.trailer_bearing_to_waypoint_7)
         self.save_to_file(f"{self.directory}/forward_velocity", self.forward_velocity)
         self.save_to_file(f"{self.directory}/line_reward", self.line_reward)
         self.save_to_file(f"{self.directory}/line_reward_location", self.line_reward_location)
@@ -334,11 +340,15 @@ class SACExperimentBasic(BaseExperiment):
         self.angle_between_waypoints_7 = []
         self.angle_between_waypoints_10 = []
         self.angle_between_waypoints_12 = []
-        self.bearing_to_waypoint = []
-        self.bearing_to_waypoint_2 = []
-        self.bearing_to_waypoint_5 = []
-        self.bearing_to_waypoint_7 = []
-        self.bearing_to_ahead_waypoints_ahead = []
+        self.truck_bearing_to_waypoint = []
+        self.truck_bearing_to_waypoint_2 = []
+        self.truck_bearing_to_waypoint_5 = []
+        self.truck_bearing_to_waypoint_7 = []
+        self.truck_bearing_to_ahead_waypoints_ahead = []
+        self.trailer_bearing_to_waypoint = []
+        self.trailer_bearing_to_waypoint_2 = []
+        self.trailer_bearing_to_waypoint_5 = []
+        self.trailer_bearing_to_waypoint_7 = []
         # self.bearing_to_ahead_waypoints_ahead_2 = []
         self.angle_between_truck_and_trailer = []
         self.trailer_bearing_to_waypoint = []
@@ -546,6 +556,12 @@ class SACExperimentBasic(BaseExperiment):
         if core.config["truckTrailerCombo"]:
             # Getting trailer location
             trailer_transform = core.hero_trailer.get_transform()
+            trailer_forward_vector = trailer_transform.get_forward_vector()
+
+        forward_vector_waypoint_0 = core.route[core.last_waypoint_index + 0].get_forward_vector()
+        forward_vector_waypoint_2 = core.route[core.last_waypoint_index + 2].get_forward_vector()
+        forward_vector_waypoint_5 = core.route[core.last_waypoint_index + 5].get_forward_vector()
+        forward_vector_waypoint_7 = core.route[core.last_waypoint_index + 7].get_forward_vector()
 
         # print(f"BEFORE CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
         # Checking if we have passed the last way point
@@ -608,20 +624,20 @@ class SACExperimentBasic(BaseExperiment):
         hyp_distance_to_next_plus_1_waypoint = math.sqrt(
             (x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
 
-        bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=truck_forward_vector)
+        truck_bearing_to_waypoint = angle_between(waypoint_forward_vector=forward_vector_waypoint_0,vehicle_forward_vector=truck_forward_vector)
 
-        bearing_to_waypoint_2 = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + 2].get_forward_vector(),vehicle_forward_vector=truck_forward_vector)
+        truck_bearing_to_waypoint_2 = angle_between(waypoint_forward_vector=forward_vector_waypoint_2,vehicle_forward_vector=truck_forward_vector)
 
-        bearing_to_waypoint_5 = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + 5].get_forward_vector(),vehicle_forward_vector=truck_forward_vector)
+        truck_bearing_to_waypoint_5 = angle_between(waypoint_forward_vector=forward_vector_waypoint_5,vehicle_forward_vector=truck_forward_vector)
 
-        bearing_to_waypoint_7 = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + 7].get_forward_vector(),vehicle_forward_vector=truck_forward_vector)
+        truck_bearing_to_waypoint_7 = angle_between(waypoint_forward_vector=forward_vector_waypoint_7,vehicle_forward_vector=truck_forward_vector)
 
         try:
-            bearing_to_ahead_waypoints_ahead = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints].get_forward_vector(),vehicle_forward_vector=truck_forward_vector)
+            truck_bearing_to_ahead_waypoints_ahead = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints].get_forward_vector(),vehicle_forward_vector=truck_forward_vector)
 
         except Exception as e:
             print(f"ERROR HERE1 {e}")
-            bearing_to_ahead_waypoints_ahead = 0
+            truck_bearing_to_ahead_waypoints_ahead = 0
 
         # try:
         #     bearing_to_ahead_waypoints_ahead_2 = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + ahead_waypoints_2].get_forward_vector(),vehicle_forward_vector=truck_forward_vector)
@@ -630,10 +646,15 @@ class SACExperimentBasic(BaseExperiment):
         #     bearing_to_ahead_waypoints_ahead_2 = 0
 
 
-        angle_between_truck_and_trailer = angle_between(waypoint_forward_vector=truck_forward_vector,vehicle_forward_vector=trailer_transform.get_forward_vector())
+        angle_between_truck_and_trailer = angle_between(waypoint_forward_vector=truck_forward_vector,vehicle_forward_vector=trailer_forward_vector)
 
-        # trailer_bearing_to_waypoint = angle_between(waypoint_forward_vector=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].get_forward_vector(),vehicle_forward_vector=trailer_transform.get_forward_vector())
+        trailer_bearing_to_waypoint = angle_between(waypoint_forward_vector=forward_vector_waypoint_0,vehicle_forward_vector=trailer_forward_vector)
 
+        trailer_bearing_to_waypoint_2 = angle_between(waypoint_forward_vector=forward_vector_waypoint_2,vehicle_forward_vector=trailer_forward_vector)
+
+        trailer_bearing_to_waypoint_5 = angle_between(waypoint_forward_vector=forward_vector_waypoint_5,vehicle_forward_vector=trailer_forward_vector)
+
+        trailer_bearing_to_waypoint_7 = angle_between(waypoint_forward_vector=forward_vector_waypoint_7,vehicle_forward_vector=trailer_forward_vector)
 
 
 
@@ -1480,11 +1501,15 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(angle_to_center_of_lane_degrees_7),
             np.float32(angle_to_center_of_lane_degrees_ahead_waypoints),
             # np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2),
-            np.float32(bearing_to_waypoint),
-            np.float32(bearing_to_waypoint_2),
-            np.float32(bearing_to_waypoint_5),
-            np.float32(bearing_to_waypoint_7),
-            np.float32(bearing_to_ahead_waypoints_ahead),
+            np.float32(truck_bearing_to_waypoint),
+            np.float32(truck_bearing_to_waypoint_2),
+            np.float32(truck_bearing_to_waypoint_5),
+            np.float32(truck_bearing_to_waypoint_7),
+            np.float32(truck_bearing_to_ahead_waypoints_ahead),
+            np.float32(trailer_bearing_to_waypoint),
+            np.float32(trailer_bearing_to_waypoint_2),
+            np.float32(trailer_bearing_to_waypoint_5),
+            np.float32(trailer_bearing_to_waypoint_7),
             # np.float32(bearing_to_ahead_waypoints_ahead_2),
             np.float32(angle_between_truck_and_trailer),
             np.float32(angle_between_waypoints_5),
@@ -1546,7 +1571,7 @@ class SACExperimentBasic(BaseExperiment):
             raise Exception('This should never happen')
 
         self.lidar_collision = False
-        if any(lidar_point < 0.03 for lidar_point in lidar_data_points):
+        if any(lidar_point < 0.01 for lidar_point in lidar_data_points):
             self.lidar_collision = True
 
 
@@ -1596,11 +1621,15 @@ class SACExperimentBasic(BaseExperiment):
             print(f"angle_between_waypoints_minus7:{np.float32(angle_between_waypoints_minus7)}")
             print(f"angle_between_waypoints_minus10:{np.float32(angle_between_waypoints_minus10)}")
             print(f"angle_between_waypoints_minus12:{np.float32(angle_between_waypoints_minus12)}")
-            print(f"bearing_to_waypoint:{np.float32(bearing_to_waypoint)}")
-            print(f"bearing_to_waypoint_2:{np.float32(bearing_to_waypoint_2)}")
-            print(f"bearing_to_waypoint_5:{np.float32(bearing_to_waypoint_5)}")
-            print(f"bearing_to_waypoint_7:{np.float32(bearing_to_waypoint_7)}")
-            print(f"bearing_to_ahead_waypoints_ahead:{np.float32(bearing_to_ahead_waypoints_ahead)}")
+            print(f"truck_bearing_to_waypoint:{np.float32(truck_bearing_to_waypoint)}")
+            print(f"truck_bearing_to_waypoint_2:{np.float32(truck_bearing_to_waypoint_2)}")
+            print(f"truck_bearing_to_waypoint_5:{np.float32(truck_bearing_to_waypoint_5)}")
+            print(f"truck_bearing_to_waypoint_7:{np.float32(truck_bearing_to_waypoint_7)}")
+            print(f"truck_bearing_to_ahead_waypoints_ahead:{np.float32(truck_bearing_to_ahead_waypoints_ahead)}")
+            print(f"trailer_bearing_to_waypoint:{np.float32(trailer_bearing_to_waypoint)}")
+            print(f"trailer_bearing_to_waypoint_2:{np.float32(trailer_bearing_to_waypoint_2)}")
+            print(f"trailer_bearing_to_waypoint_5:{np.float32(trailer_bearing_to_waypoint_5)}")
+            print(f"trailer_bearing_to_waypoint_7:{np.float32(trailer_bearing_to_waypoint_7)}")
             # print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
             print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
             print('')
@@ -1627,11 +1656,16 @@ class SACExperimentBasic(BaseExperiment):
         self.angle_between_waypoints_minus7.append(np.float32(angle_between_waypoints_minus7))
         self.angle_between_waypoints_minus10.append(np.float32(angle_between_waypoints_minus10))
         self.angle_between_waypoints_minus12.append(np.float32(angle_between_waypoints_minus12))
-        self.bearing_to_waypoint.append(np.float32(bearing_to_waypoint))
-        self.bearing_to_waypoint_2.append(np.float32(bearing_to_waypoint_2))
-        self.bearing_to_waypoint_5.append(np.float32(bearing_to_waypoint_5))
-        self.bearing_to_waypoint_7.append(np.float32(bearing_to_waypoint_7))
-        self.bearing_to_ahead_waypoints_ahead.append(np.float32(bearing_to_ahead_waypoints_ahead))
+        self.truck_bearing_to_waypoint.append(np.float32(truck_bearing_to_waypoint))
+        self.truck_bearing_to_waypoint_2.append(np.float32(truck_bearing_to_waypoint_2))
+        self.truck_bearing_to_waypoint_5.append(np.float32(truck_bearing_to_waypoint_5))
+        self.truck_bearing_to_waypoint_7.append(np.float32(truck_bearing_to_waypoint_7))
+        self.truck_bearing_to_ahead_waypoints_ahead.append(np.float32(truck_bearing_to_ahead_waypoints_ahead))
+
+        self.trailer_bearing_to_waypoint.append(np.float32(trailer_bearing_to_waypoint))
+        self.trailer_bearing_to_waypoint_2.append(np.float32(trailer_bearing_to_waypoint_2))
+        self.trailer_bearing_to_waypoint_5.append(np.float32(trailer_bearing_to_waypoint_5))
+        self.trailer_bearing_to_waypoint_7.append(np.float32(trailer_bearing_to_waypoint_7))
         # self.bearing_to_ahead_waypoints_ahead_2.append(np.float32(bearing_to_ahead_waypoints_ahead_2))
         self.angle_between_truck_and_trailer.append(np.float32(angle_between_truck_and_trailer))
         # self.trailer_bearing_to_waypoint.append(np.float32(trailer_bearing_to_waypoint))
