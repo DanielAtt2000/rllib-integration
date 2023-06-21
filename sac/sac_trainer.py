@@ -14,7 +14,7 @@ from ray.rllib.algorithms.sac import SAC
 
 class CustomSACTrainer(SAC):
     """
-    Modified version of DQNTrainer with the added functionality of saving the torch model for later inference
+    Modified version of SACTrainer with the added functionality of saving the torch model for later inference
     """
     def save_checkpoint(self, checkpoint_dir):
         checkpoint_path = super().save_checkpoint(checkpoint_dir)
