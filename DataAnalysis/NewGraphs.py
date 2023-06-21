@@ -1,3 +1,4 @@
+import math
 from copy import deepcopy
 from datetime import datetime
 from math import ceil
@@ -164,6 +165,9 @@ def plot_route(route_points_all, truck_points_all):
     easy_x_indices = []
     difficiult_x_indices = []
 
+    easy_dict ={}
+    diff_dict = {}
+
     done_data_diff = -1
     current_difficulty = ""
     for idx in range(len(x_route)):
@@ -181,22 +185,61 @@ def plot_route(route_points_all, truck_points_all):
                     current_difficulty = "difficult"
                     break
 
-            # if current_difficulty == "easy":
-            #     all_line_easy_rewards.append(sum(df.loc[idx, "line_reward"]))
-            #     all_point_easy_rewards.append(sum(df.loc[idx, "point_reward"]))
-            #     all_episodes_easy_sum.append(
-            #         sum(df.loc[idx, "line_reward"]) + sum(df.loc[idx, "point_reward"]))
-            #     easy_x_indices.append(idx)
-            # elif current_difficulty == "difficult":
-            #     all_line_difficult_rewards.append(sum(df.loc[idx, "line_reward"]))
-            #     all_point_difficult_rewards.append(sum(df.loc[idx, "point_reward"]))
-            #     all_episodes_difficult_sum.append(
-            #         sum(df.loc[idx, "line_reward"]) + sum(df.loc[idx, "point_reward"]))
-            #     difficiult_x_indices.append(idx)
-            # else:
-            #     raise Exception('wtf')
+            if current_difficulty == "easy":
+                # all_line_easy_rewards.append(sum(df.loc[idx, "line_reward"]))
+                # all_point_easy_rewards.append(sum(df.loc[idx, "point_reward"]))
+                all_episodes_easy_sum.append(
+                    sum(df.loc[idx, "total_episode_reward"]))
+
+                value_type = 'dsad'
+                arrived = 'noen'
+                if mean(df.loc[idx, "angle_to_center_of_lane_degrees_ahead_waypoints_2"
+                                    ""]) > 0:
+                    value_type = 'positive'
+                else:
+                    value_type = 'negative'
+
+                if (df.loc[idx, "Done"]) == 'done_arrived':
+                    arrived = 'yes'
+                else:
+                    arrived = 'no'
+
+                key = f'{value_type}|{arrived}'
+                if easy_dict.get(key) == None:
+                    easy_dict[key] = 1
+                else:
+                    easy_dict[key] += 1
+
+                easy_x_indices.append(idx)
+            elif current_difficulty == "difficult":
+                # all_line_difficult_rewards.append(sum(df.loc[idx, "line_reward"]))
+                # all_point_difficult_rewards.append(sum(df.loc[idx, "point_reward"]))
+                all_episodes_difficult_sum.append(sum(df.loc[idx, "total_episode_reward"]))
+
+                value_type = 'dsad'
+                arrived = 'noen'
+                if mean(df.loc[idx, "angle_to_center_of_lane_degrees_ahead_waypoints_2"]) > 0:
+                    value_type = 'positive'
+                else:
+                    value_type = 'negative'
+
+                if (df.loc[idx, "Done"]) == 'done_arrived':
+                    arrived = 'yes'
+                else:
+                    arrived = 'no'
+
+                key = f'{value_type}|{arrived}'
+
+                if diff_dict.get(key) == None:
+                    diff_dict[key] = 1
+                else:
+                    diff_dict[key] += 1
+
+                difficiult_x_indices.append(idx)
+            else:
+                raise Exception('wtf')
     plt.figure(figsize=(80, 5))
-    plt.ylim(-20000)
+    # plt.ylim()
     plt.plot(difficiult_x_indices, all_episodes_difficult_sum, label='All DIFFICULT episode rewards')
     plt.plot(easy_x_indices, all_episodes_easy_sum, label='All EASY episode rewards')
 
@@ -207,13 +250,58 @@ def plot_route(route_points_all, truck_points_all):
         average_difficult_y.append(np.mean(all_episodes_difficult_sum[ind:ind + window]))
     for ind in range(len(all_episodes_easy_sum) - window + 1):
         average_easy_y.append(np.mean(all_episodes_easy_sum[ind:ind + window]))
-    # plt.plot(average_difficult_y,label='average_DIFFICULT _y')
-    # plt.plot(average_easy_y,label='average_easy_y ')
+    plt.plot(average_difficult_y,label='average_DIFFICULT _y')
+    plt.plot(average_easy_y,label='average_easy_y ')
 
     # plt.plot(all_point_difficult_rewards,label='all_point_difficult_rewards')
     # plt.plot(all_line_difficult_rewards,label='all_line_difficult_rewards')
     plt.legend(loc='upper center')
     plt.show()
+
+    print('EASY DICT')
+    print(easy_dict)
+    total = 0
+    for key, value in easy_dict.items():
+        total += value
+    for key, value in easy_dict.items():
+        print(f'{key} = {value/total}')
+
+    total_positive = 0
+    total_negative = 0
+    for key, value in easy_dict.items():
+        if 'positive' in key:
+            total_positive += value
+        if 'negative' in key:
+            total_negative += value
+
+    for key, value in easy_dict.items():
+        if 'positive' in key:
+            print(f'positive: {total_positive/(total_negative+total_positive)}')
+        if 'negative' in key:
+            print(f'negative: {total_negative/(total_negative+total_positive)}')
+
+
+
+    print('DIFF DICT')
+    print(diff_dict)
+    for key, value in diff_dict.items():
+        total += value
+    for key, value in diff_dict.items():
+        print(f'{key} = {value/total}')
+
+    total_positive = 0
+    total_negative = 0
+    for key, value in diff_dict.items():
+        if 'positive' in key:
+            total_positive += value
+        if 'negative' in key:
+            total_negative += value
+
+    for key, value in diff_dict.items():
+        if 'positive' in key:
+            print(f'positive: {total_positive/(total_negative+total_positive)}')
+        if 'negative' in key:
+            print(f'negative: {total_negative/(total_negative+total_positive)}')
 
 
 
@@ -224,7 +312,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 200:
+        if idx > 4780:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -292,7 +380,7 @@ def plot_route(route_points_all, truck_points_all):
                 a1.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
                 # plt.axis([0, 1, 0, 1])
                 a1.set_title(
-                    f'{df.loc[idx, "Done"]}. Episode {idx}/{len(x_route)}')
+                    f'{df.loc[idx, "Done"]}. Episode {idx}/{len(x_route)}. Total Episode Reward total {sum(df.loc[idx, "total_episode_reward"])}. W/O Last value {sum(df.loc[idx, "total_episode_reward"][:-1])}')
                 a1.invert_yaxis()
                 a1.legend(loc='upper center')
 
@@ -397,19 +485,36 @@ def plot_route(route_points_all, truck_points_all):
                 items_not_to_plot = ['Collisions', 'Done', 'lidar_data', 'line_reward_location',
                                      'path', 'index',
                                      'point_reward_location', 'radii', 'route','EntryExit', 'Time','Vehicle']
+
+
                 for col in df.columns:
                     if col not in items_not_to_plot:
                         items_to_plot.append(col)
 
+                items_to_plot = [('angle_between_truck_and_trailer',-math.pi, math.pi ), ('angle_between_waypoints_10',0,1.1), ('angle_between_waypoints_12',0,1.1),
+                                 ('angle_between_waypoints_5',0,1.1), ('angle_between_waypoints_7',0,1.1), ('angle_between_waypoints_minus10',0,1.1),
+                                 ('angle_between_waypoints_minus12',0,1.1), ('angle_between_waypoints_minus5',0,1.1), ('angle_between_waypoints_minus7',0,1.1),
+                                 ('angle_to_center_of_lane_degrees',-math.pi, math.pi ), ('angle_to_center_of_lane_degrees_2',-math.pi, math.pi ),
+                ('angle_to_center_of_lane_degrees_5',-math.pi, math.pi ), ('angle_to_center_of_lane_degrees_7',-math.pi, math.pi ),
+                ('angle_to_center_of_lane_degrees_ahead_waypoints',-math.pi, math.pi ), ('angle_to_center_of_lane_degrees_ahead_waypoints_2',-math.pi, math.pi ),
+                                 ('bearing_to_ahead_waypoints_ahead',-math.pi, math.pi ), ('bearing_to_ahead_waypoints_ahead_2',-math.pi, math.pi ), ('bearing_to_waypoint',-math.pi, math.pi ),
+                 ('bearing_to_waypoint_2',-math.pi, math.pi ), ('bearing_to_waypoint_5',-math.pi, math.pi ), ('bearing_to_waypoint_7',-math.pi, math.pi ),
+                                 ('closest_distance_to_next_plus_1_waypoint_line',0,5), ('closest_distance_to_next_waypoint_line',0,5),
+                                 ('forward_velocity',0,20), ('hyp_distance_to_next_plus_1_waypoint',0,5), ('hyp_distance_to_next_waypoint',0,5),
+                ('mean_radius',0,1.1), ('total_episode_reward',-10,10)]
+
+                print(sorted(items_to_plot))
                 items_to_plot = sorted(items_to_plot)
                 num_of_cols = 4
                 num_of_rows = ceil(len(items_to_plot) / num_of_cols)
                 fig, axes = plt.subplots(ncols=num_of_cols, nrows=num_of_rows, figsize=(15, 10))
 
-                for ax, col_name in zip(axes.ravel(), items_to_plot):
-                    assert abs(len(df.loc[idx, col_name]) - len(x_truck[idx][2:])) < 3
-                    ax.plot(df.loc[idx, col_name])
-                    ax.set_title(str(col_name), fontsize=10)
+                for ax, col in zip(axes.ravel(), items_to_plot):
+                    assert abs(len(df.loc[idx, col[0]]) - len(x_truck[idx][2:])) < 3
+                    ax.plot(df.loc[idx, col[0]])
+                    ax.set_title(str(col[0]), fontsize=10)
+                    ax.set_ylim([col[1], col[2]])
+
 
                 plt.show()
 
