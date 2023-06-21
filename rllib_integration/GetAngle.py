@@ -77,39 +77,61 @@ def angle_between(waypoint_forward_vector, vehicle_forward_vector):
 
 
 class Vector:
-    def __init__(self,x,y):
+    def __init__(self,x,y,z=0):
         self.x =x
         self.y = y
+        self.z = z
 def run_tests():
-    assert round(calculate_angle_with_center_of_lane(Vector(50, 20), Vector(10, 50), Vector(50, 80)), 2) == 53.13
-    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(30, 50), Vector(100, 70)), 2) == 29.74
-    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-30, 0), Vector(100, 70)), 2) == 160.35
-    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(30, 0), Vector(50, 70)), 2) == 82.87
-    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(40, 10), Vector(10, 70)), 2) == 90.00
+    assert round(calculate_angle_with_center_of_lane(Vector(50, 20), Vector(10, 50), Vector(50, 80)), 2) == 0.93
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(30, 50), Vector(100, 70)), 2) == 0.52
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-30, 0), Vector(100, 70)), 2) == 2.80
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(30, 0), Vector(50, 70)), 2) == -1.45
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(40, 10), Vector(10, 70)), 2) == -1.57
+
+    assert round(angle_between(Vector(0, 60),Vector(-40, 30)),2) == 0.93
+    assert round(angle_between(Vector(90, 60),Vector(20,40)),2) == 0.52
+    assert round(angle_between(Vector(90,60),Vector(-40,-10)),2) == 2.80
+    assert round(angle_between(Vector(40,60),Vector(20,-10)),2) == -1.45
+    assert round(angle_between(Vector(0,60),Vector(30,0)),2) == -1.57
 
 
     # First quadrant
 
-    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(50, 50), Vector(10, 70)), 2) == 45.00
-    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(50, 50), Vector(20, 70)), 2) == 35.54
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(50, 50), Vector(10, 70)), 2) == -0.79
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(50, 50), Vector(20, 70)), 2) == -0.62
+
+    assert round(angle_between(Vector(0,60),Vector(40,40)),2) == -0.79
+    assert round(angle_between(Vector(10,60),Vector(40,40)),2) == -0.62
 
     # Vertical
 
     assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(10, 90), Vector(10, 70)), 2) == 0
-    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(10, 90), Vector(20, 70)), 2) == 9.46
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(10, 90), Vector(20, 70)), 2) == 0.17
+    assert round(angle_between(Vector(0,60),Vector(0,80)),2) == 0
+    assert round(angle_between(Vector(10,60),Vector(0,80)),2) == 0.17
+
+
     # Second quadrant
 
-    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-40, 30), Vector(10, 70)), 2) == 68.20
-    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-40, 30), Vector(20, 70)), 2) == 77.66
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-40, 30), Vector(10, 70)), 2) == 1.19
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-40, 30), Vector(20, 70)), 2) == 1.36
+    assert round(angle_between(Vector(0,60),Vector(-50,20)),2) == 1.19
+    assert round(angle_between(Vector(10,60),Vector(-50,20)),2) == 1.36
 
     # Third quadrant
-    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-20, -50), Vector(10, 70)), 2) == 153.43
-    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-20, -50), Vector(20, 70)), 2) == 162.90
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-20, -50), Vector(10, 70)), 2) == 2.68
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(-20, -50), Vector(20, 70)), 2) == 2.84
+    assert round(angle_between(Vector(0,60),Vector(-30,-60)),2) ==2.68
+    assert round(angle_between(Vector(10,60),Vector(-30,-60)),2) ==2.84
 
     # fourth quadrant
-    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(50, -60), Vector(10, 70)), 2) == 150.26
-    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(50, -60), Vector(20, 70)), 2) == 140.79
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(50, -60), Vector(10, 70)), 2) == -2.62
+    assert round(calculate_angle_with_center_of_lane(Vector(10, 10), Vector(50, -60), Vector(20, 70)), 2) == -2.46
+    assert round(angle_between(Vector(0,60),Vector(40,-70)),2) == -2.62
+    assert round(angle_between(Vector(10,60),Vector(40,-70)),2) == -2.46
     print('All assertions passed')
+
+    # assert angle_between
 # run_tests()
 
 
