@@ -1193,6 +1193,7 @@ class CarlaCore:
         return self.sqr(v.x - w.x) + self.sqr(v.y - w.y)
 
     def distToSegmentSquared(self,p, v, w):
+        # Calculates closest distance from point p to line formed by v -> w
         l2 = self.dist2(v, w)
         if l2 == 0:
             return self.dist2(p, v)
@@ -1229,4 +1230,17 @@ class CarlaCore:
 
         v = Vector(x=left_point_x, y=left_point_y)
         w = Vector(x=right_point_x, y=right_point_y)
+        return math.sqrt(self.distToSegmentSquared(p, v, w))
+
+    def shortest_distance_to_center_of_lane(self, truck_transform):
+        p = Vector(x=truck_transform.location.x, y=truck_transform.location.y)
+
+        previous_waypoint_location = self.route[self.last_waypoint_index - 1].location
+        current_waypoint_location = self.route[self.last_waypoint_index].location
+
+
+        v = Vector(x=previous_waypoint_location.x,y=previous_waypoint_location.y)
+        w = Vector(x= current_waypoint_location.x,y=current_waypoint_location.y)
+
+
         return math.sqrt(self.distToSegmentSquared(p, v, w))
