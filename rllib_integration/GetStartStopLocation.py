@@ -152,10 +152,10 @@ spawn_points_2_lane_roundabout_small_easy = [
     [40, [10], "right"],
 
     # Large gap in waypoints
-    # [34, [112], "left"],
+    [34, [112], "left"],
     [11, [10], "right"],
     # Large gap in waypoints
-    # [11, [3], "right"],
+    [11, [3], "right"],
 
     [5, [41], "left"],
     # [97, [3], "right"],
@@ -180,12 +180,12 @@ spawn_points_2_lane_roundabout_small_difficult = [
     # [102, [28], "left"],
     # In Editor
 
-    # [31, [120],"left"],
+    [31, [120],"left"],
     # Large gaps in waypoints
-    # [31, [112],"left"],
+    [31, [112],"left"],
 
     # Large gaps in waypoints
-    # [117, [112],"left"],
+    [117, [112],"left"],
     [117, [41],"left"],
 
     [34, [41], "left"],
@@ -198,7 +198,7 @@ spawn_points_2_lane_roundabout_small_difficult = [
 
 ]
 
-roundabouts = [spawn_points_2_lane_roundabout_small_difficult]
+roundabouts = [spawn_points_2_lane_roundabout_small_easy, spawn_points_2_lane_roundabout_small_difficult]
 # roundabouts = [spawn_points_2_lane_roundabout_difficult,spawn_points_2_lane_roundabout_easy]
 
 

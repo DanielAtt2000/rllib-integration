@@ -312,7 +312,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 4900:
+        if idx > 6150:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -491,24 +491,64 @@ def plot_route(route_points_all, truck_points_all):
                     if col not in items_not_to_plot:
                         items_to_plot_derived.append(col)
 
-                items_to_plot = [('angle_between_truck_and_trailer',-1,1 ), ('angle_-math.pi, math.pi-math.pi, math.pi-math.pi, math.pibetween_waypoints_10',0,1.1), ('angle_between_waypoints_12',0,1.1),
-                                 ('angle_between_waypoints_5',0,1.1), ('angle_between_waypoints_7',0,1.1), ('angle_between_waypoints_minus10',0,1.1),
-                                 ('angle_between_waypoints_minus12',0,1.1), ('angle_between_waypoints_minus5',0,1.1), ('angle_between_waypoints_minus7',0,1.1),
-                                 ('angle_to_center_of_lane_degrees',-math.pi, math.pi ), ('angle_to_center_of_lane_degrees_2',-math.pi, math.pi ),
-                ('angle_to_center_of_lane_degrees_5',-math.pi, math.pi ), ('angle_to_center_of_lane_degrees_7',-math.pi, math.pi ),
-                ('angle_to_center_of_lane_degrees_ahead_waypoints',-math.pi, math.pi ),
+                items_to_plot = [('angle_between_truck_and_trailer',-1,1 ),
+
+                                 ('angle_between_waypoints_5',0,1.1),
+                                 ('angle_between_waypoints_7',0,1.1),
+                                 ('angle_between_waypoints_10',0,1.1),
+                                 ('angle_between_waypoints_12', 0, 1.1),
+
+                                 ('angle_between_waypoints_minus5',0,1.1),
+                                 ('angle_between_waypoints_minus7',0,1.1),
+                                 ('angle_between_waypoints_minus10', 0, 1.1),
+                                 ('angle_between_waypoints_minus12', 0, 1.1),
+
+
+                                 ('angle_to_center_of_lane_degrees',-math.pi, math.pi ),
+                                 ('angle_to_center_of_lane_degrees_2',-math.pi, math.pi ),
+                                 ('angle_to_center_of_lane_degrees_5',-math.pi, math.pi ),
+                                 ('angle_to_center_of_lane_degrees_7',-math.pi, math.pi ),
+                                 ('angle_to_center_of_lane_degrees_ahead_waypoints',-math.pi, math.pi ),
                                  # ('angle_to_center_of_lane_degrees_ahead_waypoints_2',-math.pi, math.pi ),
 
-                                 ('bearing_to_ahead_waypoints_ahead',-math.pi, math.pi ),
-                                 # ('bearing_to_ahead_waypoints_ahead_2',-math.pi, math.pi ),
-                                 ('bearing_to_waypoint',-math.pi, math.pi ),
-                 ('bearing_to_waypoint_2',-math.pi, math.pi ), ('bearing_to_waypoint_5',-math.pi, math.pi ), ('bearing_to_waypoint_7',-math.pi, math.pi ),
-                                 ('closest_distance_to_next_plus_1_waypoint_line',0,5), ('closest_distance_to_next_waypoint_line',0,5),
-                                 ('forward_velocity',0,20), ('hyp_distance_to_next_plus_1_waypoint',0,5), ('hyp_distance_to_next_waypoint',0,5),
-                ('mean_radius',0,1.1), ('total_episode_reward',-10,10)]
+                                 ('truck_bearing_to_waypoint', -math.pi, math.pi),
+                                 ('truck_bearing_to_waypoint_2', -math.pi, math.pi),
+                                 ('truck_bearing_to_waypoint_5', -math.pi, math.pi),
+                                 ('truck_bearing_to_waypoint_7', -math.pi, math.pi),
+                                 ('truck_bearing_to_waypoint_10', -math.pi, math.pi),
+
+                                 ('trailer_bearing_to_waypoint', -math.pi, math.pi),
+                                 ('trailer_bearing_to_waypoint_2', -math.pi, math.pi),
+                                 ('trailer_bearing_to_waypoint_5', -math.pi, math.pi),
+                                 ('trailer_bearing_to_waypoint_7', -math.pi, math.pi),
+                                 ('trailer_bearing_to_waypoint_10', -math.pi, math.pi),
+
+                                 # ('truck_bearing_to_ahead_waypoints_ahead_2',-math.pi, math.pi ),
+
+
+                                 ('closest_distance_to_next_plus_1_waypoint_line',0,5),
+                                 ('closest_distance_to_next_waypoint_line',0,5),
+                                 ('forward_velocity',0,20),
+                                 ('hyp_distance_to_next_plus_1_waypoint',0,5),
+                                 ('hyp_distance_to_next_waypoint',0,5),
+                                    ('mean_radius',0,1.1),
+                                 ('total_episode_reward',-10,10)]
 
                 if len(items_to_plot_derived) != len(items_to_plot):
-                    raise Exception('Mismatch in items to plot')
+                    items_not_found  =[]
+                    for item in items_to_plot_derived:
+                        found = False
+                        for item_2 in items_to_plot  :
+                            if item == item_2[0]:
+                                found = True
+                                break
+
+                        if not found:
+                            items_not_found.append(item)
+
+
+                    raise Exception(f'Mismatch in items to plot {items_not_found}')
+
                 print(sorted(items_to_plot))
                 items_to_plot = sorted(items_to_plot)
                 num_of_cols = 4
