@@ -193,7 +193,7 @@ def plot_route(route_points_all, truck_points_all):
 
                 value_type = 'dsad'
                 arrived = 'noen'
-                if mean(df.loc[idx, "angle_to_center_of_lane_degrees_ahead_waypoints_2"
+                if mean(df.loc[idx, "angle_to_center_of_lane_degrees_ahead_waypoints"
                                     ""]) > 0:
                     value_type = 'positive'
                 else:
@@ -312,7 +312,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 6150:
+        if idx > 0:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -526,11 +526,11 @@ def plot_route(route_points_all, truck_points_all):
                                  # ('truck_bearing_to_ahead_waypoints_ahead_2',-math.pi, math.pi ),
 
 
-                                 ('closest_distance_to_next_plus_1_waypoint_line',0,5),
-                                 ('closest_distance_to_next_waypoint_line',0,5),
+                                 ('closest_distance_to_next_plus_1_waypoint_line',0,20),
+                                 ('closest_distance_to_next_waypoint_line',0,20),
                                  ('forward_velocity',0,20),
-                                 ('hyp_distance_to_next_plus_1_waypoint',0,5),
-                                 ('hyp_distance_to_next_waypoint',0,5),
+                                 ('hyp_distance_to_next_plus_1_waypoint',0,20),
+                                 ('hyp_distance_to_next_waypoint',0,20),
                                     ('mean_radius',0,1.1),
                                  ('total_episode_reward',-10,10)]
 

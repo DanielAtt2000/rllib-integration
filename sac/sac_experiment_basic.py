@@ -36,7 +36,7 @@ from sac.sac_callbacks import get_route_type
 class SACExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        # self.acceleration_pid = PID(Kp=0.2,Ki=0.0,Kd=0.0,setpoint=7.5,sample_time=None,output_limits=(0,1))
+        self.acceleration_pid = PID(Kp=0.2,Ki=0.2,Kd=0.0,setpoint=8.33,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -84,6 +84,7 @@ class SACExperimentBasic(BaseExperiment):
         self.truck_bearing_to_waypoint_5 = []
         self.truck_bearing_to_waypoint_7 = []
         self.truck_bearing_to_waypoint_10 = []
+        self.distance_to_center_of_lane = []
         # self.bearing_to_ahead_waypoints_ahead_2 = []
         self.angle_between_truck_and_trailer = []
         self.trailer_bearing_to_waypoint = []
@@ -279,6 +280,7 @@ class SACExperimentBasic(BaseExperiment):
         self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint_5", self.truck_bearing_to_waypoint_5)
         self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint_7", self.truck_bearing_to_waypoint_7)
         self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint_10", self.truck_bearing_to_waypoint_10)
+        self.save_to_file(f"{self.directory}/distance_to_center_of_lane", self.distance_to_center_of_lane)
         # self.save_to_file(f"{self.directory}/bearing_to_ahead_waypoints_ahead_2", self.bearing_to_ahead_waypoints_ahead_2)
         self.save_to_file(f"{self.directory}/angle_between_truck_and_trailer", self.angle_between_truck_and_trailer)
         self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint", self.trailer_bearing_to_waypoint)
@@ -347,6 +349,7 @@ class SACExperimentBasic(BaseExperiment):
         self.truck_bearing_to_waypoint_5 = []
         self.truck_bearing_to_waypoint_7 = []
         self.truck_bearing_to_waypoint_10 = []
+        self.distance_to_center_of_lane = []
         self.trailer_bearing_to_waypoint = []
         self.trailer_bearing_to_waypoint_2 = []
         self.trailer_bearing_to_waypoint_5 = []
@@ -399,8 +402,8 @@ class SACExperimentBasic(BaseExperiment):
         """
         obs_space = Dict( {
             'values':Box(
-                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                low=np.array([0,0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,200,200,200,200,20,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             ),
             'route': Discrete(2)
@@ -436,18 +439,18 @@ class SACExperimentBasic(BaseExperiment):
         return obs_space
 
     def get_actions(self):
-        # acceleration_value = self.acceleration_pid(self.current_forward_velocity)
-        # print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
+        acceleration_value = self.acceleration_pid(self.current_forward_velocity)
+        print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
         return {
-            0: [0.3, 0.00, 0.0, False, False],  # Straight
-            1: [0.3, 0.80, 0.0, False, False],  # Right
-            2: [0.3, 0.60, 0.0, False, False],  # Right
-            3: [0.3, 0.40, 0.0, False, False],  # Right
-            4: [0.3, 0.20, 0.0, False, False],  # Right
-            5: [0.3, -0.80, 0.0, False, False],  # Left
-            6: [0.3, -0.60, 0.0, False, False],  # Left
-            7: [0.3, -0.40, 0.0, False, False],  # Left
-            8: [0.3, -0.20, 0.0, False, False],  # Left
+            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
+            1: [acceleration_value, 0.80, 0.0, False, False],  # Right
+            2: [acceleration_value, 0.60, 0.0, False, False],  # Right
+            3: [acceleration_value, 0.40, 0.0, False, False],  # Right
+            4: [acceleration_value, 0.20, 0.0, False, False],  # Right
+            5: [acceleration_value, -0.80, 0.0, False, False],  # Left
+            6: [acceleration_value, -0.60, 0.0, False, False],  # Left
+            7: [acceleration_value, -0.40, 0.0, False, False],  # Left
+            8: [acceleration_value, -0.20, 0.0, False, False],  # Left
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
             # 2: [0.0, 0.75, 0.0, False, False],  # Right
@@ -627,6 +630,8 @@ class SACExperimentBasic(BaseExperiment):
                                           core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with + 1].location.y - truck_transform.location.y)
         hyp_distance_to_next_plus_1_waypoint = math.sqrt(
             (x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
+
+        distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=truck_transform)
 
         truck_bearing_to_waypoint = angle_between(waypoint_forward_vector=forward_vector_waypoint_0,
                                                   vehicle_forward_vector=truck_forward_vector)
@@ -1500,6 +1505,8 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(hyp_distance_to_next_plus_1_waypoint),
             np.float32(closest_distance_to_next_waypoint_line),
             np.float32(closest_distance_to_next_plus_1_waypoint_line),
+            np.float32(distance_to_center_of_lane),
+
             # np.float32(hyp_distance_to_next_waypoint_line),
             np.float32(angle_to_center_of_lane_degrees),
             np.float32(angle_to_center_of_lane_degrees_2),
@@ -1614,6 +1621,7 @@ class SACExperimentBasic(BaseExperiment):
             print(f"hyp_distance_to_next_plus_1_waypoint:{np.float32(hyp_distance_to_next_plus_1_waypoint)}")
             print(f"closest_distance_to_next_waypoint_line:{np.float32(closest_distance_to_next_waypoint_line)}")
             print(f"closest_distance_to_next_plus_1_waypoint_line:{np.float32(closest_distance_to_next_plus_1_waypoint_line)}")
+            print(f"distance_to_center_of_lane:{np.float32(distance_to_center_of_lane)}")
             print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
             print(f"angle_to_center_of_lane_degrees_2:{np.float32(angle_to_center_of_lane_degrees_2)}")
             print(f"angle_to_center_of_lane_degrees_5:{np.float32(angle_to_center_of_lane_degrees_5)}")
@@ -1669,6 +1677,7 @@ class SACExperimentBasic(BaseExperiment):
         self.truck_bearing_to_waypoint_5.append(np.float32(truck_bearing_to_waypoint_5))
         self.truck_bearing_to_waypoint_7.append(np.float32(truck_bearing_to_waypoint_7))
         self.truck_bearing_to_waypoint_10.append(np.float32(truck_bearing_to_waypoint_10))
+        self.distance_to_center_of_lane.append(np.float32(distance_to_center_of_lane))
 
         self.trailer_bearing_to_waypoint.append(np.float32(trailer_bearing_to_waypoint))
         self.trailer_bearing_to_waypoint_2.append(np.float32(trailer_bearing_to_waypoint_2))
@@ -1756,7 +1765,13 @@ class SACExperimentBasic(BaseExperiment):
         self.done_collision_truck = (self.last_no_of_collisions_truck > 0)
         self.done_collision_trailer = (self.last_no_of_collisions_trailer > 0)
         self.done_arrived = self.completed_route(core)
-        self.done_far_from_path = self.last_hyp_distance_to_next_waypoint > 10
+
+        if core.exit_spawn_point_index in [112,3]:
+            acceptable_gap_to_next_waypoint = 20
+        else:
+            acceptable_gap_to_next_waypoint = 10
+
+        self.done_far_from_path = self.last_hyp_distance_to_next_waypoint > acceptable_gap_to_next_waypoint
 
         output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision_truck or self.done_collision_trailer or self.done_arrived or self.done_far_from_path or self.lidar_collision
         self.custom_done_arrived = self.done_arrived
@@ -1795,6 +1810,7 @@ class SACExperimentBasic(BaseExperiment):
         hyp_distance_to_next_plus_1_waypoint = observation['values'][2]
         closest_distance_to_next_waypoint_line = observation['values'][3]
         closest_distance_to_next_plus_1_waypoint_line = observation['values'][4]
+        distance_to_center_of_lane = observation['values'][5]
 
         # print(f"in rewards forward_velocity {forward_velocity}")
         # print(f"in rewards hyp_distance_to_next_waypoint {hyp_distance_to_next_waypoint}")
@@ -1865,6 +1881,9 @@ class SACExperimentBasic(BaseExperiment):
         #
         if self.passed_waypoint:
             reward = reward + 10
+
+        distance_to_center_of_lane = (np.clip(abs(distance_to_center_of_lane),0,10))/10
+        reward = reward - distance_to_center_of_lane
 
 
         # if bearing_to_waypoint == 0:
