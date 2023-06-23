@@ -84,7 +84,7 @@ class SACExperimentBasic(BaseExperiment):
         self.truck_bearing_to_waypoint_5 = []
         self.truck_bearing_to_waypoint_7 = []
         self.truck_bearing_to_waypoint_10 = []
-        self.distance_to_center_of_lane = []
+        # self.distance_to_center_of_lane = []
         # self.bearing_to_ahead_waypoints_ahead_2 = []
         self.angle_between_truck_and_trailer = []
         self.trailer_bearing_to_waypoint = []
@@ -280,7 +280,7 @@ class SACExperimentBasic(BaseExperiment):
         self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint_5", self.truck_bearing_to_waypoint_5)
         self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint_7", self.truck_bearing_to_waypoint_7)
         self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint_10", self.truck_bearing_to_waypoint_10)
-        self.save_to_file(f"{self.directory}/distance_to_center_of_lane", self.distance_to_center_of_lane)
+        # self.save_to_file(f"{self.directory}/distance_to_center_of_lane", self.distance_to_center_of_lane)
         # self.save_to_file(f"{self.directory}/bearing_to_ahead_waypoints_ahead_2", self.bearing_to_ahead_waypoints_ahead_2)
         self.save_to_file(f"{self.directory}/angle_between_truck_and_trailer", self.angle_between_truck_and_trailer)
         self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint", self.trailer_bearing_to_waypoint)
@@ -349,7 +349,7 @@ class SACExperimentBasic(BaseExperiment):
         self.truck_bearing_to_waypoint_5 = []
         self.truck_bearing_to_waypoint_7 = []
         self.truck_bearing_to_waypoint_10 = []
-        self.distance_to_center_of_lane = []
+        # self.distance_to_center_of_lane = []
         self.trailer_bearing_to_waypoint = []
         self.trailer_bearing_to_waypoint_2 = []
         self.trailer_bearing_to_waypoint_5 = []
@@ -402,8 +402,8 @@ class SACExperimentBasic(BaseExperiment):
         """
         obs_space = Dict( {
             'values':Box(
-                low=np.array([0,0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,200,200,200,200,20,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                low=np.array([0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,200,200,200,200,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             ),
             'route': Discrete(2)
@@ -631,7 +631,7 @@ class SACExperimentBasic(BaseExperiment):
         hyp_distance_to_next_plus_1_waypoint = math.sqrt(
             (x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
 
-        distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=truck_transform)
+        # distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=truck_transform)
 
         truck_bearing_to_waypoint = angle_between(waypoint_forward_vector=forward_vector_waypoint_0,
                                                   vehicle_forward_vector=truck_forward_vector)
@@ -1505,7 +1505,7 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(hyp_distance_to_next_plus_1_waypoint),
             np.float32(closest_distance_to_next_waypoint_line),
             np.float32(closest_distance_to_next_plus_1_waypoint_line),
-            np.float32(distance_to_center_of_lane),
+            # np.float32(distance_to_center_of_lane),
 
             # np.float32(hyp_distance_to_next_waypoint_line),
             np.float32(angle_to_center_of_lane_degrees),
@@ -1621,7 +1621,7 @@ class SACExperimentBasic(BaseExperiment):
             print(f"hyp_distance_to_next_plus_1_waypoint:{np.float32(hyp_distance_to_next_plus_1_waypoint)}")
             print(f"closest_distance_to_next_waypoint_line:{np.float32(closest_distance_to_next_waypoint_line)}")
             print(f"closest_distance_to_next_plus_1_waypoint_line:{np.float32(closest_distance_to_next_plus_1_waypoint_line)}")
-            print(f"distance_to_center_of_lane:{np.float32(distance_to_center_of_lane)}")
+            # print(f"distance_to_center_of_lane:{np.float32(distance_to_center_of_lane)}")
             print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
             print(f"angle_to_center_of_lane_degrees_2:{np.float32(angle_to_center_of_lane_degrees_2)}")
             print(f"angle_to_center_of_lane_degrees_5:{np.float32(angle_to_center_of_lane_degrees_5)}")
@@ -1677,7 +1677,7 @@ class SACExperimentBasic(BaseExperiment):
         self.truck_bearing_to_waypoint_5.append(np.float32(truck_bearing_to_waypoint_5))
         self.truck_bearing_to_waypoint_7.append(np.float32(truck_bearing_to_waypoint_7))
         self.truck_bearing_to_waypoint_10.append(np.float32(truck_bearing_to_waypoint_10))
-        self.distance_to_center_of_lane.append(np.float32(distance_to_center_of_lane))
+        # self.distance_to_center_of_lane.append(np.float32(distance_to_center_of_lane))
 
         self.trailer_bearing_to_waypoint.append(np.float32(trailer_bearing_to_waypoint))
         self.trailer_bearing_to_waypoint_2.append(np.float32(trailer_bearing_to_waypoint_2))
@@ -1882,8 +1882,8 @@ class SACExperimentBasic(BaseExperiment):
         if self.passed_waypoint:
             reward = reward + 10
 
-        distance_to_center_of_lane = (np.clip(abs(distance_to_center_of_lane),0,4))/4
-        reward = reward - (distance_to_center_of_lane*4)
+        # distance_to_center_of_lane = (np.clip(abs(distance_to_center_of_lane),0,4))/4
+        # reward = reward - (distance_to_center_of_lane*4)
 
 
         # if bearing_to_waypoint == 0:
