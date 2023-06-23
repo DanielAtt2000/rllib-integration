@@ -271,9 +271,8 @@ def plot_all_routes(all_routes=-1,all_spawn_points=-1):
 
 
     for s,spawn_point in enumerate(all_spawn_points):
-        if spawn_point.location.y > 0:
-            plt.plot([spawn_point.location.x], [spawn_point.location.y], 'b^')
-            plt.annotate(str(s), (spawn_point.location.x, spawn_point.location.y))
+        plt.plot([spawn_point.location.x], [spawn_point.location.y], 'b^')
+        plt.annotate(str(s), (spawn_point.location.x, spawn_point.location.y))
 
     plt.gca().invert_yaxis()
     plt.show()

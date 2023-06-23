@@ -163,6 +163,22 @@ spawn_points_2_lane_roundabout_small_easy = [
     # [97, [3], "right"],
     [97, [95], "right"],
 
+    # large roundabout# large roundabout# large roundabout
+    # [119, [37], "right"],
+    # [119, [103], "right"],
+    # [22, [105], "left"],
+    # [22, [26], "left"],
+    # [22, [76], "left"],
+    #
+    # [16, [103], "right"],
+    # [16, [111], "right"],
+    # [96, [26], "left"],
+    # [96, [76], "left"],
+    #
+    # [58, [111], "right"],
+    # large roundabout# large roundabout# large roundabout
+
+
 ]
 
 spawn_points_2_lane_roundabout_small_difficult = [
@@ -196,6 +212,20 @@ spawn_points_2_lane_roundabout_small_difficult = [
     [5, [43], "left"],
     [5, [120], "left"],
     #
+
+    # large roundabout# large roundabout# large roundabout
+    # [73, [74], "right"],
+    # [73, [37], "right"],
+    # [15, [94], "left"],
+    # [15, [105], "left"],
+    # [15, [26], "left"],
+    #
+    # [55, [94], "left"],
+    # [55, [105], "left"],
+    # [96, [94], "left"],
+    # [58, [74], "right"],
+    # [55, [76], "left"],
+    # large roundabout# large roundabout# large roundabout
 
 
 ]
