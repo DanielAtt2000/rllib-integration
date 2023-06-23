@@ -1882,8 +1882,8 @@ class SACExperimentBasic(BaseExperiment):
         if self.passed_waypoint:
             reward = reward + 10
 
-        distance_to_center_of_lane = (np.clip(abs(distance_to_center_of_lane),0,10))/10
-        reward = reward - distance_to_center_of_lane
+        distance_to_center_of_lane = (np.clip(abs(distance_to_center_of_lane),0,4))/4
+        reward = reward - (distance_to_center_of_lane*4)
 
 
         # if bearing_to_waypoint == 0:

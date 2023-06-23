@@ -312,7 +312,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 0:
+        if idx > 2865:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -532,7 +532,8 @@ def plot_route(route_points_all, truck_points_all):
                                  ('hyp_distance_to_next_plus_1_waypoint',0,20),
                                  ('hyp_distance_to_next_waypoint',0,20),
                                     ('mean_radius',0,1.1),
-                                 ('total_episode_reward',-10,10)]
+                                 ('total_episode_reward',-10,10),
+                                 ('distance_to_center_of_lane',0,5)]
 
                 if len(items_to_plot_derived) != len(items_to_plot):
                     items_not_found  =[]
