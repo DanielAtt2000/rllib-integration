@@ -147,6 +147,51 @@ def plot_route(route_points_all, truck_points_all):
     # temp_x_route = deepcopy(x_route)
     # temp_y_route = deepcopy(y_route)
 
+    x_min = min(min(min(x_route), min(x_truck)))
+    x_max = max(max(max(x_route), max(x_truck)))
+
+    y_min = min(min(min(y_route), min(y_truck)))
+    y_max = max(max(max(y_route), max(y_truck)))
+
+    x_min_upper =[]
+    x_max_upper =[]
+
+    y_min_upper=[]
+    y_max_upper= []
+
+    x_min_lower = []
+    x_max_lower = []
+
+    y_min_lower = []
+    y_max_lower= []
+
+    for idx in range(len(y_route)):
+        if min(y_route[idx]) > 0:
+            x_min_upper.append(min(x_route[idx]))
+            x_max_upper.append(max(x_route[idx]))
+
+            y_min_upper.append(min(y_route[idx]))
+            y_max_upper.append(max(y_route[idx]))
+        else:
+            x_min_lower.append(min(x_route[idx]))
+            x_max_lower.append(max(x_route[idx]))
+
+            y_min_lower.append(min(y_route[idx]))
+            y_max_lower.append(max(y_route[idx]))
+
+    x_min_upper = min(x_min_upper)
+    y_min_upper = min(y_min_upper)
+    x_max_upper = max(x_max_upper)
+    y_max_upper = max(y_max_upper)
+
+    x_min_lower = min(x_min_lower)
+    y_min_lower = min(y_min_lower)
+    x_max_lower = max(x_max_lower)
+    y_max_lower = max(y_max_lower)
+
+
+
+
 
 
     print(f'Number of episodes {len(x_route)}')
@@ -308,7 +353,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 5300:
+        if idx > 6100:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -365,12 +410,12 @@ def plot_route(route_points_all, truck_points_all):
                 a1 = axes[0]
                 a2 = axes[1]
 
-                x_min = min(x_route[idx])
-                x_max = max(x_route[idx])
-
-                y_min = min(y_route[idx])
-                y_max = max(y_route[idx])
-                buffer = 20
+                # x_min = min(x_route[idx])
+                # x_max = max(x_route[idx])
+                #
+                # y_min = min(y_route[idx])
+                # y_max = max(y_route[idx])
+                buffer = 5
                 # a3 = axes[2]
                 # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
                 a1.plot(x_route[idx][0], y_route[idx][0], 'bo', label='Route Starting waypoint')
@@ -380,7 +425,11 @@ def plot_route(route_points_all, truck_points_all):
                 a1.plot(df.loc[idx, "Collisions"].x,
                         df.loc[idx, "Collisions"].y, 'b*')
 
-                a1.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
+                if y_route[idx][0] > 0:
+                    a1.axis([x_min_upper - buffer, x_max_upper + buffer, y_min_upper - buffer, y_max_upper + buffer])
+                else:
+                    a1.axis([x_min_lower - buffer, x_max_lower + buffer, y_min_lower - buffer, y_max_lower + buffer])
+
                 # plt.axis([0, 1, 0, 1])
                 a1.set_title(
                     f'{df.loc[idx,"EntryExit"]} {df.loc[idx, "Done"]}. Episode {idx}/{len(x_route)}. Total Episode Reward total {sum(df.loc[idx, "total_episode_reward"])}. W/O Last value {sum(df.loc[idx, "total_episode_reward"][:-1])}')
@@ -536,7 +585,7 @@ def plot_route(route_points_all, truck_points_all):
                                  ('hyp_distance_to_next_waypoint',0,20),
                                     ('mean_radius',0,1.1),
                                  ('total_episode_reward',-10,10),
-                                 # ('distance_to_center_of_lane',0,5)
+                                 ('distance_to_center_of_lane',0,5)
                                  ]
 
                 if len(items_to_plot_derived) != len(items_to_plot):

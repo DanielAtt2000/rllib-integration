@@ -1907,7 +1907,7 @@ class SACExperimentBasic(BaseExperiment):
             reward = reward + 0
 
         # Negative reward each timestep
-        reward = reward + -1
+        # reward = reward + -1
 
 
         if self.done_falling:
