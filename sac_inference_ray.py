@@ -45,6 +45,7 @@ EXPERIMENT_CLASS = SACExperimentBasic
 # /home/daniel/ray_results/carla_rllib/sac_725b71c70c/CustomSACTrainer_CarlaEnv_92ed2_00000_0_2023-06-22_07-56-47/checkpoint_019000
 # /home/daniel/ray_results/carla_rllib/sac_564062f528/CustomSACTrainer_CarlaEnv_527af_00000_0_2023-06-22_19-15-01/checkpoint_020000
 # /home/daniel/ray_results/carla_rllib/sac_e6a772bf3f/CustomSACTrainer_CarlaEnv_0d727_00000_0_2023-06-24_00-48-21/checkpoint_024000
+# /home/daniel/ray_results/carla_rllib/sac_4c0293c613/CustomSACTrainer_CarlaEnv_b1f1d_00000_0_2023-06-24_10-54-14/checkpoint_027000
 def save_to_pickle(filename, data):
     filename = filename + '.pickle'
     with open(filename, 'wb') as handle:
@@ -121,7 +122,7 @@ def main():
                 counter +=1
 
             # ['route', 'timesteps', 'collision_truck', 'collision_trailer', 'timeout','lidar_collision_truck','lidar_collision_trailer','distance_to_center_of_lane', 'completed']
-            employee_writer.writerow([f'{env.env_start_spawn_point}|{env.env_stop_spawn_point}', counter, info['done_collision_truck'],info['done_collision_trailer'],info['done_time'],info['truck_lidar_collision'],info['trailer_lidar_collision'], mean(distance_to_center_of_lane),info['done_arrived']])
+            employee_writer.writerow([f'{env.env_start_spawn_point}|{env.env_stop_spawn_point}', counter, info['done_collision_truck'],info['done_collision_trailer'],info['done_time_idle'] or info['done_time_episode'],info['truck_lidar_collision'],info['trailer_lidar_collision'], mean(distance_to_center_of_lane),info['done_arrived']])
             results_file.flush()
             # Resetting Variables
             env.done_collision_truck = False

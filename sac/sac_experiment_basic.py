@@ -1601,6 +1601,7 @@ class SACExperimentBasic(BaseExperiment):
 
 
         if self.custom_enable_rendering:
+            print(f'Entry Points {core.entry_spawn_point_index}| Exit point {core.exit_spawn_point_index}')
             print(f'Route Type {route_type}')
             print(f"Radii {radii}")
             print(f'Mean radius {mean_radius}')
