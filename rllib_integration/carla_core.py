@@ -104,6 +104,7 @@ class CarlaCore:
         self.visualise_all_routes = False
         self.times_crazy = []
         self.custom_enable_rendering = False
+        self.one_after_the_other = False
 
         self.route = []
         self.route_points = []
@@ -113,6 +114,7 @@ class CarlaCore:
         self.max_x = None
         self.min_y = None
         self.max_y = None
+        self.last_chosen_route = -2
 
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
 
@@ -173,7 +175,8 @@ class CarlaCore:
             ]
 
         map_name = "doubleRoundabout37"
-
+        # map_name = "20m"
+        # map_name = "mediumRoundabout4"
         server_command += [
             "--carla-rpc-port={}".format(self.server_port),
             "-quality-level={}".format(self.config["quality_level"]),
@@ -729,7 +732,10 @@ class CarlaCore:
     def set_route(self,failed_entry_spawn_locations):
         self.route_points = []
 
-        self.entry_spawn_point_index, self.exit_spawn_point_index, self.route_lane, self.last_roundabout_choice = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations,self.last_roundabout_choice)
+        if self.one_after_the_other:
+            self.last_chosen_route += 1
+
+        self.entry_spawn_point_index, self.exit_spawn_point_index, self.route_lane, self.last_roundabout_choice = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations,self.last_roundabout_choice, self.last_chosen_route)
         # key = str(self.entry_spawn_point_index) + " | " + str(self.exit_spawn_point_index)
         # if self.chosen_routes.get(key) is None:
         #     self.chosen_routes[key] = 1

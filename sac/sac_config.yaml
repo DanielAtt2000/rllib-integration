@@ -607,6 +607,8 @@ env_config:
       tm_hybrid_mode: True
 #    town: "Town03_Opt"
     town: 'doubleRoundabout37'
+#    town: '20m'
+#    town: 'mediumRoundabout4'
     others:
       framestack: 1
       max_time_idle: 100

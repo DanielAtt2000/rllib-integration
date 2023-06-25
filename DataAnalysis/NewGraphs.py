@@ -179,15 +179,17 @@ def plot_route(route_points_all, truck_points_all):
             y_min_lower.append(min(y_route[idx]))
             y_max_lower.append(max(y_route[idx]))
 
-    x_min_upper = min(x_min_upper)
-    y_min_upper = min(y_min_upper)
-    x_max_upper = max(x_max_upper)
-    y_max_upper = max(y_max_upper)
+    if len(x_min_upper) != 0:
+        x_min_upper = min(x_min_upper)
+        y_min_upper = min(y_min_upper)
+        x_max_upper = max(x_max_upper)
+        y_max_upper = max(y_max_upper)
 
-    x_min_lower = min(x_min_lower)
-    y_min_lower = min(y_min_lower)
-    x_max_lower = max(x_max_lower)
-    y_max_lower = max(y_max_lower)
+    if len(x_min_lower) != 0:
+        x_min_lower = min(x_min_lower)
+        y_min_lower = min(y_min_lower)
+        x_max_lower = max(x_max_lower)
+        y_max_lower = max(y_max_lower)
 
 
 
@@ -353,7 +355,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 6100:
+        if idx > 10:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -418,17 +420,19 @@ def plot_route(route_points_all, truck_points_all):
                 buffer = 5
                 # a3 = axes[2]
                 # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
-                a1.plot(x_route[idx][0], y_route[idx][0], 'bo', label='Route Starting waypoint')
-                a1.plot(x_truck[idx][0], y_truck[idx][0], 'kd', label='Truck Starting waypoint')
-                a1.plot(x_route[idx][2:], y_route[idx][2:], 'y^')
-                a1.plot(x_truck[idx][2:], y_truck[idx][2:], "ro")
-                a1.plot(df.loc[idx, "Collisions"].x,
-                        df.loc[idx, "Collisions"].y, 'b*')
+                a1.plot(x_route[idx][0], y_route[idx][0], 'ro', label='Route Starting waypoint')
+
+                # a1.plot(x_truck[idx][0], y_truck[idx][0], 'kd', label='Truck Starting waypoint')
+                a1.plot(x_route[idx][2:], y_route[idx][2:], 'g^')
+                a1.plot(x_truck[idx][2:], y_truck[idx][2:], "yo")
+                a1.plot(x_route[idx][-20], y_route[idx][-20], 'r^', label='Route End waypoint')
+                # a1.plot(df.loc[idx, "Collisions"].x, df.loc[idx, "Collisions"].y, 'b*')
 
                 if y_route[idx][0] > 0:
                     a1.axis([x_min_upper - buffer, x_max_upper + buffer, y_min_upper - buffer, y_max_upper + buffer])
                 else:
                     a1.axis([x_min_lower - buffer, x_max_lower + buffer, y_min_lower - buffer, y_max_lower + buffer])
+                # a1.axis([-80, 70,-85,85])
 
                 # plt.axis([0, 1, 0, 1])
                 a1.set_title(
