@@ -103,7 +103,7 @@ def main():
         # Initalize the CARLA environment
         env = agent.workers.local_worker().env
 
-        results_file = open(f'inference_results/{args.checkpoint.replace("/","_")}.csv', mode='a')
+        results_file = open(f'inference_results/latest/medium/easy/{args.checkpoint.replace("/","_")}.csv', mode='a')
         employee_writer = csv.writer(results_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         employee_writer.writerow(['route','timesteps','collision_truck','collision_trailer','timeout','truck_lidar_collision','trailer_lidar_collision','distance_to_center_of_lane','completed'])

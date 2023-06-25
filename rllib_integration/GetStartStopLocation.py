@@ -230,7 +230,80 @@ spawn_points_2_lane_roundabout_small_difficult = [
 
 ]
 
-roundabouts = [spawn_points_2_lane_roundabout_small_easy, spawn_points_2_lane_roundabout_small_difficult]
+lower_medium_roundabout = [
+    [28, [17], "left"],
+    [28, [46], "left"],
+    [28, [67], "left"],
+    [35, [41], "right"],
+    [35, [59], "right"],
+
+    # [12, [46], "left"],
+    [12, [67], "left"],
+    # [12, [24], "left"],
+    # [13, [59], "right"],
+    # [13, [42], "right"],
+
+    [18, [67], "left"],
+    # [18, [24], "left"],
+    [18, [17], "left"],
+    # [69, [42], "right"],
+    [69, [50], "right"],
+
+    # [, [], "left"],
+    # [, [], "left"],
+    # [, [], "left"],
+    # [, [], "right"],
+    # [, [], "right"],
+
+]
+
+upper_medium_roundabout = [
+    [26, [14], "left"],
+    [26, [3], "left"],
+    [26, [63], "left"],
+    [27, [66], "right"],
+    # [27, [2], "right"],
+
+    [4, [3], "left"],
+    [4, [63], "left"],
+    [4, [14], "left"],
+    [64, [2], "right"],
+    # [64, [25], "right"],
+
+    # [, [], "left"],
+    # [, [], "left"],
+    # [, [], "left"],
+    # [, [], "right"],
+    # [, [], "right"],
+
+]
+
+roundabout20m = [
+
+    [8, [14], "right"],
+    [8, [35], "right"],
+
+    [32, [2], "left"],
+    [32, [31], "left"],
+    [32, [4], "left"],
+    [24, [35], "right"],
+    [24, [6], "right"],
+
+    [20, [31], "left"],
+    # [20, [4], "left"],
+    [20, [7], "left"],
+    [19, [6], "right"],
+    [19, [26], "right"],
+
+    [1, [4], "left"],
+    [1, [7], "left"],
+    [1, [2], "left"],
+    [0, [26], "right"],
+    [0, [14], "right"],
+
+]
+
+roundabouts = [lower_medium_roundabout,upper_medium_roundabout]
 # roundabouts = [spawn_points_2_lane_roundabout_difficult,spawn_points_2_lane_roundabout_easy]
 
 
