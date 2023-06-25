@@ -10,6 +10,7 @@ from __future__ import print_function
 
 import argparse
 import pickle
+from statistics import mean
 
 import yaml
 
@@ -104,20 +105,23 @@ def main():
         results_file = open(f'inference_results/{args.checkpoint.replace("/","_")}.csv', mode='a')
         employee_writer = csv.writer(results_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-        employee_writer.writerow(['route','timesteps','collision_truck','collision_trailer','timeout','completed'])
+        employee_writer.writerow(['route','timesteps','collision_truck','collision_trailer','timeout','truck_lidar_collision','trailer_lidar_collision','distance_to_center_of_lane','completed'])
 
 
         while True:
             observation = env.reset()
             done = False
+            info = None
             counter = 0
+            distance_to_center_of_lane = []
             while not done:
                 action = agent.compute_single_action(observation)
                 observation, reward, done, info = env.step(action)
+                distance_to_center_of_lane.append(info['distance_to_center_of_lane'])
                 counter +=1
 
-            # ['route', 'timesteps', 'collision_truck', 'collision_trailer', 'timeout', 'completed']
-            employee_writer.writerow([f'{env.env_start_spawn_point}|{env.env_stop_spawn_point}', counter, env.done_collision_truck,env.done_collision_trailer,env.done_time,env.done_arrived])
+            # ['route', 'timesteps', 'collision_truck', 'collision_trailer', 'timeout','lidar_collision_truck','lidar_collision_trailer','distance_to_center_of_lane', 'completed']
+            employee_writer.writerow([f'{env.env_start_spawn_point}|{env.env_stop_spawn_point}', counter, info['done_collision_truck'],info['done_collision_trailer'],info['done_time'],info['truck_lidar_collision'],info['trailer_lidar_collision'], mean(distance_to_center_of_lane),info['done_arrived']])
             results_file.flush()
             # Resetting Variables
             env.done_collision_truck = False
@@ -126,6 +130,7 @@ def main():
             env.done_arrived = False
             env.env_start_spawn_point = -1
             env.env_stop_spawn_point = -1
+            distance_to_center_of_lane = []
 
     except KeyboardInterrupt:
         print("\nshutdown by user")

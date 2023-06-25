@@ -131,7 +131,16 @@ class CarlaEnv(gym.Env):
         # self.get_observation_time.append(time_taken)
         #
         # start = time.time()
-        done, self.done_collision_truck, self.done_collision_trailer, self.done_time, self.done_arrived = self.experiment.get_done_status(observation, self.core)
+        done, done_status_info = self.experiment.get_done_status(observation, self.core)
+
+        # Update the info dict with the new information from get_done_status
+        info.update(done_status_info)
+
+        self.done_collision_truck = info['done_collision_truck']
+        self.done_collision_trailer = info['done_collision_trailer']
+        self.done_time = info['done_time_idle'] or info['done_time_episode']
+        self.done_arrived = info['done_arrived']
+
 
         save = False
         if save:

@@ -123,7 +123,8 @@ class SACExperimentBasic(BaseExperiment):
         self.total_episode_reward = []
 
         self.custom_enable_rendering = False
-        self.lidar_collision = False
+        self.truck_lidar_collision = False
+        self.trailer_lidar_collision = False
 
 
         self.occupancy_maps = collections.deque(maxlen=self.max_amount_of_occupancy_maps)
@@ -233,7 +234,8 @@ class SACExperimentBasic(BaseExperiment):
         self.done_arrived = False
         self.custom_done_arrived = False
         self.done_far_from_path = False
-        self.lidar_collision = False
+        self.truck_lidar_collision = False
+        self.trailer_lidar_collision = False
 
 
         for i in range(self.max_amount_of_occupancy_maps):
@@ -1538,7 +1540,7 @@ class SACExperimentBasic(BaseExperiment):
             # np.float32(trailer_bearing_to_waypoint),
             # np.float32(acceleration)
                            ]
-        lidar_data_points = [
+        trailer_lidar_data_points = [
             np.float32(trailer_0_left),
             np.float32(trailer_0_right),
             np.float32(trailer_1_left),
@@ -1554,7 +1556,10 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(trailer_6_left),
             np.float32(trailer_6_right),
             np.float32(trailer_7_left),
-            np.float32(trailer_7_right),
+            np.float32(trailer_7_right)
+        ]
+
+        truck_lidar_data_points = [
             np.float32(truck_center),
             np.float32(truck_right),
             np.float32(truck_left),
@@ -1567,9 +1572,10 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(truck_front_30right),
             np.float32(truck_front_45right),
             np.float32(truck_front_60right),
-            np.float32(truck_front_75right),
+            np.float32(truck_front_75right)
         ]
-        value_observations.extend(lidar_data_points)
+        value_observations.extend(trailer_lidar_data_points)
+        value_observations.extend(truck_lidar_data_points)
         # value_observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
         value_observations.extend(radii)
@@ -1584,9 +1590,14 @@ class SACExperimentBasic(BaseExperiment):
         else:
             raise Exception('This should never happen')
 
-        self.lidar_collision = False
-        if any(lidar_point < 0.01 for lidar_point in lidar_data_points):
-            self.lidar_collision = True
+        self.truck_lidar_collision = False
+        if any(lidar_point < 0.01 for lidar_point in truck_lidar_data_points):
+            self.truck_lidar_collision = True
+
+        self.trailer_lidar_collision = False
+        if any(lidar_point < 0.01 for lidar_point in trailer_lidar_data_points):
+            self.trailer_lidar_collision = True
+
 
 
         if self.custom_enable_rendering:
@@ -1709,7 +1720,7 @@ class SACExperimentBasic(BaseExperiment):
 
         self.counter += 1
         return {'values':value_observations,'route': route_type},\
-            {"truck_z_value":truck_transform.location.z }
+            {"truck_z_value":truck_transform.location.z,"distance_to_center_of_lane":distance_to_center_of_lane }
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -1773,8 +1784,20 @@ class SACExperimentBasic(BaseExperiment):
 
         self.done_far_from_path = self.last_hyp_distance_to_next_waypoint > acceptable_gap_to_next_waypoint
 
-        output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision_truck or self.done_collision_trailer or self.done_arrived or self.done_far_from_path or self.lidar_collision
+        output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision_truck or self.done_collision_trailer or self.done_arrived or self.done_far_from_path or self.truck_lidar_collision or self.trailer_lidar_collision
         self.custom_done_arrived = self.done_arrived
+
+        done_status_info = {
+            'done_time_idle':self.done_time_idle,
+            'done_falling': self.done_falling,
+            'done_time_episode':self.done_time_episode,
+            'done_collision_truck': self.done_collision_truck,
+            'done_collision_trailer':self.done_collision_trailer,
+            'done_far_from_path':self.done_far_from_path,
+            'done_arrived':self.done_arrived,
+            'truck_lidar_collision':self.truck_lidar_collision,
+            'trailer_lidar_collision':self.trailer_lidar_collision,
+        }
 
         done_reason = ""
         if self.done_time_idle:
@@ -1791,14 +1814,16 @@ class SACExperimentBasic(BaseExperiment):
             done_reason += "done_far_from_path"
         if self.done_arrived:
             done_reason += "done_arrived"
-        if self.lidar_collision:
-            done_reason += "lidar_collision"
+        if self.truck_lidar_collision:
+            done_reason += "truck_lidar_collision"
+        if self.trailer_lidar_collision:
+            done_reason += "trailer_lidar_collision"
 
         if done_reason != "":
             data = f"ENTRY: {core.entry_spawn_point_index} EXIT: {core.exit_spawn_point_index} - {done_reason} \n"
             self.save_to_file(f"{self.directory}/done",data)
 
-        return bool(output), self.done_collision_truck, self.done_collision_trailer, (self.done_time_idle or self.done_time_episode), self.done_arrived
+        return bool(output), done_status_info
 
     def compute_reward(self, observation, info, core):
         """Computes the reward"""
@@ -1916,8 +1941,11 @@ class SACExperimentBasic(BaseExperiment):
         if self.done_collision_truck or self.done_collision_trailer:
             print("====> REWARD Done collision")
             reward = reward + -10
-        if self.lidar_collision:
-            print("====> REWARD Lidar collision")
+        if self.truck_lidar_collision:
+            print("====> REWARD Truck Lidar collision")
+            reward = reward + -10
+        if self.trailer_lidar_collision:
+            print("====> REWARD Trailer Lidar collision")
             reward = reward + -10
         if self.done_time_idle:
             print("====> REWARD Done idle")
