@@ -3,8 +3,7 @@ import random
 import numpy as np
 import pandas as pd
 
-results = pd.read_csv(
-    'latest/combined/easy/_home_daniel_ray_results_carla_rllib_sac_4c0293c613_CustomSACTrainer_CarlaEnv_b1f1d_00000_0_2023-06-24_10-54-14_checkpoint_027000.csv')
+results = pd.read_csv('latest/training/_home_daniel_ray_results_carla_rllib_sac_4c0293c613_CustomSACTrainer_CarlaEnv_b1f1d_00000_0_2023-06-24_10-54-14_checkpoint_027000.csv')
 results = results[results.route != 'route']
 routes = results['route'].unique()
 
