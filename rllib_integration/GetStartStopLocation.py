@@ -230,7 +230,7 @@ spawn_points_2_lane_roundabout_small_difficult = [
 
 ]
 
-lower_medium_roundabout = [
+lower_medium_roundabout_all = [
     # IN EDITOR     # IN EDITOR
     # [28, [17], "left"],
     # [28, [46], "left"],
@@ -278,6 +278,48 @@ lower_medium_roundabout = [
     # IN EXPORT IN EXPORT
 
 ]
+
+lower_medium_roundabout_easy = [
+    # IN EXPORT IN EXPORT
+    [21, [9], "left"],
+    [29, [36], "right"],
+    [29, [55], "right"],
+
+    # [4, [48], "left"],
+    # [4, [17], "left"],
+    # [5, [55], "right"],
+    [5, [67], "right"],
+
+    [10, [64], "left"],
+    [66, [67], "right"],
+    [66, [46], "right"],
+
+    # IN EXPORT IN EXPORT
+]
+
+lower_medium_roundabout_difficult = [
+    # [21, [9], "left"],
+    [21, [48], "left"],
+    [21, [64], "left"],
+    # [29, [36], "right"],
+    # [29, [55], "right"],
+    #
+    # # [4, [48], "left"],
+    [4, [64], "left"],
+    # # [4, [17], "left"],
+    # # [5, [55], "right"],
+    # [5, [67], "right"],
+    #
+    # [10, [64], "left"],
+    # # [10, [17], "left"],
+    [10, [9], "left"],
+    # [66, [67], "right"],
+    # [66, [46], "right"],
+    #
+    # # [35, [17], "left"],
+    [35, [9], "left"],
+    [35, [48], "left"],
+    ]
 
 upper_medium_roundabout = [
     [26, [14], "left"],
@@ -331,7 +373,7 @@ roundabout20m = [
 
 def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations, last_roundabout_choice, last_chosen_route, map_name):
     if map_name == 'mediumRoundabout4':
-        roundabouts = [lower_medium_roundabout]
+        roundabouts = [lower_medium_roundabout_easy,lower_medium_roundabout_difficult]
     elif map_name == 'doubleRoundabout37':
         roundabouts = [spawn_points_2_lane_roundabout_small_easy,spawn_points_2_lane_roundabout_small_difficult]
 
