@@ -24,6 +24,7 @@ import pyautogui
 
 from rllib_integration.LineIntersection import Point, lineLineIntersection
 from rllib_integration.RouteGeneration.global_route_planner import GlobalRoutePlanner
+from Helper import open_pickle, save_to_pickle
 from rllib_integration.sensors.sensor_interface import SensorInterface
 from rllib_integration.sensors.factory import SensorFactory
 from rllib_integration.helper import join_dicts
@@ -101,7 +102,7 @@ class CarlaCore:
         self.sensor_interface_trailer = SensorInterface()
         self.server_port = 2000
         self.server_port_lines = ''
-        self.visualise_all_routes = False
+        self.visualise_all_routes = True
         self.times_crazy = []
         self.custom_enable_rendering = False
         self.one_after_the_other = False
@@ -126,7 +127,18 @@ class CarlaCore:
         self.last_roundabout_choice = 1
         self.chosen_routes = {}
 
-        self.init_server()
+        self.in_editor = False
+
+        server_maps = open_pickle('server_maps')
+        server_map = server_maps.pop(0)
+        save_to_pickle('server_maps',server_maps)
+
+        print(f"Using server map for {server_map}")
+        self.map_name = server_map
+
+
+        if not self.in_editor:
+            self.init_server()
         self.connect_client()
 
     # def init_server(self):
@@ -174,13 +186,13 @@ class CarlaCore:
                 "-opengl"  # no-display isn't supported for Unreal 4.24 with vulkan
             ]
 
-        map_name = "doubleRoundabout37"
+        # map_name = "doubleRoundabout37"
         # map_name = "20m"
         # map_name = "mediumRoundabout4"
         server_command += [
             "--carla-rpc-port={}".format(self.server_port),
             "-quality-level={}".format(self.config["quality_level"]),
-            "--map={}".format(map_name),
+            "--map={}".format(self.map_name),
             "--no-rendering"
         ]
         print(f'Selected Port {self.server_port}')
@@ -199,7 +211,7 @@ class CarlaCore:
             "{}/PythonAPI/util/config.py".format(self.config['carla_location']),
             "--port {}".format(self.server_port),
             "--weather {}".format("Default"),
-            "--map {}".format(map_name),
+            "--map {}".format(self.map_name),
         ]
         server_command_text_2 = " ".join(map(str, server_command_2))
 
@@ -282,6 +294,9 @@ class CarlaCore:
                     self.custom_enable_rendering = False
                 else:
                     self.custom_enable_rendering = True
+
+                if self.in_editor:
+                    self.server_port = 2000
 
                 self.client = carla.Client(self.config["host"], self.server_port)
                 self.client.set_timeout(self.config["timeout"])
@@ -382,7 +397,7 @@ class CarlaCore:
         """Initialize the hero and sensors"""
 
         self.world = self.client.load_world(
-            map_name=experiment_config["town"],
+            map_name=self.map_name,
             reset_settings=False,
             # map_layers = carla.MapLayer.All if self.config["enable_map_assets"] else carla.MapLayer.NONE
             map_layers=carla.MapLayer.NONE
@@ -735,7 +750,7 @@ class CarlaCore:
         if self.one_after_the_other:
             self.last_chosen_route += 1
 
-        self.entry_spawn_point_index, self.exit_spawn_point_index, self.route_lane, self.last_roundabout_choice = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations,self.last_roundabout_choice, self.last_chosen_route)
+        self.entry_spawn_point_index, self.exit_spawn_point_index, self.route_lane, self.last_roundabout_choice = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations,self.last_roundabout_choice, self.last_chosen_route,map_name=self.map_name)
         # key = str(self.entry_spawn_point_index) + " | " + str(self.exit_spawn_point_index)
         # if self.chosen_routes.get(key) is None:
         #     self.chosen_routes[key] = 1
@@ -808,7 +823,7 @@ class CarlaCore:
         """This function resets / spawns the hero vehicle and its sensors"""
 
         if self.visualise_all_routes:
-            visualise_all_routes(self.map)
+            visualise_all_routes(self.map,map_name=self.map_name)
 
         # Part 1: destroy all sensors (if necessary)
         self.sensor_interface_truck.destroy()

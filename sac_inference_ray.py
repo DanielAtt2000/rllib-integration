@@ -46,6 +46,7 @@ EXPERIMENT_CLASS = SACExperimentBasic
 # /home/daniel/ray_results/carla_rllib/sac_564062f528/CustomSACTrainer_CarlaEnv_527af_00000_0_2023-06-22_19-15-01/checkpoint_020000
 # /home/daniel/ray_results/carla_rllib/sac_e6a772bf3f/CustomSACTrainer_CarlaEnv_0d727_00000_0_2023-06-24_00-48-21/checkpoint_024000
 # /home/daniel/ray_results/carla_rllib/sac_4c0293c613/CustomSACTrainer_CarlaEnv_b1f1d_00000_0_2023-06-24_10-54-14/checkpoint_027000
+# /home/daniel/ray_results/carla_rllib/sac_ae41825d17/CustomSACTrainer_CarlaEnv_19473_00000_0_2023-06-26_18-47-12/checkpoint_033000
 def save_to_pickle(filename, data):
     filename = filename + '.pickle'
     with open(filename, 'wb') as handle:
@@ -79,6 +80,11 @@ def main():
     args = argparser.parse_args()
     args.config = parse_config(args)
 
+    save_dir = "inference_results/latest/ae41825d/small/"
+    x = input(f'Please confirm save directory {save_dir}: (yes/no)')
+    if x != 'yes':
+        raise Exception('Cancelled')
+
     try:
         ray.init()
 
@@ -103,7 +109,7 @@ def main():
         # Initalize the CARLA environment
         env = agent.workers.local_worker().env
 
-        results_file = open(f'inference_results/latest/medium/easy/{args.checkpoint.replace("/","_")}.csv', mode='a')
+        results_file = open(f'{save_dir}{args.checkpoint.replace("/","_")}.csv', mode='a')
         employee_writer = csv.writer(results_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         employee_writer.writerow(['route','timesteps','collision_truck','collision_trailer','timeout','truck_lidar_collision','trailer_lidar_collision','distance_to_center_of_lane','completed'])
