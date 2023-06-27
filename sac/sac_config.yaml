@@ -610,7 +610,7 @@ env_config:
     town1: 'mediumRoundabout4'
     town1Ratio: 0.2
 #    town2: 'doubleRoundabout37'
-    town2: 'None'
+    town2: 'doubleRoundabout37'
     town2Ratio: 0.8
 #    town: '20m'
     others:
