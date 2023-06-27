@@ -3,7 +3,7 @@ import random
 import numpy as np
 import pandas as pd
 
-results = pd.read_csv('latest/training/_home_daniel_ray_results_carla_rllib_sac_4c0293c613_CustomSACTrainer_CarlaEnv_b1f1d_00000_0_2023-06-24_10-54-14_checkpoint_027000.csv')
+results = pd.read_csv('latest/ae41825d/medium/_home_daniel_ray_results_carla_rllib_sac_ae41825d17_CustomSACTrainer_CarlaEnv_19473_00000_0_2023-06-26_18-47-12_checkpoint_033000.csv')
 results = results[results.route != 'route']
 routes = results['route'].unique()
 
@@ -45,13 +45,13 @@ for route in routes:
         print(f'Success rate for route {x["route"]} = {no_of_runs_successful/no_of_runs}')
         print(f'Unsuccessful rate for route {x["route"]} = {no_of_runs_unsuccessful/no_of_runs}')
     except:
-        raise Exception('wtf happened')
+        raise Exception('Failure')
 print('OVERLALL RESULTS')
 print(f'Total Runs {total_runs}')
 print(f'Success rate overall = {total_success / total_runs}')
 print(f'Unsuccessful rate overall = {total_unsuccessful / total_runs}')
-
-print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-print('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
-print('HAVE YOU ENSURED THAT IF YOU MEREGED TO ANALYSIS TOGETHER THAT THEY DO NOT CONTAIN THE SAME ROUTES?')
-print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+#
+# print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+# print('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
+# print('HAVE YOU ENSURED THAT IF YOU MEREGED TO ANALYSIS TOGETHER THAT THEY DO NOT CONTAIN THE SAME ROUTES?')
+# print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
