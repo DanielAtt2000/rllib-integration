@@ -1,0 +1,10 @@
+route,timesteps,collision_truck,collision_trailer,timeout,completed
+40|42,196,False,False,False,True
+31|112,533,False,False,False,True
+96|76,675,False,False,False,True
+117|41,520,False,False,False,True
+96|26,417,False,False,False,True
+5|43,210,False,False,False,False
+22|76,929,False,False,False,True
+55|105,892,False,False,False,True
+22|26,673,False,False,False,True

@@ -210,6 +210,23 @@ def plot_route(route_points_all, truck_points_all):
 
     easy_dict ={}
     diff_dict = {}
+    rewards = []
+    done_array = []
+    for idx in range(len(x_route)):
+        if idx < 5700:
+            if (df.loc[idx, "Done"]) == 'done_arrived':
+                done_array.append(1)
+            else:
+                done_array.append(0)
+            rewards.append(sum(df.loc[idx, "total_episode_reward"]))
+    done_array_cum_sum = np.cumsum(done_array)
+    stat = "count"  # or proportion
+    # sns.histplot(done_array, stat=stat, cumulative=False, alpha=.4)
+    # sns.ecdfplot(done_array, stat=stat)
+    sns.lineplot(done_array_cum_sum)
+    plt.show()
+
+
 
     done_data_diff = -1
     current_difficulty = ""
@@ -281,24 +298,47 @@ def plot_route(route_points_all, truck_points_all):
                 difficiult_x_indices.append(idx)
             else:
                 raise Exception('wtf')
-    plt.figure(figsize=(80, 5))
+    # plt.figure(figsize=(80, 5))
     # plt.ylim()
-    plt.plot(difficiult_x_indices, all_episodes_difficult_sum, label='All DIFFICULT episode rewards')
-    plt.plot(easy_x_indices, all_episodes_easy_sum, label='All EASY episode rewards')
+    # plt.plot( done_array, label='All DIFFICULT episode rewards')
+    # plt.plot(easy_x_indices, all_episodes_easy_sum, label='All EASY episode rewards')
 
-    window = 10
+    window = 250
     average_difficult_y = []
     average_easy_y = []
-    for ind in range(len(all_episodes_difficult_sum) - window + 1):
-        average_difficult_y.append(np.mean(all_episodes_difficult_sum[ind:ind + window]))
-    for ind in range(len(all_episodes_easy_sum) - window + 1):
-        average_easy_y.append(np.mean(all_episodes_easy_sum[ind:ind + window]))
+    for ind in range(len(done_array) - window + 1):
+        x = np.mean(rewards[ind:ind + window])
+        average_difficult_y.append(x)
+    # for ind in range(len(all_episodes_easy_sum) - window + 1):
+    #     average_easy_y.append(np.mean(all_episodes_easy_sum[ind:ind + window]))
     plt.plot(average_difficult_y,label='average_DIFFICULT _y')
-    plt.plot(average_easy_y,label='average_easy_y ')
+    # plt.plot(average_easy_y,label='average_easy_y ')
 
     # plt.plot(all_point_difficult_rewards,label='all_point_difficult_rewards')
     # plt.plot(all_line_difficult_rewards,label='all_line_difficult_rewards')
-    plt.legend(loc='upper center')
+    plt.ylabel('Total episode reward \n averaged over a 250 episode window')
+    plt.xlabel('Number of episodes')
+    # plt.xticks(np.arange(0, 8000 + 1, 500))
+    # plt.legend(loc='upper center')
+    plt.show()
+
+    window = 250
+    average_difficult_y = []
+    average_easy_y = []
+    for ind in range(len(done_array) - window + 1):
+        x = np.mean(done_array[ind:ind + window])
+        average_difficult_y.append(x)
+    # for ind in range(len(all_episodes_easy_sum) - window + 1):
+    #     average_easy_y.append(np.mean(all_episodes_easy_sum[ind:ind + window]))
+    plt.plot(average_difficult_y,label='average_DIFFICULT _y')
+    # plt.plot(average_easy_y,label='average_easy_y ')
+
+    # plt.plot(all_point_difficult_rewards,label='all_point_difficult_rewards')
+    # plt.plot(all_line_difficult_rewards,label='all_line_difficult_rewards')
+    plt.ylabel('Ratio of successful vs unsuccessful episodes \n averaged over a 250 episode window')
+    plt.xlabel('Number of episodes')
+    # plt.xticks(np.arange(0, 8000 + 1, 500))
+    # plt.legend(loc='upper center')
     plt.show()
 
     print('EASY DICT')
@@ -355,7 +395,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 10:
+        if idx > 5700:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]

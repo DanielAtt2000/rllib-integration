@@ -232,50 +232,50 @@ spawn_points_2_lane_roundabout_small_difficult = [
 
 lower_medium_roundabout_all = [
     # IN EDITOR     # IN EDITOR
-    # [28, [17], "left"],
-    # [28, [46], "left"],
-    # [28, [67], "left"],
-    # [35, [41], "right"],
-    # [35, [59], "right"],
-    #
-    # # [12, [46], "left"],
-    # [12, [67], "left"],
-    # # [12, [24], "left"],
-    # # [13, [59], "right"],
-    # # [13, [42], "right"],
-    #
-    # [18, [67], "left"],
-    # # [18, [24], "left"],
-    # [18, [17], "left"],
-    # # [69, [42], "right"],
-    # [69, [50], "right"],
+    [28, [17], "left"],
+    [28, [46], "left"],
+    [28, [67], "left"],
+    [35, [41], "right"],
+    [35, [59], "right"],
+
+    # [12, [46], "left"],
+    [12, [67], "left"],
+    # [12, [24], "left"],
+    # [13, [59], "right"],
+    # [13, [42], "right"],
+
+    [18, [67], "left"],
+    # [18, [24], "left"],
+    [18, [17], "left"],
+    # [69, [42], "right"],
+    [69, [50], "right"],
     # IN EDITOR     # IN EDITOR
 
-    # IN EXPORT IN EXPORT
-    [21, [9], "left"],
-    [21, [48], "left"],
-    [21, [64], "left"],
-    [29, [36], "right"],
-    [29, [55], "right"],
-
-    # [4, [48], "left"],
-    [4, [64], "left"],
-    # [4, [17], "left"],
-    # [5, [55], "right"],
-    [5, [67], "right"],
-
-    [10, [64], "left"],
-    # [10, [17], "left"],
-    [10, [9], "left"],
-    [66, [67], "right"],
-    [66, [46], "right"],
-
-    # [35, [17], "left"],
-    [35, [9], "left"],
-    [35, [48], "left"],
-    # [54, [46], "right"],
-    # [54, [36], "right"],
-    # IN EXPORT IN EXPORT
+    # # IN EXPORT IN EXPORT
+    # [21, [9], "left"],
+    # [21, [48], "left"],
+    # [21, [64], "left"],
+    # [29, [36], "right"],
+    # [29, [55], "right"],
+    #
+    # # [4, [48], "left"],
+    # [4, [64], "left"],
+    # # [4, [17], "left"],
+    # # [5, [55], "right"],
+    # [5, [67], "right"],
+    #
+    # [10, [64], "left"],
+    # # [10, [17], "left"],
+    # [10, [9], "left"],
+    # [66, [67], "right"],
+    # [66, [46], "right"],
+    #
+    # # [35, [17], "left"],
+    # [35, [9], "left"],
+    # [35, [48], "left"],
+    # # [54, [46], "right"],
+    # # [54, [36], "right"],
+    # # IN EXPORT IN EXPORT
 
 ]
 
@@ -322,48 +322,96 @@ lower_medium_roundabout_difficult = [
     ]
 
 upper_medium_roundabout = [
-    [26, [14], "left"],
-    [26, [3], "left"],
-    [26, [63], "left"],
-    [27, [66], "right"],
+    # INEDITOR INEDITOR
+    # [26, [14], "left"],
+    # [26, [3], "left"],
+    # [26, [63], "left"],
+    # [27, [66], "right"],
+    # # [27, [2], "right"],
+    #
+    # [4, [3], "left"],
+    # [4, [63], "left"],
+    # [4, [14], "left"],
+    # [64, [2], "right"],
+    # [64, [25], "right"],
+    # INEDITOR INEDITOR
+
+    # INEXPORT
+
+    [19, [6], "left"],
+    [19, [23], "left"],
+    [19, [60], "left"],
+    # [20, [63], "right"],
     # [27, [2], "right"],
 
-    [4, [3], "left"],
-    [4, [63], "left"],
-    [4, [14], "left"],
-    [64, [2], "right"],
-    # [64, [25], "right"],
+    [34, [23], "left"],
+    [34, [60], "left"],
+    [34, [6], "left"],
+    [61, [12], "right"],
+    # [61, [18], "right"],
 
     # [, [], "left"],
     # [, [], "left"],
     # [, [], "left"],
     # [, [], "right"],
     # [, [], "right"],
+
+    # INEXPORT
 
 ]
 
 roundabout20m = [
 
-    [8, [14], "right"],
-    [8, [35], "right"],
+    # INEDITOR INEDOTR
 
-    [32, [2], "left"],
-    [32, [31], "left"],
-    [32, [4], "left"],
-    [24, [35], "right"],
-    [24, [6], "right"],
+    # [8, [14], "right"],
+    # [8, [35], "right"],
+    #
+    # [32, [2], "left"],
+    # [32, [31], "left"],
+    # [32, [4], "left"],
+    # [24, [35], "right"],
+    # [24, [6], "right"],
+    #
+    # [20, [31], "left"],
+    # # [20, [4], "left"],
+    # [20, [7], "left"],
+    # [19, [6], "right"],
+    # [19, [26], "right"],
+    #
+    # [1, [4], "left"],
+    # [1, [7], "left"],
+    # [1, [2], "left"],
+    # [0, [26], "right"],
+    # [0, [14], "right"],
+    # # INEDITOR INEDOTR
 
-    [20, [31], "left"],
-    # [20, [4], "left"],
-    [20, [7], "left"],
-    [19, [6], "right"],
-    [19, [26], "right"],
+    # IN EXPORT
+    [26, [12], "left"],
+    [26, [25], "left"],
+    [26, [30], "left"],
+    [17, [29], "right"],
+    [17, [32], "right"],
 
-    [1, [4], "left"],
-    [1, [7], "left"],
-    [1, [2], "left"],
-    [0, [26], "right"],
-    [0, [14], "right"],
+    [13, [25], "left"],
+    # [13, [30], "left"],
+    [13, [33], "left"],
+    [11, [32], "right"],
+    [11, [19], "right"],
+
+    [1, [30], "left"],
+    [1, [33], "left"],
+    [1, [12], "left"],
+    [0, [19], "right"],
+    [0, [6], "right"],
+
+    [34, [33], "left"],
+    # [34, [12], "left"],
+    [34, [25], "left"],
+    # [, [], "right"],
+    # [, [], "right"],
+
+    # IN EXPORT
 
 ]
 
@@ -371,11 +419,20 @@ roundabout20m = [
 # roundabouts = [spawn_points_2_lane_roundabout_difficult,spawn_points_2_lane_roundabout_easy]
 
 
-def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations, last_roundabout_choice, last_chosen_route, map_name):
+def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations, last_roundabout_choice, last_chosen_route, map_name, is_testing):
     if map_name == 'mediumRoundabout4':
-        roundabouts = [lower_medium_roundabout_easy,lower_medium_roundabout_difficult]
+        # total of 13 routes lower
+        roundabouts = [lower_medium_roundabout_easy+lower_medium_roundabout_difficult]
+        # total of 7 routes lower
+        # roundabouts = [upper_medium_roundabout]
     elif map_name == 'doubleRoundabout37':
-        roundabouts = [spawn_points_2_lane_roundabout_small_easy,spawn_points_2_lane_roundabout_small_difficult]
+        # total of 13 routes
+        roundabouts = [spawn_points_2_lane_roundabout_small_easy+spawn_points_2_lane_roundabout_small_difficult]
+    elif map_name == '20m':
+        # total of 17 routes
+        roundabouts = [roundabout20m]
+    if is_testing:
+        assert len(roundabouts) == 1
 
     entry_spawn_point_index = -1
     exit_spawn_point_index = -1
@@ -413,7 +470,7 @@ def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations, last_round
     # print("W-----|----E")
     # print("------S-----")
 
-    return entry_spawn_point_index, exit_spawn_point_index, route_lane, last_roundabout_choice
+    return entry_spawn_point_index, exit_spawn_point_index, route_lane, last_roundabout_choice, len(roundabouts[0])
 
 # ONLY TO BE USED FOR TESTING
 # def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations):
@@ -544,10 +601,15 @@ def is_in_front_of_waypoint_from_vector(line_point,vector_line, in_front_point):
 def visualise_all_routes(map,map_name):
     all_routes = []
 
+    x = input('Ensure that the roundabouts have been updated in here as well')
+
     if map_name == 'mediumRoundabout4':
-        roundabouts = [lower_medium_roundabout]
+        roundabouts = [upper_medium_roundabout]
     elif map_name == 'doubleRoundabout37':
         roundabouts = [spawn_points_2_lane_roundabout_small_easy,spawn_points_2_lane_roundabout_small_difficult]
+    elif map_name == '20m':
+        # total of 17 routes
+        roundabouts = [roundabout20m]
 
     for roundabout in roundabouts:
         for entry in roundabout:

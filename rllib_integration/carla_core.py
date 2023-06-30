@@ -106,6 +106,7 @@ class CarlaCore:
         self.times_crazy = []
         self.custom_enable_rendering = False
         self.one_after_the_other = False
+        self.total_number_of_routes = -1
 
         self.route = []
         self.route_points = []
@@ -750,7 +751,10 @@ class CarlaCore:
         if self.one_after_the_other:
             self.last_chosen_route += 1
 
-        self.entry_spawn_point_index, self.exit_spawn_point_index, self.route_lane, self.last_roundabout_choice = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations,self.last_roundabout_choice, self.last_chosen_route,map_name=self.map_name)
+            if self.total_number_of_routes != -1:
+                self.last_chosen_route = self.last_chosen_route % self.total_number_of_routes
+
+        self.entry_spawn_point_index, self.exit_spawn_point_index, self.route_lane, self.last_roundabout_choice, self.total_number_of_routes = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations,self.last_roundabout_choice, self.last_chosen_route,map_name=self.map_name,is_testing=self.one_after_the_other)
         # key = str(self.entry_spawn_point_index) + " | " + str(self.exit_spawn_point_index)
         # if self.chosen_routes.get(key) is None:
         #     self.chosen_routes[key] = 1
