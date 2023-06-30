@@ -1,5 +1,5 @@
 # Works for both torch and tf.
-num_workers: 7
+num_workers: 8
 num_gpus: 1
 num_cpus_per_worker: 2
 framework: torch
@@ -46,10 +46,10 @@ min_sample_timesteps_per_iteration: 4
 # Paper uses 20k random timesteps, which is not exactly the same, but
 # seems to work nevertheless. We use 100k here for the longer Atari
 # runs (DQN style: filling up the buffer a bit before learning).
-optimization:
-    actor_learning_rate: 0.00005
-    critic_learning_rate: 0.00005
-    entropy_learning_rate: 0.00005
+#optimization:
+#    actor_learning_rate: 0.00005
+#    critic_learning_rate: 0.00005
+#    entropy_learning_rate: 0.00005
 
 "exploration_config": {
   "type": "EpsilonGreedy",
@@ -611,7 +611,7 @@ env_config:
     town1Ratio: 0.2
 #    town2: 'doubleRoundabout37'
 #    town2: 'mediumRoundabout4'
-    town2 : 'None'
+    town2 : 'doubleRoundabout37'
     town2Ratio: 0.8
 #    town: '20m'
     others:
