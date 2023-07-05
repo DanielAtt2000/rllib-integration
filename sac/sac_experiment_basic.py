@@ -404,8 +404,8 @@ class SACExperimentBasic(BaseExperiment):
         """
         obs_space = Dict( {
             'values':Box(
-                low=np.array([0,0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,200,200,200,200,20,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
+                low=np.array([0,0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
+                high=np.array([100,200,200,200,200,20,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
                 dtype=np.float32
             )
         })
@@ -1509,22 +1509,21 @@ class SACExperimentBasic(BaseExperiment):
             np.float32(distance_to_center_of_lane),
 
             # np.float32(hyp_distance_to_next_waypoint_line),
-            # np.float32(angle_to_center_of_lane_degrees),
+            np.float32(angle_to_center_of_lane_degrees),
             np.float32(angle_to_center_of_lane_degrees_2),
             np.float32(angle_to_center_of_lane_degrees_5),
             np.float32(angle_to_center_of_lane_degrees_7),
-            # np.float32(angle_to_center_of_lane_degrees_ahead_waypoints),
-            # np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2),
-            # np.float32(truck_bearing_to_waypoint),
+            np.float32(angle_to_center_of_lane_degrees_ahead_waypoints),
+            np.float32(truck_bearing_to_waypoint),
             np.float32(truck_bearing_to_waypoint_2),
             np.float32(truck_bearing_to_waypoint_5),
             np.float32(truck_bearing_to_waypoint_7),
-            # np.float32(truck_bearing_to_waypoint_10),
-            # np.float32(trailer_bearing_to_waypoint),
+            np.float32(truck_bearing_to_waypoint_10),
+            np.float32(trailer_bearing_to_waypoint),
             np.float32(trailer_bearing_to_waypoint_2),
             np.float32(trailer_bearing_to_waypoint_5),
             np.float32(trailer_bearing_to_waypoint_7),
-            # np.float32(trailer_bearing_to_waypoint_10),
+            np.float32(trailer_bearing_to_waypoint_10),
             # np.float32(bearing_to_ahead_waypoints_ahead_2),
             np.float32(angle_between_truck_and_trailer),
             np.float32(angle_between_waypoints_5),
