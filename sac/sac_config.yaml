@@ -30,10 +30,10 @@ target_network_update_freq: 8000
 target_entropy: auto
 clip_rewards: False
 n_step: 1
-rollout_fragment_length: 1
+#rollout_fragment_length: 1
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
-  capacity: 400000
+  capacity: 600000
   # How many steps of the model to sample before learning starts.
   # If True prioritized replay buffer will be used.
   prioritized_replay_alpha: 0.6
@@ -41,21 +41,21 @@ replay_buffer_config:
   prioritized_replay_eps: 0.000001
 store_buffer_in_checkpoints: False
 num_steps_sampled_before_learning_starts: 10000
-train_batch_size: 256
+train_batch_size: 512
 min_sample_timesteps_per_iteration: 4
 # Paper uses 20k random timesteps, which is not exactly the same, but
 # seems to work nevertheless. We use 100k here for the longer Atari
 # runs (DQN style: filling up the buffer a bit before learning).
-optimization:
-    actor_learning_rate: 0.00005
-    critic_learning_rate: 0.00005
-    entropy_learning_rate: 0.00005
+#optimization:
+#    actor_learning_rate: 0.00005
+#    critic_learning_rate: 0.00005
+#    entropy_learning_rate: 0.00005
 
 "exploration_config": {
   "type": "EpsilonGreedy",
   "initial_epsilon": 1.0,
   "final_epsilon": 0.01,
-  "epsilon_timesteps": 500000
+  "epsilon_timesteps": 1000000
 }
 #num_workers: 1
 #num_gpus: 1
@@ -146,7 +146,7 @@ env_config:
 #        lidar_truck_side:
 #          type: "sensor.lidar.ray_cast_semantic"
 #          channels: "32"
-#          range: "17.0"
+#          range: "7.0"
 #          points_per_second: "25000"
 #          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
 #          upper_fov: '0.0'
@@ -157,7 +157,7 @@ env_config:
 #        lidar_trailer_0_left_3x:
 #          type: "sensor.lidar.ray_cast_semantic"
 #          channels : "32"
-#          range : "17.0"
+#          range : "7.0"
 #          points_per_second : "10000"
 #          rotation_frequency : "10" #  IMP THIS IS 1 / delta (timestep)
 #          upper_fov : '45'
@@ -168,7 +168,7 @@ env_config:
 #        lidar_trailer_1_left_3x:
 #          type: "sensor.lidar.ray_cast_semantic"
 #          channels: "32"
-#          range: "17.0"
+#          range: "7.0"
 #          points_per_second: "10000"
 #          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
 #          upper_fov: '45'
@@ -179,7 +179,7 @@ env_config:
 #        lidar_trailer_0_right_3x:
 #          type: "sensor.lidar.ray_cast_semantic"
 #          channels: "32"
-#          range: "17.0"
+#          range: "7.0"
 #          points_per_second: "10000"
 #          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
 #          upper_fov: '45'
@@ -190,7 +190,7 @@ env_config:
 #        lidar_trailer_1_right_3x:
 #          type: "sensor.lidar.ray_cast_semantic"
 #          channels: "32"
-#          range: "17.0"
+#          range: "7.0"
 #          points_per_second: "10000"
 #          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
 #          upper_fov: '45'
@@ -267,7 +267,7 @@ env_config:
         lidar_trailer_0_left:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
@@ -278,7 +278,7 @@ env_config:
         lidar_trailer_0_right:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
@@ -289,29 +289,51 @@ env_config:
         lidar_trailer_1_left:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
           horizontal_fov: '2'
           sensor_tick: '0'
-          transform: '-1.5,-1.2,1,0,0,-90' # x,y,z,pitch, yaw, roll
+          transform: '-1,-1.2,1,0,0,-90' # x,y,z,pitch, yaw, roll
         lidar_trailer_1_right:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
           horizontal_fov: '2'
           sensor_tick: '0'
-          transform: '-1.5,1.2,1,0,0,90' # x,y,z,pitch, yaw, roll
+          transform: '-1,1.2,1,0,0,90' # x,y,z,pitch, yaw, roll
         lidar_trailer_2_left:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
+          points_per_second: "5000"
+          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+          upper_fov: '45'
+          lower_fov: '-90'
+          horizontal_fov: '2'
+          sensor_tick: '0'
+          transform: '-2,-1.2,1,0,0,-90' # x,y,z,pitch, yaw, roll
+        lidar_trailer_2_right:
+          type: "sensor.lidar.ray_cast_semantic"
+          channels: "32"
+          range: "7.0"
+          points_per_second: "5000"
+          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+          upper_fov: '45'
+          lower_fov: '-90'
+          horizontal_fov: '2'
+          sensor_tick: '0'
+          transform: '-2,1.2,1,0,0,90' # x,y,z,pitch, yaw, roll
+        lidar_trailer_3_left:
+          type: "sensor.lidar.ray_cast_semantic"
+          channels: "32"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
@@ -319,10 +341,10 @@ env_config:
           horizontal_fov: '2'
           sensor_tick: '0'
           transform: '-3,-1.2,1,0,0,-90' # x,y,z,pitch, yaw, roll
-        lidar_trailer_2_right:
+        lidar_trailer_3_right:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
@@ -330,32 +352,54 @@ env_config:
           horizontal_fov: '2'
           sensor_tick: '0'
           transform: '-3,1.2,1,0,0,90' # x,y,z,pitch, yaw, roll
-        lidar_trailer_3_left:
-          type: "sensor.lidar.ray_cast_semantic"
-          channels: "32"
-          range: "17.0"
-          points_per_second: "5000"
-          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
-          upper_fov: '45'
-          lower_fov: '-90'
-          horizontal_fov: '2'
-          sensor_tick: '0'
-          transform: '-4.5,-1.2,1,0,0,-90' # x,y,z,pitch, yaw, roll
-        lidar_trailer_3_right:
-          type: "sensor.lidar.ray_cast_semantic"
-          channels: "32"
-          range: "17.0"
-          points_per_second: "5000"
-          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
-          upper_fov: '45'
-          lower_fov: '-90'
-          horizontal_fov: '2'
-          sensor_tick: '0'
-          transform: '-4.5,1.2,1,0,0,90' # x,y,z,pitch, yaw, roll
         lidar_trailer_4_left:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
+          points_per_second: "5000"
+          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+          upper_fov: '45'
+          lower_fov: '-90'
+          horizontal_fov: '2'
+          sensor_tick: '0'
+          transform: '-4,-1.2,1,0,0,-90' # x,y,z,pitch, yaw, roll
+        lidar_trailer_4_right:
+          type: "sensor.lidar.ray_cast_semantic"
+          channels: "32"
+          range: "7.0"
+          points_per_second: "5000"
+          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+          upper_fov: '45'
+          lower_fov: '-90'
+          horizontal_fov: '2'
+          sensor_tick: '0'
+          transform: '-4,1.2,1,0,0,90' # x,y,z,pitch, yaw, roll
+        lidar_trailer_5_left:
+          type: "sensor.lidar.ray_cast_semantic"
+          channels: "32"
+          range: "7.0"
+          points_per_second: "5000"
+          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+          upper_fov: '45'
+          lower_fov: '-90'
+          horizontal_fov: '2'
+          sensor_tick: '0'
+          transform: '-5,-1.2,1,0,0,-90' # x,y,z,pitch, yaw, roll
+        lidar_trailer_5_right:
+          type: "sensor.lidar.ray_cast_semantic"
+          channels: "32"
+          range: "7.0"
+          points_per_second: "5000"
+          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+          upper_fov: '45'
+          lower_fov: '-90'
+          horizontal_fov: '2'
+          sensor_tick: '0'
+          transform: '-5,1.2,1,0,0,90' # x,y,z,pitch, yaw, roll
+        lidar_trailer_6_left:
+          type: "sensor.lidar.ray_cast_semantic"
+          channels: "32"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
@@ -363,10 +407,10 @@ env_config:
           horizontal_fov: '2'
           sensor_tick: '0'
           transform: '-6,-1.2,1,0,0,-90' # x,y,z,pitch, yaw, roll
-        lidar_trailer_4_right:
+        lidar_trailer_6_right:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
@@ -374,32 +418,32 @@ env_config:
           horizontal_fov: '2'
           sensor_tick: '0'
           transform: '-6,1.2,1,0,0,90' # x,y,z,pitch, yaw, roll
-        lidar_trailer_5_left:
+        lidar_trailer_7_left:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
           horizontal_fov: '2'
           sensor_tick: '0'
-          transform: '-7.5,-1.2,1,0,0,-90' # x,y,z,pitch, yaw, roll
-        lidar_trailer_5_right:
+          transform: '-7,-1.2,1,0,0,-90' # x,y,z,pitch, yaw, roll
+        lidar_trailer_7_right:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
           horizontal_fov: '2'
           sensor_tick: '0'
-          transform: '-7.5,1.2,1,0,0,90' # x,y,z,pitch, yaw, roll
+          transform: '-7,1.2,1,0,0,90' # x,y,z,pitch, yaw, roll
         lidar_truck_center:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
@@ -410,7 +454,7 @@ env_config:
         lidar_truck_right:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
@@ -421,7 +465,7 @@ env_config:
         lidar_truck_left:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
@@ -429,21 +473,32 @@ env_config:
           horizontal_fov: '2'
           sensor_tick: '0'
           transform: '1.2,-1.2,1,0,0,-90' # x,y,z,pitch, yaw, roll
-        lidar_truck_front_22left:
+        lidar_truck_front_15left:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
           horizontal_fov: '2'
           sensor_tick: '0'
-          transform: '2.3,-1.2,1,0,0,-22.5' # x,y,z,pitch, yaw, roll
+          transform: '2.3,-1.2,1,0,0,-15' # x,y,z,pitch, yaw, roll
+        lidar_truck_front_30left:
+          type: "sensor.lidar.ray_cast_semantic"
+          channels: "32"
+          range: "7.0"
+          points_per_second: "5000"
+          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+          upper_fov: '45'
+          lower_fov: '-90'
+          horizontal_fov: '2'
+          sensor_tick: '0'
+          transform: '2.3,-1.2,1,0,0,-30' # x,y,z,pitch, yaw, roll
         lidar_truck_front_45left:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
@@ -451,32 +506,54 @@ env_config:
           horizontal_fov: '2'
           sensor_tick: '0'
           transform: '2.3,-1.2,1,0,0,-45' # x,y,z,pitch, yaw, roll
-        lidar_truck_front_67left:
+        lidar_truck_front_60left:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
           horizontal_fov: '2'
           sensor_tick: '0'
-          transform: '2.3,-1.2,1,0,0,-67.5' # x,y,z,pitch, yaw, roll
-        lidar_truck_front_22right:
+          transform: '2.3,-1.2,1,0,0,-60' # x,y,z,pitch, yaw, roll
+        lidar_truck_front_75left:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
           horizontal_fov: '2'
           sensor_tick: '0'
-          transform: '2.3,1.2,1,0,0,22.5' # x,y,z,pitch, yaw, roll
+          transform: '2.3,-1.2,1,0,0,-75' # x,y,z,pitch, yaw, roll
+        lidar_truck_front_15right:
+          type: "sensor.lidar.ray_cast_semantic"
+          channels: "32"
+          range: "7.0"
+          points_per_second: "5000"
+          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+          upper_fov: '45'
+          lower_fov: '-90'
+          horizontal_fov: '2'
+          sensor_tick: '0'
+          transform: '2.3,1.2,1,0,0,15' # x,y,z,pitch, yaw, roll
+        lidar_truck_front_30right:
+          type: "sensor.lidar.ray_cast_semantic"
+          channels: "32"
+          range: "7.0"
+          points_per_second: "5000"
+          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+          upper_fov: '45'
+          lower_fov: '-90'
+          horizontal_fov: '2'
+          sensor_tick: '0'
+          transform: '2.3,1.2,1,0,0,30' # x,y,z,pitch, yaw, roll
         lidar_truck_front_45right:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
@@ -484,17 +561,28 @@ env_config:
           horizontal_fov: '2'
           sensor_tick: '0'
           transform: '2.3,1.2,1,0,0,45' # x,y,z,pitch, yaw, roll
-        lidar_truck_front_67right:
+        lidar_truck_front_60right:
           type: "sensor.lidar.ray_cast_semantic"
           channels: "32"
-          range: "17.0"
+          range: "7.0"
           points_per_second: "5000"
           rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
           upper_fov: '45'
           lower_fov: '-90'
           horizontal_fov: '2'
           sensor_tick: '0'
-          transform: '2.3,1.2,1,0,0,67.5' # x,y,z,pitch, yaw, roll
+          transform: '2.3,1.2,1,0,0,60' # x,y,z,pitch, yaw, roll
+        lidar_truck_front_75right:
+          type: "sensor.lidar.ray_cast_semantic"
+          channels: "32"
+          range: "7.0"
+          points_per_second: "5000"
+          rotation_frequency: "10" #  IMP THIS IS 1 / delta (timestep)
+          upper_fov: '45'
+          lower_fov: '-90'
+          horizontal_fov: '2'
+          sensor_tick: '0'
+          transform: '2.3,1.2,1,0,0,75' # x,y,z,pitch, yaw, roll
 #        semantic_camera:
 #          type: "sensor.camera.semantic_segmentation"
 #          transform: '0.0,0.0,1.7,0.0,0.0,0.0' # x,y,z,pitch, yaw, roll
@@ -518,7 +606,14 @@ env_config:
 
       tm_hybrid_mode: True
 #    town: "Town03_Opt"
-    town: 'doubleRoundabout37'
+#    town: 'doubleRoundabout37'
+    town1: 'mediumRoundabout4'
+    town1Ratio: 0.2
+#    town2: 'doubleRoundabout37'
+#    town2: 'mediumRoundabout4'
+    town2 : 'doubleRoundabout37'
+    town2Ratio: 0.8
+#    town: '20m'
     others:
       framestack: 1
       max_time_idle: 100

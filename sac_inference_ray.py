@@ -10,6 +10,7 @@ from __future__ import print_function
 
 import argparse
 import pickle
+from statistics import mean
 
 import yaml
 
@@ -40,7 +41,13 @@ EXPERIMENT_CLASS = SACExperimentBasic
 # /home/daniel/ray_results/carla_rllib/dqn_53b9a7ee09/CustomDQNTrainer_CarlaEnv_8a877_00000_0_2023-03-16_08-52-46/checkpoint_000549
 # /home/daniel/ray_results/carla_rllib/good/dqn_0a9d414623_no_lidar_2_ahead_waypoints/CustomDQNTrainer_CarlaEnv_34b01_00000_0_2023-03-17_08-27-43/checkpoint_000099
 # /home/daniel/ray_results/carla_rllib/sac_933af966a6/CustomSACTrainer_CarlaEnv_44868_00000_0_2023-05-06_18-15-50/checkpoint_045000
-
+# /home/daniel/ray_results/carla_rllib/sac_9496eb1e82/CustomSACTrainer_CarlaEnv_7ea37_00000_0_2023-06-21_01-45-10/checkpoint_019000
+# /home/daniel/ray_results/carla_rllib/sac_725b71c70c/CustomSACTrainer_CarlaEnv_92ed2_00000_0_2023-06-22_07-56-47/checkpoint_019000
+# /home/daniel/ray_results/carla_rllib/sac_564062f528/CustomSACTrainer_CarlaEnv_527af_00000_0_2023-06-22_19-15-01/checkpoint_020000
+# /home/daniel/ray_results/carla_rllib/sac_e6a772bf3f/CustomSACTrainer_CarlaEnv_0d727_00000_0_2023-06-24_00-48-21/checkpoint_024000
+# /home/daniel/ray_results/carla_rllib/sac_4c0293c613/CustomSACTrainer_CarlaEnv_b1f1d_00000_0_2023-06-24_10-54-14/checkpoint_027000
+# /home/daniel/ray_results/carla_rllib/sac_ae41825d17/CustomSACTrainer_CarlaEnv_19473_00000_0_2023-06-26_18-47-12/checkpoint_033000
+# /home/daniel/ray_results/carla_rllib/sac_20fc454e44/CustomSACTrainer_CarlaEnv_cb85e_00000_0_2023-06-27_13-28-53/checkpoint_025000
 def save_to_pickle(filename, data):
     filename = filename + '.pickle'
     with open(filename, 'wb') as handle:
@@ -74,6 +81,22 @@ def main():
     args = argparser.parse_args()
     args.config = parse_config(args)
 
+    save_dir = "inference_results/latest/20fc454e/Model27K/30runs/original/training/16-103"
+    x = input(f'Please confirm save directory {save_dir}: (y/no)')
+    if x != 'y':
+        raise Exception('Cancelled')
+
+    town1 = args.config["env_config"]["experiment"]["town1"]
+    save_to_pickle('server_maps', [town1])
+
+    x = input(f'Confrim using map {town1}? (y/n): ')
+    if x != 'y':
+        raise Exception('Failed')
+
+    x = input('What are the total number of routes being tested?')
+    numbers_of_times_per_route = 30
+    total_episodes = (numbers_of_times_per_route + 2 ) * int(x)
+
     try:
         ray.init()
 
@@ -98,23 +121,31 @@ def main():
         # Initalize the CARLA environment
         env = agent.workers.local_worker().env
 
-        results_file = open(f'inference_results/{args.checkpoint.replace("/","_")}.csv', mode='a')
+        results_file = open(f'{save_dir}{args.checkpoint.replace("/","_")}.csv', mode='a')
         employee_writer = csv.writer(results_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-        employee_writer.writerow(['route','timesteps','collision_truck','collision_trailer','timeout','completed'])
+        employee_writer.writerow(['route','timesteps','collision_truck','collision_trailer','timeout','truck_lidar_collision','trailer_lidar_collision','distance_to_center_of_lane','completed'])
 
 
         while True:
             observation = env.reset()
             done = False
+            info = None
             counter = 0
+            distance_to_center_of_lane = []
+            if total_episodes == 0:
+                print('All episodes completed')
+                break
+            total_episodes -= 1
+
             while not done:
                 action = agent.compute_single_action(observation)
                 observation, reward, done, info = env.step(action)
+                distance_to_center_of_lane.append(info['distance_to_center_of_lane'])
                 counter +=1
 
-            # ['route', 'timesteps', 'collision_truck', 'collision_trailer', 'timeout', 'completed']
-            employee_writer.writerow([f'{env.env_start_spawn_point}|{env.env_stop_spawn_point}', counter, env.done_collision_truck,env.done_collision_trailer,env.done_time,env.done_arrived])
+            # ['route', 'timesteps', 'collision_truck', 'collision_trailer', 'timeout','lidar_collision_truck','lidar_collision_trailer','distance_to_center_of_lane', 'completed']
+            employee_writer.writerow([f'{env.env_start_spawn_point}|{env.env_stop_spawn_point}', counter, info['done_collision_truck'],info['done_collision_trailer'],info['done_time_idle'] or info['done_time_episode'],info['truck_lidar_collision'],info['trailer_lidar_collision'], mean(distance_to_center_of_lane),info['done_arrived']])
             results_file.flush()
             # Resetting Variables
             env.done_collision_truck = False
@@ -123,12 +154,13 @@ def main():
             env.done_arrived = False
             env.env_start_spawn_point = -1
             env.env_stop_spawn_point = -1
+            distance_to_center_of_lane = []
 
     except KeyboardInterrupt:
         print("\nshutdown by user")
     finally:
         ray.shutdown()
-        kill_all_servers()
+        # kill_all_servers()
 
 if __name__ == "__main__":
 

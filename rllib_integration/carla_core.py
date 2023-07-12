@@ -24,6 +24,7 @@ import pyautogui
 
 from rllib_integration.LineIntersection import Point, lineLineIntersection
 from rllib_integration.RouteGeneration.global_route_planner import GlobalRoutePlanner
+from Helper import open_pickle, save_to_pickle
 from rllib_integration.sensors.sensor_interface import SensorInterface
 from rllib_integration.sensors.factory import SensorFactory
 from rllib_integration.helper import join_dicts
@@ -104,6 +105,8 @@ class CarlaCore:
         self.visualise_all_routes = False
         self.times_crazy = []
         self.custom_enable_rendering = False
+        self.one_after_the_other = False
+        self.total_number_of_routes = -1
 
         self.route = []
         self.route_points = []
@@ -113,6 +116,7 @@ class CarlaCore:
         self.max_x = None
         self.min_y = None
         self.max_y = None
+        self.last_chosen_route = -2
 
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")
 
@@ -124,7 +128,18 @@ class CarlaCore:
         self.last_roundabout_choice = 1
         self.chosen_routes = {}
 
-        self.init_server()
+        self.in_editor = False
+
+        server_maps = open_pickle('server_maps')
+        server_map = server_maps.pop(0)
+        save_to_pickle('server_maps',server_maps)
+
+        print(f"Using server map for {server_map}")
+        self.map_name = server_map
+
+
+        if not self.in_editor:
+            self.init_server()
         self.connect_client()
 
     # def init_server(self):
@@ -172,12 +187,13 @@ class CarlaCore:
                 "-opengl"  # no-display isn't supported for Unreal 4.24 with vulkan
             ]
 
-        map_name = "doubleRoundabout37"
-
+        # map_name = "doubleRoundabout37"
+        # map_name = "20m"
+        # map_name = "mediumRoundabout4"
         server_command += [
             "--carla-rpc-port={}".format(self.server_port),
             "-quality-level={}".format(self.config["quality_level"]),
-            "--map={}".format(map_name),
+            "--map={}".format(self.map_name),
             "--no-rendering"
         ]
         print(f'Selected Port {self.server_port}')
@@ -196,7 +212,7 @@ class CarlaCore:
             "{}/PythonAPI/util/config.py".format(self.config['carla_location']),
             "--port {}".format(self.server_port),
             "--weather {}".format("Default"),
-            "--map {}".format(map_name),
+            "--map {}".format(self.map_name),
         ]
         server_command_text_2 = " ".join(map(str, server_command_2))
 
@@ -279,6 +295,9 @@ class CarlaCore:
                     self.custom_enable_rendering = False
                 else:
                     self.custom_enable_rendering = True
+
+                if self.in_editor:
+                    self.server_port = 2000
 
                 self.client = carla.Client(self.config["host"], self.server_port)
                 self.client.set_timeout(self.config["timeout"])
@@ -379,7 +398,7 @@ class CarlaCore:
         """Initialize the hero and sensors"""
 
         self.world = self.client.load_world(
-            map_name=experiment_config["town"],
+            map_name=self.map_name,
             reset_settings=False,
             # map_layers = carla.MapLayer.All if self.config["enable_map_assets"] else carla.MapLayer.NONE
             map_layers=carla.MapLayer.NONE
@@ -729,16 +748,22 @@ class CarlaCore:
     def set_route(self,failed_entry_spawn_locations):
         self.route_points = []
 
-        self.entry_spawn_point_index, self.exit_spawn_point_index, self.route_lane, self.last_roundabout_choice = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations,self.last_roundabout_choice)
-        key = str(self.entry_spawn_point_index) + " | " + str(self.exit_spawn_point_index)
-        if self.chosen_routes.get(key) is None:
-            self.chosen_routes[key] = 1
-        else:
-            self.chosen_routes[key] += 1
+        if self.one_after_the_other:
+            self.last_chosen_route += 1
 
-        for key,value in self.chosen_routes.items():
-            print(f"{key} : {value}")
-        print('---------')
+            if self.total_number_of_routes != -1:
+                self.last_chosen_route = self.last_chosen_route % self.total_number_of_routes
+
+        self.entry_spawn_point_index, self.exit_spawn_point_index, self.route_lane, self.last_roundabout_choice, self.total_number_of_routes = get_entry_exit_spawn_point_indices_2_lane(failed_entry_spawn_locations,self.last_roundabout_choice, self.last_chosen_route,map_name=self.map_name,is_testing=self.one_after_the_other)
+        # key = str(self.entry_spawn_point_index) + " | " + str(self.exit_spawn_point_index)
+        # if self.chosen_routes.get(key) is None:
+        #     self.chosen_routes[key] = 1
+        # else:
+        #     self.chosen_routes[key] += 1
+        #
+        # for key,value in self.chosen_routes.items():
+        #     print(f"{key} : {value}")
+        # print('---------')
 
 
         entry_spawn_point = self.map.get_spawn_points()[self.entry_spawn_point_index]
@@ -802,12 +827,12 @@ class CarlaCore:
         """This function resets / spawns the hero vehicle and its sensors"""
 
         if self.visualise_all_routes:
-            visualise_all_routes(self.map)
+            visualise_all_routes(self.map,map_name=self.map_name)
 
         # Part 1: destroy all sensors (if necessary)
         self.sensor_interface_truck.destroy()
         if hero_config["truckTrailerCombo"]:
-            print("TRAILER PART 1/7")
+            # print("TRAILER PART 1/7")
             self.sensor_interface_trailer.destroy()
 
         self.world.tick()
@@ -848,7 +873,7 @@ class CarlaCore:
         self.hero_blueprints.set_attribute("role_name", "hero")
 
         if hero_config["truckTrailerCombo"]:
-            print("TRAILER PART 2/7")
+            # print("TRAILER PART 2/7")
             self.trailer_blueprints = random.choice(get_actor_blueprints(self.world, hero_config["blueprintTrailer"], "2"))
             self.trailer_blueprints.set_attribute("role_name", "hero-trailer")
 
@@ -858,7 +883,7 @@ class CarlaCore:
             self.hero = None
 
         if hero_config["truckTrailerCombo"] and self.hero_trailer is not None:
-            print("TRAILER PART 3/7")
+            # print("TRAILER PART 3/7")
             self.hero_trailer.destroy()
             self.hero_trailer = None
 
@@ -874,7 +899,7 @@ class CarlaCore:
             entry_spawn_point_index, entry_spawn_point = self.set_route(failed_entry_spawn_locations)
 
             if hero_config["truckTrailerCombo"]:
-                print("TRAILER PART 4/7")
+                # print("TRAILER PART 4/7")
                 # Spawning the trailer first and than spawning the truck in a location a bit forward up to connect with it
                 entry_spawn_point.location.z = 0.5
                 self.hero_trailer = self.world.try_spawn_actor(self.trailer_blueprints, entry_spawn_point)
@@ -890,7 +915,7 @@ class CarlaCore:
             if self.hero is not None:
                 print("Truck spawned!")
                 if hero_config["truckTrailerCombo"]:
-                    print("TRAILER PART 5/7")
+                    # print("TRAILER PART 5/7")
                     if self.hero_trailer is not None:
                         print("Trailer spawned!")
                     else:
@@ -906,7 +931,7 @@ class CarlaCore:
             print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points<====')
             return
         if hero_config["truckTrailerCombo"] and self.hero_trailer is None:
-            print("TRAILER PART 6/7")
+            # print("TRAILER PART 6/7")
             print("We ran out of spawn points")
             print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points<====')
             return
@@ -920,12 +945,12 @@ class CarlaCore:
         for name, attributes in hero_config["sensors"].items():
             if 'lidar_trailer' not in name:
                 sensor_truck = SensorFactory.spawn(name, attributes, self.sensor_interface_truck, self.hero)
-                time.sleep(0.15)
+                # time.sleep(0.15)
             if hero_config["truckTrailerCombo"] and (name == 'collision' or 'lidar_trailer' in name):
-                print("TRAILER PART 7/7")
-                time.sleep(0.15)
+                # print("TRAILER PART 7/7")
+                # time.sleep(0.15)
                 sensor_trailer = SensorFactory.spawn(name, attributes, self.sensor_interface_trailer, self.hero_trailer)
-        time.sleep(0.15)
+        # time.sleep(0.15)
         # Not needed anymore. This tick will happen when calling CarlaCore.tick()
         # self.world.tick()
 
@@ -1193,6 +1218,7 @@ class CarlaCore:
         return self.sqr(v.x - w.x) + self.sqr(v.y - w.y)
 
     def distToSegmentSquared(self,p, v, w):
+        # Calculates closest distance from point p to line formed by v -> w
         l2 = self.dist2(v, w)
         if l2 == 0:
             return self.dist2(p, v)
@@ -1229,4 +1255,17 @@ class CarlaCore:
 
         v = Vector(x=left_point_x, y=left_point_y)
         w = Vector(x=right_point_x, y=right_point_y)
+        return math.sqrt(self.distToSegmentSquared(p, v, w))
+
+    def shortest_distance_to_center_of_lane(self, truck_transform):
+        p = Vector(x=truck_transform.location.x, y=truck_transform.location.y)
+
+        previous_waypoint_location = self.route[self.last_waypoint_index - 1].location
+        current_waypoint_location = self.route[self.last_waypoint_index].location
+
+
+        v = Vector(x=previous_waypoint_location.x,y=previous_waypoint_location.y)
+        w = Vector(x= current_waypoint_location.x,y=current_waypoint_location.y)
+
+
         return math.sqrt(self.distToSegmentSquared(p, v, w))

@@ -11,6 +11,7 @@ You can visualize experiment results in ~/ray_results using TensorBoard.
 from __future__ import print_function
 
 import argparse
+import math
 import os
 import random
 import pickle
@@ -77,6 +78,49 @@ def parse_config(args):
         config["callbacks"] = SACCallbacks
 
     return config
+def get_server_maps_dist(config):
+    num_workers = config['num_workers']
+    town1 = config["env_config"]["experiment"]["town1"]
+    town1Ratio = config["env_config"]["experiment"]["town1Ratio"]
+    town2 = config["env_config"]["experiment"]["town2"]
+    town2Ratio = config["env_config"]["experiment"]["town2Ratio"]
+
+
+    assert town1Ratio+town2Ratio == 1
+
+    if town1 == 'None':
+        raise Exception('No town 1 entered')
+    if town2 == 'None':
+        inp = input('No town 2 entered confirm? (y/n): ')
+        if inp != 'y':
+            raise Exception('No town 2 entered')
+    print('---------------------------------------')
+
+
+    output = []
+
+    if town2 == 'None':
+        for i in range(num_workers):
+            output.append(town1)
+    else:
+        if town1Ratio < town2Ratio:
+            num_of_workers_for_town1 = math.floor(num_workers*town1Ratio)
+            num_of_workers_for_town1 = 1 if num_of_workers_for_town1 == 0 else num_of_workers_for_town1
+
+            num_of_workers_for_town2 = num_workers - num_of_workers_for_town1
+
+        else:
+            num_of_workers_for_town2 = math.floor(num_workers*town2Ratio)
+            num_of_workers_for_town2 = 1 if num_of_workers_for_town2 == 0 else num_of_workers_for_town2
+
+            num_of_workers_for_town1 = num_workers - num_of_workers_for_town2
+
+
+        for i in range(num_of_workers_for_town1):
+            output.append(town1)
+        for j in range(num_of_workers_for_town2):
+            output.append(town2)
+    return output
 
 
 def main():
@@ -122,7 +166,10 @@ def main():
     specific_version = False
     check_commit = True
 
-    save_to_pickle('waiting_times',[0,20,40,60,80,100,120,140,160,180])
+    output = get_server_maps_dist(config=args.config)
+    print(output)
+    save_to_pickle('server_maps',output)
+    save_to_pickle('waiting_times',[0,20,40,60,85,105,125,145,165,185,0,20,40,60,80,100,120,140,160,180])
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())

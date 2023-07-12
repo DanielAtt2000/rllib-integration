@@ -9,13 +9,15 @@
 import numpy as np
 
 from ray.rllib.algorithms.callbacks import DefaultCallbacks
-from rllib_integration.GetStartStopLocation import spawn_points_2_lane_roundabout_small_difficult,spawn_points_2_lane_roundabout_small_easy
+from rllib_integration.GetStartStopLocation import spawn_points_2_lane_roundabout_small_difficult, \
+    spawn_points_2_lane_roundabout_small_easy, lower_medium_roundabout_difficult, lower_medium_roundabout_easy
+
 
 def get_route_type(current_entry_idx, current_exit_idx):
     found = False
     easy = False
     difficult = False
-    for entry_easy in spawn_points_2_lane_roundabout_small_easy:
+    for entry_easy in (spawn_points_2_lane_roundabout_small_easy+lower_medium_roundabout_easy):
         entry_idx = entry_easy[0]
         if current_entry_idx == entry_idx:
             if current_exit_idx in entry_easy[1]:
@@ -24,7 +26,7 @@ def get_route_type(current_entry_idx, current_exit_idx):
                 break
 
     if not found:
-        for entry_difficult in spawn_points_2_lane_roundabout_small_difficult:
+        for entry_difficult in (spawn_points_2_lane_roundabout_small_difficult+lower_medium_roundabout_difficult):
             entry_idx = entry_difficult[0]
             if current_entry_idx == entry_idx:
                 if current_exit_idx in entry_difficult[1]:
@@ -126,7 +128,8 @@ class SACCallbacks(DefaultCallbacks):
                 episode.custom_metrics[
                     "collision_without_reward_proportional_to_length"] = collision_without_reward_proportional_to_length
             else:
-                print_error_message(reward_proportional_to_length[-1])
+                # print_error_message(reward_proportional_to_length[-1])
+                pass
 
             both_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"])
             both_without_reward_proportional_to_length = np.mean(episode.user_data["reward_proportional_to_length"][:-1])
