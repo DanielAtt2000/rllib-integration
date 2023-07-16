@@ -48,6 +48,7 @@ EXPERIMENT_CLASS = SACExperimentBasic
 # /home/daniel/ray_results/carla_rllib/sac_4c0293c613/CustomSACTrainer_CarlaEnv_b1f1d_00000_0_2023-06-24_10-54-14/checkpoint_027000
 # /home/daniel/ray_results/carla_rllib/sac_ae41825d17/CustomSACTrainer_CarlaEnv_19473_00000_0_2023-06-26_18-47-12/checkpoint_033000
 # /home/daniel/ray_results/carla_rllib/sac_20fc454e44/CustomSACTrainer_CarlaEnv_cb85e_00000_0_2023-06-27_13-28-53/checkpoint_025000
+# /home/daniel/ray_results/carla_rllib/sac_b72a0fb61c/CustomSACTrainer_CarlaEnv_d3426_00000_0_2023-07-05_19-31-50/checkpoint_032000
 def save_to_pickle(filename, data):
     filename = filename + '.pickle'
     with open(filename, 'wb') as handle:
@@ -81,7 +82,7 @@ def main():
     args = argparser.parse_args()
     args.config = parse_config(args)
 
-    save_dir = "inference_results/latest/20fc454e/Model27K/30runs/original/training/16-103"
+    save_dir = "inference_results/run"
     x = input(f'Please confirm save directory {save_dir}: (y/no)')
     if x != 'y':
         raise Exception('Cancelled')

@@ -395,8 +395,8 @@ class SACExperimentBasic(BaseExperiment):
 
     def get_action_space(self):
         """Returns the action space, in this case, a discrete space"""
-        return Discrete(len(self.get_actions()))
-
+        # return Discrete(len(self.get_actions()))
+        return Box(low=np.array([0,-1,0]),high=np.array([1,1,1]),dtype=np.float)
     def get_observation_space(self):
         """
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
@@ -439,62 +439,62 @@ class SACExperimentBasic(BaseExperiment):
             # })
         return obs_space
 
-    def get_actions(self):
-        acceleration_value = self.acceleration_pid(self.current_forward_velocity)
-        print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
-        return {
-            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
-            1: [acceleration_value, 0.80, 0.0, False, False],  # Right
-            2: [acceleration_value, 0.60, 0.0, False, False],  # Right
-            3: [acceleration_value, 0.40, 0.0, False, False],  # Right
-            4: [acceleration_value, 0.20, 0.0, False, False],  # Right
-            5: [acceleration_value, -0.80, 0.0, False, False],  # Left
-            6: [acceleration_value, -0.60, 0.0, False, False],  # Left
-            7: [acceleration_value, -0.40, 0.0, False, False],  # Left
-            8: [acceleration_value, -0.20, 0.0, False, False],  # Left
-            # 0: [0.0, 0.00, 0.0, False, False],  # Coast
-            # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
-            # 2: [0.0, 0.75, 0.0, False, False],  # Right
-            # 3: [0.0, 0.50, 0.0, False, False],  # Right
-            # 4: [0.0, 0.25, 0.0, False, False],  # Right
-            # 5: [0.0, -0.75, 0.0, False, False],  # Left
-            # 6: [0.0, -0.50, 0.0, False, False],  # Left
-            # 7: [0.0, -0.25, 0.0, False, False],  # Left
-            # 8: [0.15, 0.00, 0.0, False, False],  # Straight
-            # 9: [0.15, 0.75, 0.0, False, False],  # Right
-            # 10: [0.15, 0.50, 0.0, False, False],  # Right
-            # 11: [0.15, 0.25, 0.0, False, False],  # Right
-            # 12: [0.15, -0.75, 0.0, False, False],  # Left
-            # 13: [0.15, -0.50, 0.0, False, False],  # Left
-            # 14: [0.15, -0.25, 0.0, False, False],  # Left
-            # 15: [0.3, 0.00, 0.0, False, False],  # Straight
-            # 16: [0.3, 0.75, 0.0, False, False],  # Right
-            # 17: [0.3, 0.50, 0.0, False, False],  # Right
-            # 18: [0.3, 0.25, 0.0, False, False],  # Right
-            # 19: [0.3, -0.75, 0.0, False, False],  # Left
-            # 20: [0.3, -0.50, 0.0, False, False],  # Left
-            # 21: [0.3, -0.25, 0.0, False, False],  # Left
-            # 22: [0.7, 0.00, 0.0, False, False],  # Straight
-            # 23: [0.7, 0.75, 0.0, False, False],  # Right
-            # 24: [0.7, 0.50, 0.0, False, False],  # Right
-            # 25: [0.7, 0.25, 0.0, False, False],  # Right
-            # 26: [0.7, -0.75, 0.0, False, False],  # Left
-            # 27: [0.7, -0.50, 0.0, False, False],  # Left
-            # 28: [0.7, -0.25, 0.0, False, False],  # Left
-        }
+    # def get_actions(self):
+    #     acceleration_value = self.acceleration_pid(self.current_forward_velocity)
+    #     print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
+    #     return {
+    #         0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
+    #         1: [acceleration_value, 0.80, 0.0, False, False],  # Right
+    #         2: [acceleration_value, 0.60, 0.0, False, False],  # Right
+    #         3: [acceleration_value, 0.40, 0.0, False, False],  # Right
+    #         4: [acceleration_value, 0.20, 0.0, False, False],  # Right
+    #         5: [acceleration_value, -0.80, 0.0, False, False],  # Left
+    #         6: [acceleration_value, -0.60, 0.0, False, False],  # Left
+    #         7: [acceleration_value, -0.40, 0.0, False, False],  # Left
+    #         8: [acceleration_value, -0.20, 0.0, False, False],  # Left
+    #         # 0: [0.0, 0.00, 0.0, False, False],  # Coast
+    #         # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
+    #         # 2: [0.0, 0.75, 0.0, False, False],  # Right
+    #         # 3: [0.0, 0.50, 0.0, False, False],  # Right
+    #         # 4: [0.0, 0.25, 0.0, False, False],  # Right
+    #         # 5: [0.0, -0.75, 0.0, False, False],  # Left
+    #         # 6: [0.0, -0.50, 0.0, False, False],  # Left
+    #         # 7: [0.0, -0.25, 0.0, False, False],  # Left
+    #         # 8: [0.15, 0.00, 0.0, False, False],  # Straight
+    #         # 9: [0.15, 0.75, 0.0, False, False],  # Right
+    #         # 10: [0.15, 0.50, 0.0, False, False],  # Right
+    #         # 11: [0.15, 0.25, 0.0, False, False],  # Right
+    #         # 12: [0.15, -0.75, 0.0, False, False],  # Left
+    #         # 13: [0.15, -0.50, 0.0, False, False],  # Left
+    #         # 14: [0.15, -0.25, 0.0, False, False],  # Left
+    #         # 15: [0.3, 0.00, 0.0, False, False],  # Straight
+    #         # 16: [0.3, 0.75, 0.0, False, False],  # Right
+    #         # 17: [0.3, 0.50, 0.0, False, False],  # Right
+    #         # 18: [0.3, 0.25, 0.0, False, False],  # Right
+    #         # 19: [0.3, -0.75, 0.0, False, False],  # Left
+    #         # 20: [0.3, -0.50, 0.0, False, False],  # Left
+    #         # 21: [0.3, -0.25, 0.0, False, False],  # Left
+    #         # 22: [0.7, 0.00, 0.0, False, False],  # Straight
+    #         # 23: [0.7, 0.75, 0.0, False, False],  # Right
+    #         # 24: [0.7, 0.50, 0.0, False, False],  # Right
+    #         # 25: [0.7, 0.25, 0.0, False, False],  # Right
+    #         # 26: [0.7, -0.75, 0.0, False, False],  # Left
+    #         # 27: [0.7, -0.50, 0.0, False, False],  # Left
+    #         # 28: [0.7, -0.25, 0.0, False, False],  # Left
+    #     }
 
 
 
     def compute_action(self, action):
         """Given the action, returns a carla.VehicleControl() which will be applied to the hero"""
-        action_control = self.get_actions()[int(action)]
+        action_control = action
 
         action = carla.VehicleControl()
         action.throttle = action_control[0]
         action.steer = action_control[1]
         action.brake = action_control[2]
-        action.reverse = action_control[3]
-        action.hand_brake = action_control[4]
+        action.reverse = False
+        action.hand_brake = False
 
         action_msg = ""
 
