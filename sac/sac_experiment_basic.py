@@ -396,7 +396,7 @@ class SACExperimentBasic(BaseExperiment):
     def get_action_space(self):
         """Returns the action space, in this case, a discrete space"""
         # return Discrete(len(self.get_actions()))
-        return Box(low=np.array([0,-1,0]),high=np.array([1,1,1]),dtype=np.float)
+        return Box(low=np.array([0,-1,0]),high=np.array([1,1,1]),dtype=float)
     def get_observation_space(self):
         """
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
