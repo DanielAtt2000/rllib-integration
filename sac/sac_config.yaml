@@ -12,9 +12,9 @@ q_model_config:
 policy_model_config:
   "fcnet_hiddens": [ 512, 512, 1024 ]
   "fcnet_activation": "relu"
-#model:
-#  "fcnet_hiddens": [ 256, 512 ]
-#  "fcnet_activation": "tanh"
+model:
+  "fcnet_hiddens": [ 256, 512, 1024 ]
+  "fcnet_activation": "tanh"
 
 #batch_mode: "complete_episodes"
 
