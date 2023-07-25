@@ -132,6 +132,7 @@ class CarlaCore:
 
         server_maps = open_pickle('server_maps')
         server_map = server_maps.pop(0)
+        server_maps.append(server_map)
         save_to_pickle('server_maps',server_maps)
 
         print(f"Using server map for {server_map}")

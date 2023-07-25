@@ -48,7 +48,6 @@ class CarlaEnv(gym.Env):
         waiting_time = waiting_times.pop(0)
         waiting_times.append(waiting_time)
         save_to_pickle('waiting_times',waiting_times)
-        waiting_time = 20
         print(f"Waiting for {waiting_time}")
         time.sleep(waiting_time)
 
