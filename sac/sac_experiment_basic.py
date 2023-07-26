@@ -399,7 +399,7 @@ class SACExperimentBasic(BaseExperiment):
     def get_action_space(self):
         """Returns the action space, in this case, a discrete space"""
         # return Discrete(len(self.get_actions()))
-        return Box(low=np.array([0,-1,0]),high=np.array([1,1,1]),dtype=float)
+        return Box(low=np.array([0,-1]),high=np.array([1,1]),dtype=float)
     def get_observation_space(self):
         """
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
@@ -495,7 +495,7 @@ class SACExperimentBasic(BaseExperiment):
         action = carla.VehicleControl()
         action.throttle = action_control[0]
         action.steer = action_control[1]
-        action.brake = action_control[2]
+        action.brake = 0
         action.reverse = False
         action.hand_brake = False
 
@@ -510,8 +510,8 @@ class SACExperimentBasic(BaseExperiment):
         if action_control[1] > 0:
             action_msg += f"{action_control[1]} Right "
 
-        if action_control[2] != 0:
-            action_msg += f"{action_control[2]} Break "
+        # if action_control[2] != 0:
+        #     action_msg += f"{action_control[2]} Break "
 
         if action_msg == "":
             action_msg += " Coast "
