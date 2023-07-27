@@ -398,8 +398,8 @@ class SACExperimentBasic(BaseExperiment):
 
     def get_action_space(self):
         """Returns the action space, in this case, a discrete space"""
-        # return Discrete(len(self.get_actions()))
-        return Box(low=np.array([0,-1]),high=np.array([1,1]),dtype=float)
+        return Discrete(len(self.get_actions()))
+        # return Box(low=np.array([0,-1]),high=np.array([1,1]),dtype=float)
     def get_observation_space(self):
         """
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
@@ -442,49 +442,71 @@ class SACExperimentBasic(BaseExperiment):
             # })
         return obs_space
 
-    # def get_actions(self):
-    #     acceleration_value = self.acceleration_pid(self.current_forward_velocity)
-    #     print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
-    #     return {
-    #         0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
-    #         1: [acceleration_value, 0.80, 0.0, False, False],  # Right
-    #         2: [acceleration_value, 0.60, 0.0, False, False],  # Right
-    #         3: [acceleration_value, 0.40, 0.0, False, False],  # Right
-    #         4: [acceleration_value, 0.20, 0.0, False, False],  # Right
-    #         5: [acceleration_value, -0.80, 0.0, False, False],  # Left
-    #         6: [acceleration_value, -0.60, 0.0, False, False],  # Left
-    #         7: [acceleration_value, -0.40, 0.0, False, False],  # Left
-    #         8: [acceleration_value, -0.20, 0.0, False, False],  # Left
-    #         # 0: [0.0, 0.00, 0.0, False, False],  # Coast
-    #         # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
-    #         # 2: [0.0, 0.75, 0.0, False, False],  # Right
-    #         # 3: [0.0, 0.50, 0.0, False, False],  # Right
-    #         # 4: [0.0, 0.25, 0.0, False, False],  # Right
-    #         # 5: [0.0, -0.75, 0.0, False, False],  # Left
-    #         # 6: [0.0, -0.50, 0.0, False, False],  # Left
-    #         # 7: [0.0, -0.25, 0.0, False, False],  # Left
-    #         # 8: [0.15, 0.00, 0.0, False, False],  # Straight
-    #         # 9: [0.15, 0.75, 0.0, False, False],  # Right
-    #         # 10: [0.15, 0.50, 0.0, False, False],  # Right
-    #         # 11: [0.15, 0.25, 0.0, False, False],  # Right
-    #         # 12: [0.15, -0.75, 0.0, False, False],  # Left
-    #         # 13: [0.15, -0.50, 0.0, False, False],  # Left
-    #         # 14: [0.15, -0.25, 0.0, False, False],  # Left
-    #         # 15: [0.3, 0.00, 0.0, False, False],  # Straight
-    #         # 16: [0.3, 0.75, 0.0, False, False],  # Right
-    #         # 17: [0.3, 0.50, 0.0, False, False],  # Right
-    #         # 18: [0.3, 0.25, 0.0, False, False],  # Right
-    #         # 19: [0.3, -0.75, 0.0, False, False],  # Left
-    #         # 20: [0.3, -0.50, 0.0, False, False],  # Left
-    #         # 21: [0.3, -0.25, 0.0, False, False],  # Left
-    #         # 22: [0.7, 0.00, 0.0, False, False],  # Straight
-    #         # 23: [0.7, 0.75, 0.0, False, False],  # Right
-    #         # 24: [0.7, 0.50, 0.0, False, False],  # Right
-    #         # 25: [0.7, 0.25, 0.0, False, False],  # Right
-    #         # 26: [0.7, -0.75, 0.0, False, False],  # Left
-    #         # 27: [0.7, -0.50, 0.0, False, False],  # Left
-    #         # 28: [0.7, -0.25, 0.0, False, False],  # Left
-    #     }
+    def get_actions(self):
+        # acceleration_value = self.acceleration_pid(self.current_forward_velocity)
+        # print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
+
+        all_actions = {}
+
+        all_actions[0] = [0, 0.00, 0.0, False, False] # Straight no acc
+        all_actions[1] = [0, 0.00, 0.2, False, False],  # 0.2 brake
+        all_actions[2] = [0, 0.00, 0.4, False, False],  # 0.4 brake
+        all_actions[3] = [0, 0.00, 0.6, False, False],  # 0.6 brake
+        all_actions[4] = [0, 0.00, 0.8, False, False],  # 0.8 brake
+        all_actions[5] = [0, 0.00, 1.0, False, False],  # 1.0 brake
+        key_counter = 6
+
+        for acceleration in np.arange(0,1.1,0.1):
+            for steering_angle in np.arange(-1,1.1,0.1):
+                all_actions[key_counter] = [np.float16(acceleration),np.float16(steering_angle),0, False, False]
+                key_counter += 1
+
+        return all_actions
+
+
+        # return {
+        #     0: [0, 0.00, 0.0, False, False],  # Straight no acc
+        #     1: [0, 0.00, 0.5, False, False],  # half brake
+        #     1: [0, 0.00, 1.0, False, False],  # full brake
+        #     1: [0, 0.00, 1.0, False, False],  # full brake
+        #     # 1: [acceleration_value, 0.80, 0.0, False, False],  # Right
+        #     # 2: [acceleration_value, 0.60, 0.0, False, False],  # Right
+        #     # 3: [acceleration_value, 0.40, 0.0, False, False],  # Right
+        #     # 4: [acceleration_value, 0.20, 0.0, False, False],  # Right
+        #     # 5: [acceleration_value, -0.80, 0.0, False, False],  # Left
+        #     # 6: [acceleration_value, -0.60, 0.0, False, False],  # Left
+        #     # 7: [acceleration_value, -0.40, 0.0, False, False],  # Left
+        #     # 8: [acceleration_value, -0.20, 0.0, False, False],  # Left
+        #     # 0: [0.0, 0.00, 0.0, False, False],  # Coast
+        #     # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
+        #     # 2: [0.0, 0.75, 0.0, False, False],  # Right
+        #     # 3: [0.0, 0.50, 0.0, False, False],  # Right
+        #     # 4: [0.0, 0.25, 0.0, False, False],  # Right
+        #     # 5: [0.0, -0.75, 0.0, False, False],  # Left
+        #     # 6: [0.0, -0.50, 0.0, False, False],  # Left
+        #     # 7: [0.0, -0.25, 0.0, False, False],  # Left
+        #     # 8: [0.15, 0.00, 0.0, False, False],  # Straight
+        #     # 9: [0.15, 0.75, 0.0, False, False],  # Right
+        #     # 10: [0.15, 0.50, 0.0, False, False],  # Right
+        #     # 11: [0.15, 0.25, 0.0, False, False],  # Right
+        #     # 12: [0.15, -0.75, 0.0, False, False],  # Left
+        #     # 13: [0.15, -0.50, 0.0, False, False],  # Left
+        #     # 14: [0.15, -0.25, 0.0, False, False],  # Left
+        #     # 15: [0.3, 0.00, 0.0, False, False],  # Straight
+        #     # 16: [0.3, 0.75, 0.0, False, False],  # Right
+        #     # 17: [0.3, 0.50, 0.0, False, False],  # Right
+        #     # 18: [0.3, 0.25, 0.0, False, False],  # Right
+        #     # 19: [0.3, -0.75, 0.0, False, False],  # Left
+        #     # 20: [0.3, -0.50, 0.0, False, False],  # Left
+        #     # 21: [0.3, -0.25, 0.0, False, False],  # Left
+        #     # 22: [0.7, 0.00, 0.0, False, False],  # Straight
+        #     # 23: [0.7, 0.75, 0.0, False, False],  # Right
+        #     # 24: [0.7, 0.50, 0.0, False, False],  # Right
+        #     # 25: [0.7, 0.25, 0.0, False, False],  # Right
+        #     # 26: [0.7, -0.75, 0.0, False, False],  # Left
+        #     # 27: [0.7, -0.50, 0.0, False, False],  # Left
+        #     # 28: [0.7, -0.25, 0.0, False, False],  # Left
+        # }
 
 
 
@@ -495,7 +517,7 @@ class SACExperimentBasic(BaseExperiment):
         action = carla.VehicleControl()
         action.throttle = action_control[0]
         action.steer = action_control[1]
-        action.brake = 0
+        action.brake = action_control[2]
         action.reverse = False
         action.hand_brake = False
 
