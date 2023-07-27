@@ -512,7 +512,9 @@ class SACExperimentBasic(BaseExperiment):
 
     def compute_action(self, action):
         """Given the action, returns a carla.VehicleControl() which will be applied to the hero"""
-        action_control = action
+        # action_control = action
+        action_control = self.get_actions()[int(action)]
+
 
         action = carla.VehicleControl()
         action.throttle = action_control[0]
