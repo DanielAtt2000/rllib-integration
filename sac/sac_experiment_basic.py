@@ -458,7 +458,7 @@ class SACExperimentBasic(BaseExperiment):
 
         for acceleration in np.arange(0,1.1,0.1):
             for steering_angle in np.arange(-1,1.1,0.1):
-                all_actions[key_counter] = [np.float16(acceleration),np.float16(steering_angle),0, False, False]
+                all_actions[key_counter] = [acceleration,steering_angle,0, False, False]
                 key_counter += 1
 
         return all_actions
