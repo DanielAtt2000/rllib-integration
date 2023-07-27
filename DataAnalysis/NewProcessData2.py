@@ -73,7 +73,7 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-data_file = 'data_4de711003cc'
+data_file = 'data_045edb01727'
 directory = '/home/daniel/data-rllib-integration/data/' + data_file
 for_graphs = False
 def main():
@@ -248,6 +248,7 @@ def main():
                             if '[]' not in line:
                                 data_entry = line.strip()
                                 locations_of_USD = find(data_entry, '$')
+                                print(filename)
                                 time = data_entry[locations_of_USD[0] + 1:locations_of_USD[1]]
                                 data_entry = data_entry[locations_of_USD[1] + 1:]
                                 for data in data_entry.split(','):
