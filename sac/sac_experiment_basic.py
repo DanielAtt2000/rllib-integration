@@ -449,11 +449,11 @@ class SACExperimentBasic(BaseExperiment):
         all_actions = {}
 
         all_actions[0] = [0, 0.00, 0.0, False, False] # Straight no acc
-        all_actions[1] = [0, 0.00, 0.2, False, False],  # 0.2 brake
-        all_actions[2] = [0, 0.00, 0.4, False, False],  # 0.4 brake
-        all_actions[3] = [0, 0.00, 0.6, False, False],  # 0.6 brake
-        all_actions[4] = [0, 0.00, 0.8, False, False],  # 0.8 brake
-        all_actions[5] = [0, 0.00, 1.0, False, False],  # 1.0 brake
+        all_actions[1] = [0, 0.00, 0.2, False, False]  # 0.2 brake
+        all_actions[2] = [0, 0.00, 0.4, False, False]  # 0.4 brake
+        all_actions[3] = [0, 0.00, 0.6, False, False]  # 0.6 brake
+        all_actions[4] = [0, 0.00, 0.8, False, False]  # 0.8 brake
+        all_actions[5] = [0, 0.00, 1.0, False, False]  # 1.0 brake
         key_counter = 6
 
         for acceleration in np.arange(0,1.1,0.1):
