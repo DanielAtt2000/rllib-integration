@@ -7,13 +7,13 @@ gamma: 1
 twin_q: True
 # these probably do nothing
 q_model_config:
-  "fcnet_hiddens": [ 512, 512, 512, 1024 ]
+  "fcnet_hiddens": [ 512, 512, 512, 1024, 1024 ]
   "fcnet_activation": "relu"
 policy_model_config:
-  "fcnet_hiddens": [ 512, 512, 512, 1024 ]
+  "fcnet_hiddens": [ 512, 512, 512, 1024, 1024 ]
   "fcnet_activation": "relu"
 model:
-  "fcnet_hiddens": [ 256, 512, 512, 1024 ]
+  "fcnet_hiddens": [ 256, 512, 512, 1024, 1024 ]
   "fcnet_activation": "tanh"
 
 #batch_mode: "complete_episodes"
@@ -33,7 +33,7 @@ n_step: 1
 #rollout_fragment_length: 1
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
-  capacity: 600000
+  capacity: 800000
   # How many steps of the model to sample before learning starts.
   # If True prioritized replay buffer will be used.
   prioritized_replay_alpha: 0.6
