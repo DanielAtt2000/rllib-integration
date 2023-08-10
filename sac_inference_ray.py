@@ -50,6 +50,7 @@ EXPERIMENT_CLASS = SACExperimentBasic
 # /home/daniel/ray_results/carla_rllib/sac_20fc454e44/CustomSACTrainer_CarlaEnv_cb85e_00000_0_2023-06-27_13-28-53/checkpoint_025000
 # /home/daniel/ray_results/carla_rllib/sac_b72a0fb61c/CustomSACTrainer_CarlaEnv_d3426_00000_0_2023-07-05_19-31-50/checkpoint_032000
 # /home/daniel/ray_results/carla_rllib/sac_0cee017d77/CustomSACTrainer_CarlaEnv_0b24c_00000_0_2023-07-30_17-30-42/checkpoint_025000
+# /home/daniel/ray_results/carla_rllib/sac_b487c4cb24/CustomSACTrainer_CarlaEnv_f1ad9_00000_0_2023-08-01_16-01-43/checkpoint_031000
 def save_to_pickle(filename, data):
     filename = filename + '.pickle'
     with open(filename, 'wb') as handle:
