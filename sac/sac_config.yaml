@@ -33,7 +33,7 @@ n_step: 1
 #rollout_fragment_length: 1
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
-  capacity: 800000
+  capacity: 600000
   # How many steps of the model to sample before learning starts.
   # If True prioritized replay buffer will be used.
   prioritized_replay_alpha: 0.6
@@ -607,14 +607,14 @@ env_config:
       tm_hybrid_mode: True
 #    town: "Town03_Opt"
 #    town: 'doubleRoundabout37'
-    town1: 'doubleRoundabout37'
+    town1: 'mediumRoundabout4'
     town1Ratio: 0.2
 #    town2: 'doubleRoundabout37'
 #    town2: 'mediumRoundabout4'
-    town2 : 'None'
+    town2 : 'doubleRoundabout37'
     town2Ratio: 0.8
 #    town: '20m'
     others:
       framestack: 1
-      max_time_idle: 250
+      max_time_idle: 100
       max_time_episode: 6400
