@@ -456,7 +456,7 @@ class SACExperimentBasic(BaseExperiment):
         # all_actions[5] = [0, 0.00, 1.0, False, False]  # 1.0 brake
         key_counter = 0
 
-        for acceleration in np.arange(0.3,1.0,0.3):
+        for acceleration in np.arange(0.0,1.1,0.1):
             for steering_angle in np.arange(-1,1.2,0.2):
                 all_actions[key_counter] = [acceleration,steering_angle,0, False, False]
                 key_counter += 1
