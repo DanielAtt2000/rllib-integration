@@ -3,12 +3,12 @@
 framework: "torch"
 num_workers: 7
 num_gpus: 1
-gpu: True
+#gpu: True
 #num_gpus_per_worker: 1
 num_cpus_per_worker: 2
 recreate_failed_workers: True
 #timesteps_per_iteration: 20000
-horizon: 6500
+#horizon: 6500
 
 
 num_atoms: 51
