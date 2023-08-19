@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 import math
 import numpy as np
-from gym.spaces import Box, Discrete, Dict
+from gymnasium.spaces import Box, Discrete, Dict
 import warnings
 import carla
 import os

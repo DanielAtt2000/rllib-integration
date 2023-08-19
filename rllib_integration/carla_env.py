@@ -11,7 +11,7 @@ from __future__ import print_function
 
 import pickle
 import cv2
-import gym
+import gymnasium
 from datetime import datetime
 import pandas as pd
 import time
@@ -83,7 +83,7 @@ class CarlaEnv(gym.Env):
 
         self.reset()
 
-    def reset(self):
+    def reset(self, seed=None, options=None):
         # Reset sensors hero and experiment
         self.hero = self.core.reset_hero(self.experiment.config["hero"])
         self.experiment.reset()
@@ -97,7 +97,7 @@ class CarlaEnv(gym.Env):
             observation, info = self.experiment.get_observation(sensor_data, self.core)
 
 
-        return observation
+        return observation, {}
 
     def save_data(self, filename, data):
         with open(filename, 'wb') as handle:
@@ -141,6 +141,8 @@ class CarlaEnv(gym.Env):
         self.done_time = info['done_time_idle'] or info['done_time_episode']
         self.done_arrived = info['done_arrived']
 
+        terminated = info['done_collision_truck'] or info['done_collision_trailer'] or info['done_arrived'] or info['truck_lidar_collision'] or info['trailer_lidar_collision']
+        truncated = info['done_time_idle'] or info['done_falling'] or info['done_time_episode'] or info['done_far_from_path']
 
         save = False
         if save:
@@ -173,4 +175,4 @@ class CarlaEnv(gym.Env):
         # print(f"Average get_done_status_time {sum(self.get_done_status_time)/len(self.get_done_status_time)}")
         # print(f"Average compute_reward_time {sum(self.compute_reward_time)/len(self.compute_reward_time)}")
         # print(f"Average ALL {sum(self.all_time)/len(self.all_time)}")
-        return observation, reward, done, info
+        return observation, reward, terminated, truncated, info
