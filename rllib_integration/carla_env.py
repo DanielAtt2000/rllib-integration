@@ -31,7 +31,7 @@ def open_pickle(filename):
 
 
 # import time
-class CarlaEnv(gym.Env):
+class CarlaEnv(gymnasium.Env):
     """
     This is a carla environment, responsible of handling all the CARLA related steps of the training.
     """
