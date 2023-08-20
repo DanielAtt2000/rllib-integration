@@ -15,9 +15,9 @@ num_atoms: 51
 noisy: True
 gamma: 0.99
 lr: .0001
-hiddens: [512]
+hiddens: [512,512,512,1024]
 rollout_fragment_length: 4
-train_batch_size: 32
+train_batch_size: 512
 exploration_config:
   epsilon_timesteps: 500000
   final_epsilon: 0.0
