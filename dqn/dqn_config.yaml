@@ -10,7 +10,8 @@ recreate_failed_workers: True
 #timesteps_per_iteration: 20000
 #horizon: 6500
 
-
+double_q: true
+dueling: true
 num_atoms: 51
 noisy: True
 gamma: 0.99
