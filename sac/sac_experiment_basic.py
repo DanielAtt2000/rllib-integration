@@ -12,7 +12,7 @@ from git import Repo
 
 import math
 import numpy as np
-from gym.spaces import Box, Discrete, Dict, Tuple
+from gymnasium.spaces import Box, Discrete, Dict, Tuple
 import warnings
 import carla
 import os
