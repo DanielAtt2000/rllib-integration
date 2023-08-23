@@ -7,14 +7,14 @@ gamma: 1
 twin_q: True
 # these probably do nothing
 q_model_config:
-  "fcnet_hiddens": [ 512, 512, 512, 1024 ]
+  "fcnet_hiddens": [ 512, 512, 1024 ]
   "fcnet_activation": "relu"
 policy_model_config:
-  "fcnet_hiddens": [ 512, 512, 512, 1024 ]
+  "fcnet_hiddens": [ 512, 512, 1024 ]
   "fcnet_activation": "relu"
-model:
-  "fcnet_hiddens": [ 256, 256, 512 ]
-  "fcnet_activation": "tanh"
+#model:
+#  "fcnet_hiddens": [ 256, 256, 512 ]
+#  "fcnet_activation": "tanh"
 
 #batch_mode: "complete_episodes"
 
