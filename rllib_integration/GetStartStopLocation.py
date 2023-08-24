@@ -601,7 +601,9 @@ def is_in_front_of_waypoint_from_vector(line_point,vector_line, in_front_point):
 def visualise_all_routes(map,map_name):
     all_routes = []
 
-    x = input('Ensure that the roundabouts have been updated in here as well')
+    x = print('----------------------------\n\n\n'
+              'Ensure that the roundabouts have been updated in here as well'
+              '-----------------------------\n\n\n')
 
     if map_name == 'mediumRoundabout4':
         roundabouts = [upper_medium_roundabout]
@@ -609,6 +611,8 @@ def visualise_all_routes(map,map_name):
         roundabouts = [spawn_points_2_lane_roundabout_small_easy,spawn_points_2_lane_roundabout_small_difficult]
     elif map_name == '20m':
         # total of 17 routes
+        roundabouts = [roundabout20m]
+    elif map_name == 'oneAndTwoLaneRoundabouts':
         roundabouts = [roundabout20m]
 
     for roundabout in roundabouts:
