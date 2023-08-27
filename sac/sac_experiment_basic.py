@@ -1931,7 +1931,7 @@ class SACExperimentBasic(BaseExperiment):
         # self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
 
         if self.passed_waypoint:
-            reward = reward + 10
+            reward = reward + 100
 
         distance_to_center_of_lane = (np.clip(abs(distance_to_center_of_lane),0,4))/4
         reward = reward - (distance_to_center_of_lane*6)
