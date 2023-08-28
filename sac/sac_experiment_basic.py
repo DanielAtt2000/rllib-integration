@@ -1934,7 +1934,7 @@ class SACExperimentBasic(BaseExperiment):
             reward = reward + 100
 
         distance_to_center_of_lane = (np.clip(abs(distance_to_center_of_lane),0,4))/4
-        reward = reward - (distance_to_center_of_lane*3)
+        reward = reward - (distance_to_center_of_lane*1.5)
 
 
         # if bearing_to_waypoint == 0:
