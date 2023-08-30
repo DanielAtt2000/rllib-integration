@@ -29,9 +29,18 @@ def check_with_user(check_commit):
 def commit_hash():
     repo = Repo('.')
     remote = repo.remote('origin')
-    remote.fetch()
-    latest_remote_commit = remote.refs[repo.active_branch.name].commit
     latest_local_commit = repo.head.commit
+
+    try:
+        remote.fetch()
+    except Exception as e:
+        print(e)
+        x = input('Continue with the above error? y/n')
+        if x == 'y':
+            return str(latest_local_commit)[:10]
+
+    latest_remote_commit = remote.refs[repo.active_branch.name].commit
+
 
     assert latest_local_commit == latest_remote_commit
     commit_value = str(latest_local_commit)[:10]
