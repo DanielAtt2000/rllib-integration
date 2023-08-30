@@ -138,7 +138,8 @@ class SACExperimentBasic(BaseExperiment):
         try:
             remote.fetch()
         except Exception as e:
-            print('Nothing majorly bad happened' + e)
+            print(e)
+            print('Nothing majorly bad happened')
 
         commit_hash = deepcopy(str(repo.head.commit)[:11])
         self.directory = f"/home/daniel/data-rllib-integration/data/data_{commit_hash}"
