@@ -360,6 +360,42 @@ upper_medium_roundabout = [
 
 ]
 
+oneAndTwoLaneRoundabout1Lane40m = [
+    [98,[125],'oneLane'],
+    [98,[147],'oneLane'],
+    [98,[179],'oneLane'],
+    [140,[147],'oneLane'],
+    [140,[179],'oneLane'],
+    [140,[125],'oneLane'],
+    [24,[179],'oneLane'],
+    [24,[125],'oneLane'],
+    [24,[147],'oneLane']
+]
+
+oneAndTwoLaneRoundabout1Lane30m = [
+    [15,[17],'oneLane'],
+    [15,[37],'oneLane'],
+    [15,[197],'oneLane'],
+    [15,[59],'oneLane'],
+    [25,[197],'oneLane'],
+    [25,[59],'oneLane'],
+    [25,[17],'oneLane'],
+    [25,[37],'oneLane'],
+    [194,[59],'oneLane'],
+    [194,[17],'oneLane'],
+    [194,[37],'oneLane'],
+    [194,[197],'oneLane'],
+    [109,[17],'oneLane'],
+    [109,[37],'oneLane'],
+    [109,[197],'oneLane'],
+    [109,[59],'oneLane'],
+
+]
+# [, [], 'oneLane'],
+# [, [], 'oneLane'],
+
+oneAndTwoLaneRoundabouts = oneAndTwoLaneRoundabout1Lane30m
+
 roundabout20m = [
 
     # INEDITOR INEDOTR
@@ -613,7 +649,7 @@ def visualise_all_routes(map,map_name):
         # total of 17 routes
         roundabouts = [roundabout20m]
     elif map_name == 'oneAndTwoLaneRoundabouts':
-        roundabouts = [roundabout20m]
+        roundabouts = [oneAndTwoLaneRoundabouts]
 
     for roundabout in roundabouts:
         for entry in roundabout:

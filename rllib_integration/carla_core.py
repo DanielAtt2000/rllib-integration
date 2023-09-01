@@ -1241,6 +1241,11 @@ class CarlaCore:
             # Truck should be on RIGHT lane. free LEFT lane
             t_left = -5.55
             t_right = 1.85
+        elif self.route_lane == "oneLane":
+            # Only one lane road
+            t_left = -1.85
+            t_right = 1.85
+
         else:
             raise Exception('NO LANE')
 
