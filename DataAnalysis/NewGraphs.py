@@ -213,7 +213,7 @@ def plot_route(route_points_all, truck_points_all):
     rewards = []
     done_array = []
     for idx in range(len(x_route)):
-        if idx < 5700:
+        if idx < 5000:
             if (df.loc[idx, "Done"]) == 'done_arrived':
                 done_array.append(1)
             else:
@@ -395,7 +395,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx > 5700:
+        if idx < 4500:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
