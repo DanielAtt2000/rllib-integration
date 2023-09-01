@@ -5,15 +5,16 @@
 #
 # This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
-"""DQN Algorithm. Tested with CARLA.
+"""ppo Algorithm. Tested with CARLA.
 You can visualize experiment results in ~/ray_results using TensorBoard.
 """
 from __future__ import print_function
 
 import argparse
+import math
 import os
 import random
-
+import pickle
 import yaml
 
 import ray
@@ -25,33 +26,39 @@ from rllib_integration.carla_core import kill_all_servers
 
 from rllib_integration.helper import get_checkpoint, launch_tensorboard
 
-from ppo_example.ppo_experiment import PPOExperiment
-from ppo_example.ppo_callbacks import PPOCallbacks
-from ppo_example.ppo_trainer import CustomPPOTrainer
-
+from ppo.ppo_experiment_basic import PPOExperimentBasic
+from ppo.ppo_callbacks import PPOCallbacks
+from ppo.ppo_trainer import CustomPPOTrainer
 
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
-EXPERIMENT_CLASS = PPOExperiment
+EXPERIMENT_CLASS = PPOExperimentBasic
 
+def save_to_pickle(filename, data):
+    filename = filename + '.pickle'
+    with open(filename, 'wb') as handle:
+        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 def run(args):
     try:
         os.environ['RAY_DISABLE_MEMORY_MONITOR'] = '1'
-        ray.init( num_gpus=1,include_dashboard=True,_temp_dir="/home/daniel/rllib-integration/ray_logs")
-        tune.run(CustomPPOTrainer,
+        ray.init( num_gpus=1,include_dashboard=True,_temp_dir="/home/daniel/data-rllib-integration/ray_logs")
+        analysis = tune.run(CustomPPOTrainer,
                  name=args.name,
                  local_dir=args.directory,
                  # stop={"perf/ram_util_percent": 85.0},
-                 checkpoint_freq=5,
+                 checkpoint_freq=1000,
                  # checkpoint_at_end=True,
                  restore=get_checkpoint(args.name, args.directory, args.restore, args.overwrite),
                  config=args.config,
                  # queue_trials=True,
                  resume=False,
                  reuse_actors=True,
-
-        )
-
+                 )
+        print("----------------HERE")
+        print(analysis.__dict__)
+        # print(analysis.get_all_configs())
+        # print(analysis.get_best_trial())
+        print("----------------HERE")
     finally:
         kill_all_servers()
         ray.shutdown()
@@ -71,6 +78,49 @@ def parse_config(args):
         config["callbacks"] = PPOCallbacks
 
     return config
+def get_server_maps_dist(config):
+    num_workers = config['num_workers']
+    town1 = config["env_config"]["experiment"]["town1"]
+    town1Ratio = config["env_config"]["experiment"]["town1Ratio"]
+    town2 = config["env_config"]["experiment"]["town2"]
+    town2Ratio = config["env_config"]["experiment"]["town2Ratio"]
+
+
+    assert town1Ratio+town2Ratio == 1
+
+    if town1 == 'None':
+        raise Exception('No town 1 entered')
+    if town2 == 'None':
+        inp = input('No town 2 entered confirm? (y/n): ')
+        if inp != 'y':
+            raise Exception('No town 2 entered')
+    print('---------------------------------------')
+
+
+    output = []
+
+    if town2 == 'None':
+        for i in range(num_workers):
+            output.append(town1)
+    else:
+        if town1Ratio < town2Ratio:
+            num_of_workers_for_town1 = math.floor(num_workers*town1Ratio)
+            num_of_workers_for_town1 = 1 if num_of_workers_for_town1 == 0 else num_of_workers_for_town1
+
+            num_of_workers_for_town2 = num_workers - num_of_workers_for_town1
+
+        else:
+            num_of_workers_for_town2 = math.floor(num_workers*town2Ratio)
+            num_of_workers_for_town2 = 1 if num_of_workers_for_town2 == 0 else num_of_workers_for_town2
+
+            num_of_workers_for_town1 = num_workers - num_of_workers_for_town2
+
+
+        for i in range(num_of_workers_for_town1):
+            output.append(town1)
+        for j in range(num_of_workers_for_town2):
+            output.append(town2)
+    return output
 
 
 def main():
@@ -110,18 +160,24 @@ def main():
 
 
     launch_tensorboard(logdir= path,
-                       host="localhost")
+                       host="localhost", port="6010")
 
-    specific_version = True
+
+    specific_version = False
     check_commit = True
+
+    output = get_server_maps_dist(config=args.config)
+    print(output)
+    save_to_pickle('server_maps',output)
+    save_to_pickle('waiting_times',[0,20,40,60,85,105,125,145,165,185,0,20,40,60,80,100,120,140,160,180])
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())
 
         if specific_version:
-            args.name = "ppo_3eee5763b6"
+            args.name = ""
             x = random.randint(0,100)
-            inp = input(f'SPECIFIC NAME APPLIED ENTER {x} to confirm:')
+            inp = input(f'SPECIFIC NAME APPLIED  ENTER {x} to confirm:')
 
             if int(x) == int(inp):
                 run(args)
