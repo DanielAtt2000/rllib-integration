@@ -539,8 +539,8 @@ class DDPGExperimentBasic(BaseExperiment):
         if action_control[1] > 0:
             action_msg += f"{action_control[1]} Right "
 
-        if action_control[2] != 0:
-            action_msg += f"{action_control[2]} Break "
+        # if action_control[0] != 0:
+        #    action_msg += f"{action_control[2]} Break "
 
         if action_msg == "":
             action_msg += " Coast "
