@@ -12,6 +12,10 @@ q_model_config:
 policy_model_config:
   "fcnet_hiddens": [ 512, 512, 1024 ]
   "fcnet_activation": "relu"
+
+actor_hiddens: [512,512]
+critic_hiddens: [512,512]
+
 #model:
 #  "fcnet_hiddens": [ 256, 256, 512 ]
 #  "fcnet_activation": "tanh"
