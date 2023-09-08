@@ -17,7 +17,7 @@ from ray.rllib.algorithms.ppo import PPO
 from rllib_integration.carla_env import CarlaEnv
 from rllib_integration.carla_core import kill_all_servers
 
-from ppo_example.ppo_experiment import PPOExperiment
+from ppo.ppo_experiment import PPOExperiment
 
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
 EXPERIMENT_CLASS = PPOExperiment

@@ -26,9 +26,9 @@ from rllib_integration.carla_core import kill_all_servers
 
 from rllib_integration.helper import get_checkpoint, launch_tensorboard
 
-from ppo_example.ppo_experiment_basic import PPOExperimentBasic
-from ppo_example.ppo_callbacks import PPOCallbacks
-from ppo_example.ppo_trainer import CustomPPOTrainer
+from ppo.ppo_experiment_basic import PPOExperimentBasic
+from ppo.ppo_callbacks import PPOCallbacks
+from ppo.ppo_trainer import CustomPPOTrainer
 
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
 EXPERIMENT_CLASS = PPOExperimentBasic

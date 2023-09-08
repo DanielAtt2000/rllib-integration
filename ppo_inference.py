@@ -18,8 +18,8 @@ import torch
 from rllib_integration.carla_env import CarlaEnv
 from rllib_integration.carla_core import kill_all_servers
 
-from ppo_example.ppo_experiment  import PPOExperiment
-from ppo_example.ppo_inference_model import CustomDQNModel
+from ppo.ppo_experiment  import PPOExperiment
+from ppo.ppo_inference_model import CustomDQNModel
 
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
 EXPERIMENT_CLASS = PPOExperiment
