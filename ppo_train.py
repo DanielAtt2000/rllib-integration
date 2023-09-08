@@ -133,7 +133,7 @@ def main():
                            help="Specified directory to save results (default: ~/ray_results/carla_rllib")
     argparser.add_argument("-n", "--name",
                            metavar="N",
-                           default="ppo_example",
+                           default="ppo",
                            help="Name of the experiment (default: ppo_example)")
     argparser.add_argument("--restore",
                            action="store_true",
