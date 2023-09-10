@@ -13,8 +13,8 @@ policy_model_config:
   "fcnet_hiddens": [ 512, 512, 1024 ]
   "fcnet_activation": "relu"
 
-actor_hiddens: [1024,1024,1024,1024]
-critic_hiddens: [1024,1024,1024,1024]
+actor_hiddens: [128,128]
+critic_hiddens: [128,128]
 critic_lr: 0.000001
 actor_le: 0.000001
 #model:
