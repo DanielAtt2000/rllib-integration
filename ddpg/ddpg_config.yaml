@@ -7,10 +7,10 @@ gamma: 1
 twin_q: True
 # these probably do nothing
 q_model_config:
-  "fcnet_hiddens": [ 512, 512, 1024 ]
+  "fcnet_hiddens": [128,128]
   "fcnet_activation": "relu"
 policy_model_config:
-  "fcnet_hiddens": [ 512, 512, 1024 ]
+  "fcnet_hiddens": [128,128]
   "fcnet_activation": "relu"
 
 actor_hiddens: [128,128]
