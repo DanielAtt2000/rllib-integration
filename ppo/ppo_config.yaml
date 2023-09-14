@@ -7,9 +7,11 @@ num_gpus: 1
 num_cpus_per_worker: 3
 gamma: 1
 
-
-train_batch_size: 512
-
+#
+#train_batch_size: 512
+#sgd_minibatch_size: 256
+#use_critic: "true"
+#use_gae: "true"
 #lr: 0.0001
 #sgd_minibatch_size: 64
 #rollout_fragment_length: 64
