@@ -41,7 +41,7 @@ def get_route_type(current_entry_idx, current_exit_idx):
         raise Exception('No path type found')
 
 
-class SACCallbacks(DefaultCallbacks):
+class A3CCallbacks(DefaultCallbacks):
     def on_episode_start(self, worker, base_env, policies, episode, **kwargs):
         episode.user_data["angle_with_center"] = []
         episode.user_data["forward_velocity"] = []
