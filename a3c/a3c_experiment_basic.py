@@ -30,10 +30,10 @@ from simple_pid import PID
 from rllib_integration.lidar_to_grid_map import generate_ray_casting_grid_map
 import collections
 
-from ppo.ppo_callbacks import get_route_type
+from a3c.a3c_callbacks import get_route_type
 
 
-class PPOExperimentBasic(BaseExperiment):
+class A3CExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
         self.acceleration_pid = PID(Kp=0.2,Ki=0.2,Kd=0.0,setpoint=8.33,sample_time=None,output_limits=(0,1))
