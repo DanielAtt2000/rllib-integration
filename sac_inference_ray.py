@@ -132,7 +132,7 @@ def main():
 
 
         while True:
-            observation = env.reset()
+            observation, _ = env.reset()
             done = False
             info = None
             counter = 0
@@ -144,7 +144,8 @@ def main():
 
             while not done:
                 action = agent.compute_single_action(observation)
-                observation, reward, done, info = env.step(action)
+                observation, reward, terminated, truncated, info = env.step(action)
+                done = terminated or truncated
                 distance_to_center_of_lane.append(info['distance_to_center_of_lane'])
                 counter +=1
 
