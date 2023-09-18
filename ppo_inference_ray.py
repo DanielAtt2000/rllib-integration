@@ -1,4 +1,4 @@
-self.lidar_max_points#!/usr/bin/env python
+#!/usr/bin/env python
 
 # Copyright (c) 2021 Computer Vision Center (CVC) at the Universitat Autonoma de
 # Barcelona (UAB).
@@ -9,6 +9,9 @@ self.lidar_max_points#!/usr/bin/env python
 from __future__ import print_function
 
 import argparse
+import pickle
+from statistics import mean
+
 import yaml
 
 import ray
@@ -17,14 +20,19 @@ from ray.rllib.algorithms.ppo import PPO
 from rllib_integration.carla_env import CarlaEnv
 from rllib_integration.carla_core import kill_all_servers
 
-from ppo.ppo_experiment import PPOExperiment
-
+from ppo.ppo_experiment_basic import PPOExperimentBasic
+import csv
+from git import Repo
 # Set the experiment to EXPERIMENT_CLASS so that it is passed to the configuration
-EXPERIMENT_CLASS = PPOExperiment
+EXPERIMENT_CLASS = PPOExperimentBasic
 
 # RUN FUNCTION
-# python3 ./ppo_inference_ray.py ppo_example/ppo_config.yaml "/home/daniel/ray_results/carla_rllib/ppo_77e99cc55c/CustomPPOTrainer_CarlaEnv_e71d2_00000_0_2023-01-21_15-14-24/checkpoint_000571"
-#
+# python3 ./ppo_inference_ray.py ppo/ppo_config.yaml
+def save_to_pickle(filename, data):
+    filename = filename + '.pickle'
+    with open(filename, 'wb') as handle:
+        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 def parse_config(args):
     """
     Parses the .yaml configuration file into a readable dictionary
@@ -53,8 +61,38 @@ def main():
     args = argparser.parse_args()
     args.config = parse_config(args)
 
+    save_dir = "inference_results/run"
+    x = input(f'Please confirm save directory {save_dir}: (y/no)')
+    if x != 'y':
+        raise Exception('Cancelled')
+
+    town1 = args.config["env_config"]["experiment"]["town1"]
+    save_to_pickle('server_maps', [town1])
+
+    x = input(f'Confrim using map {town1}? (y/n): ')
+    if x != 'y':
+        raise Exception('Failed')
+
+    x = input('What are the total number of routes being tested?')
+    numbers_of_times_per_route = 30
+    total_episodes = (numbers_of_times_per_route + 2 ) * int(x)
+
     try:
         ray.init()
+
+        previous_routes_files = open('testing_routes.txt', 'w')
+        previous_routes_files.write(f"roundabout_idx:{0}\n")
+        previous_routes_files.write(f"entry_idx:{0}\n")
+        previous_routes_files.write(f"exit_idx:{0}\n")
+        previous_routes_files.close()
+
+
+        repo = Repo('.')
+        remote = repo.remote('origin')
+        remote.fetch()
+
+        save_to_pickle('waiting_times', [0, 20, 30, 40, 50])
+
 
         # Restore agent
         agent = PPO(env=CarlaEnv, config=args.config)
@@ -62,17 +100,48 @@ def main():
 
         # Initalize the CARLA environment
         env = agent.workers.local_worker().env
-        obs = env.reset()
+
+        results_file = open(f'{save_dir}{args.checkpoint.replace("/","_")}.csv', mode='a')
+        employee_writer = csv.writer(results_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+        employee_writer.writerow(['route','timesteps','collision_truck','collision_trailer','timeout','truck_lidar_collision','trailer_lidar_collision','distance_to_center_of_lane','completed'])
+
 
         while True:
-            action = agent.compute_single_action(obs)
-            obs, _, _, _ = env.step(action)
+            observation, _ = env.reset()
+            done = False
+            info = None
+            counter = 0
+            distance_to_center_of_lane = []
+            if total_episodes == 0:
+                print('All episodes completed')
+                break
+            total_episodes -= 1
+
+            while not done:
+                action = agent.compute_single_action(observation)
+                observation, reward, terminated, truncated, info = env.step(action)
+                done = terminated or truncated
+                distance_to_center_of_lane.append(info['distance_to_center_of_lane'])
+                counter +=1
+
+            # ['route', 'timesteps', 'collision_truck', 'collision_trailer', 'timeout','lidar_collision_truck','lidar_collision_trailer','distance_to_center_of_lane', 'completed']
+            employee_writer.writerow([f'{env.env_start_spawn_point}|{env.env_stop_spawn_point}', counter, info['done_collision_truck'],info['done_collision_trailer'],info['done_time_idle'] or info['done_time_episode'],info['truck_lidar_collision'],info['trailer_lidar_collision'], mean(distance_to_center_of_lane),info['done_arrived']])
+            results_file.flush()
+            # Resetting Variables
+            env.done_collision_truck = False
+            env.done_collision_trailer = False
+            env.done_time = False
+            env.done_arrived = False
+            env.env_start_spawn_point = -1
+            env.env_stop_spawn_point = -1
+            distance_to_center_of_lane = []
 
     except KeyboardInterrupt:
         print("\nshutdown by user")
     finally:
         ray.shutdown()
-        kill_all_servers()
+        # kill_all_servers()
 
 if __name__ == "__main__":
 

@@ -411,23 +411,23 @@ class CarlaCore:
         weather = getattr(carla.WeatherParameters, "Default")
         self.world.set_weather(weather)
         #
-        # self.tm_port = self.server_port // 10 + self.server_port % 10
-        # while is_used(self.tm_port):
-        #     print("Traffic manager's port " + str(self.tm_port) + " is already being used. Checking the next one")
-        #     self.tm_port += 1
-        # print("Traffic manager connected to port " + str(self.tm_port))
-        #
-        # self.traffic_manager = self.client.get_trafficmanager(self.tm_port)
-        # self.traffic_manager.set_hybrid_physics_mode(experiment_config["background_activity"]["tm_hybrid_mode"])
-        # seed = experiment_config["background_activity"]["seed"]
-        # if seed is not None:
-        #     self.traffic_manager.set_random_device_seed(seed)
-        #
-        # # Spawn the background activity
-        # self.spawn_npcs(
-        #     experiment_config["background_activity"]["n_vehicles"],
-        #     experiment_config["background_activity"]["n_walkers"],
-        # )
+        self.tm_port = self.server_port // 10 + self.server_port % 10
+        while is_used(self.tm_port):
+            print("Traffic manager's port " + str(self.tm_port) + " is already being used. Checking the next one")
+            self.tm_port += 1
+        print("Traffic manager connected to port " + str(self.tm_port))
+
+        self.traffic_manager = self.client.get_trafficmanager(self.tm_port)
+        self.traffic_manager.set_hybrid_physics_mode(experiment_config["background_activity"]["tm_hybrid_mode"])
+        seed = experiment_config["background_activity"]["seed"]
+        if seed is not None:
+            self.traffic_manager.set_random_device_seed(seed)
+
+        # Spawn the background activity
+        self.spawn_npcs(
+            experiment_config["background_activity"]["n_vehicles"],
+            experiment_config["background_activity"]["n_walkers"],
+        )
 
     def set_map_normalisation(self):
         map_buffer = self.config["map_buffer"]
@@ -925,16 +925,16 @@ class CarlaCore:
             else:
                 failed_entry_spawn_locations.append(entry_spawn_point_index)
                 print("Could not spawn hero, changing spawn point")
-                print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points <====')
+                print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points 1  <====')
 
         if self.hero is None:
             print("We ran out of spawn points")
-            print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points<====')
+            print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points 2 <====')
             return
         if hero_config["truckTrailerCombo"] and self.hero_trailer is None:
             # print("TRAILER PART 6/7")
             print("We ran out of spawn points")
-            print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points<====')
+            print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points 3 <====')
             return
 
 
