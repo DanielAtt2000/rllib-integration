@@ -281,8 +281,10 @@ class World(object):
                 print('There are no spawn points available in your map/town.')
                 print('Please add some Vehicle Spawn Point to your UE4 scene.')
                 sys.exit(1)
-                # spawn_points = self.map.get_spawn_points()
+
+            # spawn_points = self.map.get_spawn_points()
             # spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
+            # spawn_point = spawn_points[44]
             # forwardVector = spawn_point.get_forward_vector()*0.6
             # spawn_point.location.x = -11436.130859
             # spawn_point.location.y = 6395.307617
@@ -291,21 +293,23 @@ class World(object):
             # spawn_point.rotation.pitch = 0.0
             # spawn_point.rotation.yaw = 0.0
 
-            # spawn_points = self.map.get_spawn_points()
-            # self.playerTrailer = self.world.try_spawn_actor(blueprintTrailer, spawn_points[0])
-            #
-            # forwardVector = spawn_points[0].get_forward_vector() * 5.2
-            # spawn_points[0].location += forwardVector
-            # # spawn_point.location.y += forwardVector.y
-            # # spawn_point.location.z = 12.0
-            # # spawn_point.rotation.roll = 0.0
-            # # spawn_point.rotation.pitch = 0.0
-            # # spawn_point.rotation.yaw = 0.0
-            # self.player = self.world.try_spawn_actor(blueprint, spawn_points[0])
+            spawn_points = self.map.get_spawn_points()
+            spawn_point =  random.choice(spawn_points)
+            self.playerTrailer = self.world.try_spawn_actor(blueprintTrailer, spawn_point)
+
+            forwardVector = spawn_point.get_forward_vector() * 5.2
+            spawn_point.location += forwardVector
+            # spawn_point.location.y += forwardVector.y
+            # spawn_point.location.z = 12.0
+            # spawn_point.rotation.roll = 0.0
+            # spawn_point.rotation.pitch = 0.0
+            # spawn_point.rotation.yaw = 0.0
+            self.player = self.world.try_spawn_actor(blueprint, spawn_point)
             self.show_vehicle_telemetry = False
             self.modify_vehicle_physics(self.player)
 
-            testing = True
+
+            testing = False
             if testing:
                 def get_value(text, symbol):
                     location_of_symbol = text.find(symbol)
@@ -1398,7 +1402,7 @@ def main():
     argparser.add_argument(
         '--host',
         metavar='H',
-        default='192.168.1.113',
+        default='127.0.0.1',
         help='IP of the host server (default: 127.0.0.1)')
     argparser.add_argument(
         '-p', '--port',
