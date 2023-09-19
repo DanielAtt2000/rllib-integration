@@ -2,16 +2,16 @@
 # https://github.com/ray-project/ray/blob/master/rllib/agents/trainer.py
 
 framework: "torch"
-num_workers: 3
+num_workers: 6
 num_gpus: 1
-num_cpus_per_worker: 6
+num_cpus_per_worker: 3
 gamma: 1
 
 #
-train_batch_size: 1024
-lr: 0.0000001
-sgd_minibatch_size: 512
-num_sgd_iter: 100
+#train_batch_size: 1024
+#lr: 0.0000001
+#sgd_minibatch_size: 512
+#num_sgd_iter: 100
 #sgd_minibatch_size: 256
 #use_critic: "true"
 #use_gae: "true"

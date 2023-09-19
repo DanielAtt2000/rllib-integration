@@ -474,60 +474,60 @@ class PPOExperimentBasic(BaseExperiment):
             # 1: [0, 0.00, 1.0, False, False],  # full brake
             # 1: [0, 0.00, 1.0, False, False],  # full brake
             # Discrete with pid value
-            # 0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
-            # 1: [acceleration_value, 0.80, 0.0, False, False],  # Right
-            # 2: [acceleration_value, 0.60, 0.0, False, False],  # Right
-            # 3: [acceleration_value, 0.40, 0.0, False, False],  # Right
-            # 4: [acceleration_value, 0.20, 0.0, False, False],  # Right
-            # 5: [acceleration_value, -0.80, 0.0, False, False],  # Left
-            # 6: [acceleration_value, -0.60, 0.0, False, False],  # Left
-            # 7: [acceleration_value, -0.40, 0.0, False, False],  # Left
-            # 8: [acceleration_value, -0.20, 0.0, False, False],  # Left
+            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
+            1: [acceleration_value, 0.80, 0.0, False, False],  # Right
+            2: [acceleration_value, 0.60, 0.0, False, False],  # Right
+            3: [acceleration_value, 0.40, 0.0, False, False],  # Right
+            4: [acceleration_value, 0.20, 0.0, False, False],  # Right
+            5: [acceleration_value, -0.80, 0.0, False, False],  # Left
+            6: [acceleration_value, -0.60, 0.0, False, False],  # Left
+            7: [acceleration_value, -0.40, 0.0, False, False],  # Left
+            8: [acceleration_value, -0.20, 0.0, False, False],  # Left
 
 
             # Discrete with custom acceleration
-            0: [0.0, 0.00, 0.0, False, False],  # Dont Move
-            1: [0.0, 0.00, 1.0, False, False],  # Brake
-
-            2: [0.1, 0.00, 0.0, False, False],  # Straight
-            3: [0.1, 0.80, 0.0, False, False],  # Right
-            4: [0.1, 0.60, 0.0, False, False],  # Right
-            5: [0.1, 0.40, 0.0, False, False],  # Right
-            6: [0.1, 0.20, 0.0, False, False],  # Right
-            7: [0.1, -0.80, 0.0, False, False],  # Left
-            8: [0.1, -0.60, 0.0, False, False],  # Left
-            9: [0.1, -0.40, 0.0, False, False],  # Left
-            10: [0.1, -0.20, 0.0, False, False],  # Left
-
-            11: [0.3, 0.00, 0.0, False, False],  # Straight
-            12: [0.3, 0.80, 0.0, False, False],  # Right
-            13: [0.3, 0.60, 0.0, False, False],  # Right
-            14: [0.3, 0.40, 0.0, False, False],  # Right
-            15: [0.3, 0.20, 0.0, False, False],  # Right
-            16: [0.3, -0.80, 0.0, False, False],  # Left
-            17: [0.3, -0.60, 0.0, False, False],  # Left
-            18: [0.3, -0.40, 0.0, False, False],  # Left
-            19: [0.3, -0.20, 0.0, False, False],  # Left
-
-            20: [0.6, 0.00, 0.0, False, False],  # Straight
-            21: [0.6, 0.80, 0.0, False, False],  # Right
-            22: [0.6, 0.60, 0.0, False, False],  # Right
-            23: [0.6, 0.40, 0.0, False, False],  # Right
-            24: [0.6, 0.20, 0.0, False, False],  # Right
-            25: [0.6, -0.80, 0.0, False, False],  # Left
-            26: [0.6, -0.60, 0.0, False, False],  # Left
-            27: [0.6, -0.40, 0.0, False, False],  # Left
-            28: [0.6, -0.20, 0.0, False, False],  # Left
-
-            29: [0.9, 0.00, 0.0, False, False],  # Straight
-            30: [0.9, 0.80, 0.0, False, False],  # Right
-            31: [0.9, 0.60, 0.0, False, False],  # Right
-            32: [0.9, 0.40, 0.0, False, False],  # Right
-            33: [0.9, 0.20, 0.0, False, False],  # Right
-            34: [0.9, -0.80, 0.0, False, False],  # Left
-            35: [0.9, -0.60, 0.0, False, False],  # Left
-            36: [0.9, -0.40, 0.0, False, False],  # Left
-            37: [0.9, -0.20, 0.0, False, False],  # Left
+            # 0: [0.0, 0.00, 0.0, False, False],  # Dont Move
+            # 1: [0.0, 0.00, 1.0, False, False],  # Brake
+            #
+            # 2: [0.1, 0.00, 0.0, False, False],  # Straight
+            # 3: [0.1, 0.80, 0.0, False, False],  # Right
+            # 4: [0.1, 0.60, 0.0, False, False],  # Right
+            # 5: [0.1, 0.40, 0.0, False, False],  # Right
+            # 6: [0.1, 0.20, 0.0, False, False],  # Right
+            # 7: [0.1, -0.80, 0.0, False, False],  # Left
+            # 8: [0.1, -0.60, 0.0, False, False],  # Left
+            # 9: [0.1, -0.40, 0.0, False, False],  # Left
+            # 10: [0.1, -0.20, 0.0, False, False],  # Left
+            #
+            # 11: [0.3, 0.00, 0.0, False, False],  # Straight
+            # 12: [0.3, 0.80, 0.0, False, False],  # Right
+            # 13: [0.3, 0.60, 0.0, False, False],  # Right
+            # 14: [0.3, 0.40, 0.0, False, False],  # Right
+            # 15: [0.3, 0.20, 0.0, False, False],  # Right
+            # 16: [0.3, -0.80, 0.0, False, False],  # Left
+            # 17: [0.3, -0.60, 0.0, False, False],  # Left
+            # 18: [0.3, -0.40, 0.0, False, False],  # Left
+            # 19: [0.3, -0.20, 0.0, False, False],  # Left
+            #
+            # 20: [0.6, 0.00, 0.0, False, False],  # Straight
+            # 21: [0.6, 0.80, 0.0, False, False],  # Right
+            # 22: [0.6, 0.60, 0.0, False, False],  # Right
+            # 23: [0.6, 0.40, 0.0, False, False],  # Right
+            # 24: [0.6, 0.20, 0.0, False, False],  # Right
+            # 25: [0.6, -0.80, 0.0, False, False],  # Left
+            # 26: [0.6, -0.60, 0.0, False, False],  # Left
+            # 27: [0.6, -0.40, 0.0, False, False],  # Left
+            # 28: [0.6, -0.20, 0.0, False, False],  # Left
+            #
+            # 29: [0.9, 0.00, 0.0, False, False],  # Straight
+            # 30: [0.9, 0.80, 0.0, False, False],  # Right
+            # 31: [0.9, 0.60, 0.0, False, False],  # Right
+            # 32: [0.9, 0.40, 0.0, False, False],  # Right
+            # 33: [0.9, 0.20, 0.0, False, False],  # Right
+            # 34: [0.9, -0.80, 0.0, False, False],  # Left
+            # 35: [0.9, -0.60, 0.0, False, False],  # Left
+            # 36: [0.9, -0.40, 0.0, False, False],  # Left
+            # 37: [0.9, -0.20, 0.0, False, False],  # Left
 
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
