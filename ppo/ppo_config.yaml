@@ -5,11 +5,12 @@ framework: "torch"
 num_workers: 3
 num_gpus: 1
 num_cpus_per_worker: 6
-gamma: 2
+gamma: 1
 
 #
-#train_batch_size: 1024
+train_batch_size: 2048
 #lr: 0.0000001
+#lr: 0.00005
 #sgd_minibatch_size: 512
 #num_sgd_iter: 100
 #sgd_minibatch_size: 256

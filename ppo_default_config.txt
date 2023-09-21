@@ -1,0 +1,1837 @@
+_local_experiment_path': '/home/daniel/ray_results/carla_rllib/ppo_c0498de8ec', '_remote_experiment_path': None, '_experiment_states': [{'checkpoints': ['{
+  "stub": false,
+  "trainable_name": "CustomPPOTrainer",
+  "trial_id": "ce0a6_00000",
+  "sync_config": {
+    "_type": "CLOUDPICKLE_FALLBACK",
+    "value": "80059593000000000000008c0f7261792e74756e652e73796e636572948c0a53796e63436f6e6669679493942981947d94288c0a75706c6f61645f646972944e8c0673796e636572948c046175746f948c0b73796e635f706572696f64944d2c018c0c73796e635f74696d656f7574944d08078c0e73796e635f61727469666163747394888c1273796e635f6f6e5f636865636b706f696e74948875622e"
+  },
+  "_orig_experiment_path": "/home/daniel/ray_results/carla_rllib/ppo_c0498de8ec",
+  "_orig_experiment_dir_name": "ppo_c0498de8ec",
+  "_local_experiment_path": "/home/daniel/ray_results/carla_rllib/ppo_c0498de8ec",
+  "_remote_experiment_path": null,
+  "config": {
+    "framework": "torch",
+    "num_workers": 1,
+    "num_gpus": 1,
+    "num_cpus_per_worker": 6,
+    "gamma": 2,
+    "env_config": {
+      "carla": {
+        "host": "127.0.0.1",
+        "programPort": "5418",
+        "timeout": 30.0,
+        "timestep": 0.1,
+        "retries_on_error": 25,
+        "resolution_x": 300,
+        "resolution_y": 300,
+        "carla_location": "/home/daniel/carla/Dist/CARLA_Shipping_0.9.13-1-g8854804f4-dirty/LinuxNoEditor",
+        "quality_level": "Low",
+        "enable_map_assets": true,
+        "enable_rendering": true,
+        "show_display": true,
+        "map_buffer": 1.2,
+        "truckTrailerCombo": true
+      },
+      "experiment": {
+        "hero": {
+          "truckTrailerCombo": true,
+          "blueprintTruck": "vehicle.daf.dafxf",
+          "blueprintTrailer": "vehicle.trailer.trailer",
+          "lidar_max_points": 3000,
+          "sensors": {
+            "collision": {
+              "type": "sensor.other.collision"
+            },
+            "lidar_trailer_0_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "0,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_0_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "0,1.2,1,0,0,90"
+            },
+            "lidar_trailer_1_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-1,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_1_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-1,1.2,1,0,0,90"
+            },
+            "lidar_trailer_2_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-2,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_2_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-2,1.2,1,0,0,90"
+            },
+            "lidar_trailer_3_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-3,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_3_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-3,1.2,1,0,0,90"
+            },
+            "lidar_trailer_4_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-4,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_4_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-4,1.2,1,0,0,90"
+            },
+            "lidar_trailer_5_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-5,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_5_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-5,1.2,1,0,0,90"
+            },
+            "lidar_trailer_6_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-6,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_6_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-6,1.2,1,0,0,90"
+            },
+            "lidar_trailer_7_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-7,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_7_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-7,1.2,1,0,0,90"
+            },
+            "lidar_truck_center": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,0,1,0,0,0"
+            },
+            "lidar_truck_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "1.2,1.2,1,0,0,90"
+            },
+            "lidar_truck_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "1.2,-1.2,1,0,0,-90"
+            },
+            "lidar_truck_front_15left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-15"
+            },
+            "lidar_truck_front_30left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-30"
+            },
+            "lidar_truck_front_45left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-45"
+            },
+            "lidar_truck_front_60left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-60"
+            },
+            "lidar_truck_front_75left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-75"
+            },
+            "lidar_truck_front_15right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,15"
+            },
+            "lidar_truck_front_30right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,30"
+            },
+            "lidar_truck_front_45right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,45"
+            },
+            "lidar_truck_front_60right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,60"
+            },
+            "lidar_truck_front_75right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,75"
+            }
+          },
+          "spawn_points": [
+            "5.1,54.2,1",
+            "5.7,117.7,1",
+            "2.0,97.2,1",
+            "1.8,87.6,1",
+            "4.5,47.0,1",
+            "8.3,25.0,1",
+            "20.0,11.5,1",
+            "36.9,7.1,1"
+          ],
+          "final_location_x": 56.4,
+          "final_location_y": 7.5
+        },
+        "background_activity": {
+          "n_vehicles": 0,
+          "n_walkers": 0,
+          "tm_hybrid_mode": true
+        },
+        "town1": "mediumRoundabout4",
+        "town1Ratio": 0.2,
+        "town2": "doubleRoundabout37",
+        "town2Ratio": 0.8,
+        "others": {
+          "framestack": 1,
+          "max_time_idle": 100,
+          "max_time_episode": 6400
+        },
+        "type": {
+          "_type": "CLOUDPICKLE_FALLBACK",
+          "value": "80059533000000000000008c1870706f2e70706f5f6578706572696d656e745f6261736963948c1250504f4578706572696d656e7442617369639493942e"
+        }
+      }
+    },
+    "env": {
+      "_type": "CLOUDPICKLE_FALLBACK",
+      "value": "8005952c000000000000008c1b726c6c69625f696e746567726174696f6e2e6361726c615f656e76948c084361726c61456e769493942e"
+    },
+    "callbacks": {
+      "_type": "CLOUDPICKLE_FALLBACK",
+      "value": "80059526000000000000008c1170706f2e70706f5f63616c6c6261636b73948c0c50504f43616c6c6261636b739493942e"
+    }
+  },
+  "_Trial__unresolved_config": {
+    "framework": "torch",
+    "num_workers": 1,
+    "num_gpus": 1,
+    "num_cpus_per_worker": 6,
+    "gamma": 2,
+    "env_config": {
+      "carla": {
+        "host": "127.0.0.1",
+        "programPort": "5418",
+        "timeout": 30.0,
+        "timestep": 0.1,
+        "retries_on_error": 25,
+        "resolution_x": 300,
+        "resolution_y": 300,
+        "carla_location": "/home/daniel/carla/Dist/CARLA_Shipping_0.9.13-1-g8854804f4-dirty/LinuxNoEditor",
+        "quality_level": "Low",
+        "enable_map_assets": true,
+        "enable_rendering": true,
+        "show_display": true,
+        "map_buffer": 1.2,
+        "truckTrailerCombo": true
+      },
+      "experiment": {
+        "hero": {
+          "truckTrailerCombo": true,
+          "blueprintTruck": "vehicle.daf.dafxf",
+          "blueprintTrailer": "vehicle.trailer.trailer",
+          "lidar_max_points": 3000,
+          "sensors": {
+            "collision": {
+              "type": "sensor.other.collision"
+            },
+            "lidar_trailer_0_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "0,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_0_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "0,1.2,1,0,0,90"
+            },
+            "lidar_trailer_1_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-1,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_1_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-1,1.2,1,0,0,90"
+            },
+            "lidar_trailer_2_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-2,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_2_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-2,1.2,1,0,0,90"
+            },
+            "lidar_trailer_3_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-3,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_3_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-3,1.2,1,0,0,90"
+            },
+            "lidar_trailer_4_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-4,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_4_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-4,1.2,1,0,0,90"
+            },
+            "lidar_trailer_5_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-5,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_5_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-5,1.2,1,0,0,90"
+            },
+            "lidar_trailer_6_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-6,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_6_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-6,1.2,1,0,0,90"
+            },
+            "lidar_trailer_7_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-7,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_7_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-7,1.2,1,0,0,90"
+            },
+            "lidar_truck_center": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,0,1,0,0,0"
+            },
+            "lidar_truck_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "1.2,1.2,1,0,0,90"
+            },
+            "lidar_truck_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "1.2,-1.2,1,0,0,-90"
+            },
+            "lidar_truck_front_15left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-15"
+            },
+            "lidar_truck_front_30left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-30"
+            },
+            "lidar_truck_front_45left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-45"
+            },
+            "lidar_truck_front_60left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-60"
+            },
+            "lidar_truck_front_75left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-75"
+            },
+            "lidar_truck_front_15right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,15"
+            },
+            "lidar_truck_front_30right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,30"
+            },
+            "lidar_truck_front_45right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,45"
+            },
+            "lidar_truck_front_60right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,60"
+            },
+            "lidar_truck_front_75right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,75"
+            }
+          },
+          "spawn_points": [
+            "5.1,54.2,1",
+            "5.7,117.7,1",
+            "2.0,97.2,1",
+            "1.8,87.6,1",
+            "4.5,47.0,1",
+            "8.3,25.0,1",
+            "20.0,11.5,1",
+            "36.9,7.1,1"
+          ],
+          "final_location_x": 56.4,
+          "final_location_y": 7.5
+        },
+        "background_activity": {
+          "n_vehicles": 0,
+          "n_walkers": 0,
+          "tm_hybrid_mode": true
+        },
+        "town1": "mediumRoundabout4",
+        "town1Ratio": 0.2,
+        "town2": "doubleRoundabout37",
+        "town2Ratio": 0.8,
+        "others": {
+          "framestack": 1,
+          "max_time_idle": 100,
+          "max_time_episode": 6400
+        },
+        "type": [
+          "__ref_ph",
+          "2e4f130b"
+        ]
+      }
+    },
+    "env": [
+      "__ref_ph",
+      "1181ad55"
+    ],
+    "callbacks": [
+      "__ref_ph",
+      "8913b504"
+    ]
+  },
+  "evaluated_params": {},
+  "experiment_tag": "0",
+  "location": {
+    "_type": "CLOUDPICKLE_FALLBACK",
+    "value": "80059546000000000000008c197261792e74756e652e6578706572696d656e742e747269616c948c095f4c6f636174696f6e9493942981947d94288c08686f73746e616d65944e8c03706964944e75622e"
+  },
+  "stopping_criterion": {},
+  "_setup_default_resource": true,
+  "_default_placement_group_factory": "80054e2e",
+  "placement_group_factory": "800595b9000000000000008c237261792e74756e652e657865637574696f6e2e706c6163656d656e745f67726f757073948c15506c6163656d656e7447726f7570466163746f72799493942981947d94288c085f62756e646c6573945d94287d948c0343505594473ff0000000000000737d94680847401800000000000073658c155f686561645f62756e646c655f69735f656d70747994898c095f7374726174656779948c045041434b948c055f6172677394298c075f6b7761726773947d9475622e",
+  "log_to_file": [
+    null,
+    null
+  ],
+  "max_failures": 0,
+  "_last_result": {
+    "trial_id": "ce0a6_00000"
+  },
+  "_default_result_or_future": null,
+  "last_update_time": -Infinity,
+  "metric_analysis": {},
+  "n_steps": [
+    5,
+    10
+  ],
+  "metric_n_steps": {},
+  "export_formats": [],
+  "status": "RUNNING",
+  "start_time": 1695288359.9252632,
+  "relative_logdir": "CustomPPOTrainer_CarlaEnv_ce0a6_00000_0_2023-09-21_11-25-29",
+  "runner": null,
+  "last_debug": 0,
+  "error_filename": null,
+  "pickled_error_filename": null,
+  "trial_name_creator": null,
+  "trial_dirname_creator": null,
+  "custom_trial_name": null,
+  "custom_dirname": null,
+  "experiment_dir_name": "ppo_c0498de8ec",
+  "saving_to": null,
+  "checkpoint_config": {
+    "_type": "CLOUDPICKLE_FALLBACK",
+    "value": "800595ff000000000000008c0e7261792e6169722e636f6e666967948c10436865636b706f696e74436f6e6669679493942981947d94288c0b6e756d5f746f5f6b656570944e8c1a636865636b706f696e745f73636f72655f617474726962757465948c12747261696e696e675f697465726174696f6e948c16636865636b706f696e745f73636f72655f6f72646572948c036d6178948c14636865636b706f696e745f6672657175656e6379944df4018c11636865636b706f696e745f61745f656e64944e8c1a5f636865636b706f696e745f6b6565705f616c6c5f72616e6b7394898c1f5f636865636b706f696e745f75706c6f61645f66726f6d5f776f726b657273948975622e"
+  },
+  "checkpoint_manager": {
+    "_type": "CLOUDPICKLE_FALLBACK",
+    "value": "800595d2020000000000008c257261792e74756e652e657865637574696f6e2e636865636b706f696e745f6d616e61676572948c125f436865636b706f696e744d616e616765729493942981947d94288c145f636865636b706f696e745f7374726174656779948c0e7261792e6169722e636f6e666967948c10436865636b706f696e74436f6e6669679493942981947d94288c0b6e756d5f746f5f6b656570944e8c1a636865636b706f696e745f73636f72655f617474726962757465948c12747261696e696e675f697465726174696f6e948c16636865636b706f696e745f73636f72655f6f72646572948c036d6178948c14636865636b706f696e745f6672657175656e6379944df4018c11636865636b706f696e745f61745f656e64944e8c1a5f636865636b706f696e745f6b6565705f616c6c5f72616e6b7394898c1f5f636865636b706f696e745f75706c6f61645f66726f6d5f776f726b657273948975628c155f6c61746573745f636865636b706f696e745f6964944b008c1a5f746f705f7065727369737465645f636865636b706f696e7473945d948c1a5f626573745f7065727369737465645f636865636b706f696e74944e8c1c5f6c61746573745f7065727369737465645f636865636b706f696e74944e8c195f6c61746573745f6d656d6f72795f636865636b706f696e74948c247261792e6169722e5f696e7465726e616c2e636865636b706f696e745f6d616e61676572948c125f547261636b6564436865636b706f696e749493942981947d94288c0b6469725f6f725f64617461944e8c026964944affffffff8c0c73746f726167655f6d6f646594681a8c11436865636b706f696e7453746f726167659493944b01859452948c0472616e6b944b008c076d657472696373947d948c076e6f64655f6970944e8c155f6d6f76655f696e73746561645f6f665f636f7079948875628c185f636865636b706f696e74735f746f5f636c65616e5f7570948f9475622e"
+  },
+  "restore_path": null,
+  "restoring_from": null,
+  "num_failures": 0,
+  "num_restore_failures": 0,
+  "results": "80054e2e",
+  "best_result": "80054e2e",
+  "param_config": "80054e2e",
+  "extra_arg": "80054e2e",
+  "_state_json": null,
+  "_state_valid": false,
+  "_resources": "80054e2e"
+}'], 'runner_data': {'_earliest_stopping_actor': inf, '_actor_cleanup_timeout': 600, '_actor_force_cleanup_timeout': 10, '_reuse_actors': True, '_chdir_to_trial_dir': True, '_buffer_length': 1, '_buffer_min_time_s': 0.0, '_buffer_max_time_s': 100.0, '_max_pending_trials': 16, '_metric': None, '_total_time': 0, '_iteration': 352, '_has_errored': False, '_fail_fast': False, '_print_trial_errors': True, '_server_port': None, '_cached_trial_decisions': {}, '_queued_trial_decisions': {}, '_should_stop_experiment': False, '_stopper': <ray.tune.stopper.noop.NoopStopper object at 0x7f84802b2370>, '_start_time': 1695288329.2033694, '_last_checkpoint_time': -inf, '_session_str': '2023-09-21_11-25-29', '_checkpoint_period': 'auto', '_trial_checkpoint_config': CheckpointConfig(checkpoint_frequency=500), '_resumed': False, 'launch_web_server': False}, 'stats': {'start_time': 1695288329.2033694, 'timestamp': -inf}}], '_checkpoints_and_paths': [('{
+  "stub": false,
+  "trainable_name": "CustomPPOTrainer",
+  "trial_id": "ce0a6_00000",
+  "sync_config": {
+    "_type": "CLOUDPICKLE_FALLBACK",
+    "value": "80059593000000000000008c0f7261792e74756e652e73796e636572948c0a53796e63436f6e6669679493942981947d94288c0a75706c6f61645f646972944e8c0673796e636572948c046175746f948c0b73796e635f706572696f64944d2c018c0c73796e635f74696d656f7574944d08078c0e73796e635f61727469666163747394888c1273796e635f6f6e5f636865636b706f696e74948875622e"
+  },
+  "_orig_experiment_path": "/home/daniel/ray_results/carla_rllib/ppo_c0498de8ec",
+  "_orig_experiment_dir_name": "ppo_c0498de8ec",
+  "_local_experiment_path": "/home/daniel/ray_results/carla_rllib/ppo_c0498de8ec",
+  "_remote_experiment_path": null,
+  "config": {
+    "framework": "torch",
+    "num_workers": 1,
+    "num_gpus": 1,
+    "num_cpus_per_worker": 6,
+    "gamma": 2,
+    "env_config": {
+      "carla": {
+        "host": "127.0.0.1",
+        "programPort": "5418",
+        "timeout": 30.0,
+        "timestep": 0.1,
+        "retries_on_error": 25,
+        "resolution_x": 300,
+        "resolution_y": 300,
+        "carla_location": "/home/daniel/carla/Dist/CARLA_Shipping_0.9.13-1-g8854804f4-dirty/LinuxNoEditor",
+        "quality_level": "Low",
+        "enable_map_assets": true,
+        "enable_rendering": true,
+        "show_display": true,
+        "map_buffer": 1.2,
+        "truckTrailerCombo": true
+      },
+      "experiment": {
+        "hero": {
+          "truckTrailerCombo": true,
+          "blueprintTruck": "vehicle.daf.dafxf",
+          "blueprintTrailer": "vehicle.trailer.trailer",
+          "lidar_max_points": 3000,
+          "sensors": {
+            "collision": {
+              "type": "sensor.other.collision"
+            },
+            "lidar_trailer_0_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "0,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_0_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "0,1.2,1,0,0,90"
+            },
+            "lidar_trailer_1_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-1,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_1_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-1,1.2,1,0,0,90"
+            },
+            "lidar_trailer_2_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-2,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_2_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-2,1.2,1,0,0,90"
+            },
+            "lidar_trailer_3_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-3,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_3_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-3,1.2,1,0,0,90"
+            },
+            "lidar_trailer_4_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-4,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_4_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-4,1.2,1,0,0,90"
+            },
+            "lidar_trailer_5_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-5,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_5_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-5,1.2,1,0,0,90"
+            },
+            "lidar_trailer_6_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-6,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_6_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-6,1.2,1,0,0,90"
+            },
+            "lidar_trailer_7_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-7,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_7_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-7,1.2,1,0,0,90"
+            },
+            "lidar_truck_center": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,0,1,0,0,0"
+            },
+            "lidar_truck_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "1.2,1.2,1,0,0,90"
+            },
+            "lidar_truck_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "1.2,-1.2,1,0,0,-90"
+            },
+            "lidar_truck_front_15left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-15"
+            },
+            "lidar_truck_front_30left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-30"
+            },
+            "lidar_truck_front_45left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-45"
+            },
+            "lidar_truck_front_60left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-60"
+            },
+            "lidar_truck_front_75left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-75"
+            },
+            "lidar_truck_front_15right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,15"
+            },
+            "lidar_truck_front_30right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,30"
+            },
+            "lidar_truck_front_45right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,45"
+            },
+            "lidar_truck_front_60right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,60"
+            },
+            "lidar_truck_front_75right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,75"
+            }
+          },
+          "spawn_points": [
+            "5.1,54.2,1",
+            "5.7,117.7,1",
+            "2.0,97.2,1",
+            "1.8,87.6,1",
+            "4.5,47.0,1",
+            "8.3,25.0,1",
+            "20.0,11.5,1",
+            "36.9,7.1,1"
+          ],
+          "final_location_x": 56.4,
+          "final_location_y": 7.5
+        },
+        "background_activity": {
+          "n_vehicles": 0,
+          "n_walkers": 0,
+          "tm_hybrid_mode": true
+        },
+        "town1": "mediumRoundabout4",
+        "town1Ratio": 0.2,
+        "town2": "doubleRoundabout37",
+        "town2Ratio": 0.8,
+        "others": {
+          "framestack": 1,
+          "max_time_idle": 100,
+          "max_time_episode": 6400
+        },
+        "type": {
+          "_type": "CLOUDPICKLE_FALLBACK",
+          "value": "80059533000000000000008c1870706f2e70706f5f6578706572696d656e745f6261736963948c1250504f4578706572696d656e7442617369639493942e"
+        }
+      }
+    },
+    "env": {
+      "_type": "CLOUDPICKLE_FALLBACK",
+      "value": "8005952c000000000000008c1b726c6c69625f696e746567726174696f6e2e6361726c615f656e76948c084361726c61456e769493942e"
+    },
+    "callbacks": {
+      "_type": "CLOUDPICKLE_FALLBACK",
+      "value": "80059526000000000000008c1170706f2e70706f5f63616c6c6261636b73948c0c50504f43616c6c6261636b739493942e"
+    }
+  },
+  "_Trial__unresolved_config": {
+    "framework": "torch",
+    "num_workers": 1,
+    "num_gpus": 1,
+    "num_cpus_per_worker": 6,
+    "gamma": 2,
+    "env_config": {
+      "carla": {
+        "host": "127.0.0.1",
+        "programPort": "5418",
+        "timeout": 30.0,
+        "timestep": 0.1,
+        "retries_on_error": 25,
+        "resolution_x": 300,
+        "resolution_y": 300,
+        "carla_location": "/home/daniel/carla/Dist/CARLA_Shipping_0.9.13-1-g8854804f4-dirty/LinuxNoEditor",
+        "quality_level": "Low",
+        "enable_map_assets": true,
+        "enable_rendering": true,
+        "show_display": true,
+        "map_buffer": 1.2,
+        "truckTrailerCombo": true
+      },
+      "experiment": {
+        "hero": {
+          "truckTrailerCombo": true,
+          "blueprintTruck": "vehicle.daf.dafxf",
+          "blueprintTrailer": "vehicle.trailer.trailer",
+          "lidar_max_points": 3000,
+          "sensors": {
+            "collision": {
+              "type": "sensor.other.collision"
+            },
+            "lidar_trailer_0_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "0,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_0_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "0,1.2,1,0,0,90"
+            },
+            "lidar_trailer_1_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-1,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_1_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-1,1.2,1,0,0,90"
+            },
+            "lidar_trailer_2_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-2,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_2_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-2,1.2,1,0,0,90"
+            },
+            "lidar_trailer_3_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-3,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_3_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-3,1.2,1,0,0,90"
+            },
+            "lidar_trailer_4_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-4,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_4_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-4,1.2,1,0,0,90"
+            },
+            "lidar_trailer_5_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-5,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_5_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-5,1.2,1,0,0,90"
+            },
+            "lidar_trailer_6_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-6,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_6_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-6,1.2,1,0,0,90"
+            },
+            "lidar_trailer_7_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-7,-1.2,1,0,0,-90"
+            },
+            "lidar_trailer_7_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "-7,1.2,1,0,0,90"
+            },
+            "lidar_truck_center": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,0,1,0,0,0"
+            },
+            "lidar_truck_right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "1.2,1.2,1,0,0,90"
+            },
+            "lidar_truck_left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "1.2,-1.2,1,0,0,-90"
+            },
+            "lidar_truck_front_15left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-15"
+            },
+            "lidar_truck_front_30left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-30"
+            },
+            "lidar_truck_front_45left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-45"
+            },
+            "lidar_truck_front_60left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-60"
+            },
+            "lidar_truck_front_75left": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,-1.2,1,0,0,-75"
+            },
+            "lidar_truck_front_15right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,15"
+            },
+            "lidar_truck_front_30right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,30"
+            },
+            "lidar_truck_front_45right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,45"
+            },
+            "lidar_truck_front_60right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,60"
+            },
+            "lidar_truck_front_75right": {
+              "type": "sensor.lidar.ray_cast_semantic",
+              "channels": "32",
+              "range": "7.0",
+              "points_per_second": "5000",
+              "rotation_frequency": "10",
+              "upper_fov": "45",
+              "lower_fov": "-90",
+              "horizontal_fov": "2",
+              "sensor_tick": "0",
+              "transform": "2.3,1.2,1,0,0,75"
+            }
+          },
+          "spawn_points": [
+            "5.1,54.2,1",
+            "5.7,117.7,1",
+            "2.0,97.2,1",
+            "1.8,87.6,1",
+            "4.5,47.0,1",
+            "8.3,25.0,1",
+            "20.0,11.5,1",
+            "36.9,7.1,1"
+          ],
+          "final_location_x": 56.4,
+          "final_location_y": 7.5
+        },
+        "background_activity": {
+          "n_vehicles": 0,
+          "n_walkers": 0,
+          "tm_hybrid_mode": true
+        },
+        "town1": "mediumRoundabout4",
+        "town1Ratio": 0.2,
+        "town2": "doubleRoundabout37",
+        "town2Ratio": 0.8,
+        "others": {
+          "framestack": 1,
+          "max_time_idle": 100,
+          "max_time_episode": 6400
+        },
+        "type": [
+          "__ref_ph",
+          "2e4f130b"
+        ]
+      }
+    },
+    "env": [
+      "__ref_ph",
+      "1181ad55"
+    ],
+    "callbacks": [
+      "__ref_ph",
+      "8913b504"
+    ]
+  },
+  "evaluated_params": {},
+  "experiment_tag": "0",
+  "location": {
+    "_type": "CLOUDPICKLE_FALLBACK",
+    "value": "80059546000000000000008c197261792e74756e652e6578706572696d656e742e747269616c948c095f4c6f636174696f6e9493942981947d94288c08686f73746e616d65944e8c03706964944e75622e"
+  },
+  "stopping_criterion": {},
+  "_setup_default_resource": true,
+  "_default_placement_group_factory": "80054e2e",
+  "placement_group_factory": "800595b9000000000000008c237261792e74756e652e657865637574696f6e2e706c6163656d656e745f67726f757073948c15506c6163656d656e7447726f7570466163746f72799493942981947d94288c085f62756e646c6573945d94287d948c0343505594473ff0000000000000737d94680847401800000000000073658c155f686561645f62756e646c655f69735f656d70747994898c095f7374726174656779948c045041434b948c055f6172677394298c075f6b7761726773947d9475622e",
+  "log_to_file": [
+    null,
+    null
+  ],
+  "max_failures": 0,
+  "_last_result": {
+    "trial_id": "ce0a6_00000"
+  },
+  "_default_result_or_future": null,
+  "last_update_time": -Infinity,
+  "metric_analysis": {},
+  "n_steps": [
+    5,
+    10
+  ],
+  "metric_n_steps": {},
+  "export_formats": [],
+  "status": "RUNNING",
+  "start_time": 1695288359.9252632,
+  "relative_logdir": "CustomPPOTrainer_CarlaEnv_ce0a6_00000_0_2023-09-21_11-25-29",
+  "runner": null,
+  "last_debug": 0,
+  "error_filename": null,
+  "pickled_error_filename": null,
+  "trial_name_creator": null,
+  "trial_dirname_creator": null,
+  "custom_trial_name": null,
+  "custom_dirname": null,
+  "experiment_dir_name": "ppo_c0498de8ec",
+  "saving_to": null,
+  "checkpoint_config": {
+    "_type": "CLOUDPICKLE_FALLBACK",
+    "value": "800595ff000000000000008c0e7261792e6169722e636f6e666967948c10436865636b706f696e74436f6e6669679493942981947d94288c0b6e756d5f746f5f6b656570944e8c1a636865636b706f696e745f73636f72655f617474726962757465948c12747261696e696e675f697465726174696f6e948c16636865636b706f696e745f73636f72655f6f72646572948c036d6178948c14636865636b706f696e745f6672657175656e6379944df4018c11636865636b706f696e745f61745f656e64944e8c1a5f636865636b706f696e745f6b6565705f616c6c5f72616e6b7394898c1f5f636865636b706f696e745f75706c6f61645f66726f6d5f776f726b657273948975622e"
+  },
+  "checkpoint_manager": {
+    "_type": "CLOUDPICKLE_FALLBACK",
+    "value": "800595d2020000000000008c257261792e74756e652e657865637574696f6e2e636865636b706f696e745f6d616e61676572948c125f436865636b706f696e744d616e616765729493942981947d94288c145f636865636b706f696e745f7374726174656779948c0e7261792e6169722e636f6e666967948c10436865636b706f696e74436f6e6669679493942981947d94288c0b6e756d5f746f5f6b656570944e8c1a636865636b706f696e745f73636f72655f617474726962757465948c12747261696e696e675f697465726174696f6e948c16636865636b706f696e745f73636f72655f6f72646572948c036d6178948c14636865636b706f696e745f6672657175656e6379944df4018c11636865636b706f696e745f61745f656e64944e8c1a5f636865636b706f696e745f6b6565705f616c6c5f72616e6b7394898c1f5f636865636b706f696e745f75706c6f61645f66726f6d5f776f726b657273948975628c155f6c61746573745f636865636b706f696e745f6964944b008c1a5f746f705f7065727369737465645f636865636b706f696e7473945d948c1a5f626573745f7065727369737465645f636865636b706f696e74944e8c1c5f6c61746573745f7065727369737465645f636865636b706f696e74944e8c195f6c61746573745f6d656d6f72795f636865636b706f696e74948c247261792e6169722e5f696e7465726e616c2e636865636b706f696e745f6d616e61676572948c125f547261636b6564436865636b706f696e749493942981947d94288c0b6469725f6f725f64617461944e8c026964944affffffff8c0c73746f726167655f6d6f646594681a8c11436865636b706f696e7453746f726167659493944b01859452948c0472616e6b944b008c076d657472696373947d948c076e6f64655f6970944e8c155f6d6f76655f696e73746561645f6f665f636f7079948875628c185f636865636b706f696e74735f746f5f636c65616e5f7570948f9475622e"
+  },
+  "restore_path": null,
+  "restoring_from": null,
+  "num_failures": 0,
+  "num_restore_failures": 0,
+  "results": "80054e2e",
+  "best_result": "80054e2e",
+  "param_config": "80054e2e",
+  "extra_arg": "80054e2e",
+  "_state_json": null,  "_state_valid": false,  "_resources": "80054e2e"
+}', PosixPath('/home/daniel/ray_results/carla_rllib/ppo_c0498de8ec'))]
