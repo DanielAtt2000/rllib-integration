@@ -107,7 +107,7 @@ class CarlaCore:
         self.custom_enable_rendering = False
         self.one_after_the_other = False
         self.total_number_of_routes = -1
-        self.in_editor = True
+        self.in_editor = False
 
         self.route = []
         self.route_points = []
