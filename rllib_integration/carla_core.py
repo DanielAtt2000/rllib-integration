@@ -107,6 +107,7 @@ class CarlaCore:
         self.custom_enable_rendering = False
         self.one_after_the_other = False
         self.total_number_of_routes = -1
+        self.in_editor = True
 
         self.route = []
         self.route_points = []
@@ -128,7 +129,7 @@ class CarlaCore:
         self.last_roundabout_choice = 1
         self.chosen_routes = {}
 
-        self.in_editor = False
+
 
         server_maps = open_pickle('server_maps')
         server_map = server_maps.pop(0)

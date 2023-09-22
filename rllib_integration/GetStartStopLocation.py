@@ -361,40 +361,178 @@ upper_medium_roundabout = [
 ]
 
 oneAndTwoLaneRoundabout1Lane40m = [
-    [98,[125],'oneLane'],
-    [98,[147],'oneLane'],
-    [98,[179],'oneLane'],
-    [140,[147],'oneLane'],
+    [140,[91],'oneLane'],
     [140,[179],'oneLane'],
     [140,[125],'oneLane'],
-    [24,[179],'oneLane'],
-    [24,[125],'oneLane'],
-    [24,[147],'oneLane']
+    [188,[179],'oneLane'],
+    [188,[125],'oneLane'],
+    [188,[91],'oneLane'],
+    [98,[125],'oneLane'],
+    [98,[91],'oneLane'],
+    [98,[179],'oneLane'],
 ]
 
 oneAndTwoLaneRoundabout1Lane30m = [
-    [15,[17],'oneLane'],
     [15,[37],'oneLane'],
     [15,[197],'oneLane'],
     [15,[59],'oneLane'],
+    [15,[17],'oneLane'],
     [25,[197],'oneLane'],
     [25,[59],'oneLane'],
     [25,[17],'oneLane'],
     [25,[37],'oneLane'],
-    [194,[59],'oneLane'],
-    [194,[17],'oneLane'],
-    [194,[37],'oneLane'],
-    [194,[197],'oneLane'],
-    [109,[17],'oneLane'],
-    [109,[37],'oneLane'],
-    [109,[197],'oneLane'],
-    [109,[59],'oneLane'],
+    [191,[59],'oneLane'],
+    [191,[17],'oneLane'],
+    [191,[37],'oneLane'],
+    [191,[197],'oneLane'],
+    [13,[17],'oneLane'],
+    [13,[37],'oneLane'],
+    [13,[197],'oneLane'],
+    [13,[59],'oneLane'],
+]
 
+oneAndTwoLaneRoundabout1Lane20m = [
+    [197,[155],'oneLane'],
+    [197,[202],'oneLane'],
+    [197,[191],'oneLane'],
+    [40,[202],'oneLane'],
+    [40,[191],'oneLane'],
+    [40,[155],'oneLane'],
+    [132,[191],'oneLane'],
+    [132,[155],'oneLane'],
+    [132,[202],'oneLane'],
+]
+
+oneAndTwoLaneRoundabout1Lane16m = [
+    [26,[13],'oneLane'],
+    [26,[203],'oneLane'],
+    [26,[24],'oneLane'],
+    [26,[200],'oneLane'],
+    [59,[203],'oneLane'],
+    [59,[24],'oneLane'],
+    [59,[200],'oneLane'],
+    [59,[13],'oneLane'],
+    [158,[24],'oneLane'],
+    [158,[200],'oneLane'],
+    [158,[13],'oneLane'],
+    [158,[203],'oneLane'],
+    [147,[200],'oneLane'],
+    [147,[13],'oneLane'],
+    [147,[203],'oneLane'],
+    [147,[24],'oneLane'],
+]
+oneAndTwoLaneRoundabout2Lane16m = [
+    [207, [175], 'right'],
+    [207, [131], 'right'],
+    [174, [160], 'left'],
+    [174, [185], 'left'],
+    [204, [131], 'right'],
+    [204, [186], 'right'],
+    [152, [185], 'left'],
+    [152, [149], 'left'],
+    [192, [186], 'right'],
+    [192, [175], 'right'],
+    [14, [149], 'left'],
+    [14, [160], 'left'],
+]
+
+oneAndTwoLaneRoundabout2Lane20m = [
+    [0, [38], 'left'],
+    [0, [206], 'left'],
+    [1, [129], 'right'],
+    [1, [148], 'right'],
+    [2, [129], 'right'],
+    [2, [184], 'right'],
+    [52, [38], 'left'],
+    [52, [143], 'left'],
+    [121, [143], 'left'],
+    [121, [206], 'left'],
+    [180, [148], 'right'],
+    [180, [184], 'right'],
+]
+
+oneAndTwoLaneRoundabout2Lane40m = [
+    # IN OUTPUT
+    # [33, [70], 'left'],
+    # [33, [112], 'left'],
+    # [33, [137], 'left'],
+    # [39, [70], 'left'],
+    # [39, [112], 'left'],
+    # [39, [136], 'left'],
+    # [41, [135], 'right'],
+    # [41, [138], 'right'],
+    # [55, [47], 'right'],
+    # [55, [138], 'right'],
+    # [89, [106], 'right'],
+    # [89, [135], 'right'],
+    # [97, [70], 'left'],
+    # [97, [136], 'left'],
+    # [97, [137], 'left'],
+    # [139, [112], 'left'],
+    # [139, [136], 'left'],
+    # [139, [137], 'left'],
+    # [142, [47], 'right'],
+    # [142, [106], 'right'],
+    #
+
+# IN EDITOR
+#
+#     [36, [33], 'left'],
+#     [36, [34], 'left'],
+#     [36, [198], 'left'],
+#     [39, [139], 'right'],
+#     [39, [192], 'right'],
+#     [126, [16], 'left'],
+#     [126, [34], 'left'],
+#     [126, [198], 'left'],
+#     [131, [16], 'left'],
+#     [131, [33], 'left'],
+#     [131, [198], 'left'],
+#     [133, [32], 'right'],
+#     [133, [35], 'right'],
+#     [146, [35], 'right'],
+#     [146, [139], 'right'],
+#     [177, [32], 'right'],
+#     [177, [192], 'right'],
+#     [184, [16], 'left'],
+#     [184, [33], 'left'],
+#     [184, [34], 'left'],
+#
+
+[1, [11], 'left'],
+[1, [19], 'left'],
+[10, [8], 'left'],
+[10, [11], 'left'],
+[12, [5], 'right'],
+[12, [22], 'right'],
+[18, [20], 'right'],
+[18, [22], 'right'],
+[21, [8], 'left'],
+[21, [19], 'left'],
+[29, [5], 'right'],
+[29, [20], 'right'],
+
+
+
+]
+oneAndTwoLaneRoundabout2Lane30m = [
+    [51, [64], 'right'],
+    [51, [92], 'right'],
+    [76, [64], 'right'],
+    [76, [182], 'right'],
+    [93, [58], 'left'],
+    [93, [111], 'left'],
+    [117, [85], 'left'],
+    [117, [111], 'left'],
+    [183, [92], 'right'],
+    [183, [182], 'right'],
+    [196, [58], 'left'],
+    [196, [85], 'left'],
 ]
 # [, [], 'oneLane'],
 # [, [], 'oneLane'],
 
-oneAndTwoLaneRoundabouts = oneAndTwoLaneRoundabout1Lane30m
+oneAndTwoLaneRoundabouts = oneAndTwoLaneRoundabout2Lane40m
 
 roundabout20m = [
 
