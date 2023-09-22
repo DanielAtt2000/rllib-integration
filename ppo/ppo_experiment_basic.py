@@ -1983,10 +1983,11 @@ class PPOExperimentBasic(BaseExperiment):
         # self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
 
         if self.passed_waypoint:
-            reward = reward + 100
+            # reward = reward + 100
+            pass
 
-        distance_to_center_of_lane = (np.clip(abs(distance_to_center_of_lane),0,4))/4
-        reward = reward - (distance_to_center_of_lane*1.5)
+        distance_to_center_of_lane = (np.clip(abs(distance_to_center_of_lane),0,4))/400
+        reward = reward - (distance_to_center_of_lane*1.0)
 
 
         # if bearing_to_waypoint == 0:
@@ -2014,29 +2015,29 @@ class PPOExperimentBasic(BaseExperiment):
 
 
         if self.done_falling:
-            reward = reward + -500
+            reward = reward + -1
             print('====> REWARD Done falling')
         if self.done_collision_truck or self.done_collision_trailer:
             print("====> REWARD Done collision")
-            reward = reward + -500
+            reward = reward + -1
         if self.truck_lidar_collision:
             print("====> REWARD Truck Lidar collision")
-            reward = reward + -500
+            reward = reward + -1
         if self.trailer_lidar_collision:
             print("====> REWARD Trailer Lidar collision")
-            reward = reward + -500
+            reward = reward + -1
         if self.done_time_idle:
             print("====> REWARD Done idle")
-            reward = reward + -500
+            reward = reward + -1
         if self.done_time_episode:
             print("====> REWARD Done max time")
-            reward = reward + -500
+            reward = reward + -1
         if self.done_far_from_path:
             print("====> REWARD Done far from path")
-            reward = reward + -500
+            reward = reward + -1
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward = reward + 0
+            reward = reward + 1
 
         self.total_episode_reward.append(reward)
         self.reward_metric = reward
