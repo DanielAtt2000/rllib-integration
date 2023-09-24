@@ -1984,6 +1984,7 @@ class PPOExperimentBasic(BaseExperiment):
 
         if self.passed_waypoint:
             # reward = reward + 100
+            reward = reward + 0.1
             pass
 
         distance_to_center_of_lane = (np.clip(abs(distance_to_center_of_lane),0,4))/400
