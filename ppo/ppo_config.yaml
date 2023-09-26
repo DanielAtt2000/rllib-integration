@@ -8,9 +8,9 @@ num_cpus_per_worker: 6
 gamma: 1
 
 #
-train_batch_size: 2048
+train_batch_size: 4096
 #lr: 0.0000001
-lr: 0.000005
+lr: 0.0000005
 #sgd_minibatch_size: 512
 #num_sgd_iter: 100
 #sgd_minibatch_size: 256
