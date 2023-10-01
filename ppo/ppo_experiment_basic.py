@@ -1922,7 +1922,6 @@ class PPOExperimentBasic(BaseExperiment):
         # bearing_to_ahead_waypoints_ahead = observation["values"][5]
         # angle_between_truck_and_trailer = observation["values"][6]
 
-        self.last_forward_velocity = forward_velocity
 
         # print(f"Hyp distance in rewards {hyp_distance_to_next_waypoint}")
         # print(f"self.last_hyp_distance_to_next_waypoint {self.last_hyp_distance_to_next_waypoint}")
@@ -1989,6 +1988,19 @@ class PPOExperimentBasic(BaseExperiment):
 
         distance_to_center_of_lane = (np.clip(abs(distance_to_center_of_lane),0,4))/400
         reward = reward - (distance_to_center_of_lane*1.0)
+
+        # to encourage faster velocity
+        proportional_forward_velocity = (100/15) * (np.clip(abs(forward_velocity), 0, 15))
+        reward = reward - 1/(proportional_forward_velocity)
+
+        # for smooth velocity
+        difference_in_velocities = self.last_forward_velocity - forward_velocity
+        proportional_difference_in_velocities = (1/120) * (np.clip(abs(difference_in_velocities), 0, 1.2))
+        reward = reward - proportional_difference_in_velocities
+
+
+        self.last_forward_velocity = forward_velocity
+
 
 
         # if bearing_to_waypoint == 0:

@@ -73,7 +73,7 @@ def min_max_normalisation(name, value):
 
 no_changes = True
 log = False
-data_file = 'data_8e09f3bf839'
+data_file = 'data_02152f79ae6_DO_NOT_DELETE'
 directory = '/home/daniel/data-rllib-integration/data/' + data_file
 for_graphs = False
 def main():
@@ -98,6 +98,7 @@ def main():
                       'x_dist_to_waypoint':[0,0.03],
                       'y_dist_to_waypoint':[0,0.015],}
     for filename in os.listdir(directory):
+        print(filename)
         file = os.path.join(directory, filename)
         # checking if it is a file
         if os.path.isfile(file):
@@ -248,7 +249,6 @@ def main():
                             if '[]' not in line:
                                 data_entry = line.strip()
                                 locations_of_USD = find(data_entry, '$')
-                                print(filename)
                                 time = data_entry[locations_of_USD[0] + 1:locations_of_USD[1]]
                                 data_entry = data_entry[locations_of_USD[1] + 1:]
                                 for data in data_entry.split(','):
@@ -262,7 +262,7 @@ def main():
 
                 if filename == "done":
                     with open(os.path.join(new_file_dir, filename + '.pkl'), 'wb') as handle:
-                        df = pd.DataFrame(new_data, columns=['Time', 'EntryExit', 'Done'])
+                        df = pd.DataFrame(new_data , columns=['Time', 'EntryExit', 'Done'])
                         pickle.dump(df, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
                 elif filename == 'collisions':
@@ -271,7 +271,7 @@ def main():
                         pickle.dump(df, handle, protocol=pickle.HIGHEST_PROTOCOL)
                 else:
                     with open(os.path.join(new_file_dir,filename + '.pkl'), 'wb') as handle:
-                        print(filename)
+                        print(f'Saving {filename}')
                         df = pd.DataFrame(new_data,columns=['Time', filename])
                         pickle.dump(df, handle, protocol=pickle.HIGHEST_PROTOCOL)
     print('Done')

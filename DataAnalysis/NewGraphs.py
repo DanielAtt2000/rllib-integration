@@ -395,7 +395,7 @@ def plot_route(route_points_all, truck_points_all):
 
         # if len(x_truck[idx]) > 0:
 
-        if idx < 4500:
+        if idx > 60000:
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -518,6 +518,20 @@ def plot_route(route_points_all, truck_points_all):
                 print(f'Average overall {mean(temp_arry[2:])}')
                 print(df.loc[idx, "Time"])
 
+                print('-----VELOCITY------')
+                last_velocity = 0
+                diff_velocities = []
+                for v, velocity in enumerate(df.loc[idx, "forward_velocity"]):
+                    diff = velocity - last_velocity
+                    if abs(diff) < 2:
+                        print(diff,end='|')
+                        diff_velocities.append(abs(diff))
+                    last_velocity= velocity
+                print('')
+                print(f'Mean: {mean(diff_velocities)}')
+                print(f'Max: {max(diff_velocities)}')
+                print(f'Min: {min(diff_velocities)}')
+                print('-----VELOCITY------')
                 # point_reward = list(df.loc[idx, "point_reward"])
                 # line_reward = list(df.loc[idx, "line_reward"])
 
