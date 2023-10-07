@@ -1990,8 +1990,9 @@ class PPOExperimentBasic(BaseExperiment):
         reward = reward - (distance_to_center_of_lane*1.0)
 
         # to encourage faster velocity
-        proportional_forward_velocity = (100/15) * (np.clip(abs(forward_velocity), 0, 15))
-        reward = reward - 1/(proportional_forward_velocity)
+        # proportional_forward_velocity = (100/15) * (np.clip(abs(forward_velocity), 0, 15))
+        # reward = reward + (proportional_forward_velocity)
+        # print(f'Reward a {1/proportional_forward_velocity}')
 
         # for smooth velocity
         difference_in_velocities = self.last_forward_velocity - forward_velocity
