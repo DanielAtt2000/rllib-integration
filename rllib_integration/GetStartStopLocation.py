@@ -589,6 +589,48 @@ roundabout20m = [
 
 ]
 
+oneLane50m = [
+    [1, [0], 'oneLane'],
+    [1, [2], 'oneLane'],
+    [1, [4], 'oneLane'],
+    [1, [6], 'oneLane'],
+    [3, [0], 'oneLane'],
+    [3, [2], 'oneLane'],
+    [3, [4], 'oneLane'],
+    [3, [6], 'oneLane'],
+    [5, [0], 'oneLane'],
+    [5, [2], 'oneLane'],
+    [5, [4], 'oneLane'],
+    [5, [6], 'oneLane'],
+    [7, [0], 'oneLane'],
+    [7, [2], 'oneLane'],
+    [7, [4], 'oneLane'],
+    [7, [6], 'oneLane'],
+]
+
+oneLane70m = [
+    [8, [9], 'oneLane'],
+    [8, [10], 'oneLane'],
+    [8, [12], 'oneLane'],
+    [8, [14], 'oneLane'],
+    [11, [9], 'oneLane'],
+    [11, [10], 'oneLane'],
+    [11, [12], 'oneLane'],
+    [11, [14], 'oneLane'],
+    [13, [9], 'oneLane'],
+    [13, [10], 'oneLane'],
+    [13, [12], 'oneLane'],
+    [13, [14], 'oneLane'],
+    [15, [9], 'oneLane'],
+    [15, [10], 'oneLane'],
+    [15, [12], 'oneLane'],
+    [15, [14], 'oneLane'],
+]
+
+OneLaneRoundabouts = oneLane50m + oneLane70m
+
+
+
 
 # roundabouts = [spawn_points_2_lane_roundabout_difficult,spawn_points_2_lane_roundabout_easy]
 
@@ -605,6 +647,9 @@ def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations, last_round
     elif map_name == '20m':
         # total of 17 routes
         roundabouts = [roundabout20m]
+    elif map_name == 'OneLaneRoundabouts':
+        # total of 17 routes
+        roundabouts = [OneLaneRoundabouts]
     if is_testing:
         assert len(roundabouts) == 1
 
@@ -788,6 +833,9 @@ def visualise_all_routes(map,map_name):
         roundabouts = [roundabout20m]
     elif map_name == 'oneAndTwoLaneRoundabouts':
         roundabouts = [oneAndTwoLaneRoundabouts]
+    elif map_name == 'OneLaneRoundabouts':
+        # total of 17 routes
+        roundabouts = [OneLaneRoundabouts]
 
     for roundabout in roundabouts:
         for entry in roundabout:

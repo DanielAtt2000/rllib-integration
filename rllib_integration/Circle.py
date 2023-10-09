@@ -53,25 +53,49 @@ def get_radii(route, last_waypoint_index,no_of_points_to_calculate_chord):
         y_p = (y_0 + y_1) /2
         y_coof = 1
 
-        if x_1-x_0 != 0:
-            # Not straight line
-            m_p = (y_1-y_0) / (x_1-x_0)
-            m_p = -1/m_p
+        if x_1-x_0 == 0 and y_1-y_0 == 0:
+            raise Exception('Same point is being used')
 
-        else:
+        if x_1-x_0 == 0:
             # Horizontal lines
             print("Horizontal Line")
             m_p = 0
+            x_coof = m_p
+            c = -x_p * m_p + y_p
 
-        x_coof = m_p
-        c = -x_p * m_p + y_p
-
-        if y_1-y_0 == 0:
+        elif y_1-y_0 == 0:
             # Vertical line
             print("Vertical Line")
             x_coof = 0
             y_coof = 0
             c = x_p
+        else:
+            m_p = (y_1 - y_0) / (x_1 - x_0)
+            m_p = -1 / m_p
+            x_coof = m_p
+            c = -x_p * m_p + y_p
+
+
+
+        # if x_1-x_0 != 0:
+        #     # Not a Vertical line
+        #     m_p = (y_1-y_0) / (x_1-x_0)
+        #     m_p = -1/m_p
+        #
+        # else:
+        #     # Vertical lines
+        #     print("Vertical Line")
+        #     m_p = 0
+        #
+        # x_coof = m_p
+        # c = -x_p * m_p + y_p
+        #
+        # if y_1-y_0 == 0:
+        #     # Horizontal line
+        #     print("Horizontal Line")
+        #     x_coof = 0
+        #     y_coof = 0
+        #     c = x_p
 
 
         perpendicular_bisectors.append(Vector(x_coof=x_coof, c_coof=c,y_coof=y_coof,x_0=x_0,y_0=y_0,x_1=x_1,y_1=y_1))

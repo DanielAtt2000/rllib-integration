@@ -1658,14 +1658,14 @@ class PPOExperimentBasic(BaseExperiment):
         value_observations.extend(radii)
         # value_observations.append(np.float32(mean_radius))
 
-        route_type_string = get_route_type(current_entry_idx=self.entry_idx, current_exit_idx=self.exit_idx)
-
-        if route_type_string == 'easy':
-            route_type = 0
-        elif route_type_string == 'difficult':
-            route_type = 1
-        else:
-            raise Exception('This should never happen')
+        # route_type_string = get_route_type(current_entry_idx=self.entry_idx, current_exit_idx=self.exit_idx)
+        #
+        # if route_type_string == 'easy':
+        #     route_type = 0
+        # elif route_type_string == 'difficult':
+        #     route_type = 1
+        # else:
+        #     raise Exception('This should never happen')
 
         self.truck_lidar_collision = False
         if any(lidar_point < 0.01 for lidar_point in truck_lidar_data_points):
@@ -1679,7 +1679,7 @@ class PPOExperimentBasic(BaseExperiment):
 
         if self.custom_enable_rendering:
             print(f'Entry Points {core.entry_spawn_point_index}| Exit point {core.exit_spawn_point_index}')
-            print(f'Route Type {route_type}')
+            # print(f'Route Type {route_type}')
             print(f"Radii {radii}")
             print(f'Mean radius {mean_radius}')
             # print(f"truck FRONT \t\t\t{round(truck_center, 2)}")
@@ -1996,7 +1996,7 @@ class PPOExperimentBasic(BaseExperiment):
 
         # for smooth velocity
         difference_in_velocities = self.last_forward_velocity - forward_velocity
-        proportional_difference_in_velocities = (1/120) * (np.clip(abs(difference_in_velocities), 0, 1.2))
+        proportional_difference_in_velocities = (5/120) * (np.clip(abs(difference_in_velocities), 0, 1.2))
         reward = reward - proportional_difference_in_velocities
 
 
