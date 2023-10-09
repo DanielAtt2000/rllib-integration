@@ -58,14 +58,14 @@ def get_radii(route, last_waypoint_index,no_of_points_to_calculate_chord):
 
         if x_1-x_0 == 0:
             # Horizontal lines
-            print("Horizontal Line")
+            # print("Horizontal Line")
             m_p = 0
             x_coof = m_p
             c = -x_p * m_p + y_p
 
         elif y_1-y_0 == 0:
             # Vertical line
-            print("Vertical Line")
+            # print("Vertical Line")
             x_coof = 0
             y_coof = 0
             c = x_p
