@@ -585,11 +585,11 @@ env_config:
       tm_hybrid_mode: True
 #    town: "Town03_Opt"
 #    town: 'doubleRoundabout37'
-    town1: 'mediumRoundabout4'
+    town1: 'OneLaneRoundabouts'
     town1Ratio: 0.2
 #    town2: 'doubleRoundabout37'
 #    town2: 'mediumRoundabout4'
-    town2 : 'doubleRoundabout37'
+    town2 : 'None'
     town2Ratio: 0.8
 #    town: '20m'
     others:
