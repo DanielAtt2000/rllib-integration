@@ -37,7 +37,7 @@ lr: 0.0000005
 ##timesteps_per_iteration: 20000
 #
 #num_steps_sampled_before_learning_starts: 2500
-#recreate_failed_workers: True
+recreate_failed_workers: True
 #replay_buffer_config: {
 #  capacity: 100000
 #}
