@@ -1244,8 +1244,8 @@ class CarlaCore:
             t_right = 1.85
         elif self.route_lane == "oneLane":
             # Only one lane road
-            t_left = -1.85
-            t_right = 1.85
+            t_left = -2.25
+            t_right = 2.25
 
         else:
             raise Exception('NO LANE')
