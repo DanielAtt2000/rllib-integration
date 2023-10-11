@@ -579,7 +579,7 @@ env_config:
       final_location_x: 56.4
       final_location_y: 7.5
     background_activity:
-      n_vehicles: 0
+      n_vehicles: 20
       n_walkers: 0
 
       tm_hybrid_mode: True
