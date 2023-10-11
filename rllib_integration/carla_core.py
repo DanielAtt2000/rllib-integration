@@ -97,6 +97,7 @@ class CarlaCore:
         self.map = None
         self.hero = None
         self.hero_trailer = None
+        self.actors = None
         self.config = join_dicts(BASE_CORE_CONFIG, config)
         self.sensor_interface_truck = SensorInterface()
         self.sensor_interface_trailer = SensorInterface()
@@ -420,6 +421,11 @@ class CarlaCore:
 
         self.traffic_manager = self.client.get_trafficmanager(self.tm_port)
         self.traffic_manager.set_hybrid_physics_mode(experiment_config["background_activity"]["tm_hybrid_mode"])
+        # 8 because the trailer is around 13.8 /14 meters long and since this distance is
+        # calcualted from the center of each vehicle
+        self.traffic_manager.set_global_distance_to_leading_vehicle(130)
+
+
         seed = experiment_config["background_activity"]["seed"]
         if seed is not None:
             self.traffic_manager.set_random_device_seed(seed)
@@ -429,6 +435,10 @@ class CarlaCore:
             experiment_config["background_activity"]["n_vehicles"],
             experiment_config["background_activity"]["n_walkers"],
         )
+
+        for actor in self.actors:
+            self.traffic_manager.ignore_vehicles_percentage(actor, 0)
+
 
     def set_map_normalisation(self):
         map_buffer = self.config["map_buffer"]
@@ -914,7 +924,7 @@ class CarlaCore:
             # Spawning the truck
             self.hero = self.world.try_spawn_actor(self.hero_blueprints, entry_spawn_point)
 
-            if self.hero is not None:
+            if self.hero is not None and self.hero_trailer is not None:
                 print("Truck spawned!")
                 if hero_config["truckTrailerCombo"]:
                     # print("TRAILER PART 5/7")
@@ -977,7 +987,7 @@ class CarlaCore:
             n_vehicles = n_spawn_points
 
         v_batch = []
-        v_blueprints = self.world.get_blueprint_library().filter("vehicle.*")
+        v_blueprints = self.world.get_blueprint_library().filter("vehicle.mercedes.coupe_2020")
 
         for n, transform in enumerate(spawn_points):
             if n >= n_vehicles:
