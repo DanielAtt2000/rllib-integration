@@ -29,7 +29,7 @@ from rllib_integration.sensors.sensor_interface import SensorInterface
 from rllib_integration.sensors.factory import SensorFactory
 from rllib_integration.helper import join_dicts
 from rllib_integration.GetStartStopLocation import get_entry_exit_spawn_point_indices, \
-    get_entry_exit_spawn_point_indices_2_lane, visualise_all_routes
+    get_entry_exit_spawn_point_indices_2_lane, visualise_all_routes, get_entry_spawn_points
 
 from rllib_integration.TestingWayPointUpdater import plot_route
 
@@ -423,8 +423,10 @@ class CarlaCore:
         self.traffic_manager.set_hybrid_physics_mode(experiment_config["background_activity"]["tm_hybrid_mode"])
         # 8 because the trailer is around 13.8 /14 meters long and since this distance is
         # calcualted from the center of each vehicle
-        self.traffic_manager.set_global_distance_to_leading_vehicle(130)
-
+        self.traffic_manager.set_global_distance_to_leading_vehicle(200)
+        self.traffic_manager.global_percentage_speed_difference(0)
+        self.traffic_manager.set_respawn_dormant_vehicles(True)
+        self.traffic_manager.set_synchronous_mode(True)
 
         seed = experiment_config["background_activity"]["seed"]
         if seed is not None:
@@ -438,6 +440,8 @@ class CarlaCore:
 
         for actor in self.actors:
             self.traffic_manager.ignore_vehicles_percentage(actor, 0)
+            actor.set_target_velocity(carla.Vector3D(x=4,y=0,z=0))
+
 
 
     def set_map_normalisation(self):
@@ -904,6 +908,9 @@ class CarlaCore:
         # # for i in range(0,len(spawn_points)):
         # next_spawn_point = spawn_points[i % len(spawn_points)]
         failed_entry_spawn_locations = [-1]
+
+        entry_spawn_points = get_entry_spawn_points(self.map_name)
+
         # while self.hero is None and (hero_config["truckTrailerCombo"] and self.hero_trailer is None) :
 
         while ((self.hero is None) or (self.hero_trailer is None)) if hero_config["truckTrailerCombo"] else (self.hero is None):
@@ -937,6 +944,12 @@ class CarlaCore:
                 failed_entry_spawn_locations.append(entry_spawn_point_index)
                 print("Could not spawn hero, changing spawn point")
                 print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points 1  <====')
+
+                if len(failed_entry_spawn_locations) >= len(entry_spawn_points) - 1:
+                    print('Waiting for 5 seconds and trying again')
+                    time.sleep(5)
+                    failed_entry_spawn_locations = [-1]
+
 
         if self.hero is None:
             print("We ran out of spawn points")
@@ -977,6 +990,15 @@ class CarlaCore:
 
         # Spawn vehicles
         spawn_points = self.world.get_map().get_spawn_points()
+        del spawn_points[15]
+        del spawn_points[13]
+        del spawn_points[11]
+        del spawn_points[8]
+        del spawn_points[7]
+        del spawn_points[5]
+        del spawn_points[3]
+        del spawn_points[1]
+
         n_spawn_points = len(spawn_points)
 
         if n_vehicles < n_spawn_points:
