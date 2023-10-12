@@ -441,6 +441,7 @@ class CarlaCore:
         for actor in self.actors:
             self.traffic_manager.ignore_vehicles_percentage(actor, 0)
             actor.set_target_velocity(carla.Vector3D(x=4,y=0,z=0))
+            # self.traffic_manager.ignore_walkers_percentage(actor, 100)
 
 
 
@@ -931,6 +932,13 @@ class CarlaCore:
             # Spawning the truck
             self.hero = self.world.try_spawn_actor(self.hero_blueprints, entry_spawn_point)
 
+            if self.hero is None and self.hero_trailer is not None:
+                self.hero_trailer.destroy()
+                self.hero_trailer = None
+            if self.hero is not None and self.hero_trailer is None:
+                self.hero.destroy()
+                self.hero = None
+
             if self.hero is not None and self.hero_trailer is not None:
                 print("Truck spawned!")
                 if hero_config["truckTrailerCombo"]:
@@ -945,9 +953,10 @@ class CarlaCore:
                 print("Could not spawn hero, changing spawn point")
                 print('====> IF ERRORING HERE CHECK CODE in carla_core when generating spawn_points 1  <====')
 
-                if len(failed_entry_spawn_locations) >= len(entry_spawn_points) - 1:
-                    print('Waiting for 5 seconds and trying again')
-                    time.sleep(5)
+                if len(failed_entry_spawn_locations) > len(entry_spawn_points):
+                    print('Moving the world forward by 5 ticks and trying again')
+                    for i in range(5):
+                        self.world.tick()
                     failed_entry_spawn_locations = [-1]
 
 
@@ -1031,44 +1040,45 @@ class CarlaCore:
         vehicles_id_list = [r.actor_id for r in results if not r.error]
 
         # Spawn the walkers
-        spawn_locations = [self.world.get_random_location_from_navigation() for i in range(n_walkers)]
+        # spawn_locations = [self.world.get_random_location_from_navigation() for i in range(n_walkers)]
+        #
+        # w_batch = []
+        # w_blueprints = self.world.get_blueprint_library().filter("walker.pedestrian.*")
+        #
+        # for spawn_location in spawn_locations:
+        #     w_blueprint = random.choice(w_blueprints)
+        #     if w_blueprint.has_attribute('is_invincible'):
+        #         w_blueprint.set_attribute('is_invincible', 'false')
+        #     w_batch.append(SpawnActor(w_blueprint, carla.Transform(spawn_location)))
+        #
+        # results = self.client.apply_batch_sync(w_batch, True)
+        # if len(results) < n_walkers:
+        #     logging.warning("Could only spawn {} out of the {} requested walkers."
+        #                     .format(len(results), n_walkers))
+        # walkers_id_list = [r.actor_id for r in results if not r.error]
+        #
+        # # Spawn the walker controllers
+        # wc_batch = []
+        # wc_blueprint = self.world.get_blueprint_library().find('controller.ai.walker')
+        #
+        # for walker_id in walkers_id_list:
+        #     wc_batch.append(SpawnActor(wc_blueprint, carla.Transform(), walker_id))
+        #
+        # results = self.client.apply_batch_sync(wc_batch, True)
+        # if len(results) < len(walkers_id_list):
+        #     logging.warning("Only {} out of {} controllers could be created. Some walkers might be stopped"
+        #                     .format(len(results), n_walkers))
+        # controllers_id_list = [r.actor_id for r in results if not r.error]
 
-        w_batch = []
-        w_blueprints = self.world.get_blueprint_library().filter("walker.pedestrian.*")
-
-        for spawn_location in spawn_locations:
-            w_blueprint = random.choice(w_blueprints)
-            if w_blueprint.has_attribute('is_invincible'):
-                w_blueprint.set_attribute('is_invincible', 'false')
-            w_batch.append(SpawnActor(w_blueprint, carla.Transform(spawn_location)))
-
-        results = self.client.apply_batch_sync(w_batch, True)
-        if len(results) < n_walkers:
-            logging.warning("Could only spawn {} out of the {} requested walkers."
-                            .format(len(results), n_walkers))
-        walkers_id_list = [r.actor_id for r in results if not r.error]
-
-        # Spawn the walker controllers
-        wc_batch = []
-        wc_blueprint = self.world.get_blueprint_library().find('controller.ai.walker')
-
-        for walker_id in walkers_id_list:
-            wc_batch.append(SpawnActor(wc_blueprint, carla.Transform(), walker_id))
-
-        results = self.client.apply_batch_sync(wc_batch, True)
-        if len(results) < len(walkers_id_list):
-            logging.warning("Only {} out of {} controllers could be created. Some walkers might be stopped"
-                            .format(len(results), n_walkers))
-        controllers_id_list = [r.actor_id for r in results if not r.error]
+        # self.world.tick()
+        #
+        # for controller in self.world.get_actors(controllers_id_list):
+        #     controller.start()
+        #     controller.go_to_location(self.world.get_random_location_from_navigation())
 
         self.world.tick()
-
-        for controller in self.world.get_actors(controllers_id_list):
-            controller.start()
-            controller.go_to_location(self.world.get_random_location_from_navigation())
-
-        self.world.tick()
-        self.actors = self.world.get_actors(vehicles_id_list + walkers_id_list + controllers_id_list)
+        # self.actors = self.world.get_actors(vehicles_id_list + walkers_id_list + controllers_id_list)
+        self.actors = self.world.get_actors(vehicles_id_list)
 
     def tick(self, control):
         """Performs one tick of the simulation, moving all actors, and getting the sensor data"""
