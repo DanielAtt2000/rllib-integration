@@ -438,11 +438,12 @@ class PPOExperimentBasic(BaseExperiment):
                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                          # traffic
-                         0, 0, 0, 0, 0,
-                         0, 0, 0, 0, 0,
-                         0, 0, 0, 0, 0,
-                         0, 0, 0, 0, 0,
-                         0, 0, 0, 0, 0
+                         # velocity, acceleration, yaw, relative_x, relative_y
+                         0, 0, -math.pi, -200, -200,
+                         0, 0, -math.pi, -200, -200,
+                         0, 0, -math.pi, -200, -200,
+                         0, 0, -math.pi, -200, -200,
+                         0, 0, -math.pi, -200, -200,
                          ]),
                     high=np.array(
                         [100, 200, 200, 200, 200, 25, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi,
@@ -451,11 +452,12 @@ class PPOExperimentBasic(BaseExperiment):
                          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                          1, 1, 1, 1, 1, 1, 1,
                          # traffic
-                         100, 200, 360, 200, 200,
-                         100, 200, 360, 200, 200,
-                         100, 200, 360, 200, 200,
-                         100, 200, 360, 200, 200,
-                         100, 200, 360, 200, 200,
+                         # velocity, acceleration, yaw, relative_x, relative_y
+                         100, 200, math.pi, 200, 200,
+                         100, 200, math.pi, 200, 200,
+                         100, 200, math.pi, 200, 200,
+                         100, 200, math.pi, 200, 200,
+                         100, 200, math.pi, 200, 200,
                          ]),
                     dtype=np.float32
                 )
@@ -939,7 +941,7 @@ class PPOExperimentBasic(BaseExperiment):
 
                 actor_velocity = self.get_speed(core.actors[index_of_closest_actor])
                 actor_acceleration = self.get_acceleration(core.actors[index_of_closest_actor])
-                actor_yaw = actor_transform.rotation.yaw
+                actor_yaw = np.clip(actor_transform.rotation.yaw * 0.0174533,-math.pi, math.pi)  # to convert to radians
                 actor_relative_x = truck_transform.location.x - actor_transform.location.x
                 actor_relative_y = truck_transform.location.y - actor_transform.location.y
 
