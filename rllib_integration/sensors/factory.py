@@ -15,7 +15,7 @@ class SensorFactory(object):
     """
 
     @staticmethod
-    def spawn(name, attributes, interface, parent):
+    def spawn(name, attributes, interface, parent, other_actor_id):
         attributes = attributes.copy()
         type_ = attributes.get("type", "")
 
@@ -30,7 +30,7 @@ class SensorFactory(object):
         elif type_ == "sensor.lidar.ray_cast":
             sensor = Lidar(name, attributes, interface, parent)
         elif type_ == "sensor.lidar.ray_cast_semantic":
-            sensor = SemanticLidar(name, attributes, interface, parent)
+            sensor = SemanticLidar(name, attributes, interface, parent, other_actor_id)
         elif type_ == "sensor.other.radar":
             sensor = Radar(name, attributes, interface, parent)
         elif type_ == "sensor.other.gnss":
@@ -40,7 +40,7 @@ class SensorFactory(object):
         elif type_ == "sensor.other.lane_invasion":
             sensor = LaneInvasion(name, attributes, interface, parent)
         elif type_ == "sensor.other.collision":
-            sensor = Collision(name, attributes, interface, parent)
+            sensor = Collision(name, attributes, interface, parent, other_actor_id)
         elif type_ == "sensor.other.obstacle":
             sensor = Obstacle(name, attributes, interface, parent)
         elif type_ == "sensor.birdview":  # Pseudosensor

@@ -20,11 +20,12 @@ import carla
 # ==================================================================================================
 
 class BaseSensor(object):
-    def __init__(self, name, attributes, interface, parent):
+    def __init__(self, name, attributes, interface, parent, other_actor_id):
         self.name = name
         self.attributes = attributes
         self.interface = interface
         self.parent = parent
+        self.other_actor_id = other_actor_id
 
         self.interface.register(self.name, self)
 
@@ -36,9 +37,9 @@ class BaseSensor(object):
 
     def update_sensor(self, data, frame):
         if not self.is_event_sensor():
-            self.interface._data_buffers.put((self.name, frame, self.parse(data)))
+            self.interface._data_buffers.put((self.name, frame, self.parse(data,self.parent,self.other_actor_id)))
         else:
-           self.interface._event_data_buffers.put((self.name, frame, self.parse(data)))
+           self.interface._event_data_buffers.put((self.name, frame, self.parse(data,self.parent,self.other_actor_id)))
 
     def callback(self, data):
         self.update_sensor(data, data.frame)
@@ -49,8 +50,8 @@ class BaseSensor(object):
 
 class CarlaSensor(BaseSensor):
 
-    def __init__(self, name, attributes, interface, parent):
-        super().__init__(name, attributes, interface, parent)
+    def __init__(self, name, attributes, interface, parent, other_actor_id):
+        super().__init__(name, attributes, interface, parent, other_actor_id)
 
         world = self.parent.get_world()
 
@@ -189,10 +190,10 @@ class Lidar(CarlaSensor):
 
 # import pickle
 class SemanticLidar(CarlaSensor):
-    def __init__(self, name, attributes, interface, parent):
-        super().__init__(name, attributes, interface, parent)
+    def __init__(self, name, attributes, interface, parent, other_actor_id):
+        super().__init__(name, attributes, interface, parent, other_actor_id )
 
-    def parse(self, sensor_data):
+    def parse(self, sensor_data, parent_actor, other_actor_id):
         """Parses the SemanticLidarMeasurememt into an numpy array"""
         # sensor_data: [x, y, z, cos(angle), actor index, semantic tag]
         # points = np.frombuffer(sensor_data.raw_data, dtype=np.dtype('f4'))
@@ -202,8 +203,11 @@ class SemanticLidar(CarlaSensor):
             ('CosAngle', np.float32), ('ObjIdx', np.uint32), ('ObjTag', np.uint32)]))
 
         # usable_indices = np.where((points['ObjTag'] == 10 | points['ObjTag'] == 8) & (abs(points['x']) - abs(points['y']) <= 0.01))
-
-        usable_indices = np.where((points['ObjTag'] == 8))
+        using_traffic = True
+        if using_traffic:
+            usable_indices = np.where(((points['ObjTag'] == 8) | (points['ObjTag'] == 10)) & ((points['ObjIdx'] != parent_actor.id) & (points['ObjIdx'] != other_actor_id) ))
+        else:
+            usable_indices = np.where((points['ObjTag'] == 8))
         # usable_indices = np.where((points['ObjTag'] == 8)& (points['x'] > 0) & (np.absolute(np.absolute(points['x']) - np.absolute(points['y'])) <= 2 ))
         #
         # temp = np.absolute(points['x']) - np.absolute(points['y'])
@@ -221,7 +225,7 @@ class SemanticLidar(CarlaSensor):
         # points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],ObjTagFloat]).T
 
         # else
-        points = np.array([points['x'],points['y']])
+        points = np.array([points['x'],points['y'], points['ObjTag']])
 
 
         # points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],points['ObjIdx'], points['ObjTag']])
@@ -302,9 +306,9 @@ class LaneInvasion(CarlaSensor):
 
 
 class Collision(CarlaSensor):
-    def __init__(self, name, attributes, interface, parent):
+    def __init__(self, name, attributes, interface, parent, other_actor_id):
         self._last_event_frame = 0
-        super().__init__(name, attributes, interface, parent)
+        super().__init__(name, attributes, interface, parent, other_actor_id)
 
     def callback(self, data):
         # The collision sensor can have multiple callbacks per tick. Get only the first one
@@ -315,7 +319,7 @@ class Collision(CarlaSensor):
     def is_event_sensor(self):
         return True
 
-    def parse(self, sensor_data):
+    def parse(self, sensor_data, parent_actor, other_actor_id):
         """Parses the ObstacleDetectionEvent into a list"""
         # sensor_data: [other actor, distance]
         # impulse = sensor_data.normal_impulse
