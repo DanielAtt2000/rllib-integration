@@ -442,8 +442,6 @@ class PPOExperimentBasic(BaseExperiment):
                          0, 0, -math.pi, -200, -200,
                          0, 0, -math.pi, -200, -200,
                          0, 0, -math.pi, -200, -200,
-                         0, 0, -math.pi, -200, -200,
-                         0, 0, -math.pi, -200, -200,
                          ]),
                     high=np.array(
                         [100, 200, 200, 200, 200, 25, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi,
@@ -453,8 +451,6 @@ class PPOExperimentBasic(BaseExperiment):
                          1, 1, 1, 1, 1, 1, 1,
                          # traffic
                          # velocity, acceleration, yaw, relative_x, relative_y
-                         100, 200, math.pi, 200, 200,
-                         100, 200, math.pi, 200, 200,
                          100, 200, math.pi, 200, 200,
                          100, 200, math.pi, 200, 200,
                          100, 200, math.pi, 200, 200,
@@ -925,7 +921,7 @@ class PPOExperimentBasic(BaseExperiment):
             # Velocity
 
             self.traffic_observations = []
-            max_no_of_vehicles = 5
+            max_no_of_vehicles = 3
             # First find the nearest 5 vehicles
             distance_to_truck = []
             for actor in core.actors:
@@ -1691,7 +1687,7 @@ class PPOExperimentBasic(BaseExperiment):
             print(f"trailer_bearing_to_waypoint_10:{np.float32(trailer_bearing_to_waypoint_10)}")
             # print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
             print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
-            for i in range(5):
+            for i in range(max_no_of_vehicles):
                 print(f'Vehicle {i}')
                 newI = i*5
                 print(f"Vehicle {i} Velcoity {self.traffic_observations[newI]}")
