@@ -1023,13 +1023,13 @@ class PPOExperimentBasic(BaseExperiment):
 
                 # static.sidewalk
 
-                self.last_no_of_collisions_truck = len(sensor_data[sensor][1]) + 10
+                self.last_no_of_collisions_truck = len(sensor_data[sensor][1])
                 self.collisions.append(['truck',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][1]),self.current_time])
 
                 print(f'COLLISIONS TRUCK {sensor_data[sensor][1][0]}')
 
             elif sensor == "collision_trailer":
-                self.last_no_of_collisions_trailer = len(sensor_data[sensor][1]) + 10
+                self.last_no_of_collisions_trailer = len(sensor_data[sensor][1])
                 self.collisions.append(['trailer',str(sensor_data[sensor][1][0].get_transform()),str(sensor_data[sensor][1][1]),self.current_time])
                 print(f'COLLISIONS TRAILER {sensor_data[sensor][1][0]}')
 
@@ -1761,7 +1761,7 @@ class PPOExperimentBasic(BaseExperiment):
 
         self.counter += 1
         return {'values':value_observations},\
-            {"truck_z_value":truck_transform.location.z,"distance_to_center_of_lane":distance_to_center_of_lane }
+            {"truck_z_value":truck_transform.location.z,"distance_to_center_of_lane":distance_to_center_of_lane, "truck_acceleration": self.get_acceleration(core.hero)}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
