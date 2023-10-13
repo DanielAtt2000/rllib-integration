@@ -441,7 +441,6 @@ class PPOExperimentBasic(BaseExperiment):
                          # velocity, acceleration, yaw, relative_x, relative_y
                          0, 0, -math.pi, -200, -200,
                          0, 0, -math.pi, -200, -200,
-                         0, 0, -math.pi, -200, -200,
                          ]),
                     high=np.array(
                         [100, 200, 200, 200, 200, 25, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi,
@@ -451,7 +450,6 @@ class PPOExperimentBasic(BaseExperiment):
                          1, 1, 1, 1, 1, 1, 1,
                          # traffic
                          # velocity, acceleration, yaw, relative_x, relative_y
-                         100, 200, math.pi, 200, 200,
                          100, 200, math.pi, 200, 200,
                          100, 200, math.pi, 200, 200,
                          ]),
@@ -921,7 +919,7 @@ class PPOExperimentBasic(BaseExperiment):
             # Velocity
 
             self.traffic_observations = []
-            max_no_of_vehicles = 3
+            max_no_of_vehicles = 2
             # First find the nearest 5 vehicles
             distance_to_truck = []
             for actor in core.actors:
