@@ -423,10 +423,17 @@ class CarlaCore:
         self.traffic_manager.set_hybrid_physics_mode(experiment_config["background_activity"]["tm_hybrid_mode"])
         # 8 because the trailer is around 13.8 /14 meters long and since this distance is
         # calcualted from the center of each vehicle
-        self.traffic_manager.set_global_distance_to_leading_vehicle(200)
+        self.traffic_manager.set_global_distance_to_leading_vehicle(300)
         self.traffic_manager.global_percentage_speed_difference(0)
         self.traffic_manager.set_respawn_dormant_vehicles(True)
         self.traffic_manager.set_synchronous_mode(True)
+        self.traffic_manager.set_hybrid_physics_radius(20)
+        self.traffic_manager.set_hybrid_physics_mode(True)
+        lower_bound = 25.0 # 25.0 is the lowest you can go
+        upper_bound = 50.0 # upper_bound has to be smaller than self.world.get_settings().actor_active_distance
+        assert upper_bound < self.world.get_settings().actor_active_distance
+
+        self.traffic_manager.set_boundaries_respawn_dormant_vehicles(lower_bound, upper_bound)
 
         seed = experiment_config["background_activity"]["seed"]
         if seed is not None:

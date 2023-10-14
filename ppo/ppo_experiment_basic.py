@@ -1600,11 +1600,11 @@ class PPOExperimentBasic(BaseExperiment):
         #     raise Exception('This should never happen')
 
         self.truck_lidar_collision = False
-        if any(lidar_point < 0.01 for lidar_point in truck_lidar_data_points):
+        if any(lidar_point < 0.0046 for lidar_point in truck_lidar_data_points):
             self.truck_lidar_collision = True
 
         self.trailer_lidar_collision = False
-        if any(lidar_point < 0.01 for lidar_point in trailer_lidar_data_points):
+        if any(lidar_point < 0.0046 for lidar_point in trailer_lidar_data_points):
             self.trailer_lidar_collision = True
 
 
@@ -1626,9 +1626,11 @@ class PPOExperimentBasic(BaseExperiment):
             # print(f"trailer_5 \t\t{round(trailer_5_left_sidewalk,2)}\t\t{round(trailer_5_right_sidewalk,2)}")
             print('Sidewalk lidar information')
             print(f"truck FRONT \t\t\t{np.float32(truck_center_sidewalk)}")
-            # print(f"truck 22 \t\t{np.float32(truck_front_22left)}\t\t{np.float32(truck_front_22right)}")
+            print(f"truck 15 \t\t{np.float32(truck_front_15left_sidewalk)}\t\t{np.float32(truck_front_15right_sidewalk)}")
+            print(f"truck 30 \t\t{np.float32(truck_front_30left_sidewalk)}\t\t{np.float32(truck_front_30right_sidewalk)}")
             print(f"truck 45 \t\t{np.float32(truck_front_45left_sidewalk)}\t\t{np.float32(truck_front_45right_sidewalk)}")
-            # print(f"truck 67 \t\t{np.float32(truck_front_67left)}\t\t{np.float32(truck_front_67right)}")
+            print(f"truck 60 \t\t{np.float32(truck_front_60left_sidewalk)}\t\t{np.float32(truck_front_60right_sidewalk)}")
+            print(f"truck 75 \t\t{np.float32(truck_front_75left_sidewalk)}\t\t{np.float32(truck_front_75right_sidewalk)}")
             print(f"truck sides \t\t{np.float32(truck_left_sidewalk)}\t\t{np.float32(truck_right_sidewalk)}")
             print(f"")
             print(f"trailer_0 \t\t{np.float32(trailer_0_left_sidewalk)}\t\t{np.float32(trailer_0_right_sidewalk)}")
@@ -1640,10 +1642,16 @@ class PPOExperimentBasic(BaseExperiment):
             if self.traffic:
                 print('Vehicle lidar Information')
                 print(f"truck FRONT \t\t\t{np.float32(truck_center_vehicle)}")
-                # print(f"truck 22 \t\t{np.float32(truck_front_22left)}\t\t{np.float32(truck_front_22right)}")
+                print(
+                    f"truck 15 \t\t{np.float32(truck_front_15left_vehicle)}\t\t{np.float32(truck_front_15right_vehicle)}")
+                print(
+                    f"truck 30 \t\t{np.float32(truck_front_30left_vehicle)}\t\t{np.float32(truck_front_30right_vehicle)}")
                 print(
                     f"truck 45 \t\t{np.float32(truck_front_45left_vehicle)}\t\t{np.float32(truck_front_45right_vehicle)}")
-                # print(f"truck 67 \t\t{np.float32(truck_front_67left)}\t\t{np.float32(truck_front_67right)}")
+                print(
+                    f"truck 60 \t\t{np.float32(truck_front_60left_vehicle)}\t\t{np.float32(truck_front_60right_vehicle)}")
+                print(
+                    f"truck 75 \t\t{np.float32(truck_front_75left_vehicle)}\t\t{np.float32(truck_front_75right_vehicle)}")
                 print(f"truck sides \t\t{np.float32(truck_left_vehicle)}\t\t{np.float32(truck_right_vehicle)}")
                 print(f"")
                 print(f"trailer_0 \t\t{np.float32(trailer_0_left_vehicle)}\t\t{np.float32(trailer_0_right_vehicle)}")
@@ -1654,37 +1662,37 @@ class PPOExperimentBasic(BaseExperiment):
                 print(f"trailer_5 \t\t{np.float32(trailer_5_left_vehicle)}\t\t{np.float32(trailer_5_right_vehicle)}")
             print('')
             print(f"forward_velocity:{np.float32(forward_velocity)}")
-            print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
-            print(f"hyp_distance_to_next_plus_1_waypoint:{np.float32(hyp_distance_to_next_plus_1_waypoint)}")
-            print(f"closest_distance_to_next_waypoint_line:{np.float32(closest_distance_to_next_waypoint_line)}")
-            print(f"closest_distance_to_next_plus_1_waypoint_line:{np.float32(closest_distance_to_next_plus_1_waypoint_line)}")
-            print(f"distance_to_center_of_lane:{np.float32(distance_to_center_of_lane)}")
-            print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
-            print(f"angle_to_center_of_lane_degrees_2:{np.float32(angle_to_center_of_lane_degrees_2)}")
-            print(f"angle_to_center_of_lane_degrees_5:{np.float32(angle_to_center_of_lane_degrees_5)}")
-            print(f"angle_to_center_of_lane_degrees_7:{np.float32(angle_to_center_of_lane_degrees_7)}")
-            print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
-            # print(f"angle_to_center_of_lane_degrees_ahead_waypoints_2:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2)}")
-            print(f"angle_between_waypoints_5:{np.float32(angle_between_waypoints_5)}")
-            print(f"angle_between_waypoints_7:{np.float32(angle_between_waypoints_7)}")
-            print(f"angle_between_waypoints_10:{np.float32(angle_between_waypoints_10)}")
-            print(f"angle_between_waypoints_12:{np.float32(angle_between_waypoints_12)}")
-            print(f"angle_between_waypoints_minus5:{np.float32(angle_between_waypoints_minus5)}")
-            print(f"angle_between_waypoints_minus7:{np.float32(angle_between_waypoints_minus7)}")
-            print(f"angle_between_waypoints_minus10:{np.float32(angle_between_waypoints_minus10)}")
-            print(f"angle_between_waypoints_minus12:{np.float32(angle_between_waypoints_minus12)}")
-            print(f"truck_bearing_to_waypoint:{np.float32(truck_bearing_to_waypoint)}")
-            print(f"truck_bearing_to_waypoint_2:{np.float32(truck_bearing_to_waypoint_2)}")
-            print(f"truck_bearing_to_waypoint_5:{np.float32(truck_bearing_to_waypoint_5)}")
-            print(f"truck_bearing_to_waypoint_7:{np.float32(truck_bearing_to_waypoint_7)}")
-            print(f"truck_bearing_to_waypoint_10:{np.float32(truck_bearing_to_waypoint_10)}")
-            print(f"trailer_bearing_to_waypoint:{np.float32(trailer_bearing_to_waypoint)}")
-            print(f"trailer_bearing_to_waypoint_2:{np.float32(trailer_bearing_to_waypoint_2)}")
-            print(f"trailer_bearing_to_waypoint_5:{np.float32(trailer_bearing_to_waypoint_5)}")
-            print(f"trailer_bearing_to_waypoint_7:{np.float32(trailer_bearing_to_waypoint_7)}")
-            print(f"trailer_bearing_to_waypoint_10:{np.float32(trailer_bearing_to_waypoint_10)}")
-            # print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
-            print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
+            # print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
+            # print(f"hyp_distance_to_next_plus_1_waypoint:{np.float32(hyp_distance_to_next_plus_1_waypoint)}")
+            # print(f"closest_distance_to_next_waypoint_line:{np.float32(closest_distance_to_next_waypoint_line)}")
+            # print(f"closest_distance_to_next_plus_1_waypoint_line:{np.float32(closest_distance_to_next_plus_1_waypoint_line)}")
+            # print(f"distance_to_center_of_lane:{np.float32(distance_to_center_of_lane)}")
+            # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
+            # print(f"angle_to_center_of_lane_degrees_2:{np.float32(angle_to_center_of_lane_degrees_2)}")
+            # print(f"angle_to_center_of_lane_degrees_5:{np.float32(angle_to_center_of_lane_degrees_5)}")
+            # print(f"angle_to_center_of_lane_degrees_7:{np.float32(angle_to_center_of_lane_degrees_7)}")
+            # print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
+            # # print(f"angle_to_center_of_lane_degrees_ahead_waypoints_2:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2)}")
+            # print(f"angle_between_waypoints_5:{np.float32(angle_between_waypoints_5)}")
+            # print(f"angle_between_waypoints_7:{np.float32(angle_between_waypoints_7)}")
+            # print(f"angle_between_waypoints_10:{np.float32(angle_between_waypoints_10)}")
+            # print(f"angle_between_waypoints_12:{np.float32(angle_between_waypoints_12)}")
+            # print(f"angle_between_waypoints_minus5:{np.float32(angle_between_waypoints_minus5)}")
+            # print(f"angle_between_waypoints_minus7:{np.float32(angle_between_waypoints_minus7)}")
+            # print(f"angle_between_waypoints_minus10:{np.float32(angle_between_waypoints_minus10)}")
+            # print(f"angle_between_waypoints_minus12:{np.float32(angle_between_waypoints_minus12)}")
+            # print(f"truck_bearing_to_waypoint:{np.float32(truck_bearing_to_waypoint)}")
+            # print(f"truck_bearing_to_waypoint_2:{np.float32(truck_bearing_to_waypoint_2)}")
+            # print(f"truck_bearing_to_waypoint_5:{np.float32(truck_bearing_to_waypoint_5)}")
+            # print(f"truck_bearing_to_waypoint_7:{np.float32(truck_bearing_to_waypoint_7)}")
+            # print(f"truck_bearing_to_waypoint_10:{np.float32(truck_bearing_to_waypoint_10)}")
+            # print(f"trailer_bearing_to_waypoint:{np.float32(trailer_bearing_to_waypoint)}")
+            # print(f"trailer_bearing_to_waypoint_2:{np.float32(trailer_bearing_to_waypoint_2)}")
+            # print(f"trailer_bearing_to_waypoint_5:{np.float32(trailer_bearing_to_waypoint_5)}")
+            # print(f"trailer_bearing_to_waypoint_7:{np.float32(trailer_bearing_to_waypoint_7)}")
+            # print(f"trailer_bearing_to_waypoint_10:{np.float32(trailer_bearing_to_waypoint_10)}")
+            # # print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
+            # print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
             for i in range(max_no_of_vehicles):
                 print(f'Vehicle {i}')
                 newI = i*5
