@@ -465,14 +465,14 @@ class PPOExperimentBasic(BaseExperiment):
                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                          0, 0, 0,
                          # Radius
-                         # 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0
                          ]),
                     high=np.array(
                         [100, 200, 200, 200, 200, 25, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi,
                          math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, 1, 1, 1, 1, 1,
                          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                          # Radius
-                         # 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1
                          ]),
                     dtype=np.float32
                 )
@@ -658,7 +658,7 @@ class PPOExperimentBasic(BaseExperiment):
         self.custom_enable_rendering = core.custom_enable_rendering
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S_%f")
 
-        # radii, mean_radius = get_radii(core.route,core.last_waypoint_index,5)
+        radii, mean_radius = get_radii(core.route,core.last_waypoint_index,5)
 
         self.entry_idx = core.entry_spawn_point_index
         self.exit_idx = core.exit_spawn_point_index
@@ -1591,7 +1591,7 @@ class PPOExperimentBasic(BaseExperiment):
         value_observations.extend(truck_lidar_data_points)
         # value_observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
-        # value_observations.extend(radii)
+        value_observations.extend(radii)
 
         if self.traffic:
             value_observations.extend(self.traffic_observations)
@@ -1752,7 +1752,7 @@ class PPOExperimentBasic(BaseExperiment):
         # self.acceleration.append(np.float32(acceleration))
         self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
         self.temp_route = deepcopy(core.route_points)
-        # self.radii.append(radii)
+        self.radii.append(radii)
         # self.mean_radius.append(mean_radius)
         #
         # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
