@@ -2,7 +2,7 @@
 # https://github.com/ray-project/ray/blob/master/rllib/agents/trainer.py
 
 framework: "torch"
-num_workers: 3
+num_workers: 2
 num_gpus: 1
 num_cpus_per_worker: 3
 gamma: 1
