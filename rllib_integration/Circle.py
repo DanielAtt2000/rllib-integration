@@ -142,14 +142,14 @@ def get_radii(route, last_waypoint_index,no_of_points_to_calculate_chord):
         r_0 = math.sqrt((x_center-perpendicular_bisectors[i].x_0)**2+(y_center-perpendicular_bisectors[i].y_0)**2)/100
         r_1 = math.sqrt((x_center-perpendicular_bisectors[i+1].x_1)**2+(y_center-perpendicular_bisectors[i+1].y_1)**2)/100
 
-        angle_between_starting_ending_point = calculate_angle_with_center_of_lane(
-            previous_position=Location(x=perpendicular_bisectors[i].x_0,y=perpendicular_bisectors[i].y_0,z=0),
-            current_position=Location(x=perpendicular_bisectors[i].x_1,y=perpendicular_bisectors[i].y_1,z=0),
-            next_position=Location(x=perpendicular_bisectors[i+1].x_1,y=perpendicular_bisectors[i+1].y_1,z=0))
+        # angle_between_starting_ending_point = calculate_angle_with_center_of_lane(
+        #     previous_position=Location(x=perpendicular_bisectors[i].x_0,y=perpendicular_bisectors[i].y_0,z=0),
+        #     current_position=Location(x=perpendicular_bisectors[i].x_1,y=perpendicular_bisectors[i].y_1,z=0),
+        #     next_position=Location(x=perpendicular_bisectors[i+1].x_1,y=perpendicular_bisectors[i+1].y_1,z=0))
 
         sign = 1
-        if angle_between_starting_ending_point < 0:
-            sign = -1
+        # if angle_between_starting_ending_point < 0:
+        #     sign = -1
 
         assert max_radius_value_before_sign == 1
         riadus = np.clip((r_0 + r_1) / 2, 0, max_radius_value_before_sign)

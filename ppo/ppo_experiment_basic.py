@@ -463,12 +463,17 @@ class PPOExperimentBasic(BaseExperiment):
                         [0, 0, 0, 0, 0, 0, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi,
                          -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, 0, 0,
                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+                         0, 0, 0,
+                         # Radius
+                         # 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                         ]),
                     high=np.array(
                         [100, 200, 200, 200, 200, 25, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi,
                          math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, 1, 1, 1, 1, 1,
                          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1]),
+                         # Radius
+                         # 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+                         ]),
                     dtype=np.float32
                 )
             })
@@ -502,60 +507,60 @@ class PPOExperimentBasic(BaseExperiment):
             # 1: [0, 0.00, 1.0, False, False],  # full brake
             # 1: [0, 0.00, 1.0, False, False],  # full brake
             # Discrete with pid value
-            # 0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
-            # 1: [acceleration_value, 0.80, 0.0, False, False],  # Right
-            # 2: [acceleration_value, 0.60, 0.0, False, False],  # Right
-            # 3: [acceleration_value, 0.40, 0.0, False, False],  # Right
-            # 4: [acceleration_value, 0.20, 0.0, False, False],  # Right
-            # 5: [acceleration_value, -0.80, 0.0, False, False],  # Left
-            # 6: [acceleration_value, -0.60, 0.0, False, False],  # Left
-            # 7: [acceleration_value, -0.40, 0.0, False, False],  # Left
-            # 8: [acceleration_value, -0.20, 0.0, False, False],  # Left
+            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
+            1: [acceleration_value, 0.80, 0.0, False, False],  # Right
+            2: [acceleration_value, 0.60, 0.0, False, False],  # Right
+            3: [acceleration_value, 0.40, 0.0, False, False],  # Right
+            4: [acceleration_value, 0.20, 0.0, False, False],  # Right
+            5: [acceleration_value, -0.80, 0.0, False, False],  # Left
+            6: [acceleration_value, -0.60, 0.0, False, False],  # Left
+            7: [acceleration_value, -0.40, 0.0, False, False],  # Left
+            8: [acceleration_value, -0.20, 0.0, False, False],  # Left
 
 
             # Discrete with custom acceleration
-            0: [0.0, 0.00, 0.0, False, False],  # Dont Move
-            1: [0.0, 0.00, 1.0, False, False],  # Brake
-
-            2: [0.1, 0.00, 0.0, False, False],  # Straight
-            3: [0.1, 0.80, 0.0, False, False],  # Right
-            4: [0.1, 0.60, 0.0, False, False],  # Right
-            5: [0.1, 0.40, 0.0, False, False],  # Right
-            6: [0.1, 0.20, 0.0, False, False],  # Right
-            7: [0.1, -0.80, 0.0, False, False],  # Left
-            8: [0.1, -0.60, 0.0, False, False],  # Left
-            9: [0.1, -0.40, 0.0, False, False],  # Left
-            10: [0.1, -0.20, 0.0, False, False],  # Left
-
-            11: [0.3, 0.00, 0.0, False, False],  # Straight
-            12: [0.3, 0.80, 0.0, False, False],  # Right
-            13: [0.3, 0.60, 0.0, False, False],  # Right
-            14: [0.3, 0.40, 0.0, False, False],  # Right
-            15: [0.3, 0.20, 0.0, False, False],  # Right
-            16: [0.3, -0.80, 0.0, False, False],  # Left
-            17: [0.3, -0.60, 0.0, False, False],  # Left
-            18: [0.3, -0.40, 0.0, False, False],  # Left
-            19: [0.3, -0.20, 0.0, False, False],  # Left
-
-            20: [0.6, 0.00, 0.0, False, False],  # Straight
-            21: [0.6, 0.80, 0.0, False, False],  # Right
-            22: [0.6, 0.60, 0.0, False, False],  # Right
-            23: [0.6, 0.40, 0.0, False, False],  # Right
-            24: [0.6, 0.20, 0.0, False, False],  # Right
-            25: [0.6, -0.80, 0.0, False, False],  # Left
-            26: [0.6, -0.60, 0.0, False, False],  # Left
-            27: [0.6, -0.40, 0.0, False, False],  # Left
-            28: [0.6, -0.20, 0.0, False, False],  # Left
-
-            29: [0.9, 0.00, 0.0, False, False],  # Straight
-            30: [0.9, 0.80, 0.0, False, False],  # Right
-            31: [0.9, 0.60, 0.0, False, False],  # Right
-            32: [0.9, 0.40, 0.0, False, False],  # Right
-            33: [0.9, 0.20, 0.0, False, False],  # Right
-            34: [0.9, -0.80, 0.0, False, False],  # Left
-            35: [0.9, -0.60, 0.0, False, False],  # Left
-            36: [0.9, -0.40, 0.0, False, False],  # Left
-            37: [0.9, -0.20, 0.0, False, False],  # Left
+            # 0: [0.0, 0.00, 0.0, False, False],  # Dont Move
+            # 1: [0.0, 0.00, 1.0, False, False],  # Brake
+            #
+            # 2: [0.1, 0.00, 0.0, False, False],  # Straight
+            # 3: [0.1, 0.80, 0.0, False, False],  # Right
+            # 4: [0.1, 0.60, 0.0, False, False],  # Right
+            # 5: [0.1, 0.40, 0.0, False, False],  # Right
+            # 6: [0.1, 0.20, 0.0, False, False],  # Right
+            # 7: [0.1, -0.80, 0.0, False, False],  # Left
+            # 8: [0.1, -0.60, 0.0, False, False],  # Left
+            # 9: [0.1, -0.40, 0.0, False, False],  # Left
+            # 10: [0.1, -0.20, 0.0, False, False],  # Left
+            #
+            # 11: [0.3, 0.00, 0.0, False, False],  # Straight
+            # 12: [0.3, 0.80, 0.0, False, False],  # Right
+            # 13: [0.3, 0.60, 0.0, False, False],  # Right
+            # 14: [0.3, 0.40, 0.0, False, False],  # Right
+            # 15: [0.3, 0.20, 0.0, False, False],  # Right
+            # 16: [0.3, -0.80, 0.0, False, False],  # Left
+            # 17: [0.3, -0.60, 0.0, False, False],  # Left
+            # 18: [0.3, -0.40, 0.0, False, False],  # Left
+            # 19: [0.3, -0.20, 0.0, False, False],  # Left
+            #
+            # 20: [0.6, 0.00, 0.0, False, False],  # Straight
+            # 21: [0.6, 0.80, 0.0, False, False],  # Right
+            # 22: [0.6, 0.60, 0.0, False, False],  # Right
+            # 23: [0.6, 0.40, 0.0, False, False],  # Right
+            # 24: [0.6, 0.20, 0.0, False, False],  # Right
+            # 25: [0.6, -0.80, 0.0, False, False],  # Left
+            # 26: [0.6, -0.60, 0.0, False, False],  # Left
+            # 27: [0.6, -0.40, 0.0, False, False],  # Left
+            # 28: [0.6, -0.20, 0.0, False, False],  # Left
+            #
+            # 29: [0.9, 0.00, 0.0, False, False],  # Straight
+            # 30: [0.9, 0.80, 0.0, False, False],  # Right
+            # 31: [0.9, 0.60, 0.0, False, False],  # Right
+            # 32: [0.9, 0.40, 0.0, False, False],  # Right
+            # 33: [0.9, 0.20, 0.0, False, False],  # Right
+            # 34: [0.9, -0.80, 0.0, False, False],  # Left
+            # 35: [0.9, -0.60, 0.0, False, False],  # Left
+            # 36: [0.9, -0.40, 0.0, False, False],  # Left
+            # 37: [0.9, -0.20, 0.0, False, False],  # Left
 
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
@@ -653,7 +658,7 @@ class PPOExperimentBasic(BaseExperiment):
         self.custom_enable_rendering = core.custom_enable_rendering
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S_%f")
 
-        radii, mean_radius = get_radii(core.route,core.last_waypoint_index,5)
+        # radii, mean_radius = get_radii(core.route,core.last_waypoint_index,5)
 
         self.entry_idx = core.entry_spawn_point_index
         self.exit_idx = core.exit_spawn_point_index
@@ -1586,7 +1591,7 @@ class PPOExperimentBasic(BaseExperiment):
         value_observations.extend(truck_lidar_data_points)
         # value_observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
-        value_observations.extend(radii)
+        # value_observations.extend(radii)
 
         if self.traffic:
             value_observations.extend(self.traffic_observations)
@@ -1614,8 +1619,8 @@ class PPOExperimentBasic(BaseExperiment):
         if self.custom_enable_rendering:
             print(f'Entry Points {core.entry_spawn_point_index}| Exit point {core.exit_spawn_point_index}')
             # print(f'Route Type {route_type}')
-            print(f"Radii {radii}")
-            print(f'Mean radius {mean_radius}')
+            # print(f"Radii {radii}")
+            # print(f'Mean radius {mean_radius}')
             # print(f"truck FRONT \t\t\t{round(truck_center_sidewalk, 2)}")
             # print(f"truck 45 \t\t{round(truck_front_left,2)}\t\t{round(truck_front_right,2)}")
             # print(f"truck sides \t\t{round(truck_left_sidewalk, 2)}\t\t{round(truck_right_sidewalk, 2)}")
@@ -1747,8 +1752,8 @@ class PPOExperimentBasic(BaseExperiment):
         # self.acceleration.append(np.float32(acceleration))
         self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
         self.temp_route = deepcopy(core.route_points)
-        self.radii.append(radii)
-        self.mean_radius.append(mean_radius)
+        # self.radii.append(radii)
+        # self.mean_radius.append(mean_radius)
         #
         # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
         # print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
@@ -1963,12 +1968,10 @@ class PPOExperimentBasic(BaseExperiment):
         # print(f'Reward a {1/proportional_forward_velocity}')
 
         # for smooth velocity
-        difference_in_velocities = self.last_forward_velocity - forward_velocity
-        proportional_difference_in_velocities = (5/120) * (np.clip(abs(difference_in_velocities), 0, 1.2))
-        reward = reward - proportional_difference_in_velocities
-
-
-        self.last_forward_velocity = forward_velocity
+        # difference_in_velocities = self.last_forward_velocity - forward_velocity
+        # proportional_difference_in_velocities = (5/120) * (np.clip(abs(difference_in_velocities), 0, 1.2))
+        # reward = reward - proportional_difference_in_velocities
+        # self.last_forward_velocity = forward_velocity
 
 
 
@@ -1987,10 +1990,10 @@ class PPOExperimentBasic(BaseExperiment):
         #
         #     reward = reward + reward_bearing_to_ahead_waypoints_ahead
 
-        if forward_velocity < 0.75:
-            # Negative reward for no velocity
-            print('REWARD -100 for velocity') if self.custom_enable_rendering else None
-            reward = reward + 0
+        # if forward_velocity < 0.75:
+        #     # Negative reward for no velocity
+        #     print('REWARD -100 for velocity') if self.custom_enable_rendering else None
+        #     reward = reward + 0
 
         # Negative reward each timestep
         # reward = reward + -1
