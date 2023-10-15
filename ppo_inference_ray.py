@@ -30,6 +30,7 @@ EXPERIMENT_CLASS = PPOExperimentBasic
 # python3 ./ppo_inference_ray.py ppo/ppo_config.yaml
 # /home/daniel/ray_results/carla_rllib/ppo_02152f79ae_DO_NOT_DELETE/CustomPPOTrainer_CarlaEnv_b14f2_00000_0_2023-09-30_07-53-34/checkpoint_005000
 # /home/daniel/ray_results/carla_rllib/ppo_30e97a9090_DO_NOT_DELETE/CustomPPOTrainer_CarlaEnv_5fe5f_00000_0_2023-10-07_19-03-02/checkpoint_002500
+# /home/daniel/ray_results/carla_rllib/ppo_f0a9aeaa3d_DO_NOT_DELETE/CustomPPOTrainer_CarlaEnv_4bfb9_00000_0_2023-10-14_10-54-34/checkpoint_001500
 def save_to_pickle(filename, data):
     filename = filename + '.pickle'
     with open(filename, 'wb') as handle:

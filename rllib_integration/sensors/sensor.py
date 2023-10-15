@@ -203,7 +203,7 @@ class SemanticLidar(CarlaSensor):
             ('CosAngle', np.float32), ('ObjIdx', np.uint32), ('ObjTag', np.uint32)]))
 
         # usable_indices = np.where((points['ObjTag'] == 10 | points['ObjTag'] == 8) & (abs(points['x']) - abs(points['y']) <= 0.01))
-        using_traffic = True
+        using_traffic = False
         if using_traffic:
             usable_indices = np.where(((points['ObjTag'] == 8) | (points['ObjTag'] == 10)) & ((points['ObjIdx'] != parent_actor.id) & (points['ObjIdx'] != other_actor_id) ))
         else:

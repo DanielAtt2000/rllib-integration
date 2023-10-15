@@ -964,22 +964,23 @@ class PPOExperimentBasic(BaseExperiment):
         trailer_7_left_sidewalk = 0
         trailer_7_right_sidewalk = 0
 
-        trailer_0_left_vehicle = 0
-        trailer_0_right_vehicle = 0
-        trailer_1_left_vehicle = 0
-        trailer_1_right_vehicle = 0
-        trailer_2_left_vehicle = 0
-        trailer_2_right_vehicle = 0
-        trailer_3_left_vehicle = 0
-        trailer_3_right_vehicle = 0
-        trailer_4_left_vehicle = 0
-        trailer_4_right_vehicle = 0
-        trailer_5_left_vehicle = 0
-        trailer_5_right_vehicle = 0
-        trailer_6_left_vehicle = 0
-        trailer_6_right_vehicle = 0
-        trailer_7_left_vehicle = 0
-        trailer_7_right_vehicle = 0
+        if self.traffic:
+            trailer_0_left_vehicle = 0
+            trailer_0_right_vehicle = 0
+            trailer_1_left_vehicle = 0
+            trailer_1_right_vehicle = 0
+            trailer_2_left_vehicle = 0
+            trailer_2_right_vehicle = 0
+            trailer_3_left_vehicle = 0
+            trailer_3_right_vehicle = 0
+            trailer_4_left_vehicle = 0
+            trailer_4_right_vehicle = 0
+            trailer_5_left_vehicle = 0
+            trailer_5_right_vehicle = 0
+            trailer_6_left_vehicle = 0
+            trailer_6_right_vehicle = 0
+            trailer_7_left_vehicle = 0
+            trailer_7_right_vehicle = 0
 
         truck_center_sidewalk = 0
         truck_right_sidewalk = 0
@@ -995,19 +996,20 @@ class PPOExperimentBasic(BaseExperiment):
         truck_front_60left_sidewalk = 0
         truck_front_75left_sidewalk = 0
 
-        truck_center_vehicle = 0
-        truck_right_vehicle = 0
-        truck_left_vehicle = 0
-        truck_front_15right_vehicle = 0
-        truck_front_30right_vehicle = 0
-        truck_front_45right_vehicle = 0
-        truck_front_60right_vehicle = 0
-        truck_front_75right_vehicle = 0
-        truck_front_15left_vehicle = 0
-        truck_front_30left_vehicle = 0
-        truck_front_45left_vehicle = 0
-        truck_front_60left_vehicle = 0
-        truck_front_75left_vehicle = 0
+        if self.traffic:
+            truck_center_vehicle = 0
+            truck_right_vehicle = 0
+            truck_left_vehicle = 0
+            truck_front_15right_vehicle = 0
+            truck_front_30right_vehicle = 0
+            truck_front_45right_vehicle = 0
+            truck_front_60right_vehicle = 0
+            truck_front_75right_vehicle = 0
+            truck_front_15left_vehicle = 0
+            truck_front_30left_vehicle = 0
+            truck_front_45left_vehicle = 0
+            truck_front_60left_vehicle = 0
+            truck_front_75left_vehicle = 0
 
         for sensor in sensor_data:
             if sensor == 'collision_truck':
@@ -1600,11 +1602,11 @@ class PPOExperimentBasic(BaseExperiment):
         #     raise Exception('This should never happen')
 
         self.truck_lidar_collision = False
-        if any(lidar_point < 0.0046 for lidar_point in truck_lidar_data_points):
+        if any(lidar_point < 0.01 for lidar_point in truck_lidar_data_points):
             self.truck_lidar_collision = True
 
         self.trailer_lidar_collision = False
-        if any(lidar_point < 0.0046 for lidar_point in trailer_lidar_data_points):
+        if any(lidar_point < 0.01 for lidar_point in trailer_lidar_data_points):
             self.trailer_lidar_collision = True
 
 
@@ -1693,14 +1695,15 @@ class PPOExperimentBasic(BaseExperiment):
             # print(f"trailer_bearing_to_waypoint_10:{np.float32(trailer_bearing_to_waypoint_10)}")
             # # print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
             # print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
-            for i in range(max_no_of_vehicles):
-                print(f'Vehicle {i}')
-                newI = i*5
-                print(f"Vehicle {i} Velcoity {self.traffic_observations[newI]}")
-                print(f"Vehicle {i} Acceleration {self.traffic_observations[newI+1]}")
-                print(f"Vehicle {i} Yaw {self.traffic_observations[newI+2]}")
-                print(f"Vehicle {i} Relative X {self.traffic_observations[newI+3]}")
-                print(f"Vehicle {i} Relative Y {self.traffic_observations[newI+4]}")
+            if self.traffic:
+                for i in range(max_no_of_vehicles):
+                    print(f'Vehicle {i}')
+                    newI = i*5
+                    print(f"Vehicle {i} Velcoity {self.traffic_observations[newI]}")
+                    print(f"Vehicle {i} Acceleration {self.traffic_observations[newI+1]}")
+                    print(f"Vehicle {i} Yaw {self.traffic_observations[newI+2]}")
+                    print(f"Vehicle {i} Relative X {self.traffic_observations[newI+3]}")
+                    print(f"Vehicle {i} Relative Y {self.traffic_observations[newI+4]}")
 
             print('')
             print('')

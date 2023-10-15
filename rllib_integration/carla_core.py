@@ -413,42 +413,43 @@ class CarlaCore:
         weather = getattr(carla.WeatherParameters, "Default")
         self.world.set_weather(weather)
 
-        self.tm_port = self.server_port // 10 + self.server_port % 10
-        while is_used(self.tm_port):
-            print("Traffic manager's port " + str(self.tm_port) + " is already being used. Checking the next one")
-            self.tm_port += 1
-        print("Traffic manager connected to port " + str(self.tm_port))
+        if experiment_config["others"]["traffic"]:
+            self.tm_port = self.server_port // 10 + self.server_port % 10
+            while is_used(self.tm_port):
+                print("Traffic manager's port " + str(self.tm_port) + " is already being used. Checking the next one")
+                self.tm_port += 1
+            print("Traffic manager connected to port " + str(self.tm_port))
 
-        self.traffic_manager = self.client.get_trafficmanager(self.tm_port)
-        self.traffic_manager.set_hybrid_physics_mode(experiment_config["background_activity"]["tm_hybrid_mode"])
-        # 8 because the trailer is around 13.8 /14 meters long and since this distance is
-        # calcualted from the center of each vehicle
-        self.traffic_manager.set_global_distance_to_leading_vehicle(300)
-        self.traffic_manager.global_percentage_speed_difference(0)
-        self.traffic_manager.set_respawn_dormant_vehicles(True)
-        self.traffic_manager.set_synchronous_mode(True)
-        self.traffic_manager.set_hybrid_physics_radius(20)
-        self.traffic_manager.set_hybrid_physics_mode(True)
-        lower_bound = 25.0 # 25.0 is the lowest you can go
-        upper_bound = 50.0 # upper_bound has to be smaller than self.world.get_settings().actor_active_distance
-        assert upper_bound < self.world.get_settings().actor_active_distance
+            self.traffic_manager = self.client.get_trafficmanager(self.tm_port)
+            self.traffic_manager.set_hybrid_physics_mode(experiment_config["background_activity"]["tm_hybrid_mode"])
+            # 8 because the trailer is around 13.8 /14 meters long and since this distance is
+            # calcualted from the center of each vehicle
+            self.traffic_manager.set_global_distance_to_leading_vehicle(300)
+            self.traffic_manager.global_percentage_speed_difference(0)
+            self.traffic_manager.set_respawn_dormant_vehicles(True)
+            self.traffic_manager.set_synchronous_mode(True)
+            self.traffic_manager.set_hybrid_physics_radius(20)
+            self.traffic_manager.set_hybrid_physics_mode(True)
+            lower_bound = 25.0 # 25.0 is the lowest you can go
+            upper_bound = 50.0 # upper_bound has to be smaller than self.world.get_settings().actor_active_distance
+            assert upper_bound < self.world.get_settings().actor_active_distance
 
-        self.traffic_manager.set_boundaries_respawn_dormant_vehicles(lower_bound, upper_bound)
+            self.traffic_manager.set_boundaries_respawn_dormant_vehicles(lower_bound, upper_bound)
 
-        seed = experiment_config["background_activity"]["seed"]
-        if seed is not None:
-            self.traffic_manager.set_random_device_seed(seed)
+            seed = experiment_config["background_activity"]["seed"]
+            if seed is not None:
+                self.traffic_manager.set_random_device_seed(seed)
 
-        # Spawn the background activity
-        self.spawn_npcs(
-            experiment_config["background_activity"]["n_vehicles"],
-            experiment_config["background_activity"]["n_walkers"],
-        )
+            # Spawn the background activity
+            self.spawn_npcs(
+                experiment_config["background_activity"]["n_vehicles"],
+                experiment_config["background_activity"]["n_walkers"],
+            )
 
-        for actor in self.actors:
-            self.traffic_manager.ignore_vehicles_percentage(actor, 0)
-            actor.set_target_velocity(carla.Vector3D(x=4,y=0,z=0))
-            # self.traffic_manager.ignore_walkers_percentage(actor, 100)
+            for actor in self.actors:
+                self.traffic_manager.ignore_vehicles_percentage(actor, 0)
+                actor.set_target_velocity(carla.Vector3D(x=4,y=0,z=0))
+                # self.traffic_manager.ignore_walkers_percentage(actor, 100)
 
 
 
