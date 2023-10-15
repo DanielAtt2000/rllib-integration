@@ -461,23 +461,37 @@ class PPOExperimentBasic(BaseExperiment):
                 'values': Box(
                     low=np.array(
                         [0, 0, 0, 0, 0, 0,
-                         -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi,
+                         # Angle to center of lane
+                         -math.pi, -math.pi, -math.pi, -math.pi, -math.pi,
+                         # Truck bearing to waypoint
+                         -math.pi, -math.pi, -math.pi, -math.pi, -math.pi,
+                         # Trailer bearing to waypoint
+                         -math.pi, -math.pi, -math.pi, -math.pi, -math.pi,
+                         # Angle between truck and trailer
+                         -math.pi,
                          # Angle between waypoints
-                         # -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi,
+                         # 0, 0, 0, 0, 0, 0, 0, 0,
                          # Lidar data
-                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                          # Radius
                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0
                          ]),
                     high=np.array(
                         [100, 200, 200, 200, 200, 25,
-                         math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi,
+                         # Angle to center of lane
+                         math.pi, math.pi, math.pi, math.pi, math.pi,
+                         # Truck bearing to waypoint
+                         math.pi, math.pi, math.pi, math.pi, math.pi,
+                         # Trailer bearing to waypoint
+                         math.pi, math.pi, math.pi, math.pi, math.pi,
+                         # Angle between truck and trailer
+                         math.pi,
                          # Angle between waypoints
-                         # math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi,
+                         # 1, 1, 1, 1, 1, 1, 1, 1,
                          # Lidar data
-                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                          # Radius
                          1, 1, 1, 1, 1, 1, 1, 1, 1, 1
                          ]),
