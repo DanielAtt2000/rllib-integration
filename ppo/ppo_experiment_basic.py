@@ -470,7 +470,7 @@ class PPOExperimentBasic(BaseExperiment):
                          # Angle between truck and trailer
                          -math.pi,
                          # Angle between waypoints
-                         # 0, 0, 0, 0, 0, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0,
                          # Lidar data
                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -488,7 +488,7 @@ class PPOExperimentBasic(BaseExperiment):
                          # Angle between truck and trailer
                          math.pi,
                          # Angle between waypoints
-                         # 1, 1, 1, 1, 1, 1, 1, 1,
+                         1, 1, 1, 1, 1, 1, 1, 1,
                          # Lidar data
                          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -528,60 +528,60 @@ class PPOExperimentBasic(BaseExperiment):
             # 1: [0, 0.00, 1.0, False, False],  # full brake
             # 1: [0, 0.00, 1.0, False, False],  # full brake
             # Discrete with pid value
-            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
-            1: [acceleration_value, 0.80, 0.0, False, False],  # Right
-            2: [acceleration_value, 0.60, 0.0, False, False],  # Right
-            3: [acceleration_value, 0.40, 0.0, False, False],  # Right
-            4: [acceleration_value, 0.20, 0.0, False, False],  # Right
-            5: [acceleration_value, -0.80, 0.0, False, False],  # Left
-            6: [acceleration_value, -0.60, 0.0, False, False],  # Left
-            7: [acceleration_value, -0.40, 0.0, False, False],  # Left
-            8: [acceleration_value, -0.20, 0.0, False, False],  # Left
+            # 0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
+            # 1: [acceleration_value, 0.80, 0.0, False, False],  # Right
+            # 2: [acceleration_value, 0.60, 0.0, False, False],  # Right
+            # 3: [acceleration_value, 0.40, 0.0, False, False],  # Right
+            # 4: [acceleration_value, 0.20, 0.0, False, False],  # Right
+            # 5: [acceleration_value, -0.80, 0.0, False, False],  # Left
+            # 6: [acceleration_value, -0.60, 0.0, False, False],  # Left
+            # 7: [acceleration_value, -0.40, 0.0, False, False],  # Left
+            # 8: [acceleration_value, -0.20, 0.0, False, False],  # Left
 
 
             # Discrete with custom acceleration
-            # 0: [0.0, 0.00, 0.0, False, False],  # Dont Move
-            # 1: [0.0, 0.00, 1.0, False, False],  # Brake
-            #
-            # 2: [0.1, 0.00, 0.0, False, False],  # Straight
-            # 3: [0.1, 0.80, 0.0, False, False],  # Right
-            # 4: [0.1, 0.60, 0.0, False, False],  # Right
-            # 5: [0.1, 0.40, 0.0, False, False],  # Right
-            # 6: [0.1, 0.20, 0.0, False, False],  # Right
-            # 7: [0.1, -0.80, 0.0, False, False],  # Left
-            # 8: [0.1, -0.60, 0.0, False, False],  # Left
-            # 9: [0.1, -0.40, 0.0, False, False],  # Left
-            # 10: [0.1, -0.20, 0.0, False, False],  # Left
-            #
-            # 11: [0.3, 0.00, 0.0, False, False],  # Straight
-            # 12: [0.3, 0.80, 0.0, False, False],  # Right
-            # 13: [0.3, 0.60, 0.0, False, False],  # Right
-            # 14: [0.3, 0.40, 0.0, False, False],  # Right
-            # 15: [0.3, 0.20, 0.0, False, False],  # Right
-            # 16: [0.3, -0.80, 0.0, False, False],  # Left
-            # 17: [0.3, -0.60, 0.0, False, False],  # Left
-            # 18: [0.3, -0.40, 0.0, False, False],  # Left
-            # 19: [0.3, -0.20, 0.0, False, False],  # Left
-            #
-            # 20: [0.6, 0.00, 0.0, False, False],  # Straight
-            # 21: [0.6, 0.80, 0.0, False, False],  # Right
-            # 22: [0.6, 0.60, 0.0, False, False],  # Right
-            # 23: [0.6, 0.40, 0.0, False, False],  # Right
-            # 24: [0.6, 0.20, 0.0, False, False],  # Right
-            # 25: [0.6, -0.80, 0.0, False, False],  # Left
-            # 26: [0.6, -0.60, 0.0, False, False],  # Left
-            # 27: [0.6, -0.40, 0.0, False, False],  # Left
-            # 28: [0.6, -0.20, 0.0, False, False],  # Left
-            #
-            # 29: [0.9, 0.00, 0.0, False, False],  # Straight
-            # 30: [0.9, 0.80, 0.0, False, False],  # Right
-            # 31: [0.9, 0.60, 0.0, False, False],  # Right
-            # 32: [0.9, 0.40, 0.0, False, False],  # Right
-            # 33: [0.9, 0.20, 0.0, False, False],  # Right
-            # 34: [0.9, -0.80, 0.0, False, False],  # Left
-            # 35: [0.9, -0.60, 0.0, False, False],  # Left
-            # 36: [0.9, -0.40, 0.0, False, False],  # Left
-            # 37: [0.9, -0.20, 0.0, False, False],  # Left
+            0: [0.0, 0.00, 0.0, False, False],  # Dont Move
+            1: [0.0, 0.00, 1.0, False, False],  # Brake
+
+            2: [0.1, 0.00, 0.0, False, False],  # Straight
+            3: [0.1, 0.80, 0.0, False, False],  # Right
+            4: [0.1, 0.60, 0.0, False, False],  # Right
+            5: [0.1, 0.40, 0.0, False, False],  # Right
+            6: [0.1, 0.20, 0.0, False, False],  # Right
+            7: [0.1, -0.80, 0.0, False, False],  # Left
+            8: [0.1, -0.60, 0.0, False, False],  # Left
+            9: [0.1, -0.40, 0.0, False, False],  # Left
+            10: [0.1, -0.20, 0.0, False, False],  # Left
+
+            11: [0.3, 0.00, 0.0, False, False],  # Straight
+            12: [0.3, 0.80, 0.0, False, False],  # Right
+            13: [0.3, 0.60, 0.0, False, False],  # Right
+            14: [0.3, 0.40, 0.0, False, False],  # Right
+            15: [0.3, 0.20, 0.0, False, False],  # Right
+            16: [0.3, -0.80, 0.0, False, False],  # Left
+            17: [0.3, -0.60, 0.0, False, False],  # Left
+            18: [0.3, -0.40, 0.0, False, False],  # Left
+            19: [0.3, -0.20, 0.0, False, False],  # Left
+
+            20: [0.6, 0.00, 0.0, False, False],  # Straight
+            21: [0.6, 0.80, 0.0, False, False],  # Right
+            22: [0.6, 0.60, 0.0, False, False],  # Right
+            23: [0.6, 0.40, 0.0, False, False],  # Right
+            24: [0.6, 0.20, 0.0, False, False],  # Right
+            25: [0.6, -0.80, 0.0, False, False],  # Left
+            26: [0.6, -0.60, 0.0, False, False],  # Left
+            27: [0.6, -0.40, 0.0, False, False],  # Left
+            28: [0.6, -0.20, 0.0, False, False],  # Left
+
+            29: [0.9, 0.00, 0.0, False, False],  # Straight
+            30: [0.9, 0.80, 0.0, False, False],  # Right
+            31: [0.9, 0.60, 0.0, False, False],  # Right
+            32: [0.9, 0.40, 0.0, False, False],  # Right
+            33: [0.9, 0.20, 0.0, False, False],  # Right
+            34: [0.9, -0.80, 0.0, False, False],  # Left
+            35: [0.9, -0.60, 0.0, False, False],  # Left
+            36: [0.9, -0.40, 0.0, False, False],  # Left
+            37: [0.9, -0.20, 0.0, False, False],  # Left
 
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
@@ -813,74 +813,74 @@ class PPOExperimentBasic(BaseExperiment):
             clipped = np.clip(abs(value),0,normalisation_value)
             return clipped/normalisation_value
 
-        # if core.last_waypoint_index - 5 > 0:
-        #     angle_between_waypoints_minus5 = calculate_angle_with_center_of_lane(
-        #         previous_position=core.route[core.last_waypoint_index].location,
-        #         current_position=core.route[core.last_waypoint_index - 5].location,
-        #         next_position=core.route[core.last_waypoint_index + 5].location)
-        #     angle_between_waypoints_minus5 = abs_clip_normalise(angle_between_waypoints_minus5, math.pi)
-        # else:
-        #     angle_between_waypoints_minus5 = 1
-        #
-        # if core.last_waypoint_index - 7 > 0:
-        #     angle_between_waypoints_minus7 = calculate_angle_with_center_of_lane(
-        #         previous_position=core.route[core.last_waypoint_index].location,
-        #         current_position=core.route[core.last_waypoint_index - 7].location,
-        #         next_position=core.route[core.last_waypoint_index + 7].location)
-        #     angle_between_waypoints_minus7 = abs_clip_normalise(angle_between_waypoints_minus7, math.pi)
-        # else:
-        #     angle_between_waypoints_minus7 = 1
-        #
-        # if core.last_waypoint_index - 10 > 0:
-        #     angle_between_waypoints_minus10 = calculate_angle_with_center_of_lane(
-        #         previous_position=core.route[core.last_waypoint_index].location,
-        #         current_position=core.route[core.last_waypoint_index - 10].location,
-        #         next_position=core.route[core.last_waypoint_index + 10].location)
-        #     angle_between_waypoints_minus10 = abs_clip_normalise(angle_between_waypoints_minus10, math.pi)
-        # else:
-        #     angle_between_waypoints_minus10 = 1
-        #
-        # if core.last_waypoint_index - 12 > 0:
-        #     angle_between_waypoints_minus12 = calculate_angle_with_center_of_lane(
-        #         previous_position=core.route[core.last_waypoint_index].location,
-        #         current_position=core.route[core.last_waypoint_index - 12].location,
-        #         next_position=core.route[core.last_waypoint_index + 12].location)
-        #     angle_between_waypoints_minus12 = abs_clip_normalise(angle_between_waypoints_minus12, math.pi)
-        # else:
-        #     angle_between_waypoints_minus12 = 1
-        #
-        # angle_between_waypoints_5 = calculate_angle_with_center_of_lane(
-        #     previous_position=core.route[core.last_waypoint_index+5].location,
-        #     current_position=core.route[core.last_waypoint_index].location,
-        #     next_position=core.route[core.last_waypoint_index + 10].location)
-        # angle_between_waypoints_5 = abs_clip_normalise(angle_between_waypoints_5,math.pi)
-        #
-        # angle_between_waypoints_7 = calculate_angle_with_center_of_lane(
-        #     previous_position=core.route[core.last_waypoint_index+7].location,
-        #     current_position=core.route[core.last_waypoint_index].location,
-        #     next_position=core.route[core.last_waypoint_index + 14].location)
-        # angle_between_waypoints_7 = abs_clip_normalise(angle_between_waypoints_7,math.pi)
-        #
-        #
-        # if len(core.route) > core.last_waypoint_index + 20:
-        #     angle_between_waypoints_10 = calculate_angle_with_center_of_lane(
-        #         previous_position=core.route[core.last_waypoint_index + 10].location,
-        #         current_position=core.route[core.last_waypoint_index].location,
-        #         next_position=core.route[core.last_waypoint_index + 20].location)
-        #     angle_between_waypoints_10 = abs_clip_normalise(angle_between_waypoints_10, math.pi)
-        #
-        # else:
-        #     angle_between_waypoints_10 = 1
-        #
-        # if len(core.route) > core.last_waypoint_index + 24:
-        #     angle_between_waypoints_12 = calculate_angle_with_center_of_lane(
-        #         previous_position=core.route[core.last_waypoint_index + 12].location,
-        #         current_position=core.route[core.last_waypoint_index].location,
-        #         next_position=core.route[core.last_waypoint_index + 24].location)
-        #     angle_between_waypoints_12 = abs_clip_normalise(angle_between_waypoints_12, math.pi)
-        #
-        # else:
-        #     angle_between_waypoints_12 = 1
+        if core.last_waypoint_index - 5 > 0:
+            angle_between_waypoints_minus5 = calculate_angle_with_center_of_lane(
+                previous_position=core.route[core.last_waypoint_index].location,
+                current_position=core.route[core.last_waypoint_index - 5].location,
+                next_position=core.route[core.last_waypoint_index + 5].location)
+            angle_between_waypoints_minus5 = abs_clip_normalise(angle_between_waypoints_minus5, math.pi)
+        else:
+            angle_between_waypoints_minus5 = 1
+
+        if core.last_waypoint_index - 7 > 0:
+            angle_between_waypoints_minus7 = calculate_angle_with_center_of_lane(
+                previous_position=core.route[core.last_waypoint_index].location,
+                current_position=core.route[core.last_waypoint_index - 7].location,
+                next_position=core.route[core.last_waypoint_index + 7].location)
+            angle_between_waypoints_minus7 = abs_clip_normalise(angle_between_waypoints_minus7, math.pi)
+        else:
+            angle_between_waypoints_minus7 = 1
+
+        if core.last_waypoint_index - 10 > 0:
+            angle_between_waypoints_minus10 = calculate_angle_with_center_of_lane(
+                previous_position=core.route[core.last_waypoint_index].location,
+                current_position=core.route[core.last_waypoint_index - 10].location,
+                next_position=core.route[core.last_waypoint_index + 10].location)
+            angle_between_waypoints_minus10 = abs_clip_normalise(angle_between_waypoints_minus10, math.pi)
+        else:
+            angle_between_waypoints_minus10 = 1
+
+        if core.last_waypoint_index - 12 > 0:
+            angle_between_waypoints_minus12 = calculate_angle_with_center_of_lane(
+                previous_position=core.route[core.last_waypoint_index].location,
+                current_position=core.route[core.last_waypoint_index - 12].location,
+                next_position=core.route[core.last_waypoint_index + 12].location)
+            angle_between_waypoints_minus12 = abs_clip_normalise(angle_between_waypoints_minus12, math.pi)
+        else:
+            angle_between_waypoints_minus12 = 1
+
+        angle_between_waypoints_5 = calculate_angle_with_center_of_lane(
+            previous_position=core.route[core.last_waypoint_index+5].location,
+            current_position=core.route[core.last_waypoint_index].location,
+            next_position=core.route[core.last_waypoint_index + 10].location)
+        angle_between_waypoints_5 = abs_clip_normalise(angle_between_waypoints_5,math.pi)
+
+        angle_between_waypoints_7 = calculate_angle_with_center_of_lane(
+            previous_position=core.route[core.last_waypoint_index+7].location,
+            current_position=core.route[core.last_waypoint_index].location,
+            next_position=core.route[core.last_waypoint_index + 14].location)
+        angle_between_waypoints_7 = abs_clip_normalise(angle_between_waypoints_7,math.pi)
+
+
+        if len(core.route) > core.last_waypoint_index + 20:
+            angle_between_waypoints_10 = calculate_angle_with_center_of_lane(
+                previous_position=core.route[core.last_waypoint_index + 10].location,
+                current_position=core.route[core.last_waypoint_index].location,
+                next_position=core.route[core.last_waypoint_index + 20].location)
+            angle_between_waypoints_10 = abs_clip_normalise(angle_between_waypoints_10, math.pi)
+
+        else:
+            angle_between_waypoints_10 = 1
+
+        if len(core.route) > core.last_waypoint_index + 24:
+            angle_between_waypoints_12 = calculate_angle_with_center_of_lane(
+                previous_position=core.route[core.last_waypoint_index + 12].location,
+                current_position=core.route[core.last_waypoint_index].location,
+                next_position=core.route[core.last_waypoint_index + 24].location)
+            angle_between_waypoints_12 = abs_clip_normalise(angle_between_waypoints_12, math.pi)
+
+        else:
+            angle_between_waypoints_12 = 1
 
         # Angle to center of lane
 
@@ -1522,14 +1522,14 @@ class PPOExperimentBasic(BaseExperiment):
             np.float32(trailer_bearing_to_waypoint_10),
             # np.float32(bearing_to_ahead_waypoints_ahead_2),
             np.float32(angle_between_truck_and_trailer),
-            # np.float32(angle_between_waypoints_5),
-            # np.float32(angle_between_waypoints_7),
-            # np.float32(angle_between_waypoints_10),
-            # np.float32(angle_between_waypoints_12),
-            # np.float32(angle_between_waypoints_minus5),
-            # np.float32(angle_between_waypoints_minus7),
-            # np.float32(angle_between_waypoints_minus10),
-            # np.float32(angle_between_waypoints_minus12),
+            np.float32(angle_between_waypoints_5),
+            np.float32(angle_between_waypoints_7),
+            np.float32(angle_between_waypoints_10),
+            np.float32(angle_between_waypoints_12),
+            np.float32(angle_between_waypoints_minus5),
+            np.float32(angle_between_waypoints_minus7),
+            np.float32(angle_between_waypoints_minus10),
+            np.float32(angle_between_waypoints_minus12),
 
             # np.float32(trailer_bearing_to_waypoint),
             # np.float32(acceleration)
@@ -1747,14 +1747,14 @@ class PPOExperimentBasic(BaseExperiment):
         self.angle_to_center_of_lane_degrees_7.append(np.float32(angle_to_center_of_lane_degrees_7))
         self.angle_to_center_of_lane_degrees_ahead_waypoints.append(np.float32(angle_to_center_of_lane_degrees_ahead_waypoints))
         # self.angle_to_center_of_lane_degrees_ahead_waypoints_2.append(np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2))
-        # self.angle_between_waypoints_5.append(np.float32(angle_between_waypoints_5))
-        # self.angle_between_waypoints_7.append(np.float32(angle_between_waypoints_7))
-        # self.angle_between_waypoints_10.append(np.float32(angle_between_waypoints_10))
-        # self.angle_between_waypoints_12.append(np.float32(angle_between_waypoints_12))
-        # self.angle_between_waypoints_minus5.append(np.float32(angle_between_waypoints_minus5))
-        # self.angle_between_waypoints_minus7.append(np.float32(angle_between_waypoints_minus7))
-        # self.angle_between_waypoints_minus10.append(np.float32(angle_between_waypoints_minus10))
-        # self.angle_between_waypoints_minus12.append(np.float32(angle_between_waypoints_minus12))
+        self.angle_between_waypoints_5.append(np.float32(angle_between_waypoints_5))
+        self.angle_between_waypoints_7.append(np.float32(angle_between_waypoints_7))
+        self.angle_between_waypoints_10.append(np.float32(angle_between_waypoints_10))
+        self.angle_between_waypoints_12.append(np.float32(angle_between_waypoints_12))
+        self.angle_between_waypoints_minus5.append(np.float32(angle_between_waypoints_minus5))
+        self.angle_between_waypoints_minus7.append(np.float32(angle_between_waypoints_minus7))
+        self.angle_between_waypoints_minus10.append(np.float32(angle_between_waypoints_minus10))
+        self.angle_between_waypoints_minus12.append(np.float32(angle_between_waypoints_minus12))
         self.truck_bearing_to_waypoint.append(np.float32(truck_bearing_to_waypoint))
         self.truck_bearing_to_waypoint_2.append(np.float32(truck_bearing_to_waypoint_2))
         self.truck_bearing_to_waypoint_5.append(np.float32(truck_bearing_to_waypoint_5))
