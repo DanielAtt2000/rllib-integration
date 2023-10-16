@@ -167,10 +167,13 @@ if __name__ == "__main__":
 
     run_all = True
     if run_all:
-        commit_hash = "169760e0"
+        commit_hash = "d5efe1c5"
+        x = input(f'Confirm saving to commit hash {commit_hash}? (y/n): ')
+        if x != 'y':
+            raise Exception()
         runs = [
-            # ['training','mediumRoundabout4',13],
-            # ['training','doubleRoundabout37',39],
+            ['training','mediumRoundabout4',13],
+            ['training','doubleRoundabout37',39],
             ['testing','mediumRoundabout4',7],
             ['testing','20m',16]
         ]

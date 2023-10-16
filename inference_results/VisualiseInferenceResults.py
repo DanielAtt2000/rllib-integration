@@ -127,9 +127,12 @@ for route in routes:
         print(f'Truck collision rate for route {x["route"]} = {x["truck_lidar_collision"]/no_of_runs}')
         print(f'Trailer collision rate for route {x["route"]} = {x["trailer_lidar_collision"]/no_of_runs}')
         if no_of_runs_successful/no_of_runs != 1 and x['trailer_lidar_collision'] != no_of_runs_unsuccessful:
-            input(',HERE')
+            pass
+            # input(',HERE')
     except:
         raise Exception('Failure')
+split_path = path.split('/')
+final_results.to_csv(f'{split_path[0]}/{split_path[1]}/output/{split_path[1]}_{split_path[2]}_output.csv')
 print('OVERLALL RESULTS')
 print(f'Total Runs {total_runs}')
 print(f'Success rate overall = {total_success / total_runs}')
