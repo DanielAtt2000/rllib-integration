@@ -5,7 +5,10 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from rllib_integration.GetStartStopLocation import roundabout20m, lower_medium_roundabout_all, upper_medium_roundabout
+from rllib_integration.GetStartStopLocation import roundabout20m, lower_medium_roundabout_all, upper_medium_roundabout, \
+    spawn_points_2_lane_roundabout_small_easy, spawn_points_2_lane_roundabout_small_difficult, \
+    lower_medium_roundabout_easy, lower_medium_roundabout_difficult
+
 
 def find_all(path):
     result = []
@@ -14,7 +17,7 @@ def find_all(path):
             result.append(os.path.join(root, file))
     return result
 
-path = 'latest/20fc454e/Model27K/30runs/modified/testing/combined'
+path = 'final/169760e0/testing'
 found_files = find_all(path)
 assert len(found_files) == 1
 results = pd.read_csv(found_files[0])
@@ -47,6 +50,7 @@ def get_route_type(current_entry_idx, current_exit_idx):
     ifroundabout20m = False
     ifupper_medium_roundabout = False
     iflower_medium_roundabout_all = False
+    ifdoubleRoundabout_roundabout_all = False
     for entry_easy in roundabout20m:
         entry_idx = entry_easy[0]
         if current_entry_idx == entry_idx:
@@ -64,12 +68,20 @@ def get_route_type(current_entry_idx, current_exit_idx):
                     ifupper_medium_roundabout = True
                     break
     if not found:
-        for entry_easy in lower_medium_roundabout_all:
+        for entry_easy in (lower_medium_roundabout_easy+lower_medium_roundabout_difficult):
             entry_idx = entry_easy[0]
             if current_entry_idx == entry_idx:
                 if current_exit_idx in entry_easy[1]:
                     found = True
                     iflower_medium_roundabout_all = True
+                    break
+    if not found:
+        for entry_easy in (spawn_points_2_lane_roundabout_small_easy+spawn_points_2_lane_roundabout_small_difficult):
+            entry_idx = entry_easy[0]
+            if current_entry_idx == entry_idx:
+                if current_exit_idx in entry_easy[1]:
+                    found = True
+                    ifdoubleRoundabout_roundabout_all = True
                     break
 
     if iflower_medium_roundabout_all:
@@ -78,6 +90,8 @@ def get_route_type(current_entry_idx, current_exit_idx):
         return '40m'
     elif ifroundabout20m:
         return '20m'
+    elif ifdoubleRoundabout_roundabout_all:
+        return 'double'
     else:
         raise Exception('fuc')
 

@@ -51,7 +51,7 @@ def parse_config(args):
 
     return config
 
-def main():
+def main(auto=False,commit_hash='temp',inference_run=[]):
 
     argparser = argparse.ArgumentParser()
     argparser.add_argument("configuration_file",
@@ -63,23 +63,36 @@ def main():
 
     args = argparser.parse_args()
     args.config = parse_config(args)
+    if not auto:
+        save_dir = f"inference_results/run/"
+        x = input(f'Please confirm save directory {save_dir}: (y/no)')
+        if x != 'y':
+            raise Exception('Cancelled')
 
-    save_dir = "inference_results/run"
-    x = input(f'Please confirm save directory {save_dir}: (y/no)')
-    if x != 'y':
-        raise Exception('Cancelled')
+        town1 = args.config["env_config"]["experiment"]["town1"]
+        save_to_pickle('server_maps', [town1])
 
-    town1 = args.config["env_config"]["experiment"]["town1"]
-    save_to_pickle('server_maps', [town1])
+        x = input(f'Confrim using map {town1}? (y/n): ')
+        if x != 'y':
+            raise Exception('Failed')
 
-    x = input(f'Confrim using map {town1}? (y/n): ')
-    if x != 'y':
-        raise Exception('Failed')
+        print('Medium Roundabout TRAINING 13 routes')
+        print('Double Roundabout Training 39 ')
+        print('Medium Roundabout Testing 7 routes ----> CHANGE IN GetStartStopLocation <----')
+        print('20m Roundabout Testing 16 ')
+        x = input('What are the total number of routes being tested?')
+        numbers_of_times_per_route = 2
+        total_episodes = (numbers_of_times_per_route + 2 ) * int(x)
+    else:
+        save_dir = f"inference_results/final/{commit_hash}/{inference_run[0]}/"
+        args.config["env_config"]["experiment"]["town1"] = inference_run[1]
+        save_to_pickle('server_maps', [inference_run[1]])
 
-    x = input('What are the total number of routes being tested?')
-    numbers_of_times_per_route = 30
-    total_episodes = (numbers_of_times_per_route + 2 ) * int(x)
+        if inference_run[1] == 'mediumRoundabout4':
+            save_to_pickle('mediumRoundabout4Type', inference_run[0])
 
+        numbers_of_times_per_route = 2
+        total_episodes = (numbers_of_times_per_route + 2) * int(inference_run[2])
     try:
         ray.init()
 
@@ -143,9 +156,25 @@ def main():
     except KeyboardInterrupt:
         print("\nshutdown by user")
     finally:
+        save_to_pickle('mediumRoundabout4Type', '')
         ray.shutdown()
         # kill_all_servers()
 
 if __name__ == "__main__":
+    x = input('have you made one after the other true? (y/n) ')
+    if x != 'y':
+        raise Exception()
 
-    main()
+    run_all = True
+    if run_all:
+        commit_hash = "169760e0"
+        runs = [
+            # ['training','mediumRoundabout4',13],
+            # ['training','doubleRoundabout37',39],
+            ['testing','mediumRoundabout4',7],
+            ['testing','20m',16]
+        ]
+        for run in runs:
+            main(auto=True, commit_hash=commit_hash, inference_run=run)
+    else:
+        main(auto=False)

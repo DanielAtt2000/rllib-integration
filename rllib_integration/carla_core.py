@@ -106,7 +106,7 @@ class CarlaCore:
         self.visualise_all_routes = False
         self.times_crazy = []
         self.custom_enable_rendering = False
-        self.one_after_the_other = False
+        self.one_after_the_other = True
         self.total_number_of_routes = -1
         self.in_editor = False
 
