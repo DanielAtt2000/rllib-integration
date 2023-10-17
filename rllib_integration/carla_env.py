@@ -61,6 +61,7 @@ class CarlaEnv(gymnasium.Env):
         self.done_arrived = False
         self.env_start_spawn_point = -1
         self.env_stop_spawn_point = -1
+        self.counter = 0
         # self.compute_action_time = []
         # self.tick_time = []
         # self.get_observation_time = []
@@ -84,9 +85,11 @@ class CarlaEnv(gymnasium.Env):
         self.reset()
 
     def reset(self, seed=None, options=None):
+        if self.counter % 500:
+            carla_process_pids = open_pickle('pids')
+            save_to_pickle('pids',carla_process_pids.add(self.core.carla_process_pid))
 
-        # carla_process_pids = open_pickle('pids')
-        # save_to_pickle('pids',carla_process_pids.add(self.core.carla_process_pid))
+        self.counter += 1
 
         # Reset sensors hero and experiment
         self.hero = self.core.reset_hero(self.experiment.config["hero"])
