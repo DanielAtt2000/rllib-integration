@@ -162,7 +162,7 @@ class CarlaCore:
         current_carla_processes = []
         processes = psutil.process_iter()
         for process in processes:
-            if process.name == carla_process_name:
+            if carla_process_name in str(process.name):
                 current_carla_processes.append(process.pid)
         return current_carla_processes
 
