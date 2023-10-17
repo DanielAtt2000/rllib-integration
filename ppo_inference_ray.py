@@ -31,6 +31,7 @@ EXPERIMENT_CLASS = PPOExperimentBasic
 # /home/daniel/ray_results/carla_rllib/ppo_02152f79ae_DO_NOT_DELETE/CustomPPOTrainer_CarlaEnv_b14f2_00000_0_2023-09-30_07-53-34/checkpoint_005000
 # /home/daniel/ray_results/carla_rllib/ppo_30e97a9090_DO_NOT_DELETE/CustomPPOTrainer_CarlaEnv_5fe5f_00000_0_2023-10-07_19-03-02/checkpoint_002500
 # /home/daniel/ray_results/carla_rllib/ppo_f0a9aeaa3d_DO_NOT_DELETE/CustomPPOTrainer_CarlaEnv_4bfb9_00000_0_2023-10-14_10-54-34/checkpoint_001500
+# /home/daniel/ray_results/carla_rllib/ppo_adf9a013d4_DO_NOT_DELETE/CustomPPOTrainer_CarlaEnv_01dd6_00000_0_2023-10-16_18-35-25/checkpoint_001900
 def save_to_pickle(filename, data):
     filename = filename + '.pickle'
     with open(filename, 'wb') as handle:
@@ -165,7 +166,7 @@ if __name__ == "__main__":
     if x != 'y':
         raise Exception()
 
-    run_all = True
+    run_all = False
     if run_all:
         commit_hash = "d5efe1c5"
         x = input(f'Confirm saving to commit hash {commit_hash}? (y/n): ')
