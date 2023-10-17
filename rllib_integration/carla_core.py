@@ -109,6 +109,7 @@ class CarlaCore:
         self.one_after_the_other = True
         self.total_number_of_routes = -1
         self.in_editor = False
+        self.carla_process_pid = -1
 
         self.route = []
         self.route_points = []
@@ -156,7 +157,19 @@ class CarlaCore:
     #             if str(self.server_port) not in line:
     #                 portsFileWrite.write(line)
 
+    def get_all_carla_process(self):
+        carla_process_name = "CarlaUE4-Linux-Shipping"
+        current_carla_processes = []
+        processes = psutil.process_iter()
+        for process in processes:
+            if process.name == carla_process_name:
+                current_carla_processes.append(process.pid)
+        return current_carla_processes
+
     def init_server(self):
+
+
+        starting_carla_processes = self.get_all_carla_process()
         """Start a server on a random port"""
         self.server_port = random.randint(15000, 32000)
         time.sleep(random.randint(0,10))
@@ -225,6 +238,17 @@ class CarlaCore:
             preexec_fn=os.setsid,
             stdout=open(os.devnull, "w"),
         )
+
+        after_carla_processes = self.get_all_carla_process()
+
+        for after_pid in after_carla_processes:
+            before_pid_found = False
+            for before_pid in starting_carla_processes:
+                if before_pid == after_pid:
+                    before_pid_found = True
+            if not before_pid_found:
+                self.carla_process_pid = after_pid
+                break
 
         time.sleep(5)
         print('Waited 5 seconds for server')

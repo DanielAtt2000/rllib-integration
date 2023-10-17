@@ -170,6 +170,7 @@ def main():
     print(output)
     save_to_pickle('server_maps',output)
     save_to_pickle('waiting_times',[0,20,40,60,85,105,125,145,165,185,0,20,40,60,80,100,120,140,160,180])
+    # save_to_pickle('pids',set())
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())

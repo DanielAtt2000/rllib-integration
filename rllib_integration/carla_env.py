@@ -84,6 +84,10 @@ class CarlaEnv(gymnasium.Env):
         self.reset()
 
     def reset(self, seed=None, options=None):
+
+        # carla_process_pids = open_pickle('pids')
+        # save_to_pickle('pids',carla_process_pids.add(self.core.carla_process_pid))
+
         # Reset sensors hero and experiment
         self.hero = self.core.reset_hero(self.experiment.config["hero"])
         self.experiment.reset()

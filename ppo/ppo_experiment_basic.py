@@ -573,15 +573,15 @@ class PPOExperimentBasic(BaseExperiment):
             27: [0.6, -0.40, 0.0, False, False],  # Left
             28: [0.6, -0.20, 0.0, False, False],  # Left
 
-            29: [0.9, 0.00, 0.0, False, False],  # Straight
-            30: [0.9, 0.80, 0.0, False, False],  # Right
-            31: [0.9, 0.60, 0.0, False, False],  # Right
-            32: [0.9, 0.40, 0.0, False, False],  # Right
-            33: [0.9, 0.20, 0.0, False, False],  # Right
-            34: [0.9, -0.80, 0.0, False, False],  # Left
-            35: [0.9, -0.60, 0.0, False, False],  # Left
-            36: [0.9, -0.40, 0.0, False, False],  # Left
-            37: [0.9, -0.20, 0.0, False, False],  # Left
+            # 29: [0.9, 0.00, 0.0, False, False],  # Straight
+            # 30: [0.9, 0.80, 0.0, False, False],  # Right
+            # 31: [0.9, 0.60, 0.0, False, False],  # Right
+            # 32: [0.9, 0.40, 0.0, False, False],  # Right
+            # 33: [0.9, 0.20, 0.0, False, False],  # Right
+            # 34: [0.9, -0.80, 0.0, False, False],  # Left
+            # 35: [0.9, -0.60, 0.0, False, False],  # Left
+            # 36: [0.9, -0.40, 0.0, False, False],  # Left
+            # 37: [0.9, -0.20, 0.0, False, False],  # Left
 
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
@@ -1980,8 +1980,8 @@ class PPOExperimentBasic(BaseExperiment):
             reward = reward + 0.1
             pass
 
-        distance_to_center_of_lane = (np.clip(abs(distance_to_center_of_lane),0,4))/400
-        reward = reward - (distance_to_center_of_lane*1.0)
+        distance_to_center_of_lane = (5/400) * (np.clip(abs(distance_to_center_of_lane),0,4))
+        reward = reward - distance_to_center_of_lane
 
         # to encourage faster velocity
         # proportional_forward_velocity = (100/15) * (np.clip(abs(forward_velocity), 0, 15))
@@ -1989,10 +1989,10 @@ class PPOExperimentBasic(BaseExperiment):
         # print(f'Reward a {1/proportional_forward_velocity}')
 
         # for smooth velocity
-        # difference_in_velocities = self.last_forward_velocity - forward_velocity
-        # proportional_difference_in_velocities = (5/120) * (np.clip(abs(difference_in_velocities), 0, 1.2))
-        # reward = reward - proportional_difference_in_velocities
-        # self.last_forward_velocity = forward_velocity
+        difference_in_velocities = self.last_forward_velocity - forward_velocity
+        proportional_difference_in_velocities = (5/120) * (np.clip(abs(difference_in_velocities), 0, 1.2))
+        reward = reward - proportional_difference_in_velocities
+        self.last_forward_velocity = forward_velocity
 
 
 
