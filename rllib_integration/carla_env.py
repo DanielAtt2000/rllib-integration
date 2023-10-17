@@ -87,7 +87,8 @@ class CarlaEnv(gymnasium.Env):
     def reset(self, seed=None, options=None):
         if self.custom_episode_counter % 500 == 0:
             carla_process_pids = open_pickle('pids')
-            save_to_pickle('pids',carla_process_pids.append([self.core.carla_process_pid,self.custom_episode_counter]))
+            carla_process_pids.append([self.core.carla_process_pid, self.custom_episode_counter])
+            save_to_pickle('pids',carla_process_pids)
 
         self.custom_episode_counter += 1
 
