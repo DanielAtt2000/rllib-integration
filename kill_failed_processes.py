@@ -20,7 +20,7 @@ while True:
             os.kill(int(pid_to_kill), signal.SIGKILL)
             killed = True
             break
-    if not killed:
+    if not killed and len(lines) != 0:
         pid_to_kill = lines[0].split('----')
         pid_to_kill = pid_to_kill[1].replace(' ', '').replace('\n','')
         previous_killed_time = lines[0].split('----')[0]
