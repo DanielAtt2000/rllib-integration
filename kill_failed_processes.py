@@ -5,7 +5,7 @@ import time
 from Helper import read_txt_file
 
 
-previous_killed_time = '2023-10-19 10:04:11.603536'
+previous_killed_time = '-1'
 while True:
     lines = read_txt_file('failed_pids')
     killed = False
