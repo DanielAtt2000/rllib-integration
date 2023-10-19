@@ -17,3 +17,11 @@ def clear_txt_file(filename):
     filename = filename + '.txt'
     with open(filename,'w') as file:
         file.write('')
+
+def read_txt_file(filename):
+    filename = filename + '.txt'
+    output = None
+    with open(filename,'r+') as file:
+        output = file.readlines()
+
+    return output

@@ -52,7 +52,7 @@ class SensorInterface(object):
     def __init__(self):
         self._sensors = {}  # {name: Sensor object}
         self._data_buffers = queue.Queue()
-        self._queue_timeout = 300
+        self._queue_timeout = 60
 
         self._event_sensors = {}
         self._event_data_buffers = queue.Queue()
