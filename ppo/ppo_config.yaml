@@ -587,11 +587,11 @@ env_config:
 #    town: 'doubleRoundabout37'
 #    town: 'OneLaneRoundabouts'
     town1: 'mediumRoundabout4'
-    town1Ratio: 0.3
+    town1Ratio: 0.4
 #    town2: 'doubleRoundabout37'
 #    town2: 'mediumRoundabout4'
     town2 : 'doubleRoundabout37'
-    town2Ratio: 0.7
+    town2Ratio: 0.6
 #    town: '20m'
     others:
       framestack: 1
