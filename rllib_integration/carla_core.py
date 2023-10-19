@@ -1017,7 +1017,7 @@ class CarlaCore:
                 # print("TRAILER PART 7/7")
                 time.sleep(0.15)
                 sensor_trailer = SensorFactory.spawn(name, attributes, self.sensor_interface_trailer, self.hero_trailer,self.hero.id)
-        # time.sleep(0.15)
+        time.sleep(0.05)
         # Not needed anymore. This tick will happen when calling CarlaCore.tick()
         # self.world.tick()
 
