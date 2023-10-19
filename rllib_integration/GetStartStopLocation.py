@@ -668,7 +668,7 @@ def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations, last_round
 
         if mediumRoundaboutType == 'training' or mediumRoundaboutType == '':
             # total of 13 routes lower
-            roundabouts = [lower_medium_roundabout_easy,lower_medium_roundabout_difficult]
+            roundabouts = [lower_medium_roundabout_easy+lower_medium_roundabout_difficult]
         elif mediumRoundaboutType == 'testing':
             # total of 7 routes lower
             roundabouts = [upper_medium_roundabout]
@@ -677,7 +677,7 @@ def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations, last_round
 
     elif map_name == 'doubleRoundabout37':
         # total of 13 routes
-        roundabouts = [spawn_points_2_lane_roundabout_small_easy,spawn_points_2_lane_roundabout_small_difficult]
+        roundabouts = [spawn_points_2_lane_roundabout_small_easy+spawn_points_2_lane_roundabout_small_difficult]
     elif map_name == '20m':
         # total of 17 routes
         roundabouts = [roundabout20m]
