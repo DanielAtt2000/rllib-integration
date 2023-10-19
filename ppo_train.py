@@ -170,7 +170,7 @@ def main():
     output = get_server_maps_dist(config=args.config)
     print(output)
     save_to_pickle('server_maps',output)
-    save_to_pickle('waiting_times',[0,20,40,60,20,20,20,20,20,20,20,20,20,20])
+    save_to_pickle('waiting_times',[0,20,40,60,80,100,120,140,160,20,20,20,])
     save_to_pickle('pids',[])
     clear_txt_file('failed_pids')
 
