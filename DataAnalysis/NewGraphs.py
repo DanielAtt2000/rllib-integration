@@ -226,6 +226,18 @@ def plot_route(route_points_all, truck_points_all):
     sns.lineplot(done_array_cum_sum)
     plt.show()
 
+    x = sns.histplot(df['EntryExit'])
+
+    print("------------------------------")
+    print("DONE DATA")
+    # print(df[['EntryExit', 'Done']].output.value_counts())
+    # print(df[['EntryExit', 'Done']].points.value_counts())
+    print("------------------------------")
+
+    # x = sns.swarmplot(df_done,x="output",y="points")
+    # sns.scatterplot(data)
+    plt.show()
+
 
 
     done_data_diff = -1
