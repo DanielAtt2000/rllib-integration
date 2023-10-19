@@ -20,6 +20,7 @@ import yaml
 import ray
 from ray import tune
 
+from Helper import clear_txt_file
 from checker import check_with_user, commit_hash
 from rllib_integration.carla_env import CarlaEnv
 from rllib_integration.carla_core import kill_all_servers
@@ -171,6 +172,7 @@ def main():
     save_to_pickle('server_maps',output)
     save_to_pickle('waiting_times',[0,20,40,60,85,105,125,145,165,185,0,20,40,60,80,100,120,140,160,180])
     save_to_pickle('pids',[])
+    clear_txt_file('failed_pids')
 
     if check_with_user(check_commit):
         args.name = args.name + '_' + str(commit_hash())

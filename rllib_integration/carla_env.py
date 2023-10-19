@@ -101,7 +101,7 @@ class CarlaEnv(gymnasium.Env):
         observation, info = self.experiment.get_observation(sensor_data, self.core)
 
         while info['truck_z_value'] > 0.1 and info['truck_acceleration'] > 1:
-            print(f"info['truck_acceleration'] {info['truck_acceleration']}")
+            # print(f"info['truck_acceleration'] {info['truck_acceleration']}")
             sensor_data = self.core.tick(None)
             observation, info = self.experiment.get_observation(sensor_data, self.core)
 

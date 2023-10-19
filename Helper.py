@@ -7,3 +7,13 @@ def save_to_pickle(filename, data):
 def open_pickle(filename):
     with open(filename + '.pickle', 'rb') as handle:
         return pickle.load(handle)
+
+def append_to_txt(filename, data):
+    filename = filename + '.txt'
+    with open(filename,'a+') as file:
+        file.write(data)
+
+def clear_txt_file(filename):
+    filename = filename + '.txt'
+    with open(filename,'w') as file:
+        file.write('')

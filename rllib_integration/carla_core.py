@@ -972,11 +972,12 @@ class CarlaCore:
                 self.hero = None
 
             if self.hero is not None and self.hero_trailer is not None:
-                print("Truck spawned!")
+                # print("Truck spawned!")
                 if hero_config["truckTrailerCombo"]:
                     # print("TRAILER PART 5/7")
                     if self.hero_trailer is not None:
-                        print("Trailer spawned!")
+                        pass
+                        # print("Trailer spawned!")
                     else:
                         print('FAILED TO SPAWN TRAILER')
 
@@ -1178,9 +1179,9 @@ class CarlaCore:
 
     def get_sensor_data(self):
         """Returns the data sent by the different sensors at this tick"""
-        sensor_data_truck = self.sensor_interface_truck.get_data('truck')
+        sensor_data_truck = self.sensor_interface_truck.get_data('truck',self.carla_process_pid)
         if self.sensor_interface_trailer != None:
-            sensor_data_trailer = self.sensor_interface_trailer.get_data('trailer')
+            sensor_data_trailer = self.sensor_interface_trailer.get_data('trailer',self.carla_process_pid)
         # print("---------")
         # world_frame = self.world.get_snapshot().frame
         # print("World frame: {}".format(world_frame))

@@ -15,6 +15,8 @@ from datetime import datetime
 import pandas as pd
 from PIL import Image
 
+from Helper import save_to_pickle, append_to_txt
+
 LABEL_COLORS = np.array([
     (255, 255, 255),  # None
     (70, 70, 70),  # Building
@@ -50,7 +52,7 @@ class SensorInterface(object):
     def __init__(self):
         self._sensors = {}  # {name: Sensor object}
         self._data_buffers = queue.Queue()
-        self._queue_timeout = 600
+        self._queue_timeout = 300
 
         self._event_sensors = {}
         self._event_data_buffers = queue.Queue()
@@ -100,7 +102,7 @@ class SensorInterface(object):
         else:
             self._sensors[name] = sensor
 
-    def get_data(self,blueprintName):
+    def get_data(self,blueprintName, carla_pid):
         """Returns the data of all the registered sensors as a dictionary {sensor_name: sensor_data}"""
         try:
             data_dict = {}
@@ -163,6 +165,7 @@ class SensorInterface(object):
                 data_dict[sensor_data[0]+'_'+blueprintName] = (sensor_data[1], sensor_data[2])
                 self.counter+=1
         except queue.Empty:
+            append_to_txt('failed_pids',carla_pid)
             raise RuntimeError("A sensor took too long to send their data")
 
         for event_sensor in self._event_sensors:
