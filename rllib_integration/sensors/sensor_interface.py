@@ -165,7 +165,7 @@ class SensorInterface(object):
                 data_dict[sensor_data[0]+'_'+blueprintName] = (sensor_data[1], sensor_data[2])
                 self.counter+=1
         except queue.Empty:
-            append_to_txt('failed_pids',carla_pid)
+            append_to_txt('failed_pids', str(datetime.now()) + ' ---- ' + str(carla_pid) + '\n')
             raise RuntimeError("A sensor took too long to send their data")
 
         for event_sensor in self._event_sensors:
