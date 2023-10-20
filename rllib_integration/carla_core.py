@@ -539,12 +539,16 @@ class CarlaCore:
     #
     #     c_perpendicular = current_point.y - m_perpendicular * current_point.x
 
-    def is_in_front_of_waypoint(self, x_pos, y_pos):
-        last_x = self.route[self.last_waypoint_index].location.x
-        last_y = self.route[self.last_waypoint_index].location.y
+    def is_in_front_of_waypoint(self, x_pos, y_pos,waypoint_no=None):
 
-        next_x = self.route[self.last_waypoint_index + 1].location.x
-        next_y = self.route[self.last_waypoint_index + 1].location.y
+        if waypoint_no is None:
+            waypoint_no = self.last_waypoint_index
+
+        last_x = self.route[waypoint_no].location.x
+        last_y = self.route[waypoint_no].location.y
+
+        next_x = self.route[waypoint_no + 1].location.x
+        next_y = self.route[waypoint_no + 1].location.y
 
         last_to_next_vector = (next_x - last_x, next_y - last_y)
 
@@ -1304,10 +1308,13 @@ class CarlaCore:
 
         return self.dist2(p, Vector(x=v.x + t * (w.x - v.x), y=v.y + t * (w.y - v.y)))
 
-    def distToSegment(self,truck_transform,waypoint_plus_current):
+    def distToSegment(self, truck_transform, waypoint_plus_current, waypoint_no=None):
+        if waypoint_no is None:
+            waypoint_no = self.last_waypoint_index
+
         p = Vector(x=truck_transform.location.x, y=truck_transform.location.y)
 
-        waypoint_right_vector = self.route[self.last_waypoint_index + waypoint_plus_current].get_right_vector()
+        waypoint_right_vector = self.route[waypoint_no + waypoint_plus_current].get_right_vector()
         if self.route_lane == "left":
             # Truck should be on LEFT lane. free RIGHT lane
             t_left = -1.85
@@ -1326,24 +1333,26 @@ class CarlaCore:
             raise Exception('NO LANE')
 
         left_point_x = self.route[
-                           self.last_waypoint_index + waypoint_plus_current].location.x + t_left * waypoint_right_vector.x
+                           waypoint_no + waypoint_plus_current].location.x + t_left * waypoint_right_vector.x
         left_point_y = self.route[
-                           self.last_waypoint_index + waypoint_plus_current].location.y + t_left * waypoint_right_vector.y
+                           waypoint_no + waypoint_plus_current].location.y + t_left * waypoint_right_vector.y
         right_point_x = self.route[
-                            self.last_waypoint_index + waypoint_plus_current].location.x + t_right * waypoint_right_vector.x
+                            waypoint_no + waypoint_plus_current].location.x + t_right * waypoint_right_vector.x
         right_point_y = self.route[
-                            self.last_waypoint_index + waypoint_plus_current].location.y + t_right * waypoint_right_vector.y
+                            waypoint_no + waypoint_plus_current].location.y + t_right * waypoint_right_vector.y
 
 
         v = Vector(x=left_point_x, y=left_point_y)
         w = Vector(x=right_point_x, y=right_point_y)
         return math.sqrt(self.distToSegmentSquared(p, v, w))
 
-    def shortest_distance_to_center_of_lane(self, truck_transform):
+    def shortest_distance_to_center_of_lane(self, truck_transform, waypoint_no=None):
+        if waypoint_no is None:
+            waypoint_no = self.last_waypoint_index
         p = Vector(x=truck_transform.location.x, y=truck_transform.location.y)
 
-        previous_waypoint_location = self.route[self.last_waypoint_index - 1].location
-        current_waypoint_location = self.route[self.last_waypoint_index].location
+        previous_waypoint_location = self.route[waypoint_no- 1].location
+        current_waypoint_location = self.route[waypoint_no].location
 
 
         v = Vector(x=previous_waypoint_location.x,y=previous_waypoint_location.y)

@@ -63,7 +63,7 @@ class PPOExperimentBasic(BaseExperiment):
 
         self.last_closest_distance_to_next_waypoint_line = 0
         self.last_closest_distance_to_next_plus_1_waypoint_line = 0
-
+        self.current_trailer_waypoint = 0
         self.x_dist_to_waypoint = []
         self.y_dist_to_waypoint = []
         self.angle_to_center_of_lane_degrees = []
@@ -260,6 +260,7 @@ class PPOExperimentBasic(BaseExperiment):
         self.truck_lidar_collision = False
         self.trailer_lidar_collision = False
 
+        self.current_trailer_waypoint = 0
 
         for i in range(self.max_amount_of_occupancy_maps):
             self.occupancy_maps.append(np.zeros((self.occupancy_map_y, self.occupancy_map_x,1)))
@@ -704,6 +705,14 @@ class PPOExperimentBasic(BaseExperiment):
         forward_vector_waypoint_7 = core.route[core.last_waypoint_index + 7].get_forward_vector()
         forward_vector_waypoint_10 = core.route[core.last_waypoint_index + 10].get_forward_vector()
 
+        d = 8
+        magnitude_of_trailer_forward_vector = math.sqrt(trailer_forward_vector.x**2+trailer_forward_vector.y**2+trailer_forward_vector.z**2)
+        trailer_rear_axle_transform = carla.Transform(
+            carla.Location(trailer_forward_vector.x-trailer_forward_vector.x*magnitude_of_trailer_forward_vector*d,
+                           trailer_forward_vector.y-trailer_forward_vector.y*magnitude_of_trailer_forward_vector*d,
+                           trailer_forward_vector.z-trailer_forward_vector.z*magnitude_of_trailer_forward_vector*d),
+            carla.Rotation(0, 0, 0))
+
         # print(f"BEFORE CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
         # Checking if we have passed the last way point
 
@@ -718,6 +727,16 @@ class PPOExperimentBasic(BaseExperiment):
             print('Passed Waypoint <------------') if self.custom_enable_rendering else None
         else:
             pass
+
+        distance_to_next_waypoint_line_trailer = core.distToSegment(truck_transform=trailer_rear_axle_transform,waypoint_no=self.current_trailer_waypoint,waypoint_plus_current=1)
+        in_front_of_waypoint_trailer = core.is_in_front_of_waypoint(trailer_rear_axle_transform.location.x, trailer_rear_axle_transform.location.y,waypoint_no=self.current_trailer_waypoint)
+        if 10 > distance_to_next_waypoint_line_trailer and (in_front_of_waypoint_trailer == 0 or in_front_of_waypoint_trailer == 1):
+            self.current_trailer_waypoint = self.current_trailer_waypoint + 1
+            print('Trailer Passed Waypoint <------------') if self.custom_enable_rendering else None
+        else:
+            pass
+
+
 
         lidar = False
 
@@ -766,6 +785,7 @@ class PPOExperimentBasic(BaseExperiment):
             (x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
 
         distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=truck_transform)
+        trailer_distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=trailer_rear_axle_transform,waypoint_no=self.current_trailer_waypoint)
 
         truck_bearing_to_waypoint = angle_between(waypoint_forward_vector=forward_vector_waypoint_0,
                                                   vehicle_forward_vector=truck_forward_vector)
@@ -1792,7 +1812,7 @@ class PPOExperimentBasic(BaseExperiment):
 
         self.counter += 1
         return {'values':value_observations},\
-            {"truck_z_value":truck_transform.location.z,"distance_to_center_of_lane":distance_to_center_of_lane, "truck_acceleration": self.get_acceleration(core.hero)}
+            {"truck_z_value":truck_transform.location.z,"distance_to_center_of_lane":distance_to_center_of_lane, "truck_acceleration": self.get_acceleration(core.hero),'trailer_distance_to_center_of_lane':trailer_distance_to_center_of_lane}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""

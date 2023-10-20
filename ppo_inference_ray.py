@@ -121,7 +121,7 @@ def main(auto=False,commit_hash='temp',inference_run=[]):
         results_file = open(f'{save_dir}{args.checkpoint.replace("/","_")}.csv', mode='a')
         employee_writer = csv.writer(results_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-        employee_writer.writerow(['route','timesteps','collision_truck','collision_trailer','timeout','truck_lidar_collision','trailer_lidar_collision','distance_to_center_of_lane','completed'])
+        employee_writer.writerow(['route','timesteps','collision_truck','collision_trailer','timeout','truck_lidar_collision','trailer_lidar_collision','distance_to_center_of_lane','trailer_distance_to_center_of_lane','completed'])
 
 
         while True:
@@ -130,6 +130,7 @@ def main(auto=False,commit_hash='temp',inference_run=[]):
             info = None
             counter = 0
             distance_to_center_of_lane = []
+            trailer_distance_to_center_of_lane = []
             if total_episodes == 0:
                 print('All episodes completed')
                 break
@@ -140,10 +141,11 @@ def main(auto=False,commit_hash='temp',inference_run=[]):
                 observation, reward, terminated, truncated, info = env.step(action)
                 done = terminated or truncated
                 distance_to_center_of_lane.append(info['distance_to_center_of_lane'])
+                trailer_distance_to_center_of_lane.append(info['trailer_distance_to_center_of_lane'])
                 counter +=1
 
             # ['route', 'timesteps', 'collision_truck', 'collision_trailer', 'timeout','lidar_collision_truck','lidar_collision_trailer','distance_to_center_of_lane', 'completed']
-            employee_writer.writerow([f'{env.env_start_spawn_point}|{env.env_stop_spawn_point}', counter, info['done_collision_truck'],info['done_collision_trailer'],info['done_time_idle'] or info['done_time_episode'],info['truck_lidar_collision'],info['trailer_lidar_collision'], mean(distance_to_center_of_lane),info['done_arrived']])
+            employee_writer.writerow([f'{env.env_start_spawn_point}|{env.env_stop_spawn_point}', counter, info['done_collision_truck'],info['done_collision_trailer'],info['done_time_idle'] or info['done_time_episode'],info['truck_lidar_collision'],info['trailer_lidar_collision'], mean(distance_to_center_of_lane), mean(trailer_distance_to_center_of_lane),info['done_arrived']])
             results_file.flush()
             # Resetting Variables
             env.done_collision_truck = False
@@ -153,6 +155,7 @@ def main(auto=False,commit_hash='temp',inference_run=[]):
             env.env_start_spawn_point = -1
             env.env_stop_spawn_point = -1
             distance_to_center_of_lane = []
+            trailer_distance_to_center_of_lane = []
 
     except KeyboardInterrupt:
         print("\nshutdown by user")
