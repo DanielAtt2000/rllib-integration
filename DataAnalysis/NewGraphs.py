@@ -226,7 +226,8 @@ def plot_route(route_points_all, truck_points_all):
     sns.lineplot(done_array_cum_sum)
     plt.show()
 
-    x = sns.histplot(df['EntryExit'])
+    x = sns.histplot(df['EntryExit'], binwidth=10)
+    print(df.groupby(df['EntryExit'].tolist(), as_index=False).size())
 
     print("------------------------------")
     print("DONE DATA")
