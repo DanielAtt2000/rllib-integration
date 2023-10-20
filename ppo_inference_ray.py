@@ -92,7 +92,7 @@ def main(auto=False,commit_hash='temp',inference_run=[]):
         if inference_run[1] == 'mediumRoundabout4':
             save_to_pickle('mediumRoundabout4Type', inference_run[0])
 
-        numbers_of_times_per_route = 2
+        numbers_of_times_per_route = 3
         total_episodes = (numbers_of_times_per_route + 2) * int(inference_run[2])
     try:
         ray.init()
