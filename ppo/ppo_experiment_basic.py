@@ -1980,7 +1980,7 @@ class PPOExperimentBasic(BaseExperiment):
             reward = reward + 10
             pass
 
-        distance_to_center_of_lane = (1/4) * (np.clip(abs(distance_to_center_of_lane),0,4))
+        distance_to_center_of_lane = (2/4) * (np.clip(abs(distance_to_center_of_lane),0,4))
         reward = reward - distance_to_center_of_lane
 
         # to encourage faster velocity
