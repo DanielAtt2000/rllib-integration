@@ -4,7 +4,7 @@
 framework: "torch"
 num_workers: 3
 num_gpus: 1
-num_cpus_per_worker: 6
+num_cpus_per_worker: 3
 gamma: 1
 
 #
