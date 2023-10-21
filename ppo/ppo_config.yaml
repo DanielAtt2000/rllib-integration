@@ -2,15 +2,15 @@
 # https://github.com/ray-project/ray/blob/master/rllib/agents/trainer.py
 
 framework: "torch"
-num_workers: 6
+num_workers: 3
 num_gpus: 1
-num_cpus_per_worker: 3
+num_cpus_per_worker: 6
 gamma: 1
 
 #
 train_batch_size: 4096
 #lr: 0.0000001
-lr: 0.0000005
+lr: 0.000005
 #sgd_minibatch_size: 2048
 #num_sgd_iter: 100
 #sgd_minibatch_size: 256
@@ -587,11 +587,11 @@ env_config:
 #    town: 'doubleRoundabout37'
 #    town: 'OneLaneRoundabouts'
     town1: 'mediumRoundabout4'
-    town1Ratio: 0.4
+    town1Ratio: 0.2
 #    town2: 'doubleRoundabout37'
 #    town2: 'mediumRoundabout4'
     town2 : 'doubleRoundabout37'
-    town2Ratio: 0.6
+    town2Ratio: 0.8
 #    town: '20m'
     others:
       framestack: 1
