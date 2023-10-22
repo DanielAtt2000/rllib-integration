@@ -69,10 +69,6 @@ def main(auto=False,commit_hash='temp',inference_run=[]):
         "map",
         type=str,
         help="map")
-    argparser.add_argument(
-        "num_of_routes",
-        type=str,
-        help="num_of_routes")
 
 
     args = argparser.parse_args()
@@ -101,7 +97,23 @@ def main(auto=False,commit_hash='temp',inference_run=[]):
         inference_run = []
         inference_run.append(args.run_type)
         inference_run.append(args.map)
-        inference_run.append(args.num_of_routes)
+
+        if args.run_type == 'training':
+            if args.maps == 'mediumRoundabout4':
+                inference_run.append(13)
+            elif args.maps == 'doubleRoundabout37':
+                inference_run.append(39)
+            else:
+                raise Exception()
+        elif args.run_type == 'testing':
+            if args.maps == 'mediumRoundabout4':
+                inference_run.append(7)
+            elif args.maps == '20m':
+                inference_run.append(16)
+            else:
+                raise Exception()
+        else:
+            raise Exception()
 
         save_dir = f"inference_results/final/{commit_hash}/{inference_run[0]}/"
         args.config["env_config"]["experiment"]["town1"] = inference_run[1]
@@ -214,11 +226,11 @@ if __name__ == "__main__":
         if x != 'y':
             raise Exception()
 
-        print(f'python3 ./ppo_inference_ray.py ppo/ppo_config.yaml "{checkpoint}" "training" "mediumRoundabout4" 13')
-        print(f'python3 ./ppo_inference_ray.py ppo/ppo_config.yaml "{checkpoint}" "training" "doubleRoundabout37" 39')
-        print(f'python3 ./ppo_inference_ray.py ppo/ppo_config.yaml "{checkpoint}" "testing" "20m" 16')
+        print(f'python3 ./ppo_inference_ray.py ppo/ppo_config.yaml "{checkpoint}" "training" "mediumRoundabout4"')
+        print(f'python3 ./ppo_inference_ray.py ppo/ppo_config.yaml "{checkpoint}" "training" "doubleRoundabout37"')
+        print(f'python3 ./ppo_inference_ray.py ppo/ppo_config.yaml "{checkpoint}" "testing" "20m"')
         print(f'AFTERAFTERAFTER')
-        print(f'python3 ./ppo_inference_ray.py ppo/ppo_config.yaml "xyz" "testing" "mediumRoundabout4" 16')
+        print(f'python3 ./ppo_inference_ray.py ppo/ppo_config.yaml "{checkpoint}" "testing" "mediumRoundabout4"')
         print(f'AFTERAFTERAFTER')
         main(auto=True,commit_hash=commit_hash)
     else:
