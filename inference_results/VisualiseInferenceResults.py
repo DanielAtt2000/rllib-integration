@@ -17,7 +17,7 @@ def find_all(path):
             result.append(os.path.join(root, file))
     return result
 
-path = 'final/169760e0_800Model/training'
+path = 'final/d6750979/testing'
 found_files = find_all(path)
 assert len(found_files) == 1
 results = pd.read_csv(found_files[0])
@@ -34,17 +34,19 @@ results = results.replace(['True'],1)
 
 
 results['distance_to_center_of_lane'] = results['distance_to_center_of_lane'].astype('float32')
+results['trailer_distance_to_center_of_lane'] = results['trailer_distance_to_center_of_lane'].astype('float32')
 results['timesteps'] = results['timesteps'].astype('int')
 
 final_results = pd.DataFrame(columns=['route','roundabout', 'timesteps', 'collision_truck', 'collision_trailer', 'timeout', 'truck_lidar_collision',
-     'trailer_lidar_collision', 'distance_to_center_of_lane','distance_to_center_of_lane_completed_only', 'completed'])
+     'trailer_lidar_collision', 'distance_to_center_of_lane','trailer_distance_to_center_of_lane','distance_to_center_of_lane_completed_only', 'completed'])
 total_runs = 0
 total_success = 0
 total_unsuccessful = 0
 total_unsuccessful_truck = 0
 total_unsuccessful_trailer = 0
 total_routes = 0
-total_distance_to_center_of_lane_completed_routes = 0
+truck_total_distance_to_center_of_lane_completed_routes = 0
+trailer_total_distance_to_center_of_lane_completed_routes = 0
 total_completed_routes_at_least_one = 0
 
 def get_route_type(current_entry_idx, current_exit_idx):
@@ -109,9 +111,11 @@ for route in routes:
         completed_routes = indicies.loc[indicies['completed'] == 1]
         combined_completed_routes = completed_routes.sum()
         if len(completed_routes) > 0:
-            average_distance_away_from_lane_for_completed_routes = combined_completed_routes['distance_to_center_of_lane']/len(completed_routes)
+            truck_average_distance_away_from_lane_for_completed_routes = combined_completed_routes['distance_to_center_of_lane']/len(completed_routes)
+            trailer_average_distance_away_from_lane_for_completed_routes = combined_completed_routes['trailer_distance_to_center_of_lane']/len(completed_routes)
         else:
-            average_distance_away_from_lane_for_completed_routes = 0
+            truck_average_distance_away_from_lane_for_completed_routes = 0
+            trailer_average_distance_away_from_lane_for_completed_routes = 0
 
         x = indicies.sum()
         no_of_runs_successful = x['completed']
@@ -120,13 +124,15 @@ for route in routes:
         total_unsuccessful += no_of_runs_unsuccessful
         total_unsuccessful_truck += x['truck_lidar_collision']
         total_unsuccessful_trailer += x['trailer_lidar_collision']
-        total_distance_to_center_of_lane_completed_routes +=average_distance_away_from_lane_for_completed_routes
+        truck_total_distance_to_center_of_lane_completed_routes +=truck_average_distance_away_from_lane_for_completed_routes
+        trailer_total_distance_to_center_of_lane_completed_routes +=trailer_average_distance_away_from_lane_for_completed_routes
         total_completed_routes_at_least_one += 1 if len(completed_routes) > 0 else 0
 
         x['route'] = str(route)
         x['completed'] = x['completed']
         x['timesteps'] = x['timesteps']/no_of_runs
         x['distance_to_center_of_lane'] = x['distance_to_center_of_lane']/no_of_runs
+        x['trailer_distance_to_center_of_lane'] = x['trailer_distance_to_center_of_lane']/no_of_runs
         x['roundabout'] = get_route_type(int(x['route'].split('|')[0]),int(x['route'].split('|')[1]))
 
         # x['route'] = total_routes
@@ -152,7 +158,8 @@ print(f'Success rate overall = {total_success / total_runs}')
 print(f'Unsuccessful rate overall = {total_unsuccessful / total_runs}')
 print(f'Truck collision rate overall = {total_unsuccessful_truck / total_runs}')
 print(f'Trailer collision rate overall = {total_unsuccessful_trailer / total_runs}')
-print(f'Mean distance to center of lane for completed routes = {total_distance_to_center_of_lane_completed_routes / total_completed_routes_at_least_one}')
+print(f'Mean TRUCK distance to center of lane for completed routes = {truck_total_distance_to_center_of_lane_completed_routes / total_completed_routes_at_least_one}')
+print(f'Mean TRAILER distance to center of lane for completed routes = {trailer_total_distance_to_center_of_lane_completed_routes / total_completed_routes_at_least_one}')
 print(f'Total Routes = {total_routes}')
 
 import seaborn as sns
