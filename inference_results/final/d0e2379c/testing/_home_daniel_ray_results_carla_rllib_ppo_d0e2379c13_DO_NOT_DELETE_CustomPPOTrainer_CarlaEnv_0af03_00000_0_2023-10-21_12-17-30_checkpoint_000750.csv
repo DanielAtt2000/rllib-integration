@@ -113,5 +113,3 @@ route,timesteps,collision_truck,collision_trailer,timeout,truck_lidar_collision,
 34|6,801,False,False,False,False,False,1.0156067182605777,0.569948872463265,True
 61|12,281,False,False,False,False,False,0.34810415220796526,0.44947623126642283,True
 19|6,750,False,False,False,False,False,0.4994307293018647,0.6186246854017243,True
-29|36,298,False,False,False,False,False,0.3344867305140138,0.20528395044373424,True
-29|55,488,False,False,False,False,False,0.40260266115069415,0.18902280653588105,True
