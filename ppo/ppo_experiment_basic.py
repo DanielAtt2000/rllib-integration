@@ -705,12 +705,12 @@ class PPOExperimentBasic(BaseExperiment):
         forward_vector_waypoint_7 = core.route[core.last_waypoint_index + 7].get_forward_vector()
         forward_vector_waypoint_10 = core.route[core.last_waypoint_index + 10].get_forward_vector()
 
-        d = 8
+        d = 3
         magnitude_of_trailer_forward_vector = math.sqrt(trailer_forward_vector.x**2+trailer_forward_vector.y**2+trailer_forward_vector.z**2)
         trailer_rear_axle_transform = carla.Transform(
-            carla.Location(trailer_forward_vector.x-trailer_forward_vector.x*magnitude_of_trailer_forward_vector*d,
-                           trailer_forward_vector.y-trailer_forward_vector.y*magnitude_of_trailer_forward_vector*d,
-                           trailer_forward_vector.z-trailer_forward_vector.z*magnitude_of_trailer_forward_vector*d),
+            carla.Location(trailer_transform.location.x-trailer_forward_vector.x*magnitude_of_trailer_forward_vector*d,
+                           trailer_transform.location.y-trailer_forward_vector.y*magnitude_of_trailer_forward_vector*d,
+                           trailer_transform.location.z-trailer_forward_vector.z*magnitude_of_trailer_forward_vector*d),
             carla.Rotation(0, 0, 0))
 
         # print(f"BEFORE CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
