@@ -61,6 +61,19 @@ def main(auto=False,commit_hash='temp',inference_run=[]):
         "checkpoint",
         type=str,
         help="Checkpoint from which to roll out.")
+    argparser.add_argument(
+        "run_type",
+        type=str,
+        help="run_type")
+    argparser.add_argument(
+        "map",
+        type=str,
+        help="map")
+    argparser.add_argument(
+        "num_of_routes",
+        type=str,
+        help="num_of_routes")
+
 
     args = argparser.parse_args()
     args.config = parse_config(args)
@@ -85,6 +98,11 @@ def main(auto=False,commit_hash='temp',inference_run=[]):
         numbers_of_times_per_route = 2
         total_episodes = (numbers_of_times_per_route + 2 ) * int(x)
     else:
+        inference_run = []
+        inference_run.append(args.run_type)
+        inference_run.append(args.map)
+        inference_run.append(args.num_of_routes)
+
         save_dir = f"inference_results/final/{commit_hash}/{inference_run[0]}/"
         args.config["env_config"]["experiment"]["town1"] = inference_run[1]
         save_to_pickle('server_maps', [inference_run[1]])
@@ -161,6 +179,7 @@ def main(auto=False,commit_hash='temp',inference_run=[]):
         print("\nshutdown by user")
     finally:
         save_to_pickle('mediumRoundabout4Type', '')
+        print(f'\n\n Done running inference for {inference_run[0]} {inference_run[1]} {inference_run[2]}\n\n')
         ray.shutdown()
         # kill_all_servers()
 
@@ -169,8 +188,10 @@ if __name__ == "__main__":
     if x != 'y':
         raise Exception()
 
+    run = 2
     run_all = False
-    if run_all:
+
+    if run_all and run != 2:
         commit_hash = "d5efe1c5"
         x = input(f'Confirm saving to commit hash {commit_hash}? (y/n): ')
         if x != 'y':
@@ -183,5 +204,22 @@ if __name__ == "__main__":
         ]
         for run in runs:
             main(auto=True, commit_hash=commit_hash, inference_run=run)
+    elif run == 2:
+        commit_hash = "temp"
+        checkpoint = '/home/daniel/ray_results/carla_rllib/ppo_d67509795c_DO_NOT_DELETE/CustomPPOTrainer_CarlaEnv_f15cc_00000_0_2023-10-21_20-23-33/checkpoint_001050'
+        x = input(f'Confirm saving to commit hash {commit_hash}? (y/n): ')
+        if x != 'y':
+            raise Exception()
+        x = input(f'Ensure that medium is not run twice? (y/n): ')
+        if x != 'y':
+            raise Exception()
+
+        print(f'python3 ./ppo_inference_ray.py ppo/ppo_config.yaml "{checkpoint}" "training" "mediumRoundabout4" 13')
+        print(f'python3 ./ppo_inference_ray.py ppo/ppo_config.yaml "{checkpoint}" "training" "doubleRoundabout37" 39')
+        print(f'python3 ./ppo_inference_ray.py ppo/ppo_config.yaml "{checkpoint}" "testing" "20m" 16')
+        print(f'AFTERAFTERAFTER')
+        print(f'python3 ./ppo_inference_ray.py ppo/ppo_config.yaml "xyz" "testing" "mediumRoundabout4" 16')
+        print(f'AFTERAFTERAFTER')
+        main(auto=True,commit_hash=commit_hash)
     else:
         main(auto=False)
