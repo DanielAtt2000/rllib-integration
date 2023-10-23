@@ -164,7 +164,7 @@ def main():
                        host="localhost", port="6010")
 
 
-    specific_version = True
+    specific_version = False
     check_commit = True
 
     output = get_server_maps_dist(config=args.config)
@@ -178,7 +178,7 @@ def main():
         args.name = args.name + '_' + str(commit_hash())
 
         if specific_version:
-            args.name = "ppo_98bf3e6ed7_DO_NOT_DELETE"
+            args.name = ""
             x = random.randint(0,100)
             inp = input(f'SPECIFIC NAME APPLIED  ENTER {x} to confirm:')
 

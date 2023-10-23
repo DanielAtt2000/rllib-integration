@@ -40,6 +40,7 @@ class SACExperimentBasic(BaseExperiment):
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
+        self.traffic = self.config["others"]["traffic"]
         self.allowed_types = [carla.LaneType.Driving, carla.LaneType.Parking]
         self.last_angle_with_center = 0
         self.last_forward_velocity = 0
@@ -62,7 +63,7 @@ class SACExperimentBasic(BaseExperiment):
 
         self.last_closest_distance_to_next_waypoint_line = 0
         self.last_closest_distance_to_next_plus_1_waypoint_line = 0
-
+        self.current_trailer_waypoint = 0
         self.x_dist_to_waypoint = []
         self.y_dist_to_waypoint = []
         self.angle_to_center_of_lane_degrees = []
@@ -146,6 +147,23 @@ class SACExperimentBasic(BaseExperiment):
 
         if not os.path.exists(self.directory):
             os.mkdir(self.directory)
+
+    def get_sidewalk_vehicle_lidar_points(self,lidar_points):
+        # 8 is the number for sidewalk while 10 is for vehicles
+
+        # We choose it from the second axis of lidar_points because
+        # in sensor.py parse() we output the ObjTag in the third axis
+
+        # lidar_points[0] is used to take the values from since we want
+        # the x-axis values i.e those infront of the lidar sensor
+
+        sidewalk_usable_indices = np.where(lidar_points[2] == 8)
+        sidewalk_lidar_points = np.take(lidar_points[0], sidewalk_usable_indices)
+
+        vehicle_usable_indices = np.where(lidar_points[2] == 10)
+        vehicle_lidar_points = np.take(lidar_points[0], vehicle_usable_indices)
+
+        return sidewalk_lidar_points[0], vehicle_lidar_points[0]
 
     def save_to_file(self, file_name, data):
         # Saving LIDAR point count
@@ -242,6 +260,7 @@ class SACExperimentBasic(BaseExperiment):
         self.truck_lidar_collision = False
         self.trailer_lidar_collision = False
 
+        self.current_trailer_waypoint = 0
 
         for i in range(self.max_amount_of_occupancy_maps):
             self.occupancy_maps.append(np.zeros((self.occupancy_map_y, self.occupancy_map_x,1)))
@@ -410,41 +429,77 @@ class SACExperimentBasic(BaseExperiment):
         Set observation space as location of vehicle im x,y starting at (0,0) and ending at (1,1)
         :return:
         """
-        obs_space = Dict( {
-            'values':Box(
-                low=np.array([0,0,0,0,0,0,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,-math.pi,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
-                high=np.array([100,200,200,200,200,20,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,math.pi,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]),
-                dtype=np.float32
-            )
-        })
-        # test
-        # image_space = Dict(
-        #     {"values":
-            # "depth_camera": Box(
-            #     low=0,
-            #     high=256,
-            #     shape=(84, 84, 3),
-            #     dtype=np.float32
-            # ),
-            # "occupancyMap_now": Box(
-            #     low=0,
-            #     high=1,
-            #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
-            #     dtype=np.float64
-            # ),
-            # "occupancyMap_05": Box(
-            #     low=0,
-            #     high=1,
-            #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
-            #     dtype=np.float64
-            # ),
-            # "occupancyMap_1": Box(
-            #     low=0,
-            #     high=1,
-            #     shape=(self.occupancy_map_y, self.occupancy_map_x, 1),
-            #     dtype=np.float64
-            # )
-            # })
+        if self.traffic:
+            obs_space = Dict({
+                'values': Box(
+                    low=np.array(
+                        [0, 0, 0, 0, 0, 0, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi,
+                         -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, -math.pi, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         # traffic
+                         # velocity, acceleration, yaw, relative_x, relative_y
+                         0, 0, -math.pi, -200, -200,
+                         0, 0, -math.pi, -200, -200,
+                         ]),
+                    high=np.array(
+                        [100, 200, 200, 200, 200, 25, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi,
+                         math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, math.pi, 1, 1, 1, 1, 1,
+                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                         1, 1, 1, 1, 1, 1, 1,
+                         # traffic
+                         # velocity, acceleration, yaw, relative_x, relative_y
+                         100, 200, math.pi, 200, 200,
+                         100, 200, math.pi, 200, 200,
+                         ]),
+                    dtype=np.float32
+                )
+            })
+        else:
+            obs_space = Dict({
+                'values': Box(
+                    low=np.array(
+                        [0, 0, 0, 0, 0, 0,
+                         # Angle to center of lane
+                         -math.pi, -math.pi, -math.pi, -math.pi, -math.pi,
+                         # Truck bearing to waypoint
+                         -math.pi, -math.pi, -math.pi, -math.pi, -math.pi,
+                         # Trailer bearing to waypoint
+                         -math.pi, -math.pi, -math.pi, -math.pi, -math.pi,
+                         # Angle between truck and trailer
+                         -math.pi,
+                         # Angle between waypoints
+                         0, 0, 0, 0, 0, 0, 0, 0,
+                         # Lidar data
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         # Radius
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                         ]),
+                    high=np.array(
+                        [100, 200, 200, 200, 200, 25,
+                         # Angle to center of lane
+                         math.pi, math.pi, math.pi, math.pi, math.pi,
+                         # Truck bearing to waypoint
+                         math.pi, math.pi, math.pi, math.pi, math.pi,
+                         # Trailer bearing to waypoint
+                         math.pi, math.pi, math.pi, math.pi, math.pi,
+                         # Angle between truck and trailer
+                         math.pi,
+                         # Angle between waypoints
+                         1, 1, 1, 1, 1, 1, 1, 1,
+                         # Lidar data
+                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                         # Radius
+                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+                         ]),
+                    dtype=np.float32
+                )
+            })
+
         return obs_space
 
     def get_actions(self):
@@ -473,6 +528,7 @@ class SACExperimentBasic(BaseExperiment):
             # 1: [0, 0.00, 0.5, False, False],  # half brake
             # 1: [0, 0.00, 1.0, False, False],  # full brake
             # 1: [0, 0.00, 1.0, False, False],  # full brake
+            # Discrete with pid value
             0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
             1: [acceleration_value, 0.80, 0.0, False, False],  # Right
             2: [acceleration_value, 0.60, 0.0, False, False],  # Right
@@ -482,6 +538,52 @@ class SACExperimentBasic(BaseExperiment):
             6: [acceleration_value, -0.60, 0.0, False, False],  # Left
             7: [acceleration_value, -0.40, 0.0, False, False],  # Left
             8: [acceleration_value, -0.20, 0.0, False, False],  # Left
+
+
+            # Discrete with custom acceleration
+            # 0: [0.0, 0.00, 0.0, False, False],  # Dont Move
+            # 1: [0.0, 0.00, 1.0, False, False],  # Brake
+            #
+            # 2: [0.1, 0.00, 0.0, False, False],  # Straight
+            # 3: [0.1, 0.80, 0.0, False, False],  # Right
+            # 4: [0.1, 0.60, 0.0, False, False],  # Right
+            # 5: [0.1, 0.40, 0.0, False, False],  # Right
+            # 6: [0.1, 0.20, 0.0, False, False],  # Right
+            # 7: [0.1, -0.80, 0.0, False, False],  # Left
+            # 8: [0.1, -0.60, 0.0, False, False],  # Left
+            # 9: [0.1, -0.40, 0.0, False, False],  # Left
+            # 10: [0.1, -0.20, 0.0, False, False],  # Left
+            #
+            # 11: [0.3, 0.00, 0.0, False, False],  # Straight
+            # 12: [0.3, 0.80, 0.0, False, False],  # Right
+            # 13: [0.3, 0.60, 0.0, False, False],  # Right
+            # 14: [0.3, 0.40, 0.0, False, False],  # Right
+            # 15: [0.3, 0.20, 0.0, False, False],  # Right
+            # 16: [0.3, -0.80, 0.0, False, False],  # Left
+            # 17: [0.3, -0.60, 0.0, False, False],  # Left
+            # 18: [0.3, -0.40, 0.0, False, False],  # Left
+            # 19: [0.3, -0.20, 0.0, False, False],  # Left
+            #
+            # 20: [0.6, 0.00, 0.0, False, False],  # Straight
+            # 21: [0.6, 0.80, 0.0, False, False],  # Right
+            # 22: [0.6, 0.60, 0.0, False, False],  # Right
+            # 23: [0.6, 0.40, 0.0, False, False],  # Right
+            # 24: [0.6, 0.20, 0.0, False, False],  # Right
+            # 25: [0.6, -0.80, 0.0, False, False],  # Left
+            # 26: [0.6, -0.60, 0.0, False, False],  # Left
+            # 27: [0.6, -0.40, 0.0, False, False],  # Left
+            # 28: [0.6, -0.20, 0.0, False, False],  # Left
+
+            # 29: [0.9, 0.00, 0.0, False, False],  # Straight
+            # 30: [0.9, 0.80, 0.0, False, False],  # Right
+            # 31: [0.9, 0.60, 0.0, False, False],  # Right
+            # 32: [0.9, 0.40, 0.0, False, False],  # Right
+            # 33: [0.9, 0.20, 0.0, False, False],  # Right
+            # 34: [0.9, -0.80, 0.0, False, False],  # Left
+            # 35: [0.9, -0.60, 0.0, False, False],  # Left
+            # 36: [0.9, -0.40, 0.0, False, False],  # Left
+            # 37: [0.9, -0.20, 0.0, False, False],  # Left
+
             # 0: [0.0, 0.00, 0.0, False, False],  # Coast
             # 1: [0.0, 0.00, 1.0, False, False],  # Apply Break
             # 2: [0.0, 0.75, 0.0, False, False],  # Right
@@ -603,6 +705,14 @@ class SACExperimentBasic(BaseExperiment):
         forward_vector_waypoint_7 = core.route[core.last_waypoint_index + 7].get_forward_vector()
         forward_vector_waypoint_10 = core.route[core.last_waypoint_index + 10].get_forward_vector()
 
+        d = 3
+        magnitude_of_trailer_forward_vector = math.sqrt(trailer_forward_vector.x**2+trailer_forward_vector.y**2+trailer_forward_vector.z**2)
+        trailer_rear_axle_transform = carla.Transform(
+            carla.Location(trailer_transform.location.x-trailer_forward_vector.x*magnitude_of_trailer_forward_vector*d,
+                           trailer_transform.location.y-trailer_forward_vector.y*magnitude_of_trailer_forward_vector*d,
+                           trailer_transform.location.z-trailer_forward_vector.z*magnitude_of_trailer_forward_vector*d),
+            carla.Rotation(0, 0, 0))
+
         # print(f"BEFORE CHECKING IF PASSED LAST WAYPOINT {core.last_waypoint_index}")
         # Checking if we have passed the last way point
 
@@ -617,6 +727,16 @@ class SACExperimentBasic(BaseExperiment):
             print('Passed Waypoint <------------') if self.custom_enable_rendering else None
         else:
             pass
+
+        distance_to_next_waypoint_line_trailer = core.distToSegment(truck_transform=trailer_rear_axle_transform,waypoint_no=self.current_trailer_waypoint,waypoint_plus_current=1)
+        in_front_of_waypoint_trailer = core.is_in_front_of_waypoint(trailer_rear_axle_transform.location.x, trailer_rear_axle_transform.location.y,waypoint_no=self.current_trailer_waypoint)
+        if 10 > distance_to_next_waypoint_line_trailer and (in_front_of_waypoint_trailer == 0 or in_front_of_waypoint_trailer == 1):
+            self.current_trailer_waypoint = self.current_trailer_waypoint + 1
+            print('Trailer Passed Waypoint <------------') if self.custom_enable_rendering else None
+        else:
+            pass
+
+
 
         lidar = False
 
@@ -665,6 +785,7 @@ class SACExperimentBasic(BaseExperiment):
             (x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
 
         distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=truck_transform)
+        trailer_distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=trailer_rear_axle_transform,waypoint_no=self.current_trailer_waypoint)
 
         truck_bearing_to_waypoint = angle_between(waypoint_forward_vector=forward_vector_waypoint_0,
                                                   vehicle_forward_vector=truck_forward_vector)
@@ -836,40 +957,105 @@ class SACExperimentBasic(BaseExperiment):
                         in_front_of_waypoint=in_front_of_waypoint,
                         angle=angle_to_center_of_lane_degrees)
 
+        if self.traffic:
+            # For the 5 nearest vehicles get the:
+            # Relative x and y positions
+            # Rotation
+            # Acceleration
+            # Velocity
 
+            self.traffic_observations = []
+            max_no_of_vehicles = 2
+            # First find the nearest 5 vehicles
+            distance_to_truck = []
+            for actor in core.actors:
+                actor_transform = actor.get_transform()
+                distance_to_truck.append(truck_transform.location.distance(actor_transform.location))
+
+            indices_of_shortest_distances = sorted(range(len(distance_to_truck)), key=lambda k: distance_to_truck[k])
+
+            for i, index_of_closest_actor in enumerate(indices_of_shortest_distances):
+                if i == max_no_of_vehicles:
+                    break
+                actor_transform = core.actors[index_of_closest_actor].get_transform()
+
+                actor_velocity = self.get_speed(core.actors[index_of_closest_actor])
+                actor_acceleration = self.get_acceleration(core.actors[index_of_closest_actor])
+                actor_yaw = np.clip(actor_transform.rotation.yaw * 0.0174533,-math.pi, math.pi)  # to convert to radians
+                actor_relative_x = truck_transform.location.x - actor_transform.location.x
+                actor_relative_y = truck_transform.location.y - actor_transform.location.y
+
+                self.traffic_observations.extend([actor_velocity,actor_acceleration,actor_yaw,actor_relative_x,actor_relative_y])
+
+            if len(self.traffic_observations) < max_no_of_vehicles * 5:
+                for i in range((max_no_of_vehicles * 5) - len(self.traffic_observations)):
+                    self.traffic_observations.append(0)
 
         depth_camera_data = None
         current_occupancy_map = None
-        trailer_0_left = 0
-        trailer_0_right = 0
-        trailer_1_left = 0
-        trailer_1_right = 0
-        trailer_2_left = 0
-        trailer_2_right = 0
-        trailer_3_left = 0
-        trailer_3_right = 0
-        trailer_4_left = 0
-        trailer_4_right = 0
-        trailer_5_left = 0
-        trailer_5_right = 0
-        trailer_6_left = 0
-        trailer_6_right = 0
-        trailer_7_left = 0
-        trailer_7_right = 0
+        trailer_0_left_sidewalk = 0
+        trailer_0_right_sidewalk = 0
+        trailer_1_left_sidewalk = 0
+        trailer_1_right_sidewalk = 0
+        trailer_2_left_sidewalk = 0
+        trailer_2_right_sidewalk = 0
+        trailer_3_left_sidewalk = 0
+        trailer_3_right_sidewalk = 0
+        trailer_4_left_sidewalk = 0
+        trailer_4_right_sidewalk = 0
+        trailer_5_left_sidewalk = 0
+        trailer_5_right_sidewalk = 0
+        trailer_6_left_sidewalk = 0
+        trailer_6_right_sidewalk = 0
+        trailer_7_left_sidewalk = 0
+        trailer_7_right_sidewalk = 0
 
-        truck_center = 0
-        truck_right = 0
-        truck_left= 0
-        truck_front_15right = 0
-        truck_front_30right = 0
-        truck_front_45right = 0
-        truck_front_60right = 0
-        truck_front_75right = 0
-        truck_front_15left = 0
-        truck_front_30left = 0
-        truck_front_45left = 0
-        truck_front_60left = 0
-        truck_front_75left = 0
+        if self.traffic:
+            trailer_0_left_vehicle = 0
+            trailer_0_right_vehicle = 0
+            trailer_1_left_vehicle = 0
+            trailer_1_right_vehicle = 0
+            trailer_2_left_vehicle = 0
+            trailer_2_right_vehicle = 0
+            trailer_3_left_vehicle = 0
+            trailer_3_right_vehicle = 0
+            trailer_4_left_vehicle = 0
+            trailer_4_right_vehicle = 0
+            trailer_5_left_vehicle = 0
+            trailer_5_right_vehicle = 0
+            trailer_6_left_vehicle = 0
+            trailer_6_right_vehicle = 0
+            trailer_7_left_vehicle = 0
+            trailer_7_right_vehicle = 0
+
+        truck_center_sidewalk = 0
+        truck_right_sidewalk = 0
+        truck_left_sidewalk = 0
+        truck_front_15right_sidewalk = 0
+        truck_front_30right_sidewalk = 0
+        truck_front_45right_sidewalk = 0
+        truck_front_60right_sidewalk = 0
+        truck_front_75right_sidewalk = 0
+        truck_front_15left_sidewalk = 0
+        truck_front_30left_sidewalk = 0
+        truck_front_45left_sidewalk = 0
+        truck_front_60left_sidewalk = 0
+        truck_front_75left_sidewalk = 0
+
+        if self.traffic:
+            truck_center_vehicle = 0
+            truck_right_vehicle = 0
+            truck_left_vehicle = 0
+            truck_front_15right_vehicle = 0
+            truck_front_30right_vehicle = 0
+            truck_front_45right_vehicle = 0
+            truck_front_60right_vehicle = 0
+            truck_front_75right_vehicle = 0
+            truck_front_15left_vehicle = 0
+            truck_front_30left_vehicle = 0
+            truck_front_45left_vehicle = 0
+            truck_front_60left_vehicle = 0
+            truck_front_75left_vehicle = 0
 
         for sensor in sensor_data:
             if sensor == 'collision_truck':
@@ -900,532 +1086,297 @@ class SACExperimentBasic(BaseExperiment):
                 # print(depth_camera_data.shape)
 
                 assert depth_camera_data is not None
-            elif sensor == "lidar_truck_side_truck":
-                lidar_points = sensor_data['lidar_truck_side_truck'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_side"]["range"])
 
-                # LIDAR GRAPH
-                #           x
-                #           |
-                #           |
-                # ----------+-------- y
-                #           |
-                #           |
-
-                # Left and Right Lidar points
-                horizontal_indices = np.where((lidar_points[0] > -1) & (lidar_points[0] < 1 ))
-                horizontal_relevant_lidar_y_points = lidar_points[1][horizontal_indices]
-
-                # Forward lidar points
-                vertical_indices = np.where((lidar_points[1] > -1) & (lidar_points[1] < 1) & (lidar_points[0] > 0))
-                vertical_relevant_lidar_x_points = lidar_points[0][vertical_indices]
-
-                # Angled lidar points
-                angle_45_indices = np.where((lidar_points[0] > 0) & (np.absolute(np.absolute(lidar_points[0]) - np.absolute(lidar_points[1])) <= 1.5))
-                angle_45_relevant_lidar_x_points = lidar_points[0][angle_45_indices]
-                angle_45_relevant_lidar_y_points = lidar_points[1][angle_45_indices]
-
-                # print(f"lidar opints {lidar_points}")
-                # print(f"horizontal_indices {horizontal_indices}")
-                # print(f"horizontal_relevant_lidar_y_points {horizontal_relevant_lidar_y_points}")
-                # print(f"vertical_indices {vertical_indices}")
-                # print(f"vertical_relevant_lidar_x_points {vertical_relevant_lidar_x_points}")
-                # print(f"angle_45_indices {angle_45_indices}")
-                # print(f"angle_45_relevant_lidar_x_points{angle_45_relevant_lidar_x_points}")
-                # print(f"angle_45_relevant_lidar_y_points{angle_45_relevant_lidar_y_points}")
-
-                if len(angle_45_relevant_lidar_x_points) == 0:
-                    truck_front_right = 1
-                    truck_front_left = 1
-                else:
-
-                    greater_0_indices = np.where(angle_45_relevant_lidar_y_points > 0)
-                    smaller_0_indices = np.where(angle_45_relevant_lidar_y_points < 0)
-
-
-                    if greater_0_indices[0].size != 0:
-                        closest_point = min(abs(angle_45_relevant_lidar_x_points[greater_0_indices]**2 + angle_45_relevant_lidar_y_points[greater_0_indices]**2))
-                        truck_front_right = math.sqrt(closest_point) / lidar_range
-                    else:
-                        truck_front_right = 1
-
-                    if smaller_0_indices[0].size != 0:
-                        closest_point = min(abs(
-                            angle_45_relevant_lidar_x_points[smaller_0_indices] ** 2 + angle_45_relevant_lidar_y_points[
-                                smaller_0_indices] ** 2))
-                        truck_front_left = math.sqrt(closest_point) / lidar_range
-                    else:
-                        truck_front_left = 1
-
-                    if truck_front_right < 0:
-                        truck_front_right = 0
-
-                    if truck_front_left < 0:
-                        truck_front_left = 0
-
-
-                if len(horizontal_relevant_lidar_y_points) == 0:
-                    truck_right = 1
-                    truck_left = 1
-                else:
-                    greater_0_indices = np.where(horizontal_relevant_lidar_y_points > 0)
-                    smaller_0_indices = np.where(horizontal_relevant_lidar_y_points < 0)
-
-
-                    if greater_0_indices[0].size != 0:
-                        truck_right = min(abs(horizontal_relevant_lidar_y_points[greater_0_indices])) / lidar_range
-                    else:
-                        truck_right = 1
-
-                    if smaller_0_indices[0].size != 0:
-                        truck_left = min(abs(horizontal_relevant_lidar_y_points[smaller_0_indices])) / lidar_range
-                    else:
-                        truck_left = 1
-
-                    if truck_right < 0:
-                        truck_right = 0
-
-                    if truck_left < 0:
-                        truck_left = 0
-
-                if len(vertical_relevant_lidar_x_points) == 0:
-                    truck_center = 1
-                else:
-                    truck_center = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
-
-                    if truck_center < 0:
-                        truck_center = 0
-
-            elif sensor == "lidar_trailer_0_left_3x_trailer":
-                lidar_points = sensor_data['lidar_trailer_0_left_3x_trailer'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_left_3x"]["range"])
-
-                # LIDAR GRAPH
-                #           x
-                #           |
-                #           |
-                # ----------+-------- y
-                #           |
-                #           |
-
-                # Forward lidar points
-                vertical_indices = np.where((lidar_points[1] > -1) & (lidar_points[1] < 1) & (lidar_points[0] > 0))
-                vertical_relevant_lidar_x_points = lidar_points[0][vertical_indices]
-
-                # Angled lidar points
-                angle_45_indices = np.where((lidar_points[0] > 0) & (np.absolute(np.absolute(lidar_points[0]) - np.absolute(lidar_points[1])) <= 1.5))
-                angle_45_relevant_lidar_x_points = lidar_points[0][angle_45_indices]
-                angle_45_relevant_lidar_y_points = lidar_points[1][angle_45_indices]
-
-                # print(f"lidar opints {lidar_points}")
-                # print(f"horizontal_indices {horizontal_indices}")
-                # print(f"horizontal_relevant_lidar_y_points {horizontal_relevant_lidar_y_points}")
-                # print(f"vertical_indices {vertical_indices}")
-                # print(f"vertical_relevant_lidar_x_points {vertical_relevant_lidar_x_points}")
-                # print(f"angle_45_indices {angle_45_indices}")
-                # print(f"angle_45_relevant_lidar_x_points{angle_45_relevant_lidar_x_points}")
-                # print(f"angle_45_relevant_lidar_y_points{angle_45_relevant_lidar_y_points}")
-
-                if len(angle_45_relevant_lidar_x_points) == 0:
-                    trailer_0_left = 1
-                    trailer_2_left = 1
-                else:
-
-                    greater_0_indices = np.where(angle_45_relevant_lidar_y_points > 0)
-                    smaller_0_indices = np.where(angle_45_relevant_lidar_y_points < 0)
-
-
-                    if greater_0_indices[0].size != 0:
-                        closest_point = min(abs(angle_45_relevant_lidar_x_points[greater_0_indices]**2 + angle_45_relevant_lidar_y_points[greater_0_indices]**2))
-                        trailer_0_left = math.sqrt(closest_point) / lidar_range
-                    else:
-                        trailer_0_left = 1
-
-                    if smaller_0_indices[0].size != 0:
-                        closest_point = min(abs(
-                            angle_45_relevant_lidar_x_points[smaller_0_indices] ** 2 + angle_45_relevant_lidar_y_points[
-                                smaller_0_indices] ** 2))
-                        trailer_2_left = math.sqrt(closest_point) / lidar_range
-                    else:
-                        trailer_2_left = 1
-
-                    if trailer_0_left < 0:
-                        trailer_0_left = 0
-
-                    if trailer_2_left < 0:
-                        trailer_2_left = 0
-
-                if len(vertical_relevant_lidar_x_points) == 0:
-                    trailer_1_left = 1
-                else:
-                    trailer_1_left = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
-
-                    if trailer_1_left < 0:
-                        trailer_1_left = 0
-
-            elif sensor == "lidar_trailer_1_left_3x_trailer":
-                lidar_points = sensor_data['lidar_trailer_1_left_3x_trailer'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_left_3x"]["range"])
-
-                # LIDAR GRAPH
-                #           x
-                #           |
-                #           |
-                # ----------+-------- y
-                #           |
-                #           |
-
-                # Forward lidar points
-                vertical_indices = np.where((lidar_points[1] > -1) & (lidar_points[1] < 1) & (lidar_points[0] > 0))
-                vertical_relevant_lidar_x_points = lidar_points[0][vertical_indices]
-
-                # Angled lidar points
-                angle_45_indices = np.where((lidar_points[0] > 0) & (np.absolute(np.absolute(lidar_points[0]) - np.absolute(lidar_points[1])) <= 1.5))
-                angle_45_relevant_lidar_x_points = lidar_points[0][angle_45_indices]
-                angle_45_relevant_lidar_y_points = lidar_points[1][angle_45_indices]
-
-                # print(f"lidar opints {lidar_points}")
-                # print(f"horizontal_indices {horizontal_indices}")
-                # print(f"horizontal_relevant_lidar_y_points {horizontal_relevant_lidar_y_points}")
-                # print(f"vertical_indices {vertical_indices}")
-                # print(f"vertical_relevant_lidar_x_points {vertical_relevant_lidar_x_points}")
-                # print(f"angle_45_indices {angle_45_indices}")
-                # print(f"angle_45_relevant_lidar_x_points{angle_45_relevant_lidar_x_points}")
-                # print(f"angle_45_relevant_lidar_y_points{angle_45_relevant_lidar_y_points}")
-
-                if len(angle_45_relevant_lidar_x_points) == 0:
-                    trailer_3_left = 1
-                    trailer_5_left = 1
-                else:
-
-                    greater_0_indices = np.where(angle_45_relevant_lidar_y_points > 0)
-                    smaller_0_indices = np.where(angle_45_relevant_lidar_y_points < 0)
-
-
-                    if greater_0_indices[0].size != 0:
-                        closest_point = min(abs(angle_45_relevant_lidar_x_points[greater_0_indices]**2 + angle_45_relevant_lidar_y_points[greater_0_indices]**2))
-                        trailer_3_left = math.sqrt(closest_point) / lidar_range
-                    else:
-                        trailer_3_left = 1
-
-                    if smaller_0_indices[0].size != 0:
-                        closest_point = min(abs(
-                            angle_45_relevant_lidar_x_points[smaller_0_indices] ** 2 + angle_45_relevant_lidar_y_points[
-                                smaller_0_indices] ** 2))
-                        trailer_5_left = math.sqrt(closest_point) / lidar_range
-                    else:
-                        trailer_5_left = 1
-
-                    if trailer_3_left < 0:
-                        trailer_3_left = 0
-
-                    if trailer_5_left < 0:
-                        trailer_5_left = 0
-
-                if len(vertical_relevant_lidar_x_points) == 0:
-                    trailer_4_left = 1
-                else:
-                    trailer_4_left = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
-
-                    if trailer_4_left < 0:
-                        trailer_4_left = 0
-
-            elif sensor == "lidar_trailer_0_right_3x_trailer":
-                lidar_points = sensor_data['lidar_trailer_0_right_3x_trailer'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_right_3x"]["range"])
-
-                # LIDAR GRAPH
-                #           x
-                #           |
-                #           |
-                # ----------+-------- y
-                #           |
-                #           |
-
-                # Forward lidar points
-                vertical_indices = np.where((lidar_points[1] > -1) & (lidar_points[1] < 1) & (lidar_points[0] > 0))
-                vertical_relevant_lidar_x_points = lidar_points[0][vertical_indices]
-
-                # Angled lidar points
-                angle_45_indices = np.where((lidar_points[0] > 0) & (np.absolute(np.absolute(lidar_points[0]) - np.absolute(lidar_points[1])) <= 1.5))
-                angle_45_relevant_lidar_x_points = lidar_points[0][angle_45_indices]
-                angle_45_relevant_lidar_y_points = lidar_points[1][angle_45_indices]
-
-                # print(f"lidar opints {lidar_points}")
-                # print(f"horizontal_indices {horizontal_indices}")
-                # print(f"horizontal_relevant_lidar_y_points {horizontal_relevant_lidar_y_points}")
-                # print(f"vertical_indices {vertical_indices}")
-                # print(f"vertical_relevant_lidar_x_points {vertical_relevant_lidar_x_points}")
-                # print(f"angle_45_indices {angle_45_indices}")
-                # print(f"angle_45_relevant_lidar_x_points{angle_45_relevant_lidar_x_points}")
-                # print(f"angle_45_relevant_lidar_y_points{angle_45_relevant_lidar_y_points}")
-
-                if len(angle_45_relevant_lidar_x_points) == 0:
-                    trailer_0_right = 1
-                    trailer_2_right = 1
-                else:
-
-                    greater_0_indices = np.where(angle_45_relevant_lidar_y_points > 0)
-                    smaller_0_indices = np.where(angle_45_relevant_lidar_y_points < 0)
-
-
-                    if greater_0_indices[0].size != 0:
-                        closest_point = min(abs(angle_45_relevant_lidar_x_points[greater_0_indices]**2 + angle_45_relevant_lidar_y_points[greater_0_indices]**2))
-                        trailer_0_right = math.sqrt(closest_point) / lidar_range
-                    else:
-                        trailer_0_right = 1
-
-                    if smaller_0_indices[0].size != 0:
-                        closest_point = min(abs(
-                            angle_45_relevant_lidar_x_points[smaller_0_indices] ** 2 + angle_45_relevant_lidar_y_points[
-                                smaller_0_indices] ** 2))
-                        trailer_2_right = math.sqrt(closest_point) / lidar_range
-                    else:
-                        trailer_2_right = 1
-
-                    if trailer_0_right < 0:
-                        trailer_0_right = 0
-
-                    if trailer_2_right < 0:
-                        trailer_2_right = 0
-
-                if len(vertical_relevant_lidar_x_points) == 0:
-                    trailer_1_right = 1
-                else:
-                    trailer_1_right = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
-
-                    if trailer_1_right < 0:
-                        trailer_1_right = 0
-
-            elif sensor == "lidar_trailer_1_right_3x_trailer":
-                lidar_points = sensor_data['lidar_trailer_1_right_3x_trailer'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_right_3x"]["range"])
-
-                # LIDAR GRAPH
-                #           x
-                #           |
-                #           |
-                # ----------+-------- y
-                #           |
-                #           |
-
-                # Forward lidar points
-                vertical_indices = np.where((lidar_points[1] > -1) & (lidar_points[1] < 1) & (lidar_points[0] > 0))
-                vertical_relevant_lidar_x_points = lidar_points[0][vertical_indices]
-
-                # Angled lidar points
-                angle_45_indices = np.where((lidar_points[0] > 0) & (np.absolute(np.absolute(lidar_points[0]) - np.absolute(lidar_points[1])) <= 1.5))
-                angle_45_relevant_lidar_x_points = lidar_points[0][angle_45_indices]
-                angle_45_relevant_lidar_y_points = lidar_points[1][angle_45_indices]
-
-                # print(f"lidar opints {lidar_points}")
-                # print(f"horizontal_indices {horizontal_indices}")
-                # print(f"horizontal_relevant_lidar_y_points {horizontal_relevant_lidar_y_points}")
-                # print(f"vertical_indices {vertical_indices}")
-                # print(f"vertical_relevant_lidar_x_points {vertical_relevant_lidar_x_points}")
-                # print(f"angle_45_indices {angle_45_indices}")
-                # print(f"angle_45_relevant_lidar_x_points{angle_45_relevant_lidar_x_points}")
-                # print(f"angle_45_relevant_lidar_y_points{angle_45_relevant_lidar_y_points}")
-
-                if len(angle_45_relevant_lidar_x_points) == 0:
-                    trailer_3_right = 1
-                    trailer_5_right = 1
-                else:
-
-                    greater_0_indices = np.where(angle_45_relevant_lidar_y_points > 0)
-                    smaller_0_indices = np.where(angle_45_relevant_lidar_y_points < 0)
-
-
-                    if greater_0_indices[0].size != 0:
-                        closest_point = min(abs(angle_45_relevant_lidar_x_points[greater_0_indices]**2 + angle_45_relevant_lidar_y_points[greater_0_indices]**2))
-                        trailer_3_right = math.sqrt(closest_point) / lidar_range
-                    else:
-                        trailer_3_right = 1
-
-                    if smaller_0_indices[0].size != 0:
-                        closest_point = min(abs(
-                            angle_45_relevant_lidar_x_points[smaller_0_indices] ** 2 + angle_45_relevant_lidar_y_points[
-                                smaller_0_indices] ** 2))
-                        trailer_5_right = math.sqrt(closest_point) / lidar_range
-                    else:
-                        trailer_5_right = 1
-
-                    if trailer_3_right < 0:
-                        trailer_3_right = 0
-
-                    if trailer_5_right < 0:
-                        trailer_5_right = 0
-
-                if len(vertical_relevant_lidar_x_points) == 0:
-                    trailer_4_right = 1
-                else:
-                    trailer_4_right = min(abs(vertical_relevant_lidar_x_points)) / lidar_range
-
-                    if trailer_4_right < 0:
-                        trailer_4_right = 0
-
-            elif sensor == "lidar_trailer_0_trailer":
-                trailer_0_right, trailer_0_left = self.lidar_right_left_closest_points(sensor_data=sensor_data,
-                                                                                       sensor_name=sensor)
-            elif sensor == "lidar_trailer_1_trailer":
-                trailer_1_right, trailer_1_left = self.lidar_right_left_closest_points(sensor_data=sensor_data,
-                                                                                       sensor_name=sensor)
-            elif sensor == "lidar_trailer_2_trailer":
-                trailer_2_right, trailer_2_left = self.lidar_right_left_closest_points(sensor_data=sensor_data,
-                                                                                       sensor_name=sensor)
-            elif sensor == "lidar_trailer_3_trailer":
-                trailer_3_right, trailer_3_left = self.lidar_right_left_closest_points(sensor_data=sensor_data,
-                                                                                       sensor_name=sensor)
-            elif sensor == "lidar_trailer_4_trailer":
-                trailer_4_right, trailer_4_left = self.lidar_right_left_closest_points(sensor_data=sensor_data,
-                                                                                       sensor_name=sensor)
-            elif sensor == "lidar_trailer_5_trailer":
-                trailer_5_right, trailer_5_left = self.lidar_right_left_closest_points(sensor_data=sensor_data,
-                                                                                       sensor_name=sensor)
             elif sensor == "lidar_trailer_0_left_trailer":
                 lidar_points = sensor_data['lidar_trailer_0_left_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_left"]["range"])
-                trailer_0_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_0_left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_0_left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
+
 
             elif sensor == "lidar_trailer_0_right_trailer":
                 lidar_points = sensor_data['lidar_trailer_0_right_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_right"]["range"])
-                trailer_0_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_0_right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_0_right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_trailer_1_left_trailer":
                 lidar_points = sensor_data['lidar_trailer_1_left_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_left"]["range"])
-                trailer_1_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_1_left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_1_left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_trailer_1_right_trailer":
                 lidar_points = sensor_data['lidar_trailer_1_right_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_1_right"]["range"])
-                trailer_1_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_1_right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_1_right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_trailer_2_left_trailer":
                 lidar_points = sensor_data['lidar_trailer_2_left_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_2_left"]["range"])
-                trailer_2_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_2_left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_2_left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_trailer_2_right_trailer":
                 lidar_points = sensor_data['lidar_trailer_2_right_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_2_right"]["range"])
-                trailer_2_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_2_right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_2_right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_trailer_3_left_trailer":
                 lidar_points = sensor_data['lidar_trailer_3_left_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_3_left"]["range"])
-                trailer_3_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_3_left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_3_left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_trailer_3_right_trailer":
                 lidar_points = sensor_data['lidar_trailer_3_right_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_3_right"]["range"])
-                trailer_3_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_3_right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_3_right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_trailer_4_left_trailer":
                 lidar_points = sensor_data['lidar_trailer_4_left_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_4_left"]["range"])
-                trailer_4_left = self.get_min_lidar_point(lidar_points[0],lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_4_left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_4_left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_trailer_4_right_trailer":
                 lidar_points = sensor_data['lidar_trailer_4_right_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_4_right"]["range"])
-                trailer_4_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_4_right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_4_right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_trailer_5_left_trailer":
                 lidar_points = sensor_data['lidar_trailer_5_left_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5_left"]["range"])
-                trailer_5_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_5_left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_5_left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_trailer_5_right_trailer":
                 lidar_points = sensor_data['lidar_trailer_5_right_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_5_right"]["range"])
-                trailer_5_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_5_right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
 
+                trailer_5_right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
             elif sensor == "lidar_trailer_6_left_trailer":
                 lidar_points = sensor_data['lidar_trailer_6_left_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_6_left"]["range"])
-                trailer_6_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_6_left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_6_left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_trailer_6_right_trailer":
                 lidar_points = sensor_data['lidar_trailer_6_right_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_6_right"]["range"])
-                trailer_6_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_6_right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_6_right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_trailer_7_left_trailer":
                 lidar_points = sensor_data['lidar_trailer_7_left_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_7_left"]["range"])
-                trailer_7_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_7_left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                trailer_7_left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_trailer_7_right_trailer":
                 lidar_points = sensor_data['lidar_trailer_7_right_trailer'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_7_right"]["range"])
-                trailer_7_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    trailer_7_right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
 
+                trailer_7_right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
             elif sensor == "lidar_truck_right_truck":
                 lidar_points = sensor_data['lidar_truck_right_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_right"]["range"])
-                truck_right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    truck_right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                truck_right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_truck_left_truck":
                 lidar_points = sensor_data['lidar_truck_left_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_left"]["range"])
-                truck_left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    truck_left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                truck_left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_truck_center_truck":
                 lidar_points = sensor_data['lidar_truck_center_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_center"]["range"])
-                truck_center = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    truck_center_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+
+                truck_center_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_truck_front_15left_truck":
                 lidar_points = sensor_data['lidar_truck_front_15left_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_15left"]["range"])
-                truck_front_15left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    truck_front_15left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                truck_front_15left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_truck_front_30left_truck":
                 lidar_points = sensor_data['lidar_truck_front_30left_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_30left"]["range"])
-                truck_front_30left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    truck_front_30left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                truck_front_30left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_truck_front_45left_truck":
                 lidar_points = sensor_data['lidar_truck_front_45left_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_45left"]["range"])
-                truck_front_45left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    truck_front_45left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                truck_front_45left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_truck_front_60left_truck":
                 lidar_points = sensor_data['lidar_truck_front_60left_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_60left"]["range"])
-                truck_front_60left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    truck_front_60left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                truck_front_60left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_truck_front_75left_truck":
                 lidar_points = sensor_data['lidar_truck_front_75left_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_75left"]["range"])
-                truck_front_75left = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    truck_front_75left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                truck_front_75left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_truck_front_15right_truck":
                 lidar_points = sensor_data['lidar_truck_front_15right_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_15right"]["range"])
-                truck_front_15right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    truck_front_15right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                truck_front_15right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_truck_front_30right_truck":
                 lidar_points = sensor_data['lidar_truck_front_30right_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_30right"]["range"])
-                truck_front_30right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    truck_front_30right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                truck_front_30right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_truck_front_45right_truck":
                 lidar_points = sensor_data['lidar_truck_front_45right_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_45right"]["range"])
-                truck_front_45right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    truck_front_45right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                truck_front_45right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_truck_front_60right_truck":
                 lidar_points = sensor_data['lidar_truck_front_60right_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_60right"]["range"])
-                truck_front_60right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    truck_front_60right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                truck_front_60right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_truck_front_75right_truck":
                 lidar_points = sensor_data['lidar_truck_front_75right_truck'][1]
                 lidar_range = float(self.config["hero"]["sensors"]["lidar_truck_front_75right"]["range"])
-                truck_front_75right = self.get_min_lidar_point(lidar_points[0], lidar_range)
+                sidewalk_lidar_points = lidar_points[0]
+                if self.traffic:
+                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
+                    truck_front_75right_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
+
+                truck_front_75right_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
 
             elif sensor == "lidar_truck_truck":
                 lidar_points = sensor_data['lidar_truck_truck'][1]
@@ -1495,37 +1446,70 @@ class SACExperimentBasic(BaseExperiment):
         # Only saving the last lidar data points
         self.lidar_data.append([
             self.current_time,
-            np.float32(trailer_0_left),
-            np.float32(trailer_0_right),
-            np.float32(trailer_1_left),
-            np.float32(trailer_1_right),
-            np.float32(trailer_2_left),
-            np.float32(trailer_2_right),
-            np.float32(trailer_3_left),
-            np.float32(trailer_3_right),
-            np.float32(trailer_4_left),
-            np.float32(trailer_4_right),
-            np.float32(trailer_5_left),
-            np.float32(trailer_5_right),
-            np.float32(trailer_6_left),
-            np.float32(trailer_6_right),
-            np.float32(trailer_7_left),
-            np.float32(trailer_7_right),
-            np.float32(truck_center),
-            np.float32(truck_right),
-            np.float32(truck_left),
-            np.float32(truck_front_15left),
-            np.float32(truck_front_30left),
-            np.float32(truck_front_45left),
-            np.float32(truck_front_60left),
-            np.float32(truck_front_75left),
-            np.float32(truck_front_15right),
-            np.float32(truck_front_30right),
-            np.float32(truck_front_45right),
-            np.float32(truck_front_60right),
-            np.float32(truck_front_75right),
-
+            np.float32(trailer_0_left_sidewalk),
+            np.float32(trailer_0_right_sidewalk),
+            np.float32(trailer_1_left_sidewalk),
+            np.float32(trailer_1_right_sidewalk),
+            np.float32(trailer_2_left_sidewalk),
+            np.float32(trailer_2_right_sidewalk),
+            np.float32(trailer_3_left_sidewalk),
+            np.float32(trailer_3_right_sidewalk),
+            np.float32(trailer_4_left_sidewalk),
+            np.float32(trailer_4_right_sidewalk),
+            np.float32(trailer_5_left_sidewalk),
+            np.float32(trailer_5_right_sidewalk),
+            np.float32(trailer_6_left_sidewalk),
+            np.float32(trailer_6_right_sidewalk),
+            np.float32(trailer_7_left_sidewalk),
+            np.float32(trailer_7_right_sidewalk),
+            np.float32(truck_center_sidewalk),
+            np.float32(truck_right_sidewalk),
+            np.float32(truck_left_sidewalk),
+            np.float32(truck_front_15left_sidewalk),
+            np.float32(truck_front_30left_sidewalk),
+            np.float32(truck_front_45left_sidewalk),
+            np.float32(truck_front_60left_sidewalk),
+            np.float32(truck_front_75left_sidewalk),
+            np.float32(truck_front_15right_sidewalk),
+            np.float32(truck_front_30right_sidewalk),
+            np.float32(truck_front_45right_sidewalk),
+            np.float32(truck_front_60right_sidewalk),
+            np.float32(truck_front_75right_sidewalk),
         ])
+
+        if self.traffic:
+
+            self.lidar_data.extend([
+                np.float32(trailer_0_left_vehicle),
+                np.float32(trailer_0_right_vehicle),
+                np.float32(trailer_1_left_vehicle),
+                np.float32(trailer_1_right_vehicle),
+                np.float32(trailer_2_left_vehicle),
+                np.float32(trailer_2_right_vehicle),
+                np.float32(trailer_3_left_vehicle),
+                np.float32(trailer_3_right_vehicle),
+                np.float32(trailer_4_left_vehicle),
+                np.float32(trailer_4_right_vehicle),
+                np.float32(trailer_5_left_vehicle),
+                np.float32(trailer_5_right_vehicle),
+                np.float32(trailer_6_left_vehicle),
+                np.float32(trailer_6_right_vehicle),
+                np.float32(trailer_7_left_vehicle),
+                np.float32(trailer_7_right_vehicle),
+                np.float32(truck_center_vehicle),
+                np.float32(truck_right_vehicle),
+                np.float32(truck_left_vehicle),
+                np.float32(truck_front_15left_vehicle),
+                np.float32(truck_front_30left_vehicle),
+                np.float32(truck_front_45left_vehicle),
+                np.float32(truck_front_60left_vehicle),
+                np.float32(truck_front_75left_vehicle),
+                np.float32(truck_front_15right_vehicle),
+                np.float32(truck_front_30right_vehicle),
+                np.float32(truck_front_45right_vehicle),
+                np.float32(truck_front_60right_vehicle),
+                np.float32(truck_front_75right_vehicle)
+            ])
 
         value_observations = [
             # np.float32(number_of_waypoints),
@@ -1571,54 +1555,97 @@ class SACExperimentBasic(BaseExperiment):
             # np.float32(acceleration)
                            ]
         trailer_lidar_data_points = [
-            np.float32(trailer_0_left),
-            np.float32(trailer_0_right),
-            np.float32(trailer_1_left),
-            np.float32(trailer_1_right),
-            np.float32(trailer_2_left),
-            np.float32(trailer_2_right),
-            np.float32(trailer_3_left),
-            np.float32(trailer_3_right),
-            np.float32(trailer_4_left),
-            np.float32(trailer_4_right),
-            np.float32(trailer_5_left),
-            np.float32(trailer_5_right),
-            np.float32(trailer_6_left),
-            np.float32(trailer_6_right),
-            np.float32(trailer_7_left),
-            np.float32(trailer_7_right)
+            np.float32(trailer_0_left_sidewalk),
+            np.float32(trailer_0_right_sidewalk),
+            np.float32(trailer_1_left_sidewalk),
+            np.float32(trailer_1_right_sidewalk),
+            np.float32(trailer_2_left_sidewalk),
+            np.float32(trailer_2_right_sidewalk),
+            np.float32(trailer_3_left_sidewalk),
+            np.float32(trailer_3_right_sidewalk),
+            np.float32(trailer_4_left_sidewalk),
+            np.float32(trailer_4_right_sidewalk),
+            np.float32(trailer_5_left_sidewalk),
+            np.float32(trailer_5_right_sidewalk),
+            np.float32(trailer_6_left_sidewalk),
+            np.float32(trailer_6_right_sidewalk),
+            np.float32(trailer_7_left_sidewalk),
+            np.float32(trailer_7_right_sidewalk),
+
+
         ]
 
+        if self.traffic:
+            trailer_lidar_data_points.extend([
+                np.float32(trailer_0_left_vehicle),
+                np.float32(trailer_0_right_vehicle),
+                np.float32(trailer_1_left_vehicle),
+                np.float32(trailer_1_right_vehicle),
+                np.float32(trailer_2_left_vehicle),
+                np.float32(trailer_2_right_vehicle),
+                np.float32(trailer_3_left_vehicle),
+                np.float32(trailer_3_right_vehicle),
+                np.float32(trailer_4_left_vehicle),
+                np.float32(trailer_4_right_vehicle),
+                np.float32(trailer_5_left_vehicle),
+                np.float32(trailer_5_right_vehicle),
+                np.float32(trailer_6_left_vehicle),
+                np.float32(trailer_6_right_vehicle),
+                np.float32(trailer_7_left_vehicle),
+                np.float32(trailer_7_right_vehicle)
+            ])
+
+
         truck_lidar_data_points = [
-            np.float32(truck_center),
-            np.float32(truck_right),
-            np.float32(truck_left),
-            np.float32(truck_front_15left),
-            np.float32(truck_front_30left),
-            np.float32(truck_front_45left),
-            np.float32(truck_front_60left),
-            np.float32(truck_front_75left),
-            np.float32(truck_front_15right),
-            np.float32(truck_front_30right),
-            np.float32(truck_front_45right),
-            np.float32(truck_front_60right),
-            np.float32(truck_front_75right)
+            np.float32(truck_center_sidewalk),
+            np.float32(truck_right_sidewalk),
+            np.float32(truck_left_sidewalk),
+            np.float32(truck_front_15left_sidewalk),
+            np.float32(truck_front_30left_sidewalk),
+            np.float32(truck_front_45left_sidewalk),
+            np.float32(truck_front_60left_sidewalk),
+            np.float32(truck_front_75left_sidewalk),
+            np.float32(truck_front_15right_sidewalk),
+            np.float32(truck_front_30right_sidewalk),
+            np.float32(truck_front_45right_sidewalk),
+            np.float32(truck_front_60right_sidewalk),
+            np.float32(truck_front_75right_sidewalk)
         ]
+
+        if self.traffic:
+            truck_lidar_data_points.extend([
+                np.float32(truck_center_vehicle),
+                np.float32(truck_right_vehicle),
+                np.float32(truck_left_vehicle),
+                np.float32(truck_front_15left_vehicle),
+                np.float32(truck_front_30left_vehicle),
+                np.float32(truck_front_45left_vehicle),
+                np.float32(truck_front_60left_vehicle),
+                np.float32(truck_front_75left_vehicle),
+                np.float32(truck_front_15right_vehicle),
+                np.float32(truck_front_30right_vehicle),
+                np.float32(truck_front_45right_vehicle),
+                np.float32(truck_front_60right_vehicle),
+                np.float32(truck_front_75right_vehicle)
+            ])
         value_observations.extend(trailer_lidar_data_points)
         value_observations.extend(truck_lidar_data_points)
         # value_observations.extend([self.last_action[0],self.last_action[1],self.last_action[2]])
 
         value_observations.extend(radii)
+
+        if self.traffic:
+            value_observations.extend(self.traffic_observations)
         # value_observations.append(np.float32(mean_radius))
 
-        route_type_string = get_route_type(current_entry_idx=self.entry_idx, current_exit_idx=self.exit_idx)
-
-        if route_type_string == 'easy':
-            route_type = 0
-        elif route_type_string == 'difficult':
-            route_type = 1
-        else:
-            raise Exception('This should never happen')
+        # route_type_string = get_route_type(current_entry_idx=self.entry_idx, current_exit_idx=self.exit_idx)
+        #
+        # if route_type_string == 'easy':
+        #     route_type = 0
+        # elif route_type_string == 'difficult':
+        #     route_type = 1
+        # else:
+        #     raise Exception('This should never happen')
 
         self.truck_lidar_collision = False
         if any(lidar_point < 0.01 for lidar_point in truck_lidar_data_points):
@@ -1632,64 +1659,98 @@ class SACExperimentBasic(BaseExperiment):
 
         if self.custom_enable_rendering:
             print(f'Entry Points {core.entry_spawn_point_index}| Exit point {core.exit_spawn_point_index}')
-            print(f'Route Type {route_type}')
-            print(f"Radii {radii}")
-            print(f'Mean radius {mean_radius}')
-            # print(f"truck FRONT \t\t\t{round(truck_center, 2)}")
+            # print(f'Route Type {route_type}')
+            # print(f"Radii {radii}")
+            # print(f'Mean radius {mean_radius}')
+            # print(f"truck FRONT \t\t\t{round(truck_center_sidewalk, 2)}")
             # print(f"truck 45 \t\t{round(truck_front_left,2)}\t\t{round(truck_front_right,2)}")
-            # print(f"truck sides \t\t{round(truck_left, 2)}\t\t{round(truck_right, 2)}")
+            # print(f"truck sides \t\t{round(truck_left_sidewalk, 2)}\t\t{round(truck_right_sidewalk, 2)}")
             # print(f"")
-            # print(f"trailer_0 \t\t{round(trailer_0_left,2)}\t\t{round(trailer_0_right,2)}")
-            # print(f"trailer_1 \t\t{round(trailer_1_left,2)}\t\t{round(trailer_2_right,2)}")
-            # print(f"trailer_2 \t\t{round(trailer_2_left,2)}\t\t{round(trailer_2_right,2)}")
-            # print(f"trailer_3 \t\t{round(trailer_3_left,2)}\t\t{round(trailer_3_right,2)}")
-            # print(f"trailer_4 \t\t{round(trailer_4_left,2)}\t\t{round(trailer_4_right,2)}")
-            # print(f"trailer_5 \t\t{round(trailer_5_left,2)}\t\t{round(trailer_5_right,2)}")
-            print(f"truck FRONT \t\t\t{np.float32(truck_center)}")
-            # print(f"truck 22 \t\t{np.float32(truck_front_22left)}\t\t{np.float32(truck_front_22right)}")
-            print(f"truck 45 \t\t{np.float32(truck_front_45left)}\t\t{np.float32(truck_front_45right)}")
-            # print(f"truck 67 \t\t{np.float32(truck_front_67left)}\t\t{np.float32(truck_front_67right)}")
-            print(f"truck sides \t\t{np.float32(truck_left)}\t\t{np.float32(truck_right)}")
+            # print(f"trailer_0 \t\t{round(trailer_0_left_sidewalk,2)}\t\t{round(trailer_0_right_sidewalk,2)}")
+            # print(f"trailer_1 \t\t{round(trailer_1_left_sidewalk,2)}\t\t{round(trailer_2_right_sidewalk,2)}")
+            # print(f"trailer_2 \t\t{round(trailer_2_left_sidewalk,2)}\t\t{round(trailer_2_right_sidewalk,2)}")
+            # print(f"trailer_3 \t\t{round(trailer_3_left_sidewalk,2)}\t\t{round(trailer_3_right_sidewalk,2)}")
+            # print(f"trailer_4 \t\t{round(trailer_4_left_sidewalk,2)}\t\t{round(trailer_4_right_sidewalk,2)}")
+            # print(f"trailer_5 \t\t{round(trailer_5_left_sidewalk,2)}\t\t{round(trailer_5_right_sidewalk,2)}")
+            print('Sidewalk lidar information')
+            print(f"truck FRONT \t\t\t{np.float32(truck_center_sidewalk)}")
+            print(f"truck 15 \t\t{np.float32(truck_front_15left_sidewalk)}\t\t{np.float32(truck_front_15right_sidewalk)}")
+            print(f"truck 30 \t\t{np.float32(truck_front_30left_sidewalk)}\t\t{np.float32(truck_front_30right_sidewalk)}")
+            print(f"truck 45 \t\t{np.float32(truck_front_45left_sidewalk)}\t\t{np.float32(truck_front_45right_sidewalk)}")
+            print(f"truck 60 \t\t{np.float32(truck_front_60left_sidewalk)}\t\t{np.float32(truck_front_60right_sidewalk)}")
+            print(f"truck 75 \t\t{np.float32(truck_front_75left_sidewalk)}\t\t{np.float32(truck_front_75right_sidewalk)}")
+            print(f"truck sides \t\t{np.float32(truck_left_sidewalk)}\t\t{np.float32(truck_right_sidewalk)}")
             print(f"")
-            print(f"trailer_0 \t\t{np.float32(trailer_0_left)}\t\t{np.float32(trailer_0_right)}")
-            print(f"trailer_1 \t\t{np.float32(trailer_1_left)}\t\t{np.float32(trailer_2_right)}")
-            print(f"trailer_2 \t\t{np.float32(trailer_2_left)}\t\t{np.float32(trailer_2_right)}")
-            print(f"trailer_3 \t\t{np.float32(trailer_3_left)}\t\t{np.float32(trailer_3_right)}")
-            print(f"trailer_4 \t\t{np.float32(trailer_4_left)}\t\t{np.float32(trailer_4_right)}")
-            print(f"trailer_5 \t\t{np.float32(trailer_5_left)}\t\t{np.float32(trailer_5_right)}")
+            print(f"trailer_0 \t\t{np.float32(trailer_0_left_sidewalk)}\t\t{np.float32(trailer_0_right_sidewalk)}")
+            print(f"trailer_1 \t\t{np.float32(trailer_1_left_sidewalk)}\t\t{np.float32(trailer_2_right_sidewalk)}")
+            print(f"trailer_2 \t\t{np.float32(trailer_2_left_sidewalk)}\t\t{np.float32(trailer_2_right_sidewalk)}")
+            print(f"trailer_3 \t\t{np.float32(trailer_3_left_sidewalk)}\t\t{np.float32(trailer_3_right_sidewalk)}")
+            print(f"trailer_4 \t\t{np.float32(trailer_4_left_sidewalk)}\t\t{np.float32(trailer_4_right_sidewalk)}")
+            print(f"trailer_5 \t\t{np.float32(trailer_5_left_sidewalk)}\t\t{np.float32(trailer_5_right_sidewalk)}")
+            if self.traffic:
+                print('Vehicle lidar Information')
+                print(f"truck FRONT \t\t\t{np.float32(truck_center_vehicle)}")
+                print(
+                    f"truck 15 \t\t{np.float32(truck_front_15left_vehicle)}\t\t{np.float32(truck_front_15right_vehicle)}")
+                print(
+                    f"truck 30 \t\t{np.float32(truck_front_30left_vehicle)}\t\t{np.float32(truck_front_30right_vehicle)}")
+                print(
+                    f"truck 45 \t\t{np.float32(truck_front_45left_vehicle)}\t\t{np.float32(truck_front_45right_vehicle)}")
+                print(
+                    f"truck 60 \t\t{np.float32(truck_front_60left_vehicle)}\t\t{np.float32(truck_front_60right_vehicle)}")
+                print(
+                    f"truck 75 \t\t{np.float32(truck_front_75left_vehicle)}\t\t{np.float32(truck_front_75right_vehicle)}")
+                print(f"truck sides \t\t{np.float32(truck_left_vehicle)}\t\t{np.float32(truck_right_vehicle)}")
+                print(f"")
+                print(f"trailer_0 \t\t{np.float32(trailer_0_left_vehicle)}\t\t{np.float32(trailer_0_right_vehicle)}")
+                print(f"trailer_1 \t\t{np.float32(trailer_1_left_vehicle)}\t\t{np.float32(trailer_2_right_vehicle)}")
+                print(f"trailer_2 \t\t{np.float32(trailer_2_left_vehicle)}\t\t{np.float32(trailer_2_right_vehicle)}")
+                print(f"trailer_3 \t\t{np.float32(trailer_3_left_vehicle)}\t\t{np.float32(trailer_3_right_vehicle)}")
+                print(f"trailer_4 \t\t{np.float32(trailer_4_left_vehicle)}\t\t{np.float32(trailer_4_right_vehicle)}")
+                print(f"trailer_5 \t\t{np.float32(trailer_5_left_vehicle)}\t\t{np.float32(trailer_5_right_vehicle)}")
             print('')
             print(f"forward_velocity:{np.float32(forward_velocity)}")
-            print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
-            print(f"hyp_distance_to_next_plus_1_waypoint:{np.float32(hyp_distance_to_next_plus_1_waypoint)}")
-            print(f"closest_distance_to_next_waypoint_line:{np.float32(closest_distance_to_next_waypoint_line)}")
-            print(f"closest_distance_to_next_plus_1_waypoint_line:{np.float32(closest_distance_to_next_plus_1_waypoint_line)}")
-            print(f"distance_to_center_of_lane:{np.float32(distance_to_center_of_lane)}")
-            print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
-            print(f"angle_to_center_of_lane_degrees_2:{np.float32(angle_to_center_of_lane_degrees_2)}")
-            print(f"angle_to_center_of_lane_degrees_5:{np.float32(angle_to_center_of_lane_degrees_5)}")
-            print(f"angle_to_center_of_lane_degrees_7:{np.float32(angle_to_center_of_lane_degrees_7)}")
-            print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
-            # print(f"angle_to_center_of_lane_degrees_ahead_waypoints_2:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2)}")
-            print(f"angle_between_waypoints_5:{np.float32(angle_between_waypoints_5)}")
-            print(f"angle_between_waypoints_7:{np.float32(angle_between_waypoints_7)}")
-            print(f"angle_between_waypoints_10:{np.float32(angle_between_waypoints_10)}")
-            print(f"angle_between_waypoints_12:{np.float32(angle_between_waypoints_12)}")
-            print(f"angle_between_waypoints_minus5:{np.float32(angle_between_waypoints_minus5)}")
-            print(f"angle_between_waypoints_minus7:{np.float32(angle_between_waypoints_minus7)}")
-            print(f"angle_between_waypoints_minus10:{np.float32(angle_between_waypoints_minus10)}")
-            print(f"angle_between_waypoints_minus12:{np.float32(angle_between_waypoints_minus12)}")
-            print(f"truck_bearing_to_waypoint:{np.float32(truck_bearing_to_waypoint)}")
-            print(f"truck_bearing_to_waypoint_2:{np.float32(truck_bearing_to_waypoint_2)}")
-            print(f"truck_bearing_to_waypoint_5:{np.float32(truck_bearing_to_waypoint_5)}")
-            print(f"truck_bearing_to_waypoint_7:{np.float32(truck_bearing_to_waypoint_7)}")
-            print(f"truck_bearing_to_waypoint_10:{np.float32(truck_bearing_to_waypoint_10)}")
-            print(f"trailer_bearing_to_waypoint:{np.float32(trailer_bearing_to_waypoint)}")
-            print(f"trailer_bearing_to_waypoint_2:{np.float32(trailer_bearing_to_waypoint_2)}")
-            print(f"trailer_bearing_to_waypoint_5:{np.float32(trailer_bearing_to_waypoint_5)}")
-            print(f"trailer_bearing_to_waypoint_7:{np.float32(trailer_bearing_to_waypoint_7)}")
-            print(f"trailer_bearing_to_waypoint_10:{np.float32(trailer_bearing_to_waypoint_10)}")
-            # print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
-            print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
+            # print(f"hyp_distance_to_next_waypoint:{np.float32(hyp_distance_to_next_waypoint)}")
+            # print(f"hyp_distance_to_next_plus_1_waypoint:{np.float32(hyp_distance_to_next_plus_1_waypoint)}")
+            # print(f"closest_distance_to_next_waypoint_line:{np.float32(closest_distance_to_next_waypoint_line)}")
+            # print(f"closest_distance_to_next_plus_1_waypoint_line:{np.float32(closest_distance_to_next_plus_1_waypoint_line)}")
+            # print(f"distance_to_center_of_lane:{np.float32(distance_to_center_of_lane)}")
+            # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
+            # print(f"angle_to_center_of_lane_degrees_2:{np.float32(angle_to_center_of_lane_degrees_2)}")
+            # print(f"angle_to_center_of_lane_degrees_5:{np.float32(angle_to_center_of_lane_degrees_5)}")
+            # print(f"angle_to_center_of_lane_degrees_7:{np.float32(angle_to_center_of_lane_degrees_7)}")
+            # print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
+            # # print(f"angle_to_center_of_lane_degrees_ahead_waypoints_2:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints_2)}")
+            # print(f"angle_between_waypoints_5:{np.float32(angle_between_waypoints_5)}")
+            # print(f"angle_between_waypoints_7:{np.float32(angle_between_waypoints_7)}")
+            # print(f"angle_between_waypoints_10:{np.float32(angle_between_waypoints_10)}")
+            # print(f"angle_between_waypoints_12:{np.float32(angle_between_waypoints_12)}")
+            # print(f"angle_between_waypoints_minus5:{np.float32(angle_between_waypoints_minus5)}")
+            # print(f"angle_between_waypoints_minus7:{np.float32(angle_between_waypoints_minus7)}")
+            # print(f"angle_between_waypoints_minus10:{np.float32(angle_between_waypoints_minus10)}")
+            # print(f"angle_between_waypoints_minus12:{np.float32(angle_between_waypoints_minus12)}")
+            # print(f"truck_bearing_to_waypoint:{np.float32(truck_bearing_to_waypoint)}")
+            # print(f"truck_bearing_to_waypoint_2:{np.float32(truck_bearing_to_waypoint_2)}")
+            # print(f"truck_bearing_to_waypoint_5:{np.float32(truck_bearing_to_waypoint_5)}")
+            # print(f"truck_bearing_to_waypoint_7:{np.float32(truck_bearing_to_waypoint_7)}")
+            # print(f"truck_bearing_to_waypoint_10:{np.float32(truck_bearing_to_waypoint_10)}")
+            # print(f"trailer_bearing_to_waypoint:{np.float32(trailer_bearing_to_waypoint)}")
+            # print(f"trailer_bearing_to_waypoint_2:{np.float32(trailer_bearing_to_waypoint_2)}")
+            # print(f"trailer_bearing_to_waypoint_5:{np.float32(trailer_bearing_to_waypoint_5)}")
+            # print(f"trailer_bearing_to_waypoint_7:{np.float32(trailer_bearing_to_waypoint_7)}")
+            # print(f"trailer_bearing_to_waypoint_10:{np.float32(trailer_bearing_to_waypoint_10)}")
+            # # print(f"bearing_to_ahead_waypoints_ahead_2:{np.float32(bearing_to_ahead_waypoints_ahead_2)}")
+            # print(f"angle_between_truck_and_trailer:{np.float32(angle_between_truck_and_trailer)}")
+            if self.traffic:
+                for i in range(max_no_of_vehicles):
+                    print(f'Vehicle {i}')
+                    newI = i*5
+                    print(f"Vehicle {i} Velcoity {self.traffic_observations[newI]}")
+                    print(f"Vehicle {i} Acceleration {self.traffic_observations[newI+1]}")
+                    print(f"Vehicle {i} Yaw {self.traffic_observations[newI+2]}")
+                    print(f"Vehicle {i} Relative X {self.traffic_observations[newI+3]}")
+                    print(f"Vehicle {i} Relative Y {self.traffic_observations[newI+4]}")
+
             print('')
             print('')
             time.sleep(0.04)
@@ -1733,7 +1794,7 @@ class SACExperimentBasic(BaseExperiment):
         self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
         self.temp_route = deepcopy(core.route_points)
         self.radii.append(radii)
-        self.mean_radius.append(mean_radius)
+        # self.mean_radius.append(mean_radius)
         #
         # print(f"angle_to_center_of_lane_degrees:{np.float32(angle_to_center_of_lane_degrees)}")
         # print(f"angle_to_center_of_lane_degrees_ahead_waypoints:{np.float32(angle_to_center_of_lane_degrees_ahead_waypoints)}")
@@ -1751,7 +1812,7 @@ class SACExperimentBasic(BaseExperiment):
 
         self.counter += 1
         return {'values':value_observations},\
-            {"truck_z_value":truck_transform.location.z,"distance_to_center_of_lane":distance_to_center_of_lane }
+            {"truck_z_value":truck_transform.location.z,"distance_to_center_of_lane":distance_to_center_of_lane, "truck_acceleration": self.get_acceleration(core.hero),'trailer_distance_to_center_of_lane':trailer_distance_to_center_of_lane}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -1875,7 +1936,6 @@ class SACExperimentBasic(BaseExperiment):
         # bearing_to_ahead_waypoints_ahead = observation["values"][5]
         # angle_between_truck_and_trailer = observation["values"][6]
 
-        self.last_forward_velocity = forward_velocity
 
         # print(f"Hyp distance in rewards {hyp_distance_to_next_waypoint}")
         # print(f"self.last_hyp_distance_to_next_waypoint {self.last_hyp_distance_to_next_waypoint}")
@@ -1936,10 +1996,24 @@ class SACExperimentBasic(BaseExperiment):
         # self.last_closest_distance_to_next_plus_1_waypoint_line = closest_distance_to_next_plus_1_waypoint_line
 
         if self.passed_waypoint:
-            reward = reward + 100
+            # reward = reward + 100
+            reward = reward + 0.1
+            pass
 
-        distance_to_center_of_lane = (np.clip(abs(distance_to_center_of_lane),0,4))/4
-        reward = reward - (distance_to_center_of_lane*1.5)
+        distance_to_center_of_lane = (1/400) * (np.clip(abs(distance_to_center_of_lane),0,4))
+        reward = reward - distance_to_center_of_lane
+
+        # to encourage faster velocity
+        # proportional_forward_velocity = (100/15) * (np.clip(abs(forward_velocity), 0, 15))
+        # reward = reward + (proportional_forward_velocity)
+        # print(f'Reward a {1/proportional_forward_velocity}')
+
+        # for smooth velocity
+        # difference_in_velocities = self.last_forward_velocity - forward_velocity
+        # proportional_difference_in_velocities = (5/120) * (np.clip(abs(difference_in_velocities), 0, 1.2))
+        # reward = reward - proportional_difference_in_velocities
+        # self.last_forward_velocity = forward_velocity
+
 
 
         # if bearing_to_waypoint == 0:
@@ -1957,39 +2031,39 @@ class SACExperimentBasic(BaseExperiment):
         #
         #     reward = reward + reward_bearing_to_ahead_waypoints_ahead
 
-        if forward_velocity < 0.75:
-            # Negative reward for no velocity
-            print('REWARD -100 for velocity') if self.custom_enable_rendering else None
-            reward = reward + 0
+        # if forward_velocity < 0.75:
+        #     # Negative reward for no velocity
+        #     print('REWARD -100 for velocity') if self.custom_enable_rendering else None
+        #     reward = reward + 0
 
         # Negative reward each timestep
         # reward = reward + -1
 
 
         if self.done_falling:
-            reward = reward + -500
+            reward = reward + -1
             print('====> REWARD Done falling')
         if self.done_collision_truck or self.done_collision_trailer:
             print("====> REWARD Done collision")
-            reward = reward + -500
+            reward = reward + -1
         if self.truck_lidar_collision:
             print("====> REWARD Truck Lidar collision")
-            reward = reward + -500
+            reward = reward + -1
         if self.trailer_lidar_collision:
             print("====> REWARD Trailer Lidar collision")
-            reward = reward + -500
+            reward = reward + -1
         if self.done_time_idle:
             print("====> REWARD Done idle")
-            reward = reward + -500
+            reward = reward + -1
         if self.done_time_episode:
             print("====> REWARD Done max time")
-            reward = reward + -500
+            reward = reward + -1
         if self.done_far_from_path:
             print("====> REWARD Done far from path")
-            reward = reward + -500
+            reward = reward + -1
         if self.done_arrived:
             print("====> REWARD Done arrived")
-            reward = reward + 0
+            reward = reward + 1
 
         self.total_episode_reward.append(reward)
         self.reward_metric = reward
