@@ -1,7 +1,7 @@
 # Works for both torch and tf.
-num_workers: 7
+num_workers: 6
 num_gpus: 1
-num_cpus_per_worker: 2
+num_cpus_per_worker: 3
 framework: torch
 gamma: 1
 twin_q: True
@@ -41,7 +41,7 @@ replay_buffer_config:
   prioritized_replay_eps: 0.000001
 store_buffer_in_checkpoints: False
 num_steps_sampled_before_learning_starts: 10000
-train_batch_size: 256
+train_batch_size: 4096
 min_sample_timesteps_per_iteration: 4
 # Paper uses 20k random timesteps, which is not exactly the same, but
 # seems to work nevertheless. We use 100k here for the longer Atari
@@ -608,11 +608,11 @@ env_config:
 #    town: "Town03_Opt"
 #    town: 'doubleRoundabout37'
     town1: 'mediumRoundabout4'
-    town1Ratio: 0.2
+    town1Ratio: 0.4
 #    town2: 'doubleRoundabout37'
 #    town2: 'mediumRoundabout4'
     town2 : 'doubleRoundabout37'
-    town2Ratio: 0.8
+    town2Ratio: 0.6
 #    town: '20m'
     others:
       framestack: 1
