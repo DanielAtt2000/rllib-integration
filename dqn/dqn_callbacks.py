@@ -140,26 +140,26 @@ class DQNCallbacks(DefaultCallbacks):
 
 
         # Reward per roundabout
-        path_type = get_route_type(current_entry_idx=episode.user_data["entry_idx"], current_exit_idx=episode.user_data["exit_idx"])
+        # path_type = get_route_type(current_entry_idx=episode.user_data["entry_idx"], current_exit_idx=episode.user_data["exit_idx"])
 
-        if path_type == 'easy':
-            episode.custom_metrics["easy_episode_reward"] = sum(episode.user_data["total_reward"])
-            if not worker.env.experiment.custom_done_arrived:
-                episode.custom_metrics["easy_custom_done_arrived"] = 0
-
-            elif worker.env.experiment.custom_done_arrived:
-                episode.custom_metrics["easy_custom_done_arrived"] = 1
-        elif path_type == 'difficult':
-            episode.custom_metrics["difficult_episode_reward"] = sum(episode.user_data["total_reward"])
-            if not worker.env.experiment.custom_done_arrived:
-                episode.custom_metrics["difficult_custom_done_arrived"] = 0
-
-            elif worker.env.experiment.custom_done_arrived:
-                episode.custom_metrics["difficult_custom_done_arrived"] = 1
-        else:
-            print(f"Entry {episode.user_data['entry_idx']}")
-            print(f"Exit {episode.user_data['exit_idx']}")
-            raise Exception('Something when wrong here')
+        # if path_type == 'easy':
+        #     episode.custom_metrics["easy_episode_reward"] = sum(episode.user_data["total_reward"])
+        #     if not worker.env.experiment.custom_done_arrived:
+        #         episode.custom_metrics["easy_custom_done_arrived"] = 0
+        #
+        #     elif worker.env.experiment.custom_done_arrived:
+        #         episode.custom_metrics["easy_custom_done_arrived"] = 1
+        # elif path_type == 'difficult':
+        #     episode.custom_metrics["difficult_episode_reward"] = sum(episode.user_data["total_reward"])
+        #     if not worker.env.experiment.custom_done_arrived:
+        #         episode.custom_metrics["difficult_custom_done_arrived"] = 0
+        #
+        #     elif worker.env.experiment.custom_done_arrived:
+        #         episode.custom_metrics["difficult_custom_done_arrived"] = 1
+        # else:
+        #     print(f"Entry {episode.user_data['entry_idx']}")
+        #     print(f"Exit {episode.user_data['exit_idx']}")
+        #     raise Exception('Something when wrong here')
 
 
 
