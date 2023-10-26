@@ -213,7 +213,7 @@ def plot_route(route_points_all, truck_points_all):
     rewards = []
     done_array = []
     for idx in range(len(x_route)):
-        if idx < 5000:
+        if idx < 10000000:
             if (df.loc[idx, "Done"]) == 'done_arrived':
                 done_array.append(1)
             else:
@@ -241,80 +241,87 @@ def plot_route(route_points_all, truck_points_all):
 
 
 
-    done_data_diff = -1
-    current_difficulty = ""
-    for idx in range(len(x_route)):
-
-        if idx > 5 and idx + 10 < len(x_route):
-            entry = int(df['EntryExit'].loc[idx].split(',')[0])
-            exit = int(df['EntryExit'].loc[idx].split(',')[1])
-
-            for easy in spawn_points_2_lane_roundabout_small_easy:
-                if easy[0] == entry and easy[1][0] == exit:
-                    current_difficulty = "easy"
-                    break
-            for difficult in spawn_points_2_lane_roundabout_small_difficult:
-                if difficult[0] == entry and difficult[1][0] == exit:
-                    current_difficulty = "difficult"
-                    break
-
-            if current_difficulty == "easy":
-                # all_line_easy_rewards.append(sum(df.loc[idx, "line_reward"]))
-                # all_point_easy_rewards.append(sum(df.loc[idx, "point_reward"]))
-                all_episodes_easy_sum.append(
-                    sum(df.loc[idx, "total_episode_reward"]))
-
-                value_type = 'dsad'
-                arrived = 'noen'
-                if mean(df.loc[idx, "angle_to_center_of_lane_degrees_ahead_waypoints"
-                                    ""]) > 0:
-                    value_type = 'positive'
-                else:
-                    value_type = 'negative'
-
-                if (df.loc[idx, "Done"]) == 'done_arrived':
-                    arrived = 'yes'
-                else:
-                    arrived = 'no'
-
-                key = f'{value_type}|{arrived}'
-                if easy_dict.get(key) == None:
-                    easy_dict[key] = 1
-                else:
-                    easy_dict[key] += 1
-
-                easy_x_indices.append(idx)
-            elif current_difficulty == "difficult":
-                # all_line_difficult_rewards.append(sum(df.loc[idx, "line_reward"]))
-                # all_point_difficult_rewards.append(sum(df.loc[idx, "point_reward"]))
-                all_episodes_difficult_sum.append(sum(df.loc[idx, "total_episode_reward"]))
-
-                value_type = 'dsad'
-                arrived = 'noen'
-                if mean(df.loc[idx, "angle_to_center_of_lane_degrees_ahead_waypoints"]) > 0:
-                    value_type = 'positive'
-                else:
-                    value_type = 'negative'
-
-                if (df.loc[idx, "Done"]) == 'done_arrived':
-                    arrived = 'yes'
-                else:
-                    arrived = 'no'
-
-                key = f'{value_type}|{arrived}'
-
-                if diff_dict.get(key) == None:
-                    diff_dict[key] = 1
-                else:
-                    diff_dict[key] += 1
-
-                difficiult_x_indices.append(idx)
-            else:
-                raise Exception('wtf')
+    # done_data_diff = -1
+    # current_difficulty = ""
+    # for idx in range(len(x_route)):
+    #
+    #     if idx > 5 and idx + 10 < len(x_route):
+    #         entry = int(df['EntryExit'].loc[idx].split(',')[0])
+    #         exit = int(df['EntryExit'].loc[idx].split(',')[1])
+    #
+    #         for easy in spawn_points_2_lane_roundabout_small_easy:
+    #             if easy[0] == entry and easy[1][0] == exit:
+    #                 current_difficulty = "easy"
+    #                 break
+    #         for difficult in spawn_points_2_lane_roundabout_small_difficult:
+    #             if difficult[0] == entry and difficult[1][0] == exit:
+    #                 current_difficulty = "difficult"
+    #                 break
+    #
+    #         if current_difficulty == "easy":
+    #             # all_line_easy_rewards.append(sum(df.loc[idx, "line_reward"]))
+    #             # all_point_easy_rewards.append(sum(df.loc[idx, "point_reward"]))
+    #             all_episodes_easy_sum.append(
+    #                 sum(df.loc[idx, "total_episode_reward"]))
+    #
+    #             value_type = 'dsad'
+    #             arrived = 'noen'
+    #             if mean(df.loc[idx, "angle_to_center_of_lane_degrees_ahead_waypoints"
+    #                                 ""]) > 0:
+    #                 value_type = 'positive'
+    #             else:
+    #                 value_type = 'negative'
+    #
+    #             if (df.loc[idx, "Done"]) == 'done_arrived':
+    #                 arrived = 'yes'
+    #             else:
+    #                 arrived = 'no'
+    #
+    #             key = f'{value_type}|{arrived}'
+    #             if easy_dict.get(key) == None:
+    #                 easy_dict[key] = 1
+    #             else:
+    #                 easy_dict[key] += 1
+    #
+    #             easy_x_indices.append(idx)
+    #         elif current_difficulty == "difficult":
+    #             # all_line_difficult_rewards.append(sum(df.loc[idx, "line_reward"]))
+    #             # all_point_difficult_rewards.append(sum(df.loc[idx, "point_reward"]))
+    #             all_episodes_difficult_sum.append(sum(df.loc[idx, "total_episode_reward"]))
+    #
+    #             value_type = 'dsad'
+    #             arrived = 'noen'
+    #             if mean(df.loc[idx, "angle_to_center_of_lane_degrees_ahead_waypoints"]) > 0:
+    #                 value_type = 'positive'
+    #             else:
+    #                 value_type = 'negative'
+    #
+    #             if (df.loc[idx, "Done"]) == 'done_arrived':
+    #                 arrived = 'yes'
+    #             else:
+    #                 arrived = 'no'
+    #
+    #             key = f'{value_type}|{arrived}'
+    #
+    #             if diff_dict.get(key) == None:
+    #                 diff_dict[key] = 1
+    #             else:
+    #                 diff_dict[key] += 1
+    #
+    #             difficiult_x_indices.append(idx)
+    #         else:
+    #             raise Exception('wtf')
     # plt.figure(figsize=(80, 5))
     # plt.ylim()
     # plt.plot( done_array, label='All DIFFICULT episode rewards')
     # plt.plot(easy_x_indices, all_episodes_easy_sum, label='All EASY episode rewards')
+    save_reward = True
+    filename = data_file.split('_')[1]
+    if save_reward:
+        save_to_pickle('../rewards/' + filename + '_total_reward',rewards)
+        save_to_pickle('../done/' + filename + '_done',done_array)
+
+
 
     window = 250
     average_difficult_y = []
