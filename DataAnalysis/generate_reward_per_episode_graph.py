@@ -12,8 +12,8 @@ def run(filenames=[],label_names = [],window_size=[]):
 
 
 
-    max_value = 5000
-    window_reward = 1500
+    max_value = 7300
+    window_reward = 200
     window_done = 1500
     different_window_sizes = True
 
@@ -97,8 +97,8 @@ def run(filenames=[],label_names = [],window_size=[]):
 # run(['2c5a756566f','2c5a756566f'], label_names= ['2/4 - 200 window','2/4 - 1500 window'], window_size=[200,1500])
 
 # Run for differnt weight vectors
-run(['257465bf42a','169760e0cd9','1f96591647f','770d010caa3'], label_names= ['0.5/400','1.0/400','1.5/400','2.0/400'])
+# run(['257465bf42a','169760e0cd9','1f96591647f','770d010caa3'], label_names= ['0.5/400','1.0/400','1.5/400','2.0/400'])
 
-
-# run(['2c5a756566f'], label_names= ['2/4'])
+# Run for different state spaces
+run(['fe92e6d36e8','a1fc8624646','169760e0cd9'], label_names= ['Angles','Radii','Angles and Radii'])
 # run([], label_names= [])

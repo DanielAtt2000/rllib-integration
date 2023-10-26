@@ -17,7 +17,7 @@ def find_all(path):
             result.append(os.path.join(root, file))
     return result
 
-path = 'final/770d010c/testing'
+path = 'final/a1fc8624_trailer/training'
 found_files = find_all(path)
 assert len(found_files) == 1
 results = pd.read_csv(found_files[0])
@@ -156,8 +156,11 @@ print('OVERLALL RESULTS')
 print(f'Total Runs {total_runs}')
 print(f'Success rate overall = {total_success / total_runs}')
 print(f'Unsuccessful rate overall = {total_unsuccessful / total_runs}')
-print(f'Truck collision rate overall = {total_unsuccessful_truck / total_runs}')
-print(f'Trailer collision rate overall = {total_unsuccessful_trailer / total_runs}')
+truck_collision = total_unsuccessful_truck / (total_unsuccessful_truck+total_unsuccessful_trailer)
+trailer_collision = total_unsuccessful_trailer / (total_unsuccessful_truck+total_unsuccessful_trailer)
+
+print(f'Truck collision rate overall = {(truck_collision*total_unsuccessful) / total_runs}')
+print(f'Trailer collision rate overall = {(trailer_collision*total_unsuccessful) / total_runs}')
 print(f'Mean TRUCK distance to center of lane for completed routes = {truck_total_distance_to_center_of_lane_completed_routes / total_completed_routes_at_least_one}')
 print(f'Mean TRAILER distance to center of lane for completed routes = {trailer_total_distance_to_center_of_lane_completed_routes / total_completed_routes_at_least_one}')
 print(f'Total Routes = {total_routes}')
