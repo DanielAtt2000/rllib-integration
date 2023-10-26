@@ -15,7 +15,7 @@ dueling: true
 #num_atoms: 51
 #noisy: True
 gamma: 1
-lr: 0.000005
+lr: 0.0000005
 #lr: .0001
 hiddens: [512,512,1024]
 #rollout_fragment_length: 4
