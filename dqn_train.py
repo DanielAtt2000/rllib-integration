@@ -178,7 +178,7 @@ def main():
         args.name = args.name + '_' + str(commit_hash())
 
         if specific_version:
-            args.name = "a3962295"
+            args.name = "dqn_a3962295"
             x = random.randint(0,100)
             inp = input(f'SPECIFIC NAME APPLIED  ENTER {x} to confirm:')
 
