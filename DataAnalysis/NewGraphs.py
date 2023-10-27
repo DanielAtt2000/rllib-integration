@@ -415,8 +415,8 @@ def plot_route(route_points_all, truck_points_all):
         current_index_time = datetime.strptime(df.loc[idx, "Time"],"%Y_%m_%d__%H_%M_%S_%f")
         date_obj = datetime.strptime(after_this_time, "%Y_%m_%d__%H_%M_%S_%f")
         # if len(x_truck[idx]) > 0:
-        if current_index_time > date_obj:
-        # if idx > 6026:
+        # if current_index_time > date_obj:
+        if idx > 6025:
 
             entry_exit = df.loc[idx, 'EntryExit']
             entry = int(entry_exit.split(',')[0])
@@ -496,12 +496,12 @@ def plot_route(route_points_all, truck_points_all):
                 buffer = 5
                 # a3 = axes[2]
                 # print(f"X_TRUCK: {truck_normalised_transform.location.x} Y_TRUCK {truck_normalised_transform.location.y}")
-                a1.plot(x_route[idx][0], y_route[idx][0], 'ro', label='Route Starting waypoint')
+                a1.plot(x_route[idx][0], y_route[idx][0], 'bo', label='Route Starting waypoint')
 
                 # a1.plot(x_truck[idx][0], y_truck[idx][0], 'kd', label='Truck Starting waypoint')
                 a1.plot(x_route[idx][2:], y_route[idx][2:], 'g^')
-                a1.plot(x_truck[idx][2:], y_truck[idx][2:], "yo")
-                a1.plot(x_route[idx][-20], y_route[idx][-20], 'r^', label='Route End waypoint')
+                a1.plot(x_truck[idx][2:], y_truck[idx][2:], "ro")
+                a1.plot(x_route[idx][-20], y_route[idx][-20], 'y^', label='Route End waypoint')
                 # a1.plot(df.loc[idx, "Collisions"].x, df.loc[idx, "Collisions"].y, 'b*')
 
                 # roundabout = '32m'

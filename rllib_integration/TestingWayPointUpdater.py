@@ -287,14 +287,14 @@ def plot_all_routes(all_routes=-1,all_spawn_points=-1):
             idx_2 +=1
 
         plt.plot([x_route.pop(0)], y_route.pop(0), 'bo')
-        plt.plot(x_route, y_route, 'y^')
-        plt.plot([x_route[0]], [y_route[0]], 'ro', label='Starting waypoint')
-        plt.plot([x_route[len(x_route)-15]], [y_route[len(y_route)-15]], 'r^', label='Ending waypoint')
+        plt.plot(x_route, y_route, 'r^')
+        plt.plot([x_route[0]], [y_route[0]], 'bo', label='Starting waypoint')
+        plt.plot([x_route[len(x_route)-15]], [y_route[len(y_route)-15]], 'y^', label='Ending waypoint')
         plt.axis([x_min - buffer, x_max + buffer, y_min - buffer, y_max + buffer])
         # plt.axis([0, 1, 0, 1])
         # plt.title(f'{angle_to_center_of_lane_degrees * 180}')
         plt.gca().invert_yaxis()
-        plt.legend(loc='upper center')
+        # plt.legend(loc='upper center')
         plt.show()
 
         idx +=1
