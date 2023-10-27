@@ -211,7 +211,7 @@ def main():
                         entry_pos = line.find("type=")
                         collision_object = str(line[entry_pos + len("type="):-3].strip())
                         new_data.append(collision_object)
-                    elif filename == "path" or filename == "route":
+                    elif filename == "path" or filename == "route" or filename == "trailer_path":
                         temp_array = []
                         if "[]" not in line:
                             data_entry = line.strip()

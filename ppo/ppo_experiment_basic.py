@@ -97,6 +97,7 @@ class PPOExperimentBasic(BaseExperiment):
         # self.forward_velocity_x = []
         # self.forward_velocity_z = []
         self.vehicle_path = []
+        self.trailer_vehicle_path = []
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
         self.hyp_distance_to_next_plus_1_waypoint = []
@@ -324,6 +325,7 @@ class PPOExperimentBasic(BaseExperiment):
         # self.save_to_file(f"{self.directory}/acceleration", self.acceleration)
         self.save_to_file(f"{self.directory}/route", self.temp_route)
         self.save_to_file(f"{self.directory}/path", self.vehicle_path)
+        self.save_to_file(f"{self.directory}/trailer_path", self.trailer_vehicle_path)
         self.save_to_file(f"{self.directory}/lidar_data", self.lidar_data)
         self.save_to_file(f"{self.directory}/collisions", self.collisions)
         self.save_to_file(f"{self.directory}/radii",self.radii)
@@ -393,6 +395,7 @@ class PPOExperimentBasic(BaseExperiment):
         # self.forward_velocity_x = []
         # self.forward_velocity_z = []
         self.vehicle_path = []
+        self.trailer_vehicle_path = []
         self.temp_route = []
         self.hyp_distance_to_next_waypoint = []
         self.hyp_distance_to_next_plus_1_waypoint = []
@@ -1792,6 +1795,7 @@ class PPOExperimentBasic(BaseExperiment):
         # self.trailer_bearing_to_waypoint.append(np.float32(trailer_bearing_to_waypoint))
         # self.acceleration.append(np.float32(acceleration))
         self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
+        self.trailer_vehicle_path.append((trailer_rear_axle_transform.location.x,trailer_rear_axle_transform.location.y))
         self.temp_route = deepcopy(core.route_points)
         self.radii.append(radii)
         # self.mean_radius.append(mean_radius)

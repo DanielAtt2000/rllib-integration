@@ -96,18 +96,23 @@ for filename in os.listdir(directory):
 #
 # df = df.reset_index()
 
-def plot_route(route_points_all, truck_points_all):
+def plot_route(route_points_all, truck_points_all,trailer_points_all):
     x_route = []
     y_route = []
 
     x_truck = []
     y_truck = []
 
+    x_trailer = []
+    y_trailer = []
+
     try:
         x_truck = open_pickle(os.path.join(directory, 'x_truck.pickle'))
         y_truck = open_pickle(os.path.join(directory, 'y_truck.pickle'))
         x_route = open_pickle(os.path.join(directory, 'x_route.pickle'))
         y_route = open_pickle(os.path.join(directory, 'y_route.pickle'))
+        x_trailer = open_pickle(os.path.join(directory, 'x_trailer.pickle'))
+        y_trailer = open_pickle(os.path.join(directory, 'y_trailer.pickle'))
 
     except:
         route_points_all = route_points_all[route_points_all != 0]
@@ -126,12 +131,19 @@ def plot_route(route_points_all, truck_points_all):
         for truck_idx, truck_points in enumerate(truck_points_all):
             temp_x_truck = []
             temp_y_truck = []
-            for truck_point in truck_points:
+            temp_x_trailer = []
+            temp_y_trailer = []
+            for t,truck_point in enumerate(truck_points):
                 temp_x_truck.append(truck_point[0])
                 temp_y_truck.append(truck_point[1])
 
+                temp_x_trailer.append(trailer_points_all[truck_idx][t][0])
+                temp_y_trailer.append(trailer_points_all[truck_idx][t][1])
+
             x_truck.append(temp_x_truck)
             y_truck.append(temp_y_truck)
+            x_trailer.append(temp_x_trailer)
+            y_trailer.append(temp_y_trailer)
             print(f"Truck Path {truck_idx}/{len(truck_points_all)} ready")
 
         # Removing the first truck position since this is extra when starting
@@ -141,6 +153,8 @@ def plot_route(route_points_all, truck_points_all):
         save_to_pickle(f'y_truck', y_truck)
         save_to_pickle(f'x_route', x_route)
         save_to_pickle(f'y_route', y_route)
+        save_to_pickle(f'x_trailer', x_trailer)
+        save_to_pickle(f'y_trailer', y_trailer)
 
     # # Hack to remove
     # temp_x_route = deepcopy(x_route)
@@ -499,6 +513,7 @@ def plot_route(route_points_all, truck_points_all):
                 a1.plot(x_route[idx][0], y_route[idx][0], 'bo', label='Route Starting waypoint')
 
                 # a1.plot(x_truck[idx][0], y_truck[idx][0], 'kd', label='Truck Starting waypoint')
+                a1.plot(x_trailer[idx][2:], y_trailer[idx][2:], "m*")
                 a1.plot(x_route[idx][2:], y_route[idx][2:], 'g^')
                 a1.plot(x_truck[idx][2:], y_truck[idx][2:], "ro")
                 a1.plot(x_route[idx][-20], y_route[idx][-20], 'y^', label='Route End waypoint')
@@ -670,7 +685,7 @@ def plot_route(route_points_all, truck_points_all):
                 items_to_plot_derived = []
                 items_not_to_plot = ['Collisions', 'Done', 'lidar_data', 'line_reward_location',
                                      'path', 'index',
-                                     'point_reward_location', 'radii', 'route','EntryExit', 'Time','Vehicle']
+                                     'point_reward_location', 'radii', 'route','EntryExit', 'Time','Vehicle', 'trailer_path']
 
 
                 for col in df.columns:
@@ -848,7 +863,7 @@ if for_graphs:
                         plt.show()
                         x.savefig(os.path.join(directory, filename + string + '.png'))
 
-plot_route(df["route"], df["path"])
+plot_route(df["route"], df["path"], df['trailer_path'])
 
 # y_dist_to_waypoints 0-> 0.023
 # x_dist_to_waypoints
