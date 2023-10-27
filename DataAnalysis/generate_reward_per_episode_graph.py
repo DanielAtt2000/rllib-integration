@@ -12,7 +12,7 @@ def run(filenames=[],label_names = [],window_size=[]):
 
 
 
-    max_value = 7300
+    max_value = 7050
     window_reward = 200
     window_done = 1500
     different_window_sizes = True
@@ -21,7 +21,7 @@ def run(filenames=[],label_names = [],window_size=[]):
         different_window_sizes = False
         for f in filenames:
             window_size.append(window_reward)
-    plt.figure(figsize=(10, 4))
+    plt.figure(figsize=(10, 5))
 
     for filename,window in zip(filenames,window_size):
         done_array = open_pickle(f'done/{filename}_done')
