@@ -14,8 +14,7 @@ import pandas as pd
 import numpy as np
 
 from DataAnalysis.NewProcessData2 import data_file, for_graphs
-from rllib_integration.GetStartStopLocation import spawn_points_2_lane_roundabout_small_easy, \
-    spawn_points_2_lane_roundabout_small_difficult
+from newHelper import get_route_type
 
 
 class Vector:
@@ -210,34 +209,37 @@ def plot_route(route_points_all, truck_points_all):
 
     easy_dict ={}
     diff_dict = {}
-    rewards = []
-    done_array = []
-    for idx in range(len(x_route)):
-        if idx < 10000000:
-            if (df.loc[idx, "Done"]) == 'done_arrived':
-                done_array.append(1)
-            else:
-                done_array.append(0)
-            rewards.append(sum(df.loc[idx, "total_episode_reward"]))
-    done_array_cum_sum = np.cumsum(done_array)
-    stat = "count"  # or proportion
-    # sns.histplot(done_array, stat=stat, cumulative=False, alpha=.4)
-    # sns.ecdfplot(done_array, stat=stat)
-    sns.lineplot(done_array_cum_sum)
-    plt.show()
 
-    x = sns.histplot(df['EntryExit'], binwidth=10)
-    print(df.groupby(df['EntryExit'].tolist(), as_index=False).size())
+    x = input('skip initial visual? (y/n)')
+    if x == 'n':
+        rewards = []
+        done_array = []
+        for idx in range(len(x_route)):
+            if idx < 10000000:
+                if (df.loc[idx, "Done"]) == 'done_arrived':
+                    done_array.append(1)
+                else:
+                    done_array.append(0)
+                rewards.append(sum(df.loc[idx, "total_episode_reward"]))
+        done_array_cum_sum = np.cumsum(done_array)
+        stat = "count"  # or proportion
+        # sns.histplot(done_array, stat=stat, cumulative=False, alpha=.4)
+        # sns.ecdfplot(done_array, stat=stat)
+        sns.lineplot(done_array_cum_sum)
+        plt.show()
 
-    print("------------------------------")
-    print("DONE DATA")
-    # print(df[['EntryExit', 'Done']].output.value_counts())
-    # print(df[['EntryExit', 'Done']].points.value_counts())
-    print("------------------------------")
+        x = sns.histplot(df['EntryExit'], binwidth=10)
+        print(df.groupby(df['EntryExit'].tolist(), as_index=False).size())
 
-    # x = sns.swarmplot(df_done,x="output",y="points")
-    # sns.scatterplot(data)
-    plt.show()
+        print("------------------------------")
+        print("DONE DATA")
+        # print(df[['EntryExit', 'Done']].output.value_counts())
+        # print(df[['EntryExit', 'Done']].points.value_counts())
+        print("------------------------------")
+
+        # x = sns.swarmplot(df_done,x="output",y="points")
+        # sns.scatterplot(data)
+        plt.show()
 
 
 
@@ -315,107 +317,121 @@ def plot_route(route_points_all, truck_points_all):
     # plt.ylim()
     # plt.plot( done_array, label='All DIFFICULT episode rewards')
     # plt.plot(easy_x_indices, all_episodes_easy_sum, label='All EASY episode rewards')
-    save_reward = True
-    filename = data_file.split('_')[1]
-    if save_reward:
-        save_to_pickle('../rewards/' + filename + '_total_reward',rewards)
-        save_to_pickle('../done/' + filename + '_done',done_array)
+        save_reward = True
+        filename = data_file.split('_')[1]
+        if save_reward:
+            save_to_pickle('../rewards/' + filename + '_total_reward',rewards)
+            save_to_pickle('../done/' + filename + '_done',done_array)
 
 
 
-    window = 250
-    average_difficult_y = []
-    average_easy_y = []
-    for ind in range(len(done_array) - window + 1):
-        x = np.mean(rewards[ind:ind + window])
-        average_difficult_y.append(x)
-    # for ind in range(len(all_episodes_easy_sum) - window + 1):
-    #     average_easy_y.append(np.mean(all_episodes_easy_sum[ind:ind + window]))
-    plt.plot(average_difficult_y,label='average_DIFFICULT _y')
-    # plt.plot(average_easy_y,label='average_easy_y ')
+        window = 250
+        average_difficult_y = []
+        average_easy_y = []
+        for ind in range(len(done_array) - window + 1):
+            x = np.mean(rewards[ind:ind + window])
+            average_difficult_y.append(x)
+        # for ind in range(len(all_episodes_easy_sum) - window + 1):
+        #     average_easy_y.append(np.mean(all_episodes_easy_sum[ind:ind + window]))
+        plt.plot(average_difficult_y,label='average_DIFFICULT _y')
+        # plt.plot(average_easy_y,label='average_easy_y ')
 
-    # plt.plot(all_point_difficult_rewards,label='all_point_difficult_rewards')
-    # plt.plot(all_line_difficult_rewards,label='all_line_difficult_rewards')
-    plt.ylabel('Total episode reward \n averaged over a 250 episode window')
-    plt.xlabel('Number of episodes')
-    # plt.xticks(np.arange(0, 8000 + 1, 500))
-    # plt.legend(loc='upper center')
-    plt.show()
+        # plt.plot(all_point_difficult_rewards,label='all_point_difficult_rewards')
+        # plt.plot(all_line_difficult_rewards,label='all_line_difficult_rewards')
+        plt.ylabel('Total episode reward \n averaged over a 250 episode window')
+        plt.xlabel('Number of episodes')
+        # plt.xticks(np.arange(0, 8000 + 1, 500))
+        # plt.legend(loc='upper center')
+        plt.show()
 
-    window = 250
-    average_difficult_y = []
-    average_easy_y = []
-    for ind in range(len(done_array) - window + 1):
-        x = np.mean(done_array[ind:ind + window])
-        average_difficult_y.append(x)
-    # for ind in range(len(all_episodes_easy_sum) - window + 1):
-    #     average_easy_y.append(np.mean(all_episodes_easy_sum[ind:ind + window]))
-    plt.plot(average_difficult_y,label='average_DIFFICULT _y')
-    # plt.plot(average_easy_y,label='average_easy_y ')
+        window = 250
+        average_difficult_y = []
+        average_easy_y = []
+        for ind in range(len(done_array) - window + 1):
+            x = np.mean(done_array[ind:ind + window])
+            average_difficult_y.append(x)
+        # for ind in range(len(all_episodes_easy_sum) - window + 1):
+        #     average_easy_y.append(np.mean(all_episodes_easy_sum[ind:ind + window]))
+        plt.plot(average_difficult_y,label='average_DIFFICULT _y')
+        # plt.plot(average_easy_y,label='average_easy_y ')
 
-    # plt.plot(all_point_difficult_rewards,label='all_point_difficult_rewards')
-    # plt.plot(all_line_difficult_rewards,label='all_line_difficult_rewards')
-    plt.ylabel('Ratio of successful vs unsuccessful episodes \n averaged over a 250 episode window')
-    plt.xlabel('Number of episodes')
-    # plt.xticks(np.arange(0, 8000 + 1, 500))
-    # plt.legend(loc='upper center')
-    plt.show()
+        # plt.plot(all_point_difficult_rewards,label='all_point_difficult_rewards')
+        # plt.plot(all_line_difficult_rewards,label='all_line_difficult_rewards')
+        plt.ylabel('Ratio of successful vs unsuccessful episodes \n averaged over a 250 episode window')
+        plt.xlabel('Number of episodes')
+        # plt.xticks(np.arange(0, 8000 + 1, 500))
+        # plt.legend(loc='upper center')
+        plt.show()
 
-    print('EASY DICT')
-    print(easy_dict)
-    total = 0
-    for key, value in easy_dict.items():
-        total += value
-    for key, value in easy_dict.items():
-        print(f'{key} = {value/total}')
+        print('EASY DICT')
+        print(easy_dict)
+        total = 0
+        for key, value in easy_dict.items():
+            total += value
+        for key, value in easy_dict.items():
+            print(f'{key} = {value/total}')
 
-    total_positive = 0
-    total_negative = 0
-    for key, value in easy_dict.items():
-        if 'positive' in key:
-            total_positive += value
-        if 'negative' in key:
-            total_negative += value
+        total_positive = 0
+        total_negative = 0
+        for key, value in easy_dict.items():
+            if 'positive' in key:
+                total_positive += value
+            if 'negative' in key:
+                total_negative += value
 
-    for key, value in easy_dict.items():
-        if 'positive' in key:
-            print(f'positive: {total_positive/(total_negative+total_positive)}')
-        if 'negative' in key:
-            print(f'negative: {total_negative/(total_negative+total_positive)}')
+        for key, value in easy_dict.items():
+            if 'positive' in key:
+                print(f'positive: {total_positive/(total_negative+total_positive)}')
+            if 'negative' in key:
+                print(f'negative: {total_negative/(total_negative+total_positive)}')
 
 
 
-    print('DIFF DICT')
-    print(diff_dict)
-    for key, value in diff_dict.items():
-        total += value
-    for key, value in diff_dict.items():
-        print(f'{key} = {value/total}')
+        print('DIFF DICT')
+        print(diff_dict)
+        for key, value in diff_dict.items():
+            total += value
+        for key, value in diff_dict.items():
+            print(f'{key} = {value/total}')
 
-    total_positive = 0
-    total_negative = 0
-    for key, value in diff_dict.items():
-        if 'positive' in key:
-            total_positive += value
-        if 'negative' in key:
-            total_negative += value
+        total_positive = 0
+        total_negative = 0
+        for key, value in diff_dict.items():
+            if 'positive' in key:
+                total_positive += value
+            if 'negative' in key:
+                total_negative += value
 
-    for key, value in diff_dict.items():
-        if 'positive' in key:
-            print(f'positive: {total_positive/(total_negative+total_positive)}')
-        if 'negative' in key:
-            print(f'negative: {total_negative/(total_negative+total_positive)}')
+        for key, value in diff_dict.items():
+            if 'positive' in key:
+                print(f'positive: {total_positive/(total_negative+total_positive)}')
+            if 'negative' in key:
+                print(f'negative: {total_negative/(total_negative+total_positive)}')
 
 
 
     for idx in range(len(x_route)):
-        after_this_time = "2023_06_04__18_20_0"
-
-
-
+        after_this_time = "2023_10_15__18_45_42_237838"
+        current_index_time = datetime.strptime(df.loc[idx, "Time"],"%Y_%m_%d__%H_%M_%S_%f")
+        date_obj = datetime.strptime(after_this_time, "%Y_%m_%d__%H_%M_%S_%f")
         # if len(x_truck[idx]) > 0:
+        if current_index_time > date_obj:
+        # if idx > 6026:
 
-        if idx > 16000:
+            entry_exit = df.loc[idx, 'EntryExit']
+            entry = int(entry_exit.split(',')[0])
+            exit = int(entry_exit.split(',')[1])
+            roundabout = get_route_type(entry, exit)
+            roundabout16MDifficultEntryPoints = [31, 117, 34, 5]
+            roundabout50MDifficultEntryPoints = [73, 15, 55, 96, 58, 55]
+            #
+            # if roundabout == 'double' and entry in roundabout16MDifficultEntryPoints and 'done_arrived' in df.loc[idx, "Done"]:
+            #     pass
+            # else:
+            #     continue
+
+
+
             # # Hack to remove
             # if idx != 0:
             #     x_route[idx] = temp_x_route[idx][len(temp_x_route[idx-1]):]
@@ -488,15 +504,55 @@ def plot_route(route_points_all, truck_points_all):
                 a1.plot(x_route[idx][-20], y_route[idx][-20], 'r^', label='Route End waypoint')
                 # a1.plot(df.loc[idx, "Collisions"].x, df.loc[idx, "Collisions"].y, 'b*')
 
-                if y_route[idx][0] > 0:
-                    a1.axis([x_min_upper - buffer, x_max_upper + buffer, y_min_upper - buffer, y_max_upper + buffer])
+                # roundabout = '32m'
+                new_x_min = 0
+                new_x_max = 0
+                new_y_min = 0
+                new_y_max = 0
+
+                if roundabout == '32m':
+                    new_x_min = 20
+                    new_x_max = 120
+                    new_y_min = -50
+                    new_y_max = 75
+                elif roundabout == '40m':
+                    new_x_min = 0
+                    new_x_max = 0
+                    new_y_min = 0
+                    new_y_max = 0
+                elif roundabout == '20m':
+                    new_x_min = 0
+                    new_x_max = 0
+                    new_y_min = 0
+                    new_y_max = 0
+                elif roundabout == 'double':
+                    pass
                 else:
-                    a1.axis([x_min_lower - buffer, x_max_lower + buffer, y_min_lower - buffer, y_max_lower + buffer])
+                    raise Exception()
+
+
+                testing = True
+                if testing and roundabout != 'double':
+                    a1.axis([new_x_min - buffer, new_x_max + buffer, new_y_min - buffer, new_y_max + buffer])
+
+                elif testing and roundabout == 'double':
+                    if y_route[idx][0] > 0:
+                        a1.axis(
+                            [110 - buffer, 200 + buffer, 70 - buffer, 150 + buffer])
+                    else:
+                        a1.axis(
+                            [-113 - buffer, 107 + buffer, -393 - buffer, -193 + buffer])
+
+                # elif y_route[idx][0] > 0:
+                #     a1.axis([x_min_upper - buffer, x_max_upper + buffer, y_min_upper - buffer, y_max_upper + buffer])
+                # else:
+                #     a1.axis([x_min_lower - buffer, x_max_lower + buffer, y_min_lower - buffer, y_max_lower + buffer])
+
                 # a1.axis([-80, 70,-85,85])
 
                 # plt.axis([0, 1, 0, 1])
                 a1.set_title(
-                    f'{df.loc[idx,"EntryExit"]} {df.loc[idx, "Done"]}. Episode {idx}/{len(x_route)}. Total Episode Reward total {sum(df.loc[idx, "total_episode_reward"])}. W/O Last value {sum(df.loc[idx, "total_episode_reward"][:-1])}')
+                    f'{df.loc[idx,"EntryExit"]} {roundabout} {df.loc[idx, "Done"]}. Episode {idx}/{len(x_route)}. Total Episode Reward total {sum(df.loc[idx, "total_episode_reward"])}. W/O Last value {sum(df.loc[idx, "total_episode_reward"][:-1])}')
                 a1.invert_yaxis()
                 a1.legend(loc='upper center')
 
@@ -661,7 +717,7 @@ def plot_route(route_points_all, truck_points_all):
                                  ('forward_velocity',0,20),
                                  ('hyp_distance_to_next_plus_1_waypoint',0,20),
                                  ('hyp_distance_to_next_waypoint',0,20),
-                                    ('mean_radius',0,1.1),
+                                    # ('mean_radius',0,1.1),
                                  ('total_episode_reward',-10,10),
                                  ('distance_to_center_of_lane',0,5)
                                  ]
