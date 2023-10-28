@@ -436,7 +436,17 @@ def plot_route(route_points_all, truck_points_all,trailer_points_all=[]):
             entry_exit = df.loc[idx, 'EntryExit']
             entry = int(entry_exit.split(',')[0])
             exit = int(entry_exit.split(',')[1])
-            roundabout = get_route_type(entry, exit)
+            roundabout, lane = get_route_type(entry, exit)
+
+            if roundabout == '40m':
+                pass
+            else:
+                continue
+            plt.rcParams.update({'font.size': 13})
+            plt.ylabel(f'Velocity (km/h)')
+            plt.xlabel(f'Timesteps')
+            plt.plot(df.loc[idx, 'forward_velocity'])
+
             roundabout16MDifficultEntryPoints = [31, 117, 34, 5]
             roundabout50MDifficultEntryPoints = [73, 15, 55, 96, 58, 55]
             #
@@ -541,23 +551,31 @@ def plot_route(route_points_all, truck_points_all,trailer_points_all=[]):
                     new_x_max = 0
                     new_y_min = 0
                     new_y_max = 0
-                elif roundabout == 'double':
-                    pass
+                elif roundabout == '16m':
+                    new_x_min = 110
+                    new_x_max = 200
+                    new_y_min = 70
+                    new_y_max = 150
+                elif roundabout == '50m':
+                    new_x_min = -113
+                    new_x_max = 107
+                    new_y_min = -393
+                    new_y_max = -193
                 else:
                     raise Exception()
 
 
-                testing = True
-                if testing and roundabout != 'double':
-                    a1.axis([new_x_min - buffer, new_x_max + buffer, new_y_min - buffer, new_y_max + buffer])
-
-                elif testing and roundabout == 'double':
-                    if y_route[idx][0] > 0:
-                        a1.axis(
-                            [110 - buffer, 200 + buffer, 70 - buffer, 150 + buffer])
-                    else:
-                        a1.axis(
-                            [-113 - buffer, 107 + buffer, -393 - buffer, -193 + buffer])
+                # testing = True
+                # if testing and roundabout != 'double':
+                a1.axis([new_x_min - buffer, new_x_max + buffer, new_y_min - buffer, new_y_max + buffer])
+                #
+                # elif testing and roundabout == 'double':
+                #     if y_route[idx][0] > 0:
+                #         a1.axis(
+                #             [110 - buffer, 200 + buffer, 70 - buffer, 150 + buffer])
+                #     else:
+                #         a1.axis(
+                #             [-113 - buffer, 107 + buffer, -393 - buffer, -193 + buffer])
 
                 # elif y_route[idx][0] > 0:
                 #     a1.axis([x_min_upper - buffer, x_max_upper + buffer, y_min_upper - buffer, y_max_upper + buffer])
@@ -570,7 +588,7 @@ def plot_route(route_points_all, truck_points_all,trailer_points_all=[]):
                 a1.set_title(
                     f'{df.loc[idx,"EntryExit"]} {roundabout} {df.loc[idx, "Done"]}. Episode {idx}/{len(x_route)}. Total Episode Reward total {sum(df.loc[idx, "total_episode_reward"])}. W/O Last value {sum(df.loc[idx, "total_episode_reward"][:-1])}')
                 a1.invert_yaxis()
-                a1.legend(loc='upper center')
+                # a1.legend(loc='upper center')
 
                 # if df.loc[idx, "Vehicle"] != "None":
                 #     assert df.loc[idx, "Collisions"][0] in df.loc[idx,'Done']
