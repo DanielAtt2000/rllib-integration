@@ -17,7 +17,7 @@ def find_all(path):
             result.append(os.path.join(root, file))
     return result
 
-path = 'final/169760e0_trailer/training'
+path = 'final/169760e0_trailer/testing'
 found_files = find_all(path)
 assert len(found_files) == 1
 results = pd.read_csv(found_files[0])
@@ -162,16 +162,18 @@ for route in routes:
 
 
         if ((x['trailer_lidar_collision']> x['truck_lidar_collision']) or (x['trailer_lidar_collision'] != 0 and x['truck_lidar_collision'] == 0)) and x['completed'] != 5:
-            if trailer_uncompleted_routes_dict.get(x['roundabout']+lane) == None:
-                trailer_uncompleted_routes_dict[x['roundabout']+lane] = 1
-            else:
-                trailer_uncompleted_routes_dict[x['roundabout']+lane] += 1
+            for i in range(x['trailer_lidar_collision']):
+                if trailer_uncompleted_routes_dict.get(x['roundabout']+lane) == None:
+                    trailer_uncompleted_routes_dict[x['roundabout']+lane] = 1
+                else:
+                    trailer_uncompleted_routes_dict[x['roundabout']+lane] += 1
 
         elif ((x['truck_lidar_collision'] >x['trailer_lidar_collision']) or (x['truck_lidar_collision'] != 0 and x['trailer_lidar_collision'] == 0)) and x['completed'] != 5:
-            if truck_uncompleted_routes_dict.get(x['roundabout']+lane) == None:
-                truck_uncompleted_routes_dict[x['roundabout']+lane] = 1
-            else:
-                truck_uncompleted_routes_dict[x['roundabout']+lane] += 1
+            for i in range(x['truck_lidar_collision']):
+                if truck_uncompleted_routes_dict.get(x['roundabout']+lane) == None:
+                    truck_uncompleted_routes_dict[x['roundabout']+lane] = 1
+                else:
+                    truck_uncompleted_routes_dict[x['roundabout']+lane] += 1
         elif (x['truck_lidar_collision'] == x['trailer_lidar_collision']) and x['completed'] != 5:
             for i in range(x['truck_lidar_collision']):
                 if truck_uncompleted_routes_dict.get(x['roundabout'] + lane) == None:

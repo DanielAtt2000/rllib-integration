@@ -96,7 +96,7 @@ for filename in os.listdir(directory):
 #
 # df = df.reset_index()
 
-def plot_route(route_points_all, truck_points_all,trailer_points_all):
+def plot_route(route_points_all, truck_points_all,trailer_points_all=[]):
     x_route = []
     y_route = []
 
@@ -137,8 +137,9 @@ def plot_route(route_points_all, truck_points_all,trailer_points_all):
                 temp_x_truck.append(truck_point[0])
                 temp_y_truck.append(truck_point[1])
 
-                temp_x_trailer.append(trailer_points_all[truck_idx][t][0])
-                temp_y_trailer.append(trailer_points_all[truck_idx][t][1])
+                if len(trailer_points_all) != 0:
+                    temp_x_trailer.append(trailer_points_all[truck_idx][t][0])
+                    temp_y_trailer.append(trailer_points_all[truck_idx][t][1])
 
             x_truck.append(temp_x_truck)
             y_truck.append(temp_y_truck)
@@ -862,8 +863,10 @@ if for_graphs:
                         # sns.scatterplot(data)
                         plt.show()
                         x.savefig(os.path.join(directory, filename + string + '.png'))
-
-plot_route(df["route"], df["path"], df['trailer_path'])
+if 'trailer_path' in df:
+    plot_route(df["route"], df["path"], df['trailer_path'])
+else:
+    plot_route(df["route"], df["path"])
 
 # y_dist_to_waypoints 0-> 0.023
 # x_dist_to_waypoints

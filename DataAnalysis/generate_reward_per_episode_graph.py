@@ -10,7 +10,7 @@ def run(filenames=[],label_names = [],window_size=[]):
     all_reward = []
     all_done = []
 
-
+    plt.rcParams.update({'font.size': 13})
 
     max_value = 7050
     window_reward = 200
@@ -21,7 +21,7 @@ def run(filenames=[],label_names = [],window_size=[]):
         different_window_sizes = False
         for f in filenames:
             window_size.append(window_reward)
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(9, 5))
 
     for filename,window in zip(filenames,window_size):
         done_array = open_pickle(f'done/{filename}_done')
@@ -55,11 +55,12 @@ def run(filenames=[],label_names = [],window_size=[]):
     # plt.plot(all_point_difficult_rewards,label='all_point_difficult_rewards')
     # plt.plot(all_line_difficult_rewards,label='all_line_difficult_rewards')
     if not different_window_sizes:
-        plt.ylabel(f'Episode reward averaged over \n a {window_reward} episode window')
+        plt.ylabel(f'Episode reward averaged over \n a {window_reward} episode sliding window')
     else:
-        plt.ylabel(f'Episode reward averaged over \n a different episode window')
+        plt.ylabel(f'Episode reward averaged over \n different episode sliding window sizes')
 
     plt.xlabel('Number of episodes')
+
     # plt.xticks(np.arange(0, 8000 + 1, 500))
     plt.grid()
     plt.legend(loc='lower right')
@@ -100,5 +101,10 @@ def run(filenames=[],label_names = [],window_size=[]):
 # run(['257465bf42a','169760e0cd9','1f96591647f','770d010caa3'], label_names= ['0.5/400','1.0/400','1.5/400','2.0/400'])
 
 # Run for different state spaces
-run(['fe92e6d36e8','a1fc8624646','169760e0cd9'], label_names= ['Angles','Radii','Angles and Radii'])
+# run(['fe92e6d36e8','a1fc8624646','169760e0cd9'], label_names= ['Angles','Radii','Angles and Radii'])
+
+
+# Variable velocity action space
+run(['b1532c7504d','98bf3e6ed7a'], label_names= ['variable.velocity.no.smoothing','variable.velocity.smoothing'])
+# run(['b1532c7504d','98bf3e6ed7a'], label_names= ['variable.velocity.no.smoothing','variable.velocity.smoothing'],window_size=[200,1500])
 # run([], label_names= [])
