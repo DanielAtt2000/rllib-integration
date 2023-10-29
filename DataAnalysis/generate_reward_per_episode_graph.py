@@ -12,7 +12,7 @@ def run(filenames=[],label_names = [],window_size=[]):
 
     plt.rcParams.update({'font.size': 13})
 
-    max_value = 7050
+    max_value = 200000
     window_reward = 200
     window_done = 1500
     different_window_sizes = True
@@ -104,7 +104,7 @@ def run(filenames=[],label_names = [],window_size=[]):
 # run(['fe92e6d36e8','a1fc8624646','169760e0cd9'], label_names= ['Angles','Radii','Angles and Radii'])
 
 
-# Variable velocity action space
-run(['b1532c7504d','98bf3e6ed7a'], label_names= ['variable.velocity.no.smoothing','variable.velocity.smoothing'])
+# Constant vs Variable velocity action space
+run(['169760e0cd9','98bf3e6ed7a'], label_names= ['constant.velocity','variable.velocity'])
 # run(['b1532c7504d','98bf3e6ed7a'], label_names= ['variable.velocity.no.smoothing','variable.velocity.smoothing'],window_size=[200,1500])
 # run([], label_names= [])

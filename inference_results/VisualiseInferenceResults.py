@@ -17,7 +17,7 @@ def find_all(path):
             result.append(os.path.join(root, file))
     return result
 
-path = 'final/169760e0_trailer/testing'
+path = ('final/98bf3e6e_2a98820b/testing')
 found_files = find_all(path)
 assert len(found_files) == 1
 results = pd.read_csv(found_files[0])
