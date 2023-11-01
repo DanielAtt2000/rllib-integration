@@ -1,0 +1,10 @@
+route,timesteps,collision_truck,collision_trailer,timeout,truck_lidar_collision,trailer_lidar_collision,distance_to_center_of_lane,completed
+35|9,136,False,True,False,False,False,0.6925286708698747,False
+5|67,635,False,True,False,False,False,0.49872749810850003,False
+21|48,168,False,True,False,False,False,0.6225290902837171,False
+35|48,2,False,False,False,False,False,185.305794434438,False
+35|48,2,False,False,False,False,False,185.3057735102551,False
+29|55,256,False,False,False,True,False,0.5333447405430043,False
+35|9,1275,False,False,False,False,False,0.7854310963686827,True
+5|67,139,True,False,False,True,False,0.6813590855780334,False
+35|9,225,False,True,False,False,False,0.3359449172448971,False

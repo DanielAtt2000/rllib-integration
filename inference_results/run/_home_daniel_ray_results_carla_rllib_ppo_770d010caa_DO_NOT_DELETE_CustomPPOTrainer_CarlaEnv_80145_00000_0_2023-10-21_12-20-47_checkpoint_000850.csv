@@ -1,0 +1,13 @@
+route,timesteps,collision_truck,collision_trailer,timeout,truck_lidar_collision,trailer_lidar_collision,distance_to_center_of_lane,trailer_distance_to_center_of_lane,completed
+117|41,328,False,False,False,False,True,0.9396681667540762,222.16403689043278,False
+34|41,235,False,False,False,False,True,0.8108591477204676,180.85980320680585,False
+34|43,286,False,False,False,False,True,1.004845806698552,168.86920482778316,False
+5|43,352,False,False,False,False,False,0.7299978683173294,166.4313780663777,True
+5|120,391,False,False,False,True,False,1.04778337533082,142.72991446756558,False
+73|74,111,False,False,False,False,True,0.37229213238798586,200.96806612866123,False
+73|37,107,False,False,False,False,True,0.3547834293653043,280.6650027466867,False
+15|94,729,False,False,False,False,False,0.396810104300895,280.77349781228696,True
+15|105,769,False,False,False,False,False,0.5149549744292735,307.33509070319957,True
+15|26,934,False,False,False,False,False,0.602619577945664,303.42008693808697,True
+55|94,879,False,False,False,False,False,0.4834370247356434,280.463568432127,True
+55|105,921,False,False,False,False,False,0.6040249662461129,342.2997520319369,True
