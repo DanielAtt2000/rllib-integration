@@ -12,7 +12,7 @@ def run(filenames=[],label_names = [],window_size=[]):
 
     plt.rcParams.update({'font.size': 13})
 
-    max_value = 200000
+    max_value = 12000
     window_reward = 200
     window_done = 1500
     different_window_sizes = True
@@ -105,6 +105,11 @@ def run(filenames=[],label_names = [],window_size=[]):
 
 
 # Constant vs Variable velocity action space
-run(['169760e0cd9','98bf3e6ed7a'], label_names= ['constant.velocity','variable.velocity'])
+# run(['169760e0cd9','98bf3e6ed7a'], label_names= ['constant.velocity','variable.velocity'])
 # run(['b1532c7504d','98bf3e6ed7a'], label_names= ['variable.velocity.no.smoothing','variable.velocity.smoothing'],window_size=[200,1500])
+# PPO vs DQN vs SAC
+
+run(['169760e0cd9','2f20aba770b','a3962295b7_1071ef25'], label_names= ['PPO','SAC','DQN'])
+
+
 # run([], label_names= [])
