@@ -12,7 +12,7 @@ def run(filenames=[],label_names = [],window_size=[]):
 
     plt.rcParams.update({'font.size': 13})
 
-    max_value = 12000
+    max_value = 10500
     window_reward = 200
     window_done = 1500
     different_window_sizes = True
