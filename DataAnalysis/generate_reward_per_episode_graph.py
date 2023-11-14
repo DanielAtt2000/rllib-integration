@@ -12,9 +12,9 @@ def run(filenames=[],label_names = [],window_size=[]):
 
     plt.rcParams.update({'font.size': 13})
 
-    max_value = 10500
+    max_value = 7000
     window_reward = 200
-    window_done = 1500
+    # window_done = 1500
     different_window_sizes = True
 
     if window_size == []:
@@ -101,7 +101,7 @@ def run(filenames=[],label_names = [],window_size=[]):
 # run(['257465bf42a','169760e0cd9','1f96591647f','770d010caa3'], label_names= ['0.5/400','1.0/400','1.5/400','2.0/400'])
 
 # Run for different state spaces
-# run(['fe92e6d36e8','a1fc8624646','169760e0cd9'], label_names= ['Angles','Radii','Angles and Radii'])
+run(['fe92e6d36e8','a1fc8624646','169760e0cd9'], label_names= ['Angles','Radii','Angles and Radii'])
 
 
 # Constant vs Variable velocity action space
@@ -109,7 +109,7 @@ def run(filenames=[],label_names = [],window_size=[]):
 # run(['b1532c7504d','98bf3e6ed7a'], label_names= ['variable.velocity.no.smoothing','variable.velocity.smoothing'],window_size=[200,1500])
 # PPO vs DQN vs SAC
 
-run(['169760e0cd9','2f20aba770b','a3962295b7_1071ef25'], label_names= ['PPO','SAC','DQN'])
+# run(['169760e0cd9','2f20aba770b','a3962295b7_1071ef25'], label_names= ['PPO','SAC','DQN'])
 
 
 # run([], label_names= [])
