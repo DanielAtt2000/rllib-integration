@@ -717,6 +717,8 @@ class DQNExperimentBasic(BaseExperiment):
 
                 for x_lidar_point,y_lidar_point,z_lidar_point in zip(data[0],data[1],data[3]):
                     # print(f'x y z {x_lidar_point} {y_lidar_point} {z_lidar_point}')
+                    if x_lidar_point == 0 and y_lidar_point == 0:
+                        continue
 
                     # azimuth_rounded = round(self.get_azimuth(sensor_centre=virtual_lidar_centre_point, detection_point=(x_lidar_point,y_lidar_point)))
                     azimuth_rounded = round(self.get_azimuth(sensor_centre=virtual_lidar_centre_point, detection_point=(x_lidar_point,y_lidar_point)))
@@ -737,6 +739,7 @@ class DQNExperimentBasic(BaseExperiment):
                         lidar_points_dict[azimuth_rounded] = min(distance_from_sensor, lidar_points_dict[azimuth_rounded])
                         # lidar_points_dict[azimuth_rounded] = min(np.clip(distance_from_sensor/lidar_range,0,1), lidar_points_dict[azimuth_rounded])
 
+                # print(f'len lidar_points_dict {len(lidar_points_dict)}')
                 if self.visualiseLIDAR:
                     data = sensor_data[sensor][1]
 
