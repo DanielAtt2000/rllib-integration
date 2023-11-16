@@ -1,7 +1,7 @@
 # To see the complete list of configurable parameters see:
 # https://github.com/ray-project/ray/blob/master/rllib/agents/trainer.py
 framework: "torch"
-num_workers: 1
+num_workers: 6
 num_gpus: 1
 #gpu: True
 #num_gpus_per_worker: 1
@@ -11,31 +11,31 @@ recreate_failed_workers: True
 #horizon: 6500
 
 double_q: true
-dueling: true
+dueling: false
 #num_atoms: 51
 #noisy: True
-gamma: 1
-lr: 0.0000005
+gamma: 0.99
+lr: 0.0001
 #lr: .0001
-hiddens: [512,512,1024]
+hiddens: [100,100,100,100]
 #rollout_fragment_length: 4
-train_batch_size: 256
+train_batch_size: 16
 "exploration_config": {
   "type": "EpsilonGreedy",
-  "initial_epsilon": 1.0,
+  "initial_epsilon": 0.9,
   "final_epsilon": 0.01,
-  "epsilon_timesteps": 1000000
+  "epsilon_timesteps": 90000
 }
 #target_network_update_freq: 500
 replay_buffer_config:
   type: MultiAgentPrioritizedReplayBuffer
-  capacity: 600000
+  capacity: 90000
   # How many steps of the model to sample before learning starts.
   # If True prioritized replay buffer will be used.
   prioritized_replay_alpha: 0.6
   prioritized_replay_beta: 0.4
   prioritized_replay_eps: 0.000001
-num_steps_sampled_before_learning_starts: 10000
+#num_steps_sampled_before_learning_starts: 100/
 #n_step: 1
 
 

@@ -140,7 +140,11 @@ class CarlaEnv(gymnasium.Env):
         # self.get_observation_time.append(time_taken)
         #
         # start = time.time()
-        done, done_status_info = self.experiment.get_done_status(observation, self.core)
+        if self.experiment.config["hero"]["paperImplementation"]:
+            done, done_status_info = self.experiment.get_done_status(observation, self.core, info)
+        else:
+            done, done_status_info = self.experiment.get_done_status(observation, self.core)
+
 
         # Update the info dict with the new information from get_done_status
         info.update(done_status_info)
@@ -150,8 +154,12 @@ class CarlaEnv(gymnasium.Env):
         self.done_time = info['done_time_idle'] or info['done_time_episode']
         self.done_arrived = info['done_arrived']
 
-        terminated = info['done_collision_truck'] or info['done_collision_trailer'] or info['done_arrived'] or info['truck_lidar_collision'] or info['trailer_lidar_collision']
-        truncated = info['done_time_idle'] or info['done_falling'] or info['done_time_episode'] or info['done_far_from_path']
+        if self.experiment.config["hero"]["paperImplementation"]:
+            terminated = info['done_collision_truck'] or info['done_collision_trailer'] or info['done_arrived']
+            truncated = info['done_time_idle'] or info['done_falling'] or info['done_time_episode'] or info['done_angle'] or info['done_distance']
+        else:
+            terminated = info['done_collision_truck'] or info['done_collision_trailer'] or info['done_arrived'] or info['truck_lidar_collision'] or info['trailer_lidar_collision']
+            truncated = info['done_time_idle'] or info['done_falling'] or info['done_time_episode'] or info['done_far_from_path']
 
         save = False
         if save:

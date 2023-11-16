@@ -49,7 +49,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.last_angle_with_center = 0
         self.last_forward_velocity = 0
         self.custom_done_arrived = False
-        self.last_action = [0,0,0]
+        self.last_action = -1
         self.lidar_points_count = []
         self.reward_metric = 0
         self.current_time = 'None'
@@ -406,7 +406,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.save_to_file(f"{self.directory}/total_episode_reward",self.total_episode_reward)
         self.entry_idx = -1
         self.exit_idx = -1
-        self.last_action = [0,0,0]
+        self.last_action = -1
 
 
         # Saving LIDAR point count
@@ -524,15 +524,9 @@ class DQNExperimentBasic(BaseExperiment):
 
         return {
             # Discrete with pid value
-            0: [0.2, 0.00, 0.0, False, False],  # Straight
-            # 1: [acceleration_value, 0.80, 0.0, False, False],  # Right
-            # 2: [acceleration_value, 0.60, 0.0, False, False],  # Right
-            # 3: [acceleration_value, 0.40, 0.0, False, False],  # Right
-            # 4: [acceleration_value, 0.20, 0.0, False, False],  # Right
-            # 5: [acceleration_value, -0.80, 0.0, False, False],  # Left
-            # 6: [acceleration_value, -0.60, 0.0, False, False],  # Left
-            # 7: [acceleration_value, -0.40, 0.0, False, False],  # Left
-            # 8: [acceleration_value, -0.20, 0.0, False, False],  # Left
+            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
+            1: [acceleration_value, 0.50, 0.0, False, False],  # Right
+            2: [acceleration_value, -0.50, 0.0, False, False],  # Left
         }
 
 
@@ -571,7 +565,7 @@ class DQNExperimentBasic(BaseExperiment):
         # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
         print(f"----------------------------------->{action_msg}") if self.custom_enable_rendering else None
 
-        self.last_action = action_control
+        self.last_action = action
 
 
         return action
@@ -662,12 +656,21 @@ class DQNExperimentBasic(BaseExperiment):
 
 
 
-
-
+        trailer_angle_to_center_of_lane_degrees = calculate_angle_with_center_of_lane(
+            previous_position=core.route[core.last_waypoint_index-1].location,
+            current_position=trailer_transform.location,
+            next_position=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location)
 
         distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=truck_transform)
         trailer_distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=trailer_rear_axle_transform,waypoint_no=self.current_trailer_waypoint)
 
+        if trailer_angle_to_center_of_lane_degrees < 0:
+            trailer_distance_to_center_of_lane = -trailer_distance_to_center_of_lane
+
+        forward_vector_waypoint_0 = core.route[core.last_waypoint_index + 0].get_forward_vector()
+
+        trailer_bearing_to_waypoint = angle_between(waypoint_forward_vector=forward_vector_waypoint_0,
+                                                  vehicle_forward_vector=trailer_forward_vector)
 
         forward_velocity = np.clip(self.get_speed(core.hero), 0, None)
         self.current_forward_velocity = forward_velocity
@@ -894,7 +897,11 @@ class DQNExperimentBasic(BaseExperiment):
 
         self.counter += 1
         return {'values':output_values},\
-            {"truck_z_value":truck_transform.location.z,"distance_to_center_of_lane":distance_to_center_of_lane, "truck_acceleration": self.get_acceleration(core.hero),'trailer_distance_to_center_of_lane':trailer_distance_to_center_of_lane}
+            {"truck_z_value":truck_transform.location.z,
+             "distance_to_center_of_lane":distance_to_center_of_lane,
+             "truck_acceleration": self.get_acceleration(core.hero),
+             'trailer_distance_to_center_of_lane':trailer_distance_to_center_of_lane,
+             "trailer_bearing_to_waypoint":trailer_bearing_to_waypoint}
 
     def get_speed(self, hero):
         """Computes the speed of the hero vehicle in Km/h"""
@@ -927,7 +934,7 @@ class DQNExperimentBasic(BaseExperiment):
     def min_max_normalisation(self, value, min, max):
         return (value - min) / (max -min)
 
-    def get_done_status(self, observation, core):
+    def get_done_status(self, observation, core, info=None):
         """Returns whether or not the experiment has to end"""
         hero = core.hero
         self.done_time_idle = self.max_time_idle < self.time_idle
@@ -943,14 +950,28 @@ class DQNExperimentBasic(BaseExperiment):
         self.done_collision_trailer = (self.last_no_of_collisions_trailer > 0)
         self.done_arrived = self.completed_route(core)
 
-        if core.exit_spawn_point_index in [112,3]:
-            acceptable_gap_to_next_waypoint = 20
-        else:
-            acceptable_gap_to_next_waypoint = 10
+        self.done_angle = False
+        self.done_distance = False
 
-        self.done_far_from_path = self.last_hyp_distance_to_next_waypoint > acceptable_gap_to_next_waypoint
+        if info['trailer_bearing_to_waypoint'] < -math.pi/2 or info['trailer_bearing_to_waypoint'] > math.pi/2:
+            print('Angle too high!')
+            self.done_angle = True
 
-        output = self.done_time_idle or self.done_falling or self.done_time_episode or self.done_collision_truck or self.done_collision_trailer or self.done_arrived or self.done_far_from_path or self.truck_lidar_collision or self.trailer_lidar_collision
+        if info['trailer_distance_to_center_of_lane'] < -1.7 or info['trailer_distance_to_center_of_lane'] > 1.7:
+            print('Distance to centre of lane too high')
+            self.done_distance = True
+
+
+
+        output = (self.done_time_idle or
+                  self.done_falling or
+                  self.done_time_episode or
+                  self.done_collision_truck or self.done_collision_trailer or
+                  self.done_arrived or
+                  self.done_angle or
+                  self.done_distance
+                  )
+
         self.custom_done_arrived = self.done_arrived
 
         done_status_info = {
@@ -959,10 +980,9 @@ class DQNExperimentBasic(BaseExperiment):
             'done_time_episode':self.done_time_episode,
             'done_collision_truck': self.done_collision_truck,
             'done_collision_trailer':self.done_collision_trailer,
-            'done_far_from_path':self.done_far_from_path,
             'done_arrived':self.done_arrived,
-            'truck_lidar_collision':self.truck_lidar_collision,
-            'trailer_lidar_collision':self.trailer_lidar_collision,
+            'done_angle':self.done_angle,
+            'done_distance':self.done_distance,
         }
 
         done_reason = ""
@@ -976,14 +996,12 @@ class DQNExperimentBasic(BaseExperiment):
             done_reason += "done_collision_truck"
         if self.done_collision_trailer:
             done_reason += "done_collision_trailer"
-        if self.done_far_from_path:
-            done_reason += "done_far_from_path"
         if self.done_arrived:
             done_reason += "done_arrived"
-        if self.truck_lidar_collision:
-            done_reason += "truck_lidar_collision"
-        if self.trailer_lidar_collision:
-            done_reason += "trailer_lidar_collision"
+        if self.done_angle:
+            done_reason += "done_angle"
+        if self.done_distance:
+            done_reason += "done_distance"
 
         if done_reason != "":
             data = f"ENTRY: {core.entry_spawn_point_index} EXIT: {core.exit_spawn_point_index} - {done_reason} \n"
@@ -999,40 +1017,133 @@ class DQNExperimentBasic(BaseExperiment):
         hyp_distance_to_next_waypoint = observation['values'][1]
         distance_to_center_of_lane = observation['values'][5]
 
+        reward_trailer_bearing_to_waypoint = info['trailer_bearing_to_waypoint']
+        reward_trailer_distance_to_center_of_lane = info['trailer_distance_to_center_of_lane']
+
         self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
 
-        if self.passed_waypoint:
-            # reward = reward + 100
-            reward = reward + 0.1
-            pass
+        # 0 straight
+        # 1 right
+        # 2 left
 
-        distance_to_center_of_lane = (1/400) * (np.clip(abs(distance_to_center_of_lane),0,4))
-        reward = reward - distance_to_center_of_lane
+        # WHEN ON THE RIGHT SIDE
 
-        if self.done_falling:
-            reward = reward + -1
-            print('====> REWARD Done falling')
-        if self.done_collision_truck or self.done_collision_trailer:
-            print("====> REWARD Done collision")
-            reward = reward + -1
-        if self.truck_lidar_collision:
-            print("====> REWARD Truck Lidar collision")
-            reward = reward + -1
-        if self.trailer_lidar_collision:
-            print("====> REWARD Trailer Lidar collision")
-            reward = reward + -1
-        if self.done_time_idle:
-            print("====> REWARD Done idle")
-            reward = reward + -1
-        if self.done_time_episode:
-            print("====> REWARD Done max time")
-            reward = reward + -1
-        if self.done_far_from_path:
-            print("====> REWARD Done far from path")
-            reward = reward + -1
-        if self.done_arrived:
-            print("====> REWARD Done arrived")
-            reward = reward + 1
+        if 0 < reward_trailer_distance_to_center_of_lane <= 0.17:
+
+            if 0 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
+                if self.last_action == 2:
+                    reward += 1
+                else:
+                    reward += -1
+
+            elif -0.174533 <= reward_trailer_bearing_to_waypoint < 0:
+                if self.last_action == 0:
+                    reward += 1
+                else:
+                    reward += -1
+
+            elif -math.pi/2 <= reward_trailer_bearing_to_waypoint < -0.174533:
+                if self.last_action == 1:
+                    reward += 1
+                else:
+                    reward += -1
+
+        elif 0.17 < reward_trailer_distance_to_center_of_lane <= 0.36:
+
+            if -0.20944 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
+                if self.last_action == 2:
+                    reward += 1
+                else:
+                    reward += -1
+
+            elif -0.35 <= reward_trailer_bearing_to_waypoint < -0.20944:
+                if self.last_action == 0:
+                    reward += 1
+                else:
+                    reward += -1
+
+            elif -math.pi / 2 <= reward_trailer_bearing_to_waypoint < -0.35:
+                if self.last_action == 1:
+                    reward += 1
+                else:
+                    reward += -1
+
+        elif 0.36 < reward_trailer_distance_to_center_of_lane <= 1.7:
+            if -0.383972 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
+                if self.last_action == 2:
+                    reward += 1
+                else:
+                    reward += -1
+
+            elif -0.523599 <= reward_trailer_bearing_to_waypoint < -0.383972:
+                if self.last_action == 0:
+                    reward += 1
+                else:
+                    reward += -1
+
+            elif -math.pi / 2 <= reward_trailer_bearing_to_waypoint < -0.523599:
+                if self.last_action == 1:
+                    reward += 1
+                else:
+                    reward += -1
+
+        # WHEN ON THE LEFT SIDE
+        elif -0.17 <= reward_trailer_distance_to_center_of_lane < 0:
+
+            if 0.174533 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
+                if self.last_action == 2:
+                    reward += 1
+                else:
+                    reward += -1
+            elif 0 <= reward_trailer_bearing_to_waypoint < 0.174533:
+                if self.last_action == 0:
+                    reward += 1
+                else:
+                    reward += -1
+            elif -math.pi/2 <= reward_trailer_bearing_to_waypoint < 0:
+                if self.last_action == 1:
+                    reward += 1
+                else:
+                    reward += -1
+
+        elif -0.36 <= reward_trailer_distance_to_center_of_lane < -0.17:
+
+            if 0.349066 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
+                if self.last_action == 2:
+                    reward += 1
+                else:
+                    reward += -1
+
+            elif 0.20944 <= reward_trailer_bearing_to_waypoint < 0.349066:
+                if self.last_action == 0:
+                    reward += 1
+                else:
+                    reward += -1
+
+            elif -math.pi / 2 <= reward_trailer_bearing_to_waypoint < 0.20944:
+                if self.last_action == 1:
+                    reward += 1
+                else:
+                    reward += -1
+
+        elif -1.7 <= reward_trailer_distance_to_center_of_lane < -0.36:
+
+            if 0.523599 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
+                if self.last_action == 2:
+                    reward += 1
+                else:
+                    reward += -1
+            elif 0.383972 <= reward_trailer_bearing_to_waypoint < 0.523599:
+                if self.last_action == 0:
+                    reward += 1
+                else:
+                    reward += -1
+
+            elif -math.pi / 2 <= reward_trailer_bearing_to_waypoint < 0.383972:
+                if self.last_action == 1:
+                    reward += 1
+                else:
+                    reward += -1
 
         self.total_episode_reward.append(reward)
         self.reward_metric = reward
