@@ -186,7 +186,7 @@ class DQNExperimentBasic(BaseExperiment):
             angle = angle + 180
         else:
             angle = 0
-            print('Numerator and denominator both 0')
+            print(f'Numerator and denominator both 0 {numerator}/{denominator}')
             # raise Exception('Numerator and denominator both 0')
 
         return angle
