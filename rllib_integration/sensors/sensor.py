@@ -177,10 +177,10 @@ class CameraDVS(CarlaSensor):
 # -- LIDAR -----------------------------------------------------------------------------------
 # ==================================================================================================
 class Lidar(CarlaSensor):
-    def __init__(self, name, attributes, interface, parent):
-        super().__init__(name, attributes, interface, parent)
+    def __init__(self, name, attributes, interface, parent, other_actor_id):
+        super().__init__(name, attributes, interface, parent,other_actor_id)
 
-    def parse(self, sensor_data):
+    def parse(self, sensor_data, parent_actor, other_actor_id):
         """Parses the LidarMeasurememt into an numpy array"""
         # sensor_data: [x, y, z, intensity]
         points = np.frombuffer(sensor_data.raw_data, dtype=np.dtype('f4'))
@@ -225,8 +225,16 @@ class SemanticLidar(CarlaSensor):
         # points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],ObjTagFloat]).T
 
         # else
-        points = np.array([points['x'],points['y'], points['ObjTag']])
-
+        paper_implementation = True
+        visulisation = False
+        if visulisation:
+            ObjIdxFloat = points['ObjIdx'].astype('float32')
+            ObjTagFloat = points['ObjTag'].astype('float32')
+            points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],ObjTagFloat]).T
+        elif paper_implementation:
+            points = np.array([points['x'],points['y'], points['ObjTag'],points['z']])
+        else:
+            points = np.array([points['x'], points['y'], points['ObjTag']])
 
         # points = np.array([points['x'],points['y'],points['z'],points['CosAngle'],points['ObjIdx'], points['ObjTag']])
         #
@@ -255,10 +263,10 @@ class SemanticLidar(CarlaSensor):
 # ==================================================================================================
 class Radar(CarlaSensor):
 
-    def __init__(self, name, attributes, interface, parent):
-        super().__init__(name, attributes, interface, parent)
+    def __init__(self, name, attributes, interface, parent,other_actor_id):
+        super().__init__(name, attributes, interface, parent,other_actor_id)
 
-    def parse(self, sensor_data):
+    def parse(self, sensor_data, parent_actor, other_actor_id):
         """Parses the RadarMeasurement into an numpy array"""
         # sensor_data: [depth, azimuth, altitute, velocity]
         points = np.frombuffer(sensor_data.raw_data, dtype=np.dtype('f4'))

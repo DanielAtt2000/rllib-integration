@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import math
 # Copyright (c) 2021 Computer Vision Center (CVC) at the Universitat Autonoma de
 # Barcelona (UAB).
 #
@@ -14,6 +14,7 @@ import time, sys, pickle
 from datetime import datetime
 import pandas as pd
 from PIL import Image
+from matplotlib import cm
 
 from Helper import save_to_pickle, append_to_txt
 
@@ -58,20 +59,32 @@ class SensorInterface(object):
         self._event_data_buffers = queue.Queue()
 
         self.visualiseLIDAR = False
+        self.visualiseRADAR = False
+
+        if self.visualiseRADAR and self.visualiseLIDAR:
+            raise Exception('Cannot visualise both LIDAR and RADAR at the same time')
+
         self.visualiseCamera = False
         self.counter = 0
         self.lidar_window()
 
+        self.VIRIDIS = np.array(cm.get_cmap('plasma').colors)
+        self.COOL_RANGE = np.linspace(0.0, 1.0, self.VIRIDIS.shape[0])
+        self.COOL = np.array(cm.get_cmap('winter')(self.COOL_RANGE))
+        self.COOL = self.COOL[:, :3]
+
 
 
     def lidar_window(self):
-        if self.visualiseLIDAR:
-            self.point_list = o3d.geometry.PointCloud()
+        if self.visualiseLIDAR or self.visualiseRADAR:
+            name = 'lidar' if self.visualiseLIDAR else 'radar'
+            self.lidar_point_list = o3d.geometry.PointCloud()
+            self.radar_point_list = o3d.geometry.PointCloud()
 
             self.vis = o3d.visualization.Visualizer()
 
             self.vis.create_window(
-                window_name='Carla Lidar',
+                window_name=name,
                 width=960,
                 height=540,
                 left=480,
@@ -133,12 +146,56 @@ class SensorInterface(object):
                     # # of the incident ray angle, you can use:
                     # int_color *= np.array(data['CosAngle'])[:, None]
 
-                    self.point_list.points = o3d.utility.Vector3dVector(points)
-                    self.point_list.colors = o3d.utility.Vector3dVector(int_color)
+                    self.lidar_point_list.points = o3d.utility.Vector3dVector(points)
+                    self.lidar_point_list.colors = o3d.utility.Vector3dVector(int_color)
 
                     if self.frame == 2:
-                        self.vis.add_geometry(self.point_list)
-                    self.vis.update_geometry(self.point_list)
+                        self.vis.add_geometry(self.lidar_point_list)
+                    self.vis.update_geometry(self.lidar_point_list)
+
+                    self.vis.poll_events()
+                    self.vis.update_renderer()
+                    # # This can fix Open3D jittering issues:
+                    time.sleep(0.005)
+
+                    process_time = datetime.now() - self.dt0
+                    sys.stdout.write('\r' + 'FPS: ' + str(1.0 / process_time.total_seconds()))
+                    sys.stdout.flush()
+                    self.dt0 = datetime.now()
+                    self.frame += 1
+
+                if self.counter > 20 and 'radar' in sensor_data[0] and self.visualiseRADAR:
+                    data = sensor_data[2]
+
+                    radar_data = np.zeros((len(data), 4))
+
+                    print(f'LEN RADAR DATA {len(data)}')
+                    print(f'DATA {data}')
+
+                    for i, detection in enumerate(data):
+                        x = detection[2] * math.cos(detection[0]) * math.cos(detection[1])
+                        y = detection[2] * math.cos(detection[0]) * math.sin(detection[1])
+                        z = detection[2] * math.sin(detection[0])
+
+                        radar_data[i, :] = [x, y, z, detection[3]]
+
+                    intensity = np.abs(radar_data[:, -1])
+                    intensity_col = 1.0 - np.log(intensity) / np.log(np.exp(-0.004 * 100))
+                    int_color = np.c_[
+                        np.interp(intensity_col, self.COOL_RANGE, self.COOL[:, 0]),
+                        np.interp(intensity_col, self.COOL_RANGE, self.COOL[:, 1]),
+                        np.interp(intensity_col, self.COOL_RANGE, self.COOL[:, 2])]
+
+                    points = radar_data[:, :-1]
+                    points[:, :1] = -points[:, :1]
+                    print(f'POINTS {points}')
+                    print(f'int_color {int_color}')
+                    self.radar_point_list.points = o3d.utility.Vector3dVector(points)
+                    self.radar_point_list.colors = o3d.utility.Vector3dVector(int_color)
+
+                    if self.frame == 2:
+                        self.vis.add_geometry(self.radar_point_list)
+                    self.vis.update_geometry(self.radar_point_list)
 
                     self.vis.poll_events()
                     self.vis.update_renderer()

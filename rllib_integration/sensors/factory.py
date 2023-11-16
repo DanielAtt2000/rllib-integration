@@ -28,11 +28,11 @@ class SensorFactory(object):
         elif type_ == "sensor.camera.dvs":
             sensor = CameraDVS(name, attributes, interface, parent)
         elif type_ == "sensor.lidar.ray_cast":
-            sensor = Lidar(name, attributes, interface, parent)
+            sensor = Lidar(name, attributes, interface, parent,other_actor_id)
         elif type_ == "sensor.lidar.ray_cast_semantic":
             sensor = SemanticLidar(name, attributes, interface, parent, other_actor_id)
         elif type_ == "sensor.other.radar":
-            sensor = Radar(name, attributes, interface, parent)
+            sensor = Radar(name, attributes, interface, parent, other_actor_id)
         elif type_ == "sensor.other.gnss":
             sensor = Gnss(name, attributes, interface, parent)
         elif type_ == "sensor.other.imu":
