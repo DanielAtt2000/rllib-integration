@@ -1030,19 +1030,19 @@ class DQNExperimentBasic(BaseExperiment):
 
         if 0 < reward_trailer_distance_to_center_of_lane <= 0.17:
 
-            if 0 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
+            if 0 <= reward_trailer_bearing_to_waypoint <= (math.pi/2):
                 if self.last_action == left_action:
                     reward += 1
                 else:
                     reward += -1
 
-            elif -0.174533 <= reward_trailer_bearing_to_waypoint < 0:
+            elif -math.radians(10) <= reward_trailer_bearing_to_waypoint < 0:
                 if self.last_action == straight_action:
                     reward += 1
                 else:
                     reward += -1
 
-            elif -math.pi/2 <= reward_trailer_bearing_to_waypoint < -0.174533:
+            elif (-math.pi/2) <= reward_trailer_bearing_to_waypoint < -math.radians(10):
                 if self.last_action == right_action:
                     reward += 1
                 else:
@@ -1050,38 +1050,38 @@ class DQNExperimentBasic(BaseExperiment):
 
         elif 0.17 < reward_trailer_distance_to_center_of_lane <= 0.36:
 
-            if -0.20944 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
+            if -math.radians(12) <= reward_trailer_bearing_to_waypoint <= (math.pi/2):
                 if self.last_action == left_action:
                     reward += 1
                 else:
                     reward += -1
 
-            elif -0.35 <= reward_trailer_bearing_to_waypoint < -0.20944:
+            elif -math.radians(20) <= reward_trailer_bearing_to_waypoint < -math.radians(12):
                 if self.last_action == straight_action:
                     reward += 1
                 else:
                     reward += -1
 
-            elif -math.pi / 2 <= reward_trailer_bearing_to_waypoint < -0.35:
+            elif (-math.pi / 2) <= reward_trailer_bearing_to_waypoint < -math.radians(20):
                 if self.last_action == right_action:
                     reward += 1
                 else:
                     reward += -1
 
         elif 0.36 < reward_trailer_distance_to_center_of_lane <= 1.7:
-            if -0.383972 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
+            if -math.radians(22) <= reward_trailer_bearing_to_waypoint <= (math.pi/2):
                 if self.last_action == left_action:
                     reward += 1
                 else:
                     reward += -1
 
-            elif -0.523599 <= reward_trailer_bearing_to_waypoint < -0.383972:
+            elif -math.radians(30) <= reward_trailer_bearing_to_waypoint < -math.radians(22):
                 if self.last_action == straight_action:
                     reward += 1
                 else:
                     reward += -1
 
-            elif -math.pi / 2 <= reward_trailer_bearing_to_waypoint < -0.523599:
+            elif (-math.pi/2) <= reward_trailer_bearing_to_waypoint < -math.radians(30):
                 if self.last_action == right_action:
                     reward += 1
                 else:
@@ -1090,17 +1090,17 @@ class DQNExperimentBasic(BaseExperiment):
         # WHEN ON THE LEFT SIDE
         elif -0.17 <= reward_trailer_distance_to_center_of_lane < 0:
 
-            if 0.174533 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
+            if math.radians(10) <= reward_trailer_bearing_to_waypoint <= (math.pi/2):
                 if self.last_action == left_action:
                     reward += 1
                 else:
                     reward += -1
-            elif 0 <= reward_trailer_bearing_to_waypoint < 0.174533:
+            elif 0 <= reward_trailer_bearing_to_waypoint < math.radians(10):
                 if self.last_action == straight_action:
                     reward += 1
                 else:
                     reward += -1
-            elif -math.pi/2 <= reward_trailer_bearing_to_waypoint < 0:
+            elif (-math.pi/2) <= reward_trailer_bearing_to_waypoint < 0:
                 if self.last_action == right_action:
                     reward += 1
                 else:
@@ -1108,19 +1108,19 @@ class DQNExperimentBasic(BaseExperiment):
 
         elif -0.36 <= reward_trailer_distance_to_center_of_lane < -0.17:
 
-            if 0.349066 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
+            if math.radians(20) <= reward_trailer_bearing_to_waypoint <= (math.pi/2):
                 if self.last_action == left_action:
                     reward += 1
                 else:
                     reward += -1
 
-            elif 0.20944 <= reward_trailer_bearing_to_waypoint < 0.349066:
+            elif math.radians(12) <= reward_trailer_bearing_to_waypoint < math.radians(20):
                 if self.last_action == straight_action:
                     reward += 1
                 else:
                     reward += -1
 
-            elif -math.pi / 2 <= reward_trailer_bearing_to_waypoint < 0.20944:
+            elif (-math.pi / 2) <= reward_trailer_bearing_to_waypoint < math.radians(12):
                 if self.last_action == right_action:
                     reward += 1
                 else:
@@ -1128,18 +1128,18 @@ class DQNExperimentBasic(BaseExperiment):
 
         elif -1.7 <= reward_trailer_distance_to_center_of_lane < -0.36:
 
-            if 0.523599 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
+            if math.radians(30) <= reward_trailer_bearing_to_waypoint <= (math.pi/2):
                 if self.last_action == left_action:
                     reward += 1
                 else:
                     reward += -1
-            elif 0.383972 <= reward_trailer_bearing_to_waypoint < 0.523599:
+            elif math.radians(22) <= reward_trailer_bearing_to_waypoint < math.radians(30):
                 if self.last_action == straight_action:
                     reward += 1
                 else:
                     reward += -1
 
-            elif -math.pi / 2 <= reward_trailer_bearing_to_waypoint < 0.383972:
+            elif (-math.pi / 2) <= reward_trailer_bearing_to_waypoint < math.radians(22):
                 if self.last_action == right_action:
                     reward += 1
                 else:
