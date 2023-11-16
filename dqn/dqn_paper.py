@@ -132,7 +132,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.trailer_lidar_collision = False
         self.visualiseLIDAR = False
         self.visualiseRADAR = False
-        self.visualiseLIDARCircle = True
+        self.visualiseLIDARCircle = False
         self.lidar_window()
 
 
@@ -736,10 +736,6 @@ class DQNExperimentBasic(BaseExperiment):
                     else:
                         lidar_points_dict[azimuth_rounded] = min(distance_from_sensor, lidar_points_dict[azimuth_rounded])
                         # lidar_points_dict[azimuth_rounded] = min(np.clip(distance_from_sensor/lidar_range,0,1), lidar_points_dict[azimuth_rounded])
-
-                if self.counter > 10:
-                    print(f'number of points {len(lidar_points_dict)}')
-                    print(f'HERE {lidar_points_dict}')
 
                 if self.visualiseLIDAR:
                     data = sensor_data[sensor][1]

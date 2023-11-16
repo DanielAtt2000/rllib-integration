@@ -165,7 +165,7 @@ def main():
 
 
     specific_version = False
-    check_commit = False
+    check_commit = True
 
     output = get_server_maps_dist(config=args.config)
     print(output)
