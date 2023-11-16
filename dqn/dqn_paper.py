@@ -1002,7 +1002,7 @@ class DQNExperimentBasic(BaseExperiment):
         if done_reason != "":
             data = f"ENTRY: {core.entry_spawn_point_index} EXIT: {core.exit_spawn_point_index} - {done_reason} \n"
             self.save_to_file(f"{self.directory}/done",data)
-        print(done_status_info)
+        # print(done_status_info)
         return bool(output), done_status_info
 
     def compute_reward(self, observation, info, core):
