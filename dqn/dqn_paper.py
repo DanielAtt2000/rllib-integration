@@ -1022,24 +1022,28 @@ class DQNExperimentBasic(BaseExperiment):
         # 1 right
         # 2 left
 
+        straight_action = 0
+        right_action = 1
+        left_action = 2
+
         # WHEN ON THE RIGHT SIDE
 
         if 0 < reward_trailer_distance_to_center_of_lane <= 0.17:
 
             if 0 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
-                if self.last_action == 2:
+                if self.last_action == left_action:
                     reward += 1
                 else:
                     reward += -1
 
             elif -0.174533 <= reward_trailer_bearing_to_waypoint < 0:
-                if self.last_action == 0:
+                if self.last_action == straight_action:
                     reward += 1
                 else:
                     reward += -1
 
             elif -math.pi/2 <= reward_trailer_bearing_to_waypoint < -0.174533:
-                if self.last_action == 1:
+                if self.last_action == right_action:
                     reward += 1
                 else:
                     reward += -1
@@ -1047,38 +1051,38 @@ class DQNExperimentBasic(BaseExperiment):
         elif 0.17 < reward_trailer_distance_to_center_of_lane <= 0.36:
 
             if -0.20944 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
-                if self.last_action == 2:
+                if self.last_action == left_action:
                     reward += 1
                 else:
                     reward += -1
 
             elif -0.35 <= reward_trailer_bearing_to_waypoint < -0.20944:
-                if self.last_action == 0:
+                if self.last_action == straight_action:
                     reward += 1
                 else:
                     reward += -1
 
             elif -math.pi / 2 <= reward_trailer_bearing_to_waypoint < -0.35:
-                if self.last_action == 1:
+                if self.last_action == right_action:
                     reward += 1
                 else:
                     reward += -1
 
         elif 0.36 < reward_trailer_distance_to_center_of_lane <= 1.7:
             if -0.383972 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
-                if self.last_action == 2:
+                if self.last_action == left_action:
                     reward += 1
                 else:
                     reward += -1
 
             elif -0.523599 <= reward_trailer_bearing_to_waypoint < -0.383972:
-                if self.last_action == 0:
+                if self.last_action == straight_action:
                     reward += 1
                 else:
                     reward += -1
 
             elif -math.pi / 2 <= reward_trailer_bearing_to_waypoint < -0.523599:
-                if self.last_action == 1:
+                if self.last_action == right_action:
                     reward += 1
                 else:
                     reward += -1
@@ -1087,17 +1091,17 @@ class DQNExperimentBasic(BaseExperiment):
         elif -0.17 <= reward_trailer_distance_to_center_of_lane < 0:
 
             if 0.174533 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
-                if self.last_action == 2:
+                if self.last_action == left_action:
                     reward += 1
                 else:
                     reward += -1
             elif 0 <= reward_trailer_bearing_to_waypoint < 0.174533:
-                if self.last_action == 0:
+                if self.last_action == straight_action:
                     reward += 1
                 else:
                     reward += -1
             elif -math.pi/2 <= reward_trailer_bearing_to_waypoint < 0:
-                if self.last_action == 1:
+                if self.last_action == right_action:
                     reward += 1
                 else:
                     reward += -1
@@ -1105,19 +1109,19 @@ class DQNExperimentBasic(BaseExperiment):
         elif -0.36 <= reward_trailer_distance_to_center_of_lane < -0.17:
 
             if 0.349066 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
-                if self.last_action == 2:
+                if self.last_action == left_action:
                     reward += 1
                 else:
                     reward += -1
 
             elif 0.20944 <= reward_trailer_bearing_to_waypoint < 0.349066:
-                if self.last_action == 0:
+                if self.last_action == straight_action:
                     reward += 1
                 else:
                     reward += -1
 
             elif -math.pi / 2 <= reward_trailer_bearing_to_waypoint < 0.20944:
-                if self.last_action == 1:
+                if self.last_action == right_action:
                     reward += 1
                 else:
                     reward += -1
@@ -1125,18 +1129,18 @@ class DQNExperimentBasic(BaseExperiment):
         elif -1.7 <= reward_trailer_distance_to_center_of_lane < -0.36:
 
             if 0.523599 <= reward_trailer_bearing_to_waypoint <= math.pi/2:
-                if self.last_action == 2:
+                if self.last_action == left_action:
                     reward += 1
                 else:
                     reward += -1
             elif 0.383972 <= reward_trailer_bearing_to_waypoint < 0.523599:
-                if self.last_action == 0:
+                if self.last_action == straight_action:
                     reward += 1
                 else:
                     reward += -1
 
             elif -math.pi / 2 <= reward_trailer_bearing_to_waypoint < 0.383972:
-                if self.last_action == 1:
+                if self.last_action == right_action:
                     reward += 1
                 else:
                     reward += -1
