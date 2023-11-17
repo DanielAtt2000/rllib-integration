@@ -394,7 +394,12 @@ class DQNExperimentBasic(BaseExperiment):
         # print(f'Throttle {action.throttle} Steer {action.steer} Brake {action.brake} Reverse {action.reverse} Handbrake {action.hand_brake}')
         print(f"----------------------------------->{action_msg}") if self.custom_enable_rendering else None
 
-        self.last_action = action
+        if action_control[1] == 0:
+            self.last_action = 0
+        elif action_control[1] == 0.5:
+            self.last_action = 1
+        elif action_control[1] == -0.5:
+            self.last_action = 2
 
 
         return action
@@ -665,7 +670,9 @@ class DQNExperimentBasic(BaseExperiment):
         if self.custom_enable_rendering:
             print(f'Entry Points {core.entry_spawn_point_index}| Exit point {core.exit_spawn_point_index}')
             print(f"forward_velocity:{np.float32(forward_velocity)}")
-            time.sleep(0.04)
+            print(f"trailer_distance_to_center_of_lane:{trailer_distance_to_center_of_lane}")
+            print(f"trailer_bearing_to_waypoint:{trailer_bearing_to_waypoint}")
+            time.sleep(0.3)
 
         self.forward_velocity.append(np.float32(forward_velocity))
         self.distance_to_center_of_lane.append(np.float32(distance_to_center_of_lane))
@@ -805,7 +812,13 @@ class DQNExperimentBasic(BaseExperiment):
         straight_action = 0
         right_action = 1
         left_action = 2
-
+        # print(f'self.last_action {self.last_action}')
+        if self.last_action == straight_action:
+            print(f'Action STRAIGHT')
+        if self.last_action == right_action:
+            print(f'Action RIGHT')
+        if self.last_action == left_action:
+            print(f'Action LEFT')
         # WHEN ON THE RIGHT SIDE
 
         if 0 < reward_trailer_distance_to_center_of_lane <= 0.17:
