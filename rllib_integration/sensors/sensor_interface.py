@@ -89,6 +89,22 @@ class SensorInterface(object):
                 height=540,
                 left=480,
                 top=270)
+
+            axis = o3d.geometry.LineSet()
+            axis.points = o3d.utility.Vector3dVector(np.array([
+                [0.0, 0.0, 0.0],
+                [1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [0.0, 0.0, 1.0]]))
+            axis.lines = o3d.utility.Vector2iVector(np.array([
+                [0, 1],
+                [0, 2],
+                [0, 3]]))
+            axis.colors = o3d.utility.Vector3dVector(np.array([
+                [1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [0.0, 0.0, 1.0]]))
+            self.vis.add_geometry(axis)
             self.vis.get_render_option().background_color = [0.05, 0.05, 0.05]
             self.vis.get_render_option().point_size = 1
             self.vis.get_render_option().show_coordinate_frame = True

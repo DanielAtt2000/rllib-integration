@@ -111,6 +111,23 @@ class DQNExperimentBasic(BaseExperiment):
         numerator = x_detection_point
         denominator = y_detection_point
 
+        # if y == 0 and x > 0 => in front of vehicle
+        # if y ==0 and x < 0 => behind vehicle
+
+        # if x == 0 and y > 0 => left of vehicle
+        # if x ==0 and y < 0 => right of vehicle
+
+        if denominator == 0:
+            if numerator > 0:
+                return 0
+            elif numerator < 0:
+                return 180
+        elif numerator == 0:
+            if denominator > 0:
+                return 270
+            elif denominator < 0:
+                return 90
+
         angle = abs(math.degrees(math.atan(numerator/denominator)))
 
         if numerator > 0 and denominator > 0:
@@ -480,7 +497,7 @@ class DQNExperimentBasic(BaseExperiment):
         # acceleration = np.clip(self.get_acceleration(core.hero), 0, None)
 
         lidar_points_dict = {}
-
+        azimuth_0 = []
         for sensor in sensor_data:
             if sensor == 'collision_truck':
                 # TODO change to only take collision with road
@@ -503,26 +520,29 @@ class DQNExperimentBasic(BaseExperiment):
                 data = sensor_data[sensor][1]
                 lidar_range = float(self.config["hero"]["sensors"]["trailer_lidar"]["range"])
 
-                #
-                # print(f'\n\nlen data {len(data[0])}\n\n')
-                # print(f'percentile 75 {np.percentile(data[3],50)}')
-
-                # print(f'min x {min(data[0])}')
-                # print(f'max x {max(data[0])}')
-                #
-                # print(f'min y {min(data[3])}')
-                # print(f'max y {max(data[3])}')
-
-
-
-
+                # self.visualiseLIDARCircle = False
                 for x_lidar_point,y_lidar_point,z_lidar_point in zip(data[0],data[1],data[3]):
+                    store = False
                     # print(f'x y z {x_lidar_point} {y_lidar_point} {z_lidar_point}')
                     if x_lidar_point == 0 and y_lidar_point == 0:
                         continue
 
+                    if x_lidar_point == 0:
+                        # print(f'x_lidar_point {x_lidar_point}')
+                        # print(f'y_lidar_point {y_lidar_point}')
+                        store = True
+                        # self.visualiseLIDARCircle = True
+                    if y_lidar_point == 0:
+                        # print(f'x_lidar_point {x_lidar_point}')
+                        # print(f'y_lidar_point {y_lidar_point}')
+                        store = True
+                        # self.visualiseLIDARCircle = True
+
                     # azimuth_rounded = round(self.get_azimuth(sensor_centre=virtual_lidar_centre_point, detection_point=(x_lidar_point,y_lidar_point)))
                     azimuth_rounded = round(self.get_azimuth(sensor_centre=virtual_lidar_centre_point, detection_point=(x_lidar_point,y_lidar_point)))
+
+                    if store:
+                        azimuth_0.append(azimuth_rounded)
 
                     # print(f'{azimuth_rounded} = azimuth of {virtual_lidar_centre_point} to {(x_lidar_point,y_lidar_point)}')
                     # IMPORTANT HERE Z is lidar_point[3] not 2 because 2 is the ObjTag
@@ -567,49 +587,6 @@ class DQNExperimentBasic(BaseExperiment):
                     self.vis.update_geometry(self.lidar_point_list)
 
 
-            elif sensor == "trailer_radar_trailer":
-                if self.visualiseRADAR:
-                    data = sensor_data[sensor][1]
-
-                    radar_data = np.zeros((len(data), 4))
-
-                    print(f'LEN RADAR DATA {len(data)}')
-
-                    for i, detection in enumerate(data):
-                        x = detection[2] * math.cos(detection[0]) * math.cos(detection[1])
-                        y = detection[2] * math.cos(detection[0]) * math.sin(detection[1])
-                        z = detection[2] * math.sin(detection[0])
-
-                        radar_data[i, :] = [x, y, z, detection[3]]
-
-                    intensity = np.abs(radar_data[:, -1])
-                    intensity_col = 1.0 - np.log(intensity) / np.log(np.exp(-0.004 * 100))
-                    int_color = np.c_[
-                        np.interp(intensity_col, self.COOL_RANGE, self.COOL[:, 0]),
-                        np.interp(intensity_col, self.COOL_RANGE, self.COOL[:, 1]),
-                        np.interp(intensity_col, self.COOL_RANGE, self.COOL[:, 2])]
-
-                    points = radar_data[:, :-1]
-                    points[:, :1] = -points[:, :1]
-                    self.radar_point_list.points = o3d.utility.Vector3dVector(points)
-                    self.radar_point_list.colors = o3d.utility.Vector3dVector(int_color)
-
-                    if self.frame == 2:
-                        self.vis.add_geometry(self.radar_point_list)
-                    self.vis.update_geometry(self.radar_point_list)
-
-                    self.vis.poll_events()
-                    self.vis.update_renderer()
-                    # # This can fix Open3D jittering issues:
-                    time.sleep(0.005)
-
-                    process_time = datetime.datetime.now() - self.dt0
-                    sys.stdout.write('\r' + 'FPS: ' + str(1.0 / process_time.total_seconds()))
-                    sys.stdout.flush()
-                    self.dt0 = datetime.datetime.now()
-                    self.frame += 1
-
-
         output_values = []
         max_distance = 32
         for i in range(360):
@@ -618,18 +595,24 @@ class DQNExperimentBasic(BaseExperiment):
             else:
                 output_values.append(np.clip(lidar_points_dict[i],0,max_distance))
 
-        if self.visualiseLIDARCircle and self.counter % 10 == 0:
+        if self.visualiseLIDARCircle:
+            print(azimuth_0)
             x_values = []
             y_values = []
             false_x_values = []
             false_y_values = []
+            x_values_0 = []
+            y_values_0 = []
             for angle, distance in enumerate(output_values):
-
+                orig_angle = angle
                 if 0 <= angle <= 90:
                     angle = angle
                     if distance == max_distance:
                         false_x_values.append(distance * abs(math.sin(math.radians(angle))))
                         false_y_values.append(distance * abs(math.cos(math.radians(angle))))
+                    elif orig_angle in azimuth_0:
+                        x_values_0.append(distance * abs(math.sin(math.radians(angle))))
+                        y_values_0.append(distance * abs(math.cos(math.radians(angle))))
                     else:
                         x_values.append(distance * abs(math.sin(math.radians(angle))))
                         y_values.append(distance * abs(math.cos(math.radians(angle))))
@@ -638,6 +621,9 @@ class DQNExperimentBasic(BaseExperiment):
                     if distance == max_distance:
                         false_x_values.append(distance * abs(math.sin(math.radians(angle))))
                         false_y_values.append(-distance * abs(math.cos(math.radians(angle))))
+                    elif orig_angle in azimuth_0:
+                        x_values_0.append(distance * abs(math.sin(math.radians(angle))))
+                        y_values_0.append(-distance * abs(math.cos(math.radians(angle))))
                     else:
                         x_values.append(distance * abs(math.sin(math.radians(angle))))
                         y_values.append(-distance * abs(math.cos(math.radians(angle))))
@@ -646,6 +632,9 @@ class DQNExperimentBasic(BaseExperiment):
                     if distance == max_distance:
                         false_x_values.append(-distance * abs(math.sin(math.radians(angle))))
                         false_y_values.append(-distance * abs(math.cos(math.radians(angle))))
+                    elif orig_angle in azimuth_0:
+                        x_values_0.append(-distance * abs(math.sin(math.radians(angle))))
+                        y_values_0.append(-distance * abs(math.cos(math.radians(angle))))
                     else:
                         x_values.append(-distance * abs(math.sin(math.radians(angle))))
                         y_values.append(-distance * abs(math.cos(math.radians(angle))))
@@ -654,6 +643,9 @@ class DQNExperimentBasic(BaseExperiment):
                     if distance == max_distance:
                         false_x_values.append(-distance * abs(math.sin(math.radians(angle))))
                         false_y_values.append(distance * abs(math.cos(math.radians(angle))))
+                    elif orig_angle in azimuth_0:
+                        x_values_0.append(-distance * abs(math.sin(math.radians(angle))))
+                        y_values_0.append(distance * abs(math.cos(math.radians(angle))))
                     else:
                         x_values.append(-distance * abs(math.sin(math.radians(angle))))
                         y_values.append(distance * abs(math.cos(math.radians(angle))))
@@ -662,6 +654,7 @@ class DQNExperimentBasic(BaseExperiment):
 
             plt.plot(x_values, y_values, 'bo',markersize=1)
             plt.plot(false_x_values, false_y_values, 'ro',markersize=1)
+            plt.plot(x_values_0, y_values_0, 'go',markersize=3)
             # plt.axis([0.3, 0.7, 0.3, 0.7])
             # plt.axis([0, 1, 0, 1])
             plt.title(f'temp')
