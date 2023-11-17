@@ -77,6 +77,9 @@ class DQNExperimentBasic(BaseExperiment):
         self.visualiseRADAR = False
         self.visualiseLIDARCircle = False
         self.lidar_window()
+        self.distance_cutoff_1 = 0.17
+        self.distance_cutoff_2 = 0.36
+        self.distance_cutoff_3 = 3.00
 
         self.VIRIDIS = np.array(cm.get_cmap('plasma').colors)
 
@@ -672,7 +675,7 @@ class DQNExperimentBasic(BaseExperiment):
             print(f"forward_velocity:{np.float32(forward_velocity)}")
             print(f"trailer_distance_to_center_of_lane:{trailer_distance_to_center_of_lane}")
             print(f"trailer_bearing_to_waypoint:{trailer_bearing_to_waypoint}")
-            time.sleep(0.3)
+            time.sleep(0.1)
 
         self.forward_velocity.append(np.float32(forward_velocity))
         self.distance_to_center_of_lane.append(np.float32(distance_to_center_of_lane))
@@ -742,7 +745,7 @@ class DQNExperimentBasic(BaseExperiment):
             print('Angle too high!')
             self.done_angle = True
 
-        if info['trailer_distance_to_center_of_lane'] < -1.7 or info['trailer_distance_to_center_of_lane'] > 1.7:
+        if info['trailer_distance_to_center_of_lane'] < -self.distance_cutoff_3 or info['trailer_distance_to_center_of_lane'] > self.distance_cutoff_3:
             print('Distance to centre of lane too high')
             self.done_distance = True
 
@@ -772,20 +775,28 @@ class DQNExperimentBasic(BaseExperiment):
 
         done_reason = ""
         if self.done_time_idle:
+            print("done_time_idle")
             done_reason += "done_time_idle"
         if self.done_falling:
+            print("done_falling")
             done_reason += "done_falling"
         if self.done_time_episode:
+            print("done_time_episode")
             done_reason += "done_time_episode"
         if self.done_collision_truck:
+            print("done_collision_truck")
             done_reason += "done_collision_truck"
         if self.done_collision_trailer:
+            print('done_collision_trailer')
             done_reason += "done_collision_trailer"
         if self.done_arrived:
+            print('done_arrived')
             done_reason += "done_arrived"
         if self.done_angle:
+            print('done_angle')
             done_reason += "done_angle"
         if self.done_distance:
+            print('done_distance')
             done_reason += "done_distance"
 
         if done_reason != "":
@@ -822,7 +833,7 @@ class DQNExperimentBasic(BaseExperiment):
                 print(f'Action LEFT')
         # WHEN ON THE RIGHT SIDE
 
-        if 0 < reward_trailer_distance_to_center_of_lane <= 0.17:
+        if 0 < reward_trailer_distance_to_center_of_lane <= self.distance_cutoff_1:
 
             if 0 <= reward_trailer_bearing_to_waypoint <= (math.pi/2):
                 if self.last_action == left_action:
@@ -842,7 +853,7 @@ class DQNExperimentBasic(BaseExperiment):
                 else:
                     reward += -1
 
-        elif 0.17 < reward_trailer_distance_to_center_of_lane <= 0.36:
+        elif self.distance_cutoff_1 < reward_trailer_distance_to_center_of_lane <= self.distance_cutoff_2:
 
             if -math.radians(12) <= reward_trailer_bearing_to_waypoint <= (math.pi/2):
                 if self.last_action == left_action:
@@ -862,7 +873,7 @@ class DQNExperimentBasic(BaseExperiment):
                 else:
                     reward += -1
 
-        elif 0.36 < reward_trailer_distance_to_center_of_lane <= 1.7:
+        elif self.distance_cutoff_2 < reward_trailer_distance_to_center_of_lane <= self.distance_cutoff_3:
             if -math.radians(22) <= reward_trailer_bearing_to_waypoint <= (math.pi/2):
                 if self.last_action == left_action:
                     reward += 1
@@ -882,7 +893,7 @@ class DQNExperimentBasic(BaseExperiment):
                     reward += -1
 
         # WHEN ON THE LEFT SIDE
-        elif -0.17 <= reward_trailer_distance_to_center_of_lane < 0:
+        elif -self.distance_cutoff_1 <= reward_trailer_distance_to_center_of_lane < 0:
 
             if math.radians(10) <= reward_trailer_bearing_to_waypoint <= (math.pi/2):
                 if self.last_action == left_action:
@@ -900,7 +911,7 @@ class DQNExperimentBasic(BaseExperiment):
                 else:
                     reward += -1
 
-        elif -0.36 <= reward_trailer_distance_to_center_of_lane < -0.17:
+        elif -self.distance_cutoff_2 <= reward_trailer_distance_to_center_of_lane < -self.distance_cutoff_1:
 
             if math.radians(20) <= reward_trailer_bearing_to_waypoint <= (math.pi/2):
                 if self.last_action == left_action:
@@ -920,7 +931,7 @@ class DQNExperimentBasic(BaseExperiment):
                 else:
                     reward += -1
 
-        elif -1.7 <= reward_trailer_distance_to_center_of_lane < -0.36:
+        elif -self.distance_cutoff_3 <= reward_trailer_distance_to_center_of_lane < -self.distance_cutoff_2:
 
             if math.radians(30) <= reward_trailer_bearing_to_waypoint <= (math.pi/2):
                 if self.last_action == left_action:
