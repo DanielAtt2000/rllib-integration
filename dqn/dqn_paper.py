@@ -813,12 +813,13 @@ class DQNExperimentBasic(BaseExperiment):
         right_action = 1
         left_action = 2
         # print(f'self.last_action {self.last_action}')
-        if self.last_action == straight_action:
-            print(f'Action STRAIGHT')
-        if self.last_action == right_action:
-            print(f'Action RIGHT')
-        if self.last_action == left_action:
-            print(f'Action LEFT')
+        if self.custom_enable_rendering:
+            if self.last_action == straight_action:
+                print(f'Action STRAIGHT')
+            if self.last_action == right_action:
+                print(f'Action RIGHT')
+            if self.last_action == left_action:
+                print(f'Action LEFT')
         # WHEN ON THE RIGHT SIDE
 
         if 0 < reward_trailer_distance_to_center_of_lane <= 0.17:
