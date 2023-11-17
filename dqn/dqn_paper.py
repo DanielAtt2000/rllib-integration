@@ -44,71 +44,23 @@ class DQNExperimentBasic(BaseExperiment):
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
-        self.traffic = self.config["others"]["traffic"]
         self.allowed_types = [carla.LaneType.Driving, carla.LaneType.Parking]
-        self.last_angle_with_center = 0
-        self.last_forward_velocity = 0
         self.custom_done_arrived = False
         self.last_action = -1
-        self.lidar_points_count = []
         self.reward_metric = 0
         self.current_time = 'None'
-        self.min_lidar_values = 1000000
-        self.max_lidar_values = -100000
-        self.lidar_max_points = self.config["hero"]["lidar_max_points"]
         self.counter = 0
-        self.visualiseRoute = False
-        self.visualiseImage = False
-        self.visualiseOccupancyGirdMap = False
         self.counterThreshold = 10
-        self.last_hyp_distance_to_next_waypoint = 0
-        self.last_hyp_distance_to_next_plus_1_waypoint = 0
         self.passed_waypoint = False
 
-        self.last_closest_distance_to_next_waypoint_line = 0
-        self.last_closest_distance_to_next_plus_1_waypoint_line = 0
+
         self.current_trailer_waypoint = 0
-        self.x_dist_to_waypoint = []
-        self.y_dist_to_waypoint = []
-        self.angle_to_center_of_lane_degrees = []
-        self.angle_to_center_of_lane_degrees_2 = []
-        self.angle_to_center_of_lane_degrees_5 = []
-        self.angle_to_center_of_lane_degrees_7 = []
-        self.angle_to_center_of_lane_degrees_ahead_waypoints = []
-        # self.angle_to_center_of_lane_degrees_ahead_waypoints_2 = []
-        self.angle_between_waypoints_minus5 = []
-        self.angle_between_waypoints_minus7 = []
-        self.angle_between_waypoints_minus10 = []
-        self.angle_between_waypoints_minus12 = []
-        self.angle_between_waypoints_5 = []
-        self.angle_between_waypoints_7 = []
-        self.angle_between_waypoints_10 = []
-        self.angle_between_waypoints_12 = []
-        self.truck_bearing_to_waypoint = []
-        self.truck_bearing_to_waypoint_2 = []
-        self.truck_bearing_to_waypoint_5 = []
-        self.truck_bearing_to_waypoint_7 = []
-        self.truck_bearing_to_waypoint_10 = []
         self.distance_to_center_of_lane = []
-        # self.bearing_to_ahead_waypoints_ahead_2 = []
-        self.angle_between_truck_and_trailer = []
         self.trailer_bearing_to_waypoint = []
-        self.trailer_bearing_to_waypoint_2 = []
-        self.trailer_bearing_to_waypoint_5 = []
-        self.trailer_bearing_to_waypoint_7 = []
-        self.trailer_bearing_to_waypoint_10 = []
         self.forward_velocity = []
-        # self.forward_velocity_x = []
-        # self.forward_velocity_z = []
         self.vehicle_path = []
         self.temp_route = []
-        self.hyp_distance_to_next_waypoint = []
-        self.hyp_distance_to_next_plus_1_waypoint = []
-        self.closest_distance_to_next_waypoint_line = []
-        self.closest_distance_to_next_plus_1_waypoint_line = []
-        # self.acceleration = []
         self.collisions = []
-        self.lidar_data = collections.deque(maxlen=4)
         self.entry_idx = -1
         self.exit_idx = -1
         self.current_forward_velocity = 0
@@ -116,15 +68,6 @@ class DQNExperimentBasic(BaseExperiment):
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
 
-        self.occupancy_map_x = 84
-        self.occupancy_map_y = 84
-        self.max_amount_of_occupancy_maps = 11
-        self.radii = []
-        self.mean_radius = []
-        self.point_reward = []
-        self.point_reward_location = []
-        self.line_reward = []
-        self.line_reward_location = []
         self.total_episode_reward = []
 
         self.custom_enable_rendering = False
@@ -134,12 +77,6 @@ class DQNExperimentBasic(BaseExperiment):
         self.visualiseRADAR = False
         self.visualiseLIDARCircle = False
         self.lidar_window()
-
-
-        self.occupancy_maps = collections.deque(maxlen=self.max_amount_of_occupancy_maps)
-
-        for i in range(self.max_amount_of_occupancy_maps):
-            self.occupancy_maps.append(np.zeros((self.occupancy_map_y,self.occupancy_map_x,1)))
 
         self.VIRIDIS = np.array(cm.get_cmap('plasma').colors)
 
@@ -337,155 +274,30 @@ class DQNExperimentBasic(BaseExperiment):
 
         self.current_trailer_waypoint = 0
 
-        for i in range(self.max_amount_of_occupancy_maps):
-            self.occupancy_maps.append(np.zeros((self.occupancy_map_y, self.occupancy_map_x,1)))
-
-        # hero variables
-        self.last_location = None
-        self.last_velocity = 0
-        self.last_dist_to_finish = 0
-
-
-        self.last_angle_with_center = 0
-        self.last_forward_velocity = 0
-
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
 
-        self.last_hyp_distance_to_next_waypoint = 0
-        self.last_hyp_distance_to_next_plus_1_waypoint = 0
-
-        self.last_closest_distance_to_next_waypoint_line = 0
-        self.last_closest_distance_to_next_plus_1_waypoint_line = 0
-
-        self.save_to_file(f"{self.directory}/hyp_distance_to_next_waypoint", self.hyp_distance_to_next_waypoint)
-        self.save_to_file(f"{self.directory}/hyp_distance_to_next_plus_1_waypoint", self.hyp_distance_to_next_plus_1_waypoint)
-        self.save_to_file(f"{self.directory}/closest_distance_to_next_waypoint_line", self.closest_distance_to_next_waypoint_line)
-        self.save_to_file(f"{self.directory}/closest_distance_to_next_plus_1_waypoint_line", self.closest_distance_to_next_plus_1_waypoint_line)
-        self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees", self.angle_to_center_of_lane_degrees)
-        self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_2", self.angle_to_center_of_lane_degrees_2)
-        self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_5", self.angle_to_center_of_lane_degrees_5)
-        self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_7", self.angle_to_center_of_lane_degrees_7)
-        self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_ahead_waypoints", self.angle_to_center_of_lane_degrees_ahead_waypoints)
-        # self.save_to_file(f"{self.directory}/angle_to_center_of_lane_degrees_ahead_waypoints_2", self.angle_to_center_of_lane_degrees_ahead_waypoints_2)
-        self.save_to_file(f"{self.directory}/angle_between_waypoints_minus5", self.angle_between_waypoints_minus5)
-        self.save_to_file(f"{self.directory}/angle_between_waypoints_minus7", self.angle_between_waypoints_minus7)
-        self.save_to_file(f"{self.directory}/angle_between_waypoints_minus10", self.angle_between_waypoints_minus10)
-        self.save_to_file(f"{self.directory}/angle_between_waypoints_minus12", self.angle_between_waypoints_minus12)
-        self.save_to_file(f"{self.directory}/angle_between_waypoints_5", self.angle_between_waypoints_5)
-        self.save_to_file(f"{self.directory}/angle_between_waypoints_7", self.angle_between_waypoints_7)
-        self.save_to_file(f"{self.directory}/angle_between_waypoints_10", self.angle_between_waypoints_10)
-        self.save_to_file(f"{self.directory}/angle_between_waypoints_12", self.angle_between_waypoints_12)
-        self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint", self.truck_bearing_to_waypoint)
-        self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint_2", self.truck_bearing_to_waypoint_2)
-        self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint_5", self.truck_bearing_to_waypoint_5)
-        self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint_7", self.truck_bearing_to_waypoint_7)
-        self.save_to_file(f"{self.directory}/truck_bearing_to_waypoint_10", self.truck_bearing_to_waypoint_10)
         self.save_to_file(f"{self.directory}/distance_to_center_of_lane", self.distance_to_center_of_lane)
-        # self.save_to_file(f"{self.directory}/bearing_to_ahead_waypoints_ahead_2", self.bearing_to_ahead_waypoints_ahead_2)
-        self.save_to_file(f"{self.directory}/angle_between_truck_and_trailer", self.angle_between_truck_and_trailer)
         self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint", self.trailer_bearing_to_waypoint)
-        self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint_2", self.trailer_bearing_to_waypoint_2)
-        self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint_5", self.trailer_bearing_to_waypoint_5)
-        self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint_7", self.trailer_bearing_to_waypoint_7)
-        self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint_10", self.trailer_bearing_to_waypoint_10)
         self.save_to_file(f"{self.directory}/forward_velocity", self.forward_velocity)
-        self.save_to_file(f"{self.directory}/line_reward", self.line_reward)
-        self.save_to_file(f"{self.directory}/line_reward_location", self.line_reward_location)
-        self.save_to_file(f"{self.directory}/point_reward", self.point_reward)
-        self.save_to_file(f"{self.directory}/point_reward_location", self.point_reward_location)
-        # self.save_to_file(f"{self.directory}/forward_velocity_x", self.forward_velocity_x)
-        # self.save_to_file(f"{self.directory}/forward_velocity_z", self.forward_velocity_z)
-        # self.save_to_file(f"{self.directory}/acceleration", self.acceleration)
         self.save_to_file(f"{self.directory}/route", self.temp_route)
         self.save_to_file(f"{self.directory}/path", self.vehicle_path)
-        self.save_to_file(f"{self.directory}/lidar_data", self.lidar_data)
         self.save_to_file(f"{self.directory}/collisions", self.collisions)
-        self.save_to_file(f"{self.directory}/radii",self.radii)
-        self.save_to_file(f"{self.directory}/mean_radius",self.mean_radius)
         self.save_to_file(f"{self.directory}/total_episode_reward",self.total_episode_reward)
+
         self.entry_idx = -1
         self.exit_idx = -1
         self.last_action = -1
 
-
-        # Saving LIDAR point count
-        # file_lidar_counts = open(os.path.join('lidar_output','lidar_point_counts.txt'), 'a')
-        # file_lidar_counts.write(str(self.lidar_points_count))
-        # file_lidar_counts.write(str('\n'))
-        # file_lidar_counts.close()
-        #
-        # file_lidar_counts = open(os.path.join('lidar_output', 'min_lidar_values.txt'), 'a')
-        # file_lidar_counts.write(str("Min Lidar Value:" + str(self.min_lidar_values)))
-        # file_lidar_counts.write(str('\n'))
-        # file_lidar_counts.close()
-        #
-        # file_lidar_counts = open(os.path.join('lidar_output', 'max_lidar_values.txt'), 'a')
-        # file_lidar_counts.write(str("Max Lidar Value:" + str(self.max_lidar_values)))
-        # file_lidar_counts.write(str('\n'))
-        # file_lidar_counts.close()
-
-        self.min_lidar_values = 1000000
-        self.max_lidar_values = -100000
-        self.lidar_points_count = []
         self.counter = 0
-        self.x_dist_to_waypoint = []
-        self.y_dist_to_waypoint = []
-        self.angle_to_center_of_lane_degrees = []
-        self.angle_to_center_of_lane_degrees_2 = []
-        self.angle_to_center_of_lane_degrees_5 = []
-        self.angle_to_center_of_lane_degrees_7 = []
-        self.angle_to_center_of_lane_degrees_ahead_waypoints = []
-        # self.angle_to_center_of_lane_degrees_ahead_waypoints_2 = []
-        self.angle_between_waypoints_minus5 = []
-        self.angle_between_waypoints_minus7 = []
-        self.angle_between_waypoints_minus10 = []
-        self.angle_between_waypoints_minus12 = []
-        self.angle_between_waypoints_5 = []
-        self.angle_between_waypoints_7 = []
-        self.angle_between_waypoints_10 = []
-        self.angle_between_waypoints_12 = []
-        self.truck_bearing_to_waypoint = []
-        self.truck_bearing_to_waypoint_2 = []
-        self.truck_bearing_to_waypoint_5 = []
-        self.truck_bearing_to_waypoint_7 = []
-        self.truck_bearing_to_waypoint_10 = []
         self.distance_to_center_of_lane = []
         self.trailer_bearing_to_waypoint = []
-        self.trailer_bearing_to_waypoint_2 = []
-        self.trailer_bearing_to_waypoint_5 = []
-        self.trailer_bearing_to_waypoint_7 = []
-        self.trailer_bearing_to_waypoint_10 = []
-        # self.bearing_to_ahead_waypoints_ahead_2 = []
-        self.angle_between_truck_and_trailer = []
-        self.trailer_bearing_to_waypoint = []
         self.forward_velocity = []
-        self.line_reward = []
-        self.line_reward_location = []
-        self.point_reward = []
-        self.point_reward_location = []
         self.total_episode_reward = []
-        # self.forward_velocity_x = []
-        # self.forward_velocity_z = []
         self.vehicle_path = []
         self.temp_route = []
-        self.hyp_distance_to_next_waypoint = []
-        self.hyp_distance_to_next_plus_1_waypoint = []
-        self.closest_distance_to_next_waypoint_line = []
-        self.closest_distance_to_next_plus_1_waypoint_line = []
         self.collisions = []
-        self.lidar_data = collections.deque(maxlen=4)
-        self.radii = []
-        self.mean_radius = []
         self.reward_metric = 0
-        # self.acceleration = []
-
-
-
-
-
-
-
 
     # [33,28, 27, 17,  14, 11, 10, 5]
 
@@ -594,23 +406,14 @@ class DQNExperimentBasic(BaseExperiment):
         self.custom_enable_rendering = core.custom_enable_rendering
         self.current_time = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S_%f")
 
-        radii, mean_radius = get_radii(core.route,core.last_waypoint_index,5)
-
         self.entry_idx = core.entry_spawn_point_index
         self.exit_idx = core.exit_spawn_point_index
 
         number_of_waypoints_ahead_to_calculate_with = 0
-        ahead_waypoints = 10
-        ahead_waypoints_2 = 20
 
         # Getting truck location
         truck_transform = core.hero.get_transform()
         truck_forward_vector = truck_transform.get_forward_vector()
-
-        x_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.x - truck_transform.location.x)
-        y_dist_to_next_waypoint = abs(core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location.y - truck_transform.location.y)
-        hyp_distance_to_next_waypoint = math.sqrt((x_dist_to_next_waypoint) ** 2 + (y_dist_to_next_waypoint) ** 2)
-        self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
 
         if core.config["truckTrailerCombo"]:
             # Getting trailer location
@@ -633,8 +436,6 @@ class DQNExperimentBasic(BaseExperiment):
         in_front_of_waypoint = core.is_in_front_of_waypoint(truck_transform.location.x, truck_transform.location.y)
         if 10 > distance_to_next_waypoint_line and (in_front_of_waypoint == 0 or in_front_of_waypoint == 1):
             core.last_waypoint_index = core.last_waypoint_index + 1
-            self.last_hyp_distance_to_next_waypoint = 0
-            self.last_closest_distance_to_next_waypoint_line = 0
             self.passed_waypoint = True
             print('Passed Waypoint <------------') if self.custom_enable_rendering else None
         else:
@@ -809,20 +610,6 @@ class DQNExperimentBasic(BaseExperiment):
                     self.frame += 1
 
 
-
-
-
-
-            elif sensor == "lidar_trailer_0_left_trailer":
-                lidar_points = sensor_data['lidar_trailer_0_left_trailer'][1]
-                lidar_range = float(self.config["hero"]["sensors"]["lidar_trailer_0_left"]["range"])
-                sidewalk_lidar_points = lidar_points[0]
-                if self.traffic:
-                    sidewalk_lidar_points, vehicle_lidar_points = self.get_sidewalk_vehicle_lidar_points(lidar_points)
-                    trailer_0_left_vehicle = self.get_min_lidar_point(vehicle_lidar_points, lidar_range)
-
-                trailer_0_left_sidewalk = self.get_min_lidar_point(sidewalk_lidar_points, lidar_range)
-
         output_values = []
         max_distance = 32
         for i in range(360):
@@ -891,7 +678,6 @@ class DQNExperimentBasic(BaseExperiment):
         self.distance_to_center_of_lane.append(np.float32(distance_to_center_of_lane))
         self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
         self.temp_route = deepcopy(core.route_points)
-        self.radii.append(radii)
 
 
         self.counter += 1
@@ -1018,8 +804,6 @@ class DQNExperimentBasic(BaseExperiment):
 
         reward_trailer_bearing_to_waypoint = info['trailer_bearing_to_waypoint']
         reward_trailer_distance_to_center_of_lane = info['trailer_distance_to_center_of_lane']
-
-        self.last_hyp_distance_to_next_waypoint = hyp_distance_to_next_waypoint
 
         # 0 straight
         # 1 right
