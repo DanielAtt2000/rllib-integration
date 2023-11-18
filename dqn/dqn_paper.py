@@ -40,7 +40,7 @@ from rllib_integration.sensors.sensor_interface import LABEL_COLORS
 class DQNExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        self.acceleration_pid = PID(Kp=0.2,Ki=0.2,Kd=0.0,setpoint=4,sample_time=None,output_limits=(0,1))
+        self.acceleration_pid = PID(Kp=0.2,Ki=0.0,Kd=0.0,setpoint=3.2,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -79,7 +79,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.lidar_window()
         self.distance_cutoff_1 = 0.17
         self.distance_cutoff_2 = 0.36
-        self.distance_cutoff_3 = 4.00
+        self.distance_cutoff_3 = 9.00
 
         self.VIRIDIS = np.array(cm.get_cmap('plasma').colors)
 
@@ -481,16 +481,17 @@ class DQNExperimentBasic(BaseExperiment):
         virtual_lidar_centre_point = (x_virtual_lidar_centre_point,y_virtual_lidar_centre_point,z_virtual_lidar_centre_point)
 
 
+        rear_trailer_angle_to_center_of_lane_degrees = calculate_angle_with_center_of_lane(
+            previous_position=core.route[self.current_trailer_waypoint - 1].location,
+            current_position=trailer_rear_axle_transform.location,
+            next_position=core.route[
+                self.current_trailer_waypoint + number_of_waypoints_ahead_to_calculate_with].location)
 
-        trailer_angle_to_center_of_lane_degrees = calculate_angle_with_center_of_lane(
-            previous_position=core.route[core.last_waypoint_index-1].location,
-            current_position=trailer_transform.location,
-            next_position=core.route[core.last_waypoint_index + number_of_waypoints_ahead_to_calculate_with].location)
 
         distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=truck_transform)
         trailer_distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=trailer_rear_axle_transform,waypoint_no=self.current_trailer_waypoint)
 
-        if trailer_angle_to_center_of_lane_degrees < 0:
+        if rear_trailer_angle_to_center_of_lane_degrees < 0:
             trailer_distance_to_center_of_lane = -trailer_distance_to_center_of_lane
 
         forward_vector_waypoint_0 = core.route[core.last_waypoint_index + 0].get_forward_vector()
@@ -603,7 +604,7 @@ class DQNExperimentBasic(BaseExperiment):
             else:
                 output_values.append(np.clip(lidar_points_dict[i],0,max_distance))
 
-        if self.visualiseLIDARCircle:
+        if self.visualiseLIDARCircle and self.counter % 15 == 0:
             print(azimuth_0)
             x_values = []
             y_values = []
