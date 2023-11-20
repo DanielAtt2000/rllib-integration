@@ -458,6 +458,7 @@ class DQNExperimentBasic(BaseExperiment):
 
         distance_to_next_waypoint_line = core.distToSegment(truck_transform=truck_transform,waypoint_plus_current=1)
         self.passed_waypoint = False
+
         in_front_of_waypoint = core.is_in_front_of_waypoint(truck_transform.location.x, truck_transform.location.y)
         if 10 > distance_to_next_waypoint_line and (in_front_of_waypoint == 0 or in_front_of_waypoint == 1):
             core.last_waypoint_index = core.last_waypoint_index + 1
