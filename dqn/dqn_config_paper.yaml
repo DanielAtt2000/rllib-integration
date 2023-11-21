@@ -15,11 +15,11 @@ dueling: false
 #num_atoms: 51
 #noisy: True
 gamma: 0.99
-lr: 0.0001
+lr: 0.0000005
 #lr: .0001
-hiddens: [100,100,100,100]
+hiddens: [512,512,1024]
 #rollout_fragment_length: 4
-train_batch_size: 16
+train_batch_size: 256
 "exploration_config": {
   "type": "EpsilonGreedy",
   "initial_epsilon": 1.0,
