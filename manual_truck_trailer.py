@@ -261,6 +261,8 @@ class World(object):
             self.player_max_speed_fast = float(blueprint.get_attribute('speed').recommended_values[2])
         # get trailer blueprint
         blueprintTrailer = random.choice(get_actor_blueprints(self.world, "vehicle.trailer.trailer", self._actor_generation))
+        # blueprintTrailer = random.choice(get_actor_blueprints(self.world, "vehicle.trailershort.trailershort", self._actor_generation))
+
         blueprintTrailer.set_attribute('role_name', 'hero-trailer')
         # Spawn the player.
         if self.player is not None:

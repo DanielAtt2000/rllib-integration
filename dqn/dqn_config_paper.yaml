@@ -81,7 +81,8 @@ env_config:
       truckTrailerCombo: True
       blueprintTruck: "vehicle.daf.dafxf"
 #      blueprintTruck: "vehicle.audi.a2"
-      blueprintTrailer: "vehicle.trailer.trailer"
+#      blueprintTrailer: "vehicle.trailer.trailer"
+      blueprintTrailer: "vehicle.trailershort.trailershort"
       paperImplementation: 'True'
       lidar_max_points : 3000
       sensors:
