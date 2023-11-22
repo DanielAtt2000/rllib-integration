@@ -40,7 +40,7 @@ from rllib_integration.sensors.sensor_interface import LABEL_COLORS
 class DQNExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        self.acceleration_pid = PID(Kp=0.2,Ki=0.0,Kd=0.0,setpoint=1.5,sample_time=None,output_limits=(0,1))
+        self.acceleration_pid = PID(Kp=0.2,Ki=0.0,Kd=0.0,setpoint=4,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]

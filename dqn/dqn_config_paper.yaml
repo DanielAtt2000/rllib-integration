@@ -127,6 +127,6 @@ env_config:
 #    town: '20m'
     others:
       framestack: 1
-      max_time_idle: 10000
+      max_time_idle: 300
       max_time_episode: 6400
       traffic: False
