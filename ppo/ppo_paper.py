@@ -77,9 +77,9 @@ class PPOExperimentBasic(BaseExperiment):
         self.visualiseRADAR = False
         self.visualiseLIDARCircle = False
         self.lidar_window()
-        self.distance_cutoff_1 = 0.17
-        self.distance_cutoff_2 = 0.36
-        self.distance_cutoff_3 = 3.70
+        self.distance_cutoff_1 = 0.07
+        self.distance_cutoff_2 = 0.15
+        self.distance_cutoff_3 = 0.7
 
         self.VIRIDIS = np.array(cm.get_cmap('plasma').colors)
 
