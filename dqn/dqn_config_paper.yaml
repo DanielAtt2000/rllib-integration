@@ -15,11 +15,11 @@ dueling: false
 #num_atoms: 51
 #noisy: True
 gamma: 0.99
-lr: 0.0000005
+lr: 0.0001
 #lr: .0001
-hiddens: [512,512,1024]
+hiddens: [100,100,100,100]
 #rollout_fragment_length: 4
-train_batch_size: 256
+train_batch_size: 16
 "exploration_config": {
   "type": "EpsilonGreedy",
   "initial_epsilon": 1.0,
@@ -122,7 +122,7 @@ env_config:
     town1Ratio: 0.4
 #    town2: 'doubleRoundabout37'
 #    town2: 'mediumRoundabout4'
-    town2 : 'doubleRoundabout37'
+    town2 : 'None'
     town2Ratio: 0.6
 #    town: '20m'
     others:
