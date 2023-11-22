@@ -566,7 +566,7 @@ def plot_route(route_points_all, truck_points_all,trailer_points_all=[]):
 
                 # testing = True
                 # if testing and roundabout != 'double':
-                a1.axis([new_x_min - buffer, new_x_max + buffer, new_y_min - buffer, new_y_max + buffer])
+                # a1.axis([new_x_min - buffer, new_x_max + buffer, new_y_min - buffer, new_y_max + buffer])
                 #
                 # elif testing and roundabout == 'double':
                 #     if y_route[idx][0] > 0:
