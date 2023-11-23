@@ -337,7 +337,7 @@ class DQNExperimentBasic(BaseExperiment):
         :return:
         """
         lower_bound_list = [0 for x in range(360)]
-        upper_bound_list = [300 for x in range(360)]
+        upper_bound_list = [1 for x in range(360)]
 
 
         obs_space = Dict({
@@ -601,9 +601,9 @@ class DQNExperimentBasic(BaseExperiment):
         max_distance = 32
         for i in range(360):
             if lidar_points_dict.get(i) == None:
-                output_values.append(max_distance)
+                output_values.append(max_distance/max_distance)
             else:
-                output_values.append(np.clip(lidar_points_dict[i],0,max_distance))
+                output_values.append(np.clip(lidar_points_dict[i],0,max_distance)/max_distance)
 
         if self.visualiseLIDARCircle and self.counter % 15 == 0:
             print(azimuth_0)
