@@ -37,6 +37,12 @@ from matplotlib import cm
 from rllib_integration.sensors.sensor_interface import LABEL_COLORS
 
 
+class Vector:
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
 class DQNExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
@@ -79,7 +85,7 @@ class DQNExperimentBasic(BaseExperiment):
         self.lidar_window()
         self.distance_cutoff_1 = 0.17
         self.distance_cutoff_2 = 0.36
-        self.distance_cutoff_3 = 3.70
+        self.distance_cutoff_3 = 2.00
 
         self.VIRIDIS = np.array(cm.get_cmap('plasma').colors)
 
@@ -497,6 +503,13 @@ class DQNExperimentBasic(BaseExperiment):
 
         forward_vector_waypoint_0 = core.route[core.last_waypoint_index + 0].get_forward_vector()
 
+        angle_between_lidar_and_orig = angle_between(waypoint_forward_vector=Vector(x=1,y=0,z=0),
+                                                     vehicle_forward_vector=Vector(
+                                                         x=truck_transform.location.x-trailer_rear_axle_transform.location.x,
+                                                     y=truck_transform.location.y-trailer_rear_axle_transform.location.y,
+                                                     z=0))
+        # print(f'angle between obs 1{math.degrees(angle_between_lidar_and_orig)}')
+
         trailer_bearing_to_waypoint = angle_between(waypoint_forward_vector=forward_vector_waypoint_0,
                                                   vehicle_forward_vector=trailer_forward_vector)
 
@@ -549,7 +562,12 @@ class DQNExperimentBasic(BaseExperiment):
                         # self.visualiseLIDARCircle = True
 
                     # azimuth_rounded = round(self.get_azimuth(sensor_centre=virtual_lidar_centre_point, detection_point=(x_lidar_point,y_lidar_point)))
-                    azimuth_rounded = round(self.get_azimuth(sensor_centre=virtual_lidar_centre_point, detection_point=(x_lidar_point,y_lidar_point)))
+                    azimuth_rounded = round(self.get_azimuth(sensor_centre=virtual_lidar_centre_point, detection_point=(x_lidar_point,y_lidar_point)) + math.degrees(angle_between_lidar_and_orig))
+
+                    if azimuth_rounded > 360:
+                        azimuth_rounded = azimuth_rounded-360
+                    if azimuth_rounded < 0:
+                        azimuth_rounded = 360+azimuth_rounded
 
                     if store:
                         azimuth_0.append(azimuth_rounded)
