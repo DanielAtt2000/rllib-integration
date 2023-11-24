@@ -83,7 +83,7 @@ class PPOExperimentBasic(BaseExperiment):
         self.trailer_lidar_collision = False
         self.visualiseLIDAR = False
         self.visualiseRADAR = False
-        self.visualiseLIDARCircle = True
+        self.visualiseLIDARCircle = False
         self.lidar_window()
         self.distance_cutoff_1 = 0.17
         self.distance_cutoff_2 = 0.36
