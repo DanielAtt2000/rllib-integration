@@ -363,8 +363,8 @@ class DQNExperimentBasic(BaseExperiment):
         return {
             # Discrete with pid value
             0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
-            1: [acceleration_value, 1, 0.0, False, False],  # Right
-            2: [acceleration_value, -1, 0.0, False, False],  # Left
+            1: [acceleration_value, 1.0, 0.0, False, False],  # Right
+            2: [acceleration_value, -1.0, 0.0, False, False],  # Left
         }
 
 
@@ -405,9 +405,9 @@ class DQNExperimentBasic(BaseExperiment):
 
         if action_control[1] == 0:
             self.last_action = 0
-        elif action_control[1] == 0.5:
+        elif action_control[1] > 0:
             self.last_action = 1
-        elif action_control[1] == -0.5:
+        elif action_control[1] < 0:
             self.last_action = 2
 
 

@@ -405,9 +405,9 @@ class PPOExperimentBasic(BaseExperiment):
 
         if action_control[1] == 0:
             self.last_action = 0
-        elif action_control[1] == 0.5:
+        elif action_control[1] > 0:
             self.last_action = 1
-        elif action_control[1] == -0.5:
+        elif action_control[1] < 0:
             self.last_action = 2
 
 
@@ -562,12 +562,15 @@ class PPOExperimentBasic(BaseExperiment):
                         # self.visualiseLIDARCircle = True
 
                     # azimuth_rounded = round(self.get_azimuth(sensor_centre=virtual_lidar_centre_point, detection_point=(x_lidar_point,y_lidar_point)))
-                    azimuth_rounded = round(self.get_azimuth(sensor_centre=virtual_lidar_centre_point, detection_point=(x_lidar_point,y_lidar_point)) + math.degrees(angle_between_lidar_and_orig))
+                    azimuth_rounded = round(self.get_azimuth(sensor_centre=virtual_lidar_centre_point, detection_point=(x_lidar_point,y_lidar_point)))
 
-                    if azimuth_rounded > 360:
-                        azimuth_rounded = azimuth_rounded-360
-                    if azimuth_rounded < 0:
-                        azimuth_rounded = 360+azimuth_rounded
+
+                    # azimuth_rounded = round(self.get_azimuth(sensor_centre=virtual_lidar_centre_point, detection_point=(x_lidar_point,y_lidar_point)) + math.degrees(angle_between_lidar_and_orig))
+
+                    # if azimuth_rounded > 360:
+                    #     azimuth_rounded = azimuth_rounded-360
+                    # if azimuth_rounded < 0:
+                    #     azimuth_rounded = 360+azimuth_rounded
 
                     if store:
                         azimuth_0.append(azimuth_rounded)
