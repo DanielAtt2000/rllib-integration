@@ -61,10 +61,12 @@ class PPOExperimentBasic(BaseExperiment):
 
 
         self.current_trailer_waypoint = 0
-        self.distance_to_center_of_lane = []
+        self.truck_distance_to_center_of_lane = []
+        self.trailer_distance_to_center_of_lane = []
         self.trailer_bearing_to_waypoint = []
         self.forward_velocity = []
         self.vehicle_path = []
+        self.trailer_vehicle_path = []
         self.temp_route = []
         self.collisions = []
         self.entry_idx = -1
@@ -81,7 +83,7 @@ class PPOExperimentBasic(BaseExperiment):
         self.trailer_lidar_collision = False
         self.visualiseLIDAR = False
         self.visualiseRADAR = False
-        self.visualiseLIDARCircle = False
+        self.visualiseLIDARCircle = True
         self.lidar_window()
         self.distance_cutoff_1 = 0.17
         self.distance_cutoff_2 = 0.36
@@ -303,11 +305,13 @@ class PPOExperimentBasic(BaseExperiment):
         self.last_no_of_collisions_truck = 0
         self.last_no_of_collisions_trailer = 0
 
-        self.save_to_file(f"{self.directory}/distance_to_center_of_lane", self.distance_to_center_of_lane)
+        self.save_to_file(f"{self.directory}/truck_distance_to_center_of_lane", self.truck_distance_to_center_of_lane)
+        self.save_to_file(f"{self.directory}/trailer_distance_to_center_of_lane", self.trailer_distance_to_center_of_lane)
         self.save_to_file(f"{self.directory}/trailer_bearing_to_waypoint", self.trailer_bearing_to_waypoint)
         self.save_to_file(f"{self.directory}/forward_velocity", self.forward_velocity)
         self.save_to_file(f"{self.directory}/route", self.temp_route)
         self.save_to_file(f"{self.directory}/path", self.vehicle_path)
+        self.save_to_file(f"{self.directory}/trailer_path", self.trailer_vehicle_path)
         self.save_to_file(f"{self.directory}/collisions", self.collisions)
         self.save_to_file(f"{self.directory}/total_episode_reward",self.total_episode_reward)
 
@@ -316,11 +320,13 @@ class PPOExperimentBasic(BaseExperiment):
         self.last_action = -1
 
         self.counter = 0
-        self.distance_to_center_of_lane = []
+        self.truck_distance_to_center_of_lane = []
+        self.trailer_distance_to_center_of_lane = []
         self.trailer_bearing_to_waypoint = []
         self.forward_velocity = []
         self.total_episode_reward = []
         self.vehicle_path = []
+        self.trailer_vehicle_path = []
         self.temp_route = []
         self.collisions = []
         self.reward_metric = 0
@@ -495,7 +501,7 @@ class PPOExperimentBasic(BaseExperiment):
                 self.current_trailer_waypoint + number_of_waypoints_ahead_to_calculate_with].location)
 
 
-        distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=truck_transform)
+        truck_distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=truck_transform)
         trailer_distance_to_center_of_lane = core.shortest_distance_to_center_of_lane(truck_transform=trailer_rear_axle_transform,waypoint_no=self.current_trailer_waypoint)
 
         if rear_trailer_angle_to_center_of_lane_degrees < 0:
@@ -701,15 +707,18 @@ class PPOExperimentBasic(BaseExperiment):
             time.sleep(0.1)
 
         self.forward_velocity.append(np.float32(forward_velocity))
-        self.distance_to_center_of_lane.append(np.float32(distance_to_center_of_lane))
+        self.truck_distance_to_center_of_lane.append(np.float32(truck_distance_to_center_of_lane))
+        self.trailer_distance_to_center_of_lane.append(np.float32(trailer_distance_to_center_of_lane))
         self.vehicle_path.append((truck_transform.location.x,truck_transform.location.y))
+        self.trailer_vehicle_path.append((trailer_rear_axle_transform.location.x,trailer_rear_axle_transform.location.y))
+
         self.temp_route = deepcopy(core.route_points)
 
 
         self.counter += 1
         return {'values':output_values},\
             {"truck_z_value":truck_transform.location.z,
-             "distance_to_center_of_lane":distance_to_center_of_lane,
+             "distance_to_center_of_lane":truck_distance_to_center_of_lane,
              "truck_acceleration": self.get_acceleration(core.hero),
              'trailer_distance_to_center_of_lane':trailer_distance_to_center_of_lane,
              "trailer_bearing_to_waypoint":trailer_bearing_to_waypoint}

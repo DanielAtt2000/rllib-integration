@@ -300,25 +300,25 @@ lower_medium_roundabout_easy = [
 
 lower_medium_roundabout_difficult = [
     # [21, [9], "left"],
-    # [21, [48], "left"],
-    # [21, [64], "left"],
+    [21, [48], "left"],
+    [21, [64], "left"],
     # [29, [36], "right"],
     # [29, [55], "right"],
     #
     # # [4, [48], "left"],
-    # [4, [64], "left"],
+    [4, [64], "left"],
     # # [4, [17], "left"],
     # # [5, [55], "right"],
     # [5, [67], "right"],
     #
     # [10, [64], "left"],
     # # [10, [17], "left"],
-    # [10, [9], "left"],
+    [10, [9], "left"],
     # [66, [67], "right"],
     # [66, [46], "right"],
     #
     # # [35, [17], "left"],
-    # [35, [9], "left"],
+    [35, [9], "left"],
     [35, [48], "left"],
     ]
 
@@ -668,8 +668,8 @@ def get_entry_exit_spawn_point_indices_2_lane(failed_spawn_locations, last_round
 
         if mediumRoundaboutType == 'training' or mediumRoundaboutType == '':
             # total of 13 routes lower
-            # roundabouts = [lower_medium_roundabout_easy+lower_medium_roundabout_difficult]
-            roundabouts = [lower_medium_roundabout_difficult]
+            roundabouts = [lower_medium_roundabout_easy+lower_medium_roundabout_difficult]
+            # roundabouts = [lower_medium_roundabout_difficult]
         elif mediumRoundaboutType == 'testing':
             # total of 7 routes lower
             roundabouts = [upper_medium_roundabout]
