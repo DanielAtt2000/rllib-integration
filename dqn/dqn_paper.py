@@ -46,7 +46,7 @@ class Vector:
 class DQNExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        self.acceleration_pid = PID(Kp=0.2,Ki=0.0,Kd=0.0,setpoint=1.9,sample_time=None,output_limits=(0,1))
+        self.acceleration_pid = PID(Kp=0.2,Ki=0.0,Kd=0.0,setpoint=1.9,sample_time=None,output_limits=(-1,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -364,13 +364,17 @@ class DQNExperimentBasic(BaseExperiment):
 
     def get_actions(self):
         acceleration_value = self.acceleration_pid(self.current_forward_velocity)
+        braking_value = 0
+        if acceleration_value < 0:
+            braking_value = abs(acceleration_value)
+            acceleration_value = 0
         print(f"Acceleration value {acceleration_value}") if self.custom_enable_rendering else None
 
         return {
             # Discrete with pid value
-            0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
-            1: [acceleration_value, 0.35, 0.0, False, False],  # Right
-            2: [acceleration_value, -0.35, 0.0, False, False],  # Left
+            0: [acceleration_value, 0.00, braking_value, False, False],  # Straight
+            1: [acceleration_value, 1, braking_value, False, False],  # Right
+            2: [acceleration_value, -1, braking_value, False, False],  # Left
         }
 
 
@@ -400,7 +404,7 @@ class DQNExperimentBasic(BaseExperiment):
             action_msg += f"{action_control[1]} Right "
 
         if action_control[2] != 0:
-            action_msg += f"{action_control[2]} Break "
+            action_msg += f"{action_control[2]} Brake "
 
         if action_msg == "":
             action_msg += " Coast "
