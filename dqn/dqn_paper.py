@@ -46,7 +46,7 @@ class Vector:
 class DQNExperimentBasic(BaseExperiment):
     def __init__(self, config={}):
         super().__init__(config)  # Creates a self.config with the experiment configuration
-        self.acceleration_pid = PID(Kp=0.2,Ki=0.0,Kd=0.0,setpoint=4,sample_time=None,output_limits=(0,1))
+        self.acceleration_pid = PID(Kp=0.2,Ki=0.0,Kd=0.0,setpoint=1.9,sample_time=None,output_limits=(0,1))
         self.frame_stack = self.config["others"]["framestack"]
         self.max_time_idle = self.config["others"]["max_time_idle"]
         self.max_time_episode = self.config["others"]["max_time_episode"]
@@ -369,8 +369,8 @@ class DQNExperimentBasic(BaseExperiment):
         return {
             # Discrete with pid value
             0: [acceleration_value, 0.00, 0.0, False, False],  # Straight
-            1: [acceleration_value, 0.1, 0.0, False, False],  # Right
-            2: [acceleration_value, -0.1, 0.0, False, False],  # Left
+            1: [acceleration_value, 0.35, 0.0, False, False],  # Right
+            2: [acceleration_value, -0.35, 0.0, False, False],  # Left
         }
 
 
