@@ -711,10 +711,10 @@ def plot_route(route_points_all, truck_points_all,trailer_points_all=[]):
 
                 items_to_plot = [
                                  # ('trailer_bearing_to_waypoint', -math.pi, math.pi),
-                                 ('forward_velocity',0,20),
+                                 ('forward_velocity',0,5),
                                  ('total_episode_reward',-2,2),
                                  ('truck_distance_to_center_of_lane',0,5),
-                                 ('trailer_distance_to_center_of_lane',0,5)
+                                 ('trailer_distance_to_center_of_lane',-3.5,3.5)
                                  ]
 
                 if len(items_to_plot_derived) != len(items_to_plot):
