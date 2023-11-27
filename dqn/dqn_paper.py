@@ -461,7 +461,7 @@ class DQNExperimentBasic(BaseExperiment):
             trailer_transform = core.hero_trailer.get_transform()
             trailer_forward_vector = trailer_transform.get_forward_vector()
 
-        d = 3
+        d = 2
         magnitude_of_trailer_forward_vector = math.sqrt(trailer_forward_vector.x**2+trailer_forward_vector.y**2+trailer_forward_vector.z**2)
         trailer_rear_axle_transform = carla.Transform(
             carla.Location(trailer_transform.location.x-trailer_forward_vector.x*magnitude_of_trailer_forward_vector*d,
