@@ -26,6 +26,14 @@ def run(filenames=[],label_names = [],window_size=[]):
             window_size.append(window_reward)
     plt.figure(figsize=(9, 5))
 
+    ciMethodChoice = input('Select confidence Interval method: 0/1/2: ')
+    try:
+        ciMethodChoice = int(ciMethodChoice)
+        assert (ciMethodChoice == 0 or ciMethodChoice == 1 or ciMethodChoice == 2)
+
+    except Exception:
+        raise('Choice should be int and either 0 1 or 2 ')
+
     for filename,window,label in zip(filenames,window_size,label_names):
         done_array = open_pickle(f'done/{filename}_done')
         rewards = open_pickle(f'rewards/{filename}_total_reward')
@@ -49,9 +57,17 @@ def run(filenames=[],label_names = [],window_size=[]):
         for ind in range(stopping_value,0+window-1,-1):
             x = np.mean(rewards[ind - window:ind])
             last_index_done = ind
-            a = statistics.stdev(rewards[ind - window:ind])
-            reward_upper.append(x+a)
-            reward_lower.append(x-a)
+
+            if ciMethodChoice == 2:
+                a = st.norm.interval(alpha=0.95,
+                     loc=np.mean(rewards[ind - window:ind]),
+                     scale=st.sem(rewards[ind - window:ind]))
+                reward_upper.append(a[0])
+                reward_lower.append(a[1])
+            elif ciMethodChoice == 1:
+                a = statistics.stdev(rewards[ind - window:ind])
+                reward_upper.append(x + a)
+                reward_lower.append(x - a)
             average.append(x)
 
         last_average = average[-1]
@@ -62,9 +78,16 @@ def run(filenames=[],label_names = [],window_size=[]):
                 reward_upper.append(0)
                 reward_lower.append(0)
             else:
-                a = statistics.stdev(rewards[:ind])
-                reward_upper.append(x + a)
-                reward_lower.append(x - a)
+                if ciMethodChoice == 2:
+                    a = st.norm.interval(alpha=0.95,
+                                         loc=np.mean(rewards[ind - window:ind]),
+                                         scale=st.sem(rewards[ind - window:ind]))
+                    reward_upper.append(a[0])
+                    reward_lower.append(a[1])
+                elif ciMethodChoice == 1:
+                    a = statistics.stdev(rewards[:ind])
+                    reward_upper.append(x + a)
+                    reward_lower.append(x - a)
             average.append(x)
         # for i in range(window):
         #     average.append(0)
@@ -103,7 +126,8 @@ def run(filenames=[],label_names = [],window_size=[]):
         plt.ylabel(f'Episode return averaged over \n a {window_reward} episode sliding window')
     else:
         plt.ylabel(f'Episode return averaged over \n different episode sliding window sizes')
-
+    # Possible range restriction here
+    # plt.ylim([-1.1, 6.3])
     plt.xlabel('Number of episodes')
 
     # plt.xticks(np.arange(0, 8000 + 1, 500))
